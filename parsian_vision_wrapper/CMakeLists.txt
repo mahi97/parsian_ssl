@@ -9,7 +9,6 @@ project(parsian_vision_wrapper)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   parsian_msgs
-  parsian_util
   roscpp
   rospy
 )
