@@ -163,7 +163,7 @@ set(CMAKE_CXX_FLAGS "\
 ## Protobuf conversion & compiling ##
 #####################################
 
-set(proto_dir ${PROJECT_SOURCE_DIR}/mahi)
+set(proto_dir ${PROJECT_SOURCE_DIR}/proto)
 set(proto_files
     ${proto_dir}/grSim_Replacement.proto
     ${proto_dir}/grSim_Commands.proto
