@@ -15,6 +15,17 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+find_package(Protobuf REQUIRED)
+
+set(CMAKE_CXX_FLAGS "\
+--std=c++14 ${CMAKE_CXX_FLAGS} \
+-Wall \
+-Wno-unused-function \
+-Wsign-compare \
+-g \
+"
+)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -104,23 +115,17 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+#catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES parsian_util
 #  CATKIN_DEPENDS geometry_msgs parsian_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
-)
+#)
 
 ###########
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -151,6 +156,115 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+
+
+
+#####################################
+## Protobuf conversion & compiling ##
+#####################################
+
+set(proto_dir ${PROJECT_SOURCE_DIR}/mahi)
+set(proto_files
+    ${proto_dir}/grSim_Replacement.proto
+    ${proto_dir}/grSim_Commands.proto
+    ${proto_dir}/grSim_Packet.proto
+    ${proto_dir}/messages_robocup_ssl_detection.proto
+    ${proto_dir}/messages_robocup_ssl_geometry.proto
+    ${proto_dir}/messages_robocup_ssl_refbox_log.proto
+    ${proto_dir}/messages_robocup_ssl_wrapper.proto
+    ${proto_dir}/multi_team_communication.proto
+    ${proto_dir}/radio_protocol_command.proto
+    ${proto_dir}/radio_protocol_wrapper.proto
+    ${proto_dir}/referee.proto
+    ${proto_dir}/robot_status.proto
+)
+
+# Set up destination directories
+catkin_destinations()
+set(proto_gen_cpp_dir ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+set(proto_gen_python_dir ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION})
+file(MAKE_DIRECTORY ${proto_gen_cpp_dir})
+file(MAKE_DIRECTORY ${proto_gen_python_dir})
+set(protogen_include_dirs ${proto_gen_cpp_dir}/../ ${proto_gen_python_dir})
+
+# catkin_python_setup()
+
+catkin_package(
+  INCLUDE_DIRS 
+    include 
+    ${protogen_include_dirs}
+  LIBRARIES
+    parsian_util 
+    ${PROJECT_NAME}_proto
+)
+
+include_directories(
+    ${catkin_INCLUDE_DIRS}
+    include
+    ${PROTOBUF_INCLUDE_DIR}
+    ${PROTOBUF_INCLUDE_DIR}/../../
+)
+
+# Create lists of files to be generated.
+set(proto_gen_cpp_files "")
+set(proto_gen_python_files "")
+foreach(proto_file ${proto_files})
+    get_filename_component(proto_name ${proto_file} NAME_WE)
+    list(APPEND proto_gen_cpp_files ${proto_gen_cpp_dir}/${proto_name}.pb.h ${proto_gen_cpp_dir}/${proto_name}.pb.cc)
+    list(APPEND proto_gen_python_files ${proto_gen_python_dir}/${proto_name}_pb2.py)
+endforeach(proto_file ${proto_files})
+
+# Run protoc and generate language-specific headers.
+add_custom_command(
+    OUTPUT ${proto_gen_cpp_files} ${proto_gen_python_files}
+    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --proto_path=${proto_dir} --cpp_out=${proto_gen_cpp_dir} --python_out=${proto_gen_python_dir} ${proto_files}
+    
+    DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${proto_files}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+set_source_files_properties(${proto_gen_cpp_files} PROPERTIES GENERATED TRUE)
+set_source_files_properties(${proto_gen_python_files} PROPERTIES GENERATED TRUE)
+
+# Make the python message folder a python package.
+file(APPEND ${proto_gen_python_dir}/__init__.py "")
+
+add_custom_target(${PROJECT_NAME}_generate_headers
+    DEPENDS ${proto_gen_cpp_files} ${proto_gen_python_files}
+)
+
+# Create proto library for linking.
+add_library(${PROJECT_NAME}_proto ${proto_gen_cpp_files})
+target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARY})
+add_dependencies(${PROJECT_NAME}_proto ${PROJECT_NAME}_generate_headers)
+
+install(TARGETS ${PROJECT_NAME}_proto
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY ${proto_gen_cpp_dir}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+)
+
+install(DIRECTORY ${proto_gen_python_dir}/
+  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+  FILES_MATCHING PATTERN "*.py"
+)
+
+#add_library(parsian_util
+#)
+#add_dependencies(parsian_util
+#    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+#    ${catkin_EXPORTED_TARGETS}
+#    )
+#target_link_libraries(parsian_util
+#    ${catkin_LIBRARIES}
+#    ${PROJECT_NAME}_proto
+#)
+
 
 #############
 ## Install ##
