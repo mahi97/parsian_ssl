@@ -1,85 +1,101 @@
+#include <csignal>
+#include <chrono>
+
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 
-#include <sstream>
+#include <dynamic_reconfigure/server.h>
+#include <parsian_vision_wrapper/util/convert/convert_detection.h>
+#include <parsian_vision_wrapper/util/convert/convert_geometry.h>
 
-/**
- * This tutorial demonstrates simple sending of messages over the ROS system.
- */
+#include "parsian_msgs/ssl_vision_detection.h"
+#include "parsian_msgs/ssl_vision_geometry.h"
+#include "parsian_util/messages_robocup_ssl_wrapper.pb.h"
+#include "parsian_vision_wrapper/networkConfig.h"
+#include "parsian_vision_wrapper/util/net/robocup_ssl_client.h"
+
+
+
+bool shutDown = false;
+RoboCupSSLClient *vision;
+struct SVisionConfig {
+    std::string ip;
+    int port;
+} visionConfig;
+
+
+void sigintHandler(int) {
+    shutDown = true;
+}
+
+void reconnect()
+{
+//    mergedHalfWorld.ball.clear();
+//    for (int i=0;i<_NUM_PLAYERS;i++)
+//    {
+//        mergedHalfWorld.ourTeam[i].clear();
+//        mergedHalfWorld.oppTeam[i].clear();
+//    }
+    if (vision != NULL) delete vision;
+    vision = new RoboCupSSLClient(visionConfig.port, visionConfig.ip.c_str());
+    if (!vision->open(false)) ROS_WARN("Connection Failed.");
+    else ROS_INFO("Connected!");
+}
+
+void callback(ssl_vision_wrapper::networkConfig  &config, uint32_t level) {
+//    ROS_INFO("Reconfigure Request: %s %d", config.vision_multicast_ip, config.vision_multicast_port);
+    visionConfig.ip = config.vision_multicast_ip;
+    visionConfig.port = config.vision_multicast_port;
+    reconnect();
+}
+
+
 int main(int argc, char **argv)
 {
-  /**
-   * The ros::init() function needs to see argc and argv so that it can perform
-   * any ROS arguments and name remapping that were provided at the command line.
-   * For programmatic remappings you can use a different version of init() which takes
-   * remappings directly, but for most command-line programs, passing argc and argv is
-   * the easiest way to do it.  The third argument to init() is the name of the node.
-   *
-   * You must call one of the versions of ros::init() before using any other
-   * part of the ROS system.
-   */
-  ros::init(argc, argv, "talker");
+    ros::init(argc, argv, "parsian_vision", ros::init_options::NoSigintHandler);
+    signal(SIGINT, sigintHandler);
+    ros::NodeHandle n;
 
-  /**
-   * NodeHandle is the main access point to communications with the ROS system.
-   * The first NodeHandle constructed will fully initialize this node, and the last
-   * NodeHandle destructed will close down the node.
-   */
-  ros::NodeHandle n;
+    ros::Publisher ssl_geometry_pub  = n.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
+    ros::Publisher ssl_detection_pub = n.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
 
-  /**
-   * The advertise() function is how you tell ROS that you want to
-   * publish on a given topic name. This invokes a call to the ROS
-   * master node, which keeps a registry of who is publishing and who
-   * is subscribing. After this advertise() call is made, the master
-   * node will notify anyone who is trying to subscribe to this topic name,
-   * and they will in turn negotiate a peer-to-peer connection with this
-   * node.  advertise() returns a Publisher object which allows you to
-   * publish messages on that topic through a call to publish().  Once
-   * all copies of the returned Publisher object are destroyed, the topic
-   * will be automatically unadvertised.
-   *
-   * The second parameter to advertise() is the size of the message queue
-   * used for publishing messages.  If messages are published more quickly
-   * than we can send them, the number here specifies how many messages to
-   * buffer up before throwing some away.
-   */
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+    ros::Rate loop_rate(62);
+    RoboCupSSLClient *vision_client = NULL;
 
-  ros::Rate loop_rate(10);
+    std::chrono::high_resolution_clock::time_point last_param_update_time;
 
-  /**
-   * A count of how many messages we have sent. This is used to create
-   * a unique string for each message.
-   */
-  int count = 0;
-  while (ros::ok())
-  {
-    /**
-     * This is a message object. You stuff it with data, and then publish it.
-     */
-    std_msgs::String msg;
+    dynamic_reconfigure::Server<ssl_vision_wrapper::networkConfig> server;
+    dynamic_reconfigure::Server<ssl_vision_wrapper::networkConfig>::CallbackType f;
 
-    std::stringstream ss;
-    ss << "hello world " << count;
-    msg.data = ss.str();
+    f = boost::bind(&callback, _1, _2);
+    server.setCallback(f);
 
-    ROS_INFO("%s", msg.data.c_str());
+    SSL_WrapperPacket vision_packet;
 
-    /**
-     * The publish() function is how you send messages. The parameter
-     * is the message object. The type of this object must agree with the type
-     * given as a template parameter to the advertise<>() call, as was done
-     * in the constructor above.
-     */
-    chatter_pub.publish(msg);
+    while (ros::ok() && !shutDown) {
 
-    ros::spinOnce();
+        parsian_msgs::ssl_vision_detection detection;
+        parsian_msgs::ssl_vision_geometry geometry;
+        if (vision_client->receive(vision_packet)) {
+            if (vision_packet.has_detection()) {
+                detection = pr::convert_detection_frame(vision_packet.detection());
+            }
 
-    loop_rate.sleep();
-    ++count;
-  }
+            if (vision_packet.has_geometry()) {
+                geometry = pr::convert_geometry_data(vision_packet.geometry());
+            }
+        }
+        ssl_geometry_pub.publish(geometry);
+        ssl_detection_pub.publish(detection);
 
+        ros::spinOnce();
 
-  return 0;
+        loop_rate.sleep();
+    }
+
+    vision_client->close();
+    delete vision_client;
+
+    ros::shutdown();
+
+    return 0;
 }
