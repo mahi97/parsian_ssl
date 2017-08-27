@@ -8,12 +8,12 @@ project(parsian_util)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  parsian_msgs
-  roscpp
-  rospy
-  std_msgs
-)
+        geometry_msgs
+        parsian_msgs
+        roscpp
+        rospy
+        std_msgs
+        )
 
 find_package(Protobuf REQUIRED)
 
@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS "\
 -Wsign-compare \
 -g \
 "
-)
+        )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -163,21 +163,21 @@ set(CMAKE_CXX_FLAGS "\
 ## Protobuf conversion & compiling ##
 #####################################
 
-set(proto_dir ${PROJECT_SOURCE_DIR}/mahi)
+set(proto_dir ${PROJECT_SOURCE_DIR}/proto)
 set(proto_files
-    ${proto_dir}/grSim_Replacement.proto
-    ${proto_dir}/grSim_Commands.proto
-    ${proto_dir}/grSim_Packet.proto
-    ${proto_dir}/messages_robocup_ssl_detection.proto
-    ${proto_dir}/messages_robocup_ssl_geometry.proto
-    ${proto_dir}/messages_robocup_ssl_refbox_log.proto
-    ${proto_dir}/messages_robocup_ssl_wrapper.proto
-    ${proto_dir}/multi_team_communication.proto
-    ${proto_dir}/radio_protocol_command.proto
-    ${proto_dir}/radio_protocol_wrapper.proto
-    ${proto_dir}/referee.proto
-    ${proto_dir}/robot_status.proto
-)
+        ${proto_dir}/grSim_Replacement.proto
+        ${proto_dir}/grSim_Commands.proto
+        ${proto_dir}/grSim_Packet.proto
+        ${proto_dir}/messages_robocup_ssl_detection.proto
+        ${proto_dir}/messages_robocup_ssl_geometry.proto
+        ${proto_dir}/messages_robocup_ssl_refbox_log.proto
+        ${proto_dir}/messages_robocup_ssl_wrapper.proto
+        ${proto_dir}/multi_team_communication.proto
+        ${proto_dir}/radio_protocol_command.proto
+        ${proto_dir}/radio_protocol_wrapper.proto
+        ${proto_dir}/referee.proto
+        ${proto_dir}/robot_status.proto
+        )
 
 # Set up destination directories
 catkin_destinations()
@@ -190,19 +190,21 @@ set(protogen_include_dirs ${proto_gen_cpp_dir}/../ ${proto_gen_python_dir})
 # catkin_python_setup()
 
 catkin_package(
-  INCLUDE_DIRS 
-    include 
-    ${protogen_include_dirs}
-  LIBRARIES
-    parsian_util 
-    ${PROJECT_NAME}_proto
+        INCLUDE_DIRS
+        include
+        ${protogen_include_dirs}
+        LIBRARIES
+        parsian_util
+        #    ${PROJECT_NAME}_proto
 )
 
+
+
 include_directories(
-    ${catkin_INCLUDE_DIRS}
-    include
-    ${PROTOBUF_INCLUDE_DIR}
-    ${PROTOBUF_INCLUDE_DIR}/../../
+        ${catkin_INCLUDE_DIRS}
+        include
+        ${PROTOBUF_INCLUDE_DIR}
+        ${PROTOBUF_INCLUDE_DIR}/../../
 )
 
 # Create lists of files to be generated.
@@ -216,11 +218,11 @@ endforeach(proto_file ${proto_files})
 
 # Run protoc and generate language-specific headers.
 add_custom_command(
-    OUTPUT ${proto_gen_cpp_files} ${proto_gen_python_files}
-    COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --proto_path=${proto_dir} --cpp_out=${proto_gen_cpp_dir} --python_out=${proto_gen_python_dir} ${proto_files}
-    
-    DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${proto_files}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT ${proto_gen_cpp_files} ${proto_gen_python_files}
+        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --proto_path=${proto_dir} --cpp_out=${proto_gen_cpp_dir} --python_out=${proto_gen_python_dir} ${proto_files}
+
+        DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${proto_files}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 set_source_files_properties(${proto_gen_cpp_files} PROPERTIES GENERATED TRUE)
@@ -230,36 +232,41 @@ set_source_files_properties(${proto_gen_python_files} PROPERTIES GENERATED TRUE)
 file(APPEND ${proto_gen_python_dir}/__init__.py "")
 
 add_custom_target(${PROJECT_NAME}_generate_headers
-    DEPENDS ${proto_gen_cpp_files} ${proto_gen_python_files}
-)
+        DEPENDS ${proto_gen_cpp_files} ${proto_gen_python_files}
+        )
 
 # Create proto library for linking.
-add_library(${PROJECT_NAME}_proto ${proto_gen_cpp_files})
-target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARY})
-add_dependencies(${PROJECT_NAME}_proto ${PROJECT_NAME}_generate_headers)
+#add_library(${PROJECT_NAME}_proto ${proto_gen_cpp_files})
+#target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARY})
+#add_dependencies(${PROJECT_NAME}_proto ${PROJECT_NAME}_generate_headers)
+add_library(${PROJECT_NAME} ${proto_gen_cpp_files})
+target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_headers)
 
-install(TARGETS ${PROJECT_NAME}_proto
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+
+install(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 install(DIRECTORY ${proto_gen_cpp_dir}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        )
 
 install(DIRECTORY ${proto_gen_python_dir}/
-  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
-  FILES_MATCHING PATTERN "*.py"
-)
+        DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+        FILES_MATCHING PATTERN "*.py"
+        )
 
 #add_library(parsian_util
 #)
 #add_dependencies(parsian_util
 #    ${${PROJECT_NAME}_EXPORTED_TARGETS}
 #    ${catkin_EXPORTED_TARGETS}
-#    )
+#)
+
 #target_link_libraries(parsian_util
 #    ${catkin_LIBRARIES}
 #    ${PROJECT_NAME}_proto
@@ -300,6 +307,11 @@ install(DIRECTORY ${proto_gen_python_dir}/
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+
+# add_library(parsian_util_proto ${PROTO_CPP} ${PROTO_H} ${PROTO_PY})
+# add_dependencies(parsian_util_proto ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(parsian_util_proto ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES} ${PROTOBUF_LIBRARY})
+#
 
 #############
 ## Testing ##
