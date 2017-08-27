@@ -59,8 +59,10 @@ int main(int argc, char **argv)
     ros::Publisher ssl_detection_pub = n.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
 
     ros::Rate loop_rate(62);
-    RoboCupSSLClient *vision_client = NULL;
-
+    vision = NULL;
+    visionConfig.port = 10006;
+    visionConfig.ip = "224.5.23.2";
+    reconnect();
     std::chrono::high_resolution_clock::time_point last_param_update_time;
 
     dynamic_reconfigure::Server<ssl_vision_wrapper::networkConfig> server;
@@ -75,7 +77,7 @@ int main(int argc, char **argv)
 
         parsian_msgs::ssl_vision_detection detection;
         parsian_msgs::ssl_vision_geometry geometry;
-        if (vision_client->receive(vision_packet)) {
+        if (vision->receive(vision_packet)) {
             if (vision_packet.has_detection()) {
                 detection = pr::convert_detection_frame(vision_packet.detection());
             }
@@ -92,8 +94,8 @@ int main(int argc, char **argv)
         loop_rate.sleep();
     }
 
-    vision_client->close();
-    delete vision_client;
+    vision->close();
+    delete vision;
 
     ros::shutdown();
 
