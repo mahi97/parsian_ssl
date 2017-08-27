@@ -240,7 +240,7 @@ add_custom_target(${PROJECT_NAME}_generate_headers
 #target_link_libraries(${PROJECT_NAME}_proto ${PROTOBUF_LIBRARY})
 #add_dependencies(${PROJECT_NAME}_proto ${PROJECT_NAME}_generate_headers)
 add_library(${PROJECT_NAME} ${proto_gen_cpp_files})
-target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY} ${PROTOBUF_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARIES})
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_headers)
 
 

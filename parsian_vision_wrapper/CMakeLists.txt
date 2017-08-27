@@ -21,6 +21,8 @@ find_package(catkin REQUIRED COMPONENTS
   parsian_util
 )
 
+find_package(Protobuf REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -49,8 +51,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+		include
+		${catkin_INCLUDE_DIRS}
 )
 
 
@@ -92,9 +94,10 @@ add_executable(
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-   ${PROJECT_NAME}_node
-   parsian_vision_convert
-   ${catkin_LIBRARIES}
+		${PROJECT_NAME}_node
+		parsian_vision_convert
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
 )
 
 ## Add cmake target dependencies of the executable
