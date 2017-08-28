@@ -164,20 +164,9 @@ set(CMAKE_CXX_FLAGS "\
 #####################################
 
 set(proto_dir ${PROJECT_SOURCE_DIR}/proto)
-set(proto_files
-        ${proto_dir}/grSim_Replacement.proto
-        ${proto_dir}/grSim_Commands.proto
-        ${proto_dir}/grSim_Packet.proto
-        ${proto_dir}/messages_robocup_ssl_detection.proto
-        ${proto_dir}/messages_robocup_ssl_geometry.proto
-        ${proto_dir}/messages_robocup_ssl_refbox_log.proto
-        ${proto_dir}/messages_robocup_ssl_wrapper.proto
-        ${proto_dir}/multi_team_communication.proto
-        ${proto_dir}/radio_protocol_command.proto
-        ${proto_dir}/radio_protocol_wrapper.proto
-        ${proto_dir}/referee.proto
-        ${proto_dir}/robot_status.proto
-        )
+file(GLOB proto_files "${proto_dir}/*.proto")
+message(STATUS "Proto Source Dir: ${proto_dir}")
+message(STATUS "Proto Source Files: ${proto_files}")
 
 # Set up destination directories
 catkin_destinations()
