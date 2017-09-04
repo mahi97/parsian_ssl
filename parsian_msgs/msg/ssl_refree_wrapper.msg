@@ -4,14 +4,14 @@
 uint64 packet_timestamp
 
 # The "coarse" stage of the game.
-RefereeStage stage
+ssl_refree_stage stage
 
 # The number of microseconds left in the stage.
 # Becomes negative when a stage runs over its specified time.
 int32 stage_time_left
 
 # The "fine" states of play.
-RefereeCommand command
+ssl_refree_command command
 
 # Number of commands issued since startup.
 # The ssl_referee.proto comments: (mod 2^32).
@@ -22,8 +22,8 @@ uint32 command_counter
 # Value changes only when a new command gets issued, not on each packet.
 uint64 command_timestamp
 
-RefereeTeamInfo yellow
-RefereeTeamInfo blue
+ssl_refree_teaminfo us
+ssl_refree_teaminfo them
 
 
-Vector2f designated_position
+geometry_msgs/Point32 designated_position
