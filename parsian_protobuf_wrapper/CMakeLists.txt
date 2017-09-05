@@ -110,7 +110,8 @@ set(proto_gen_python_files "")
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-        cfg/proto.cfg
+        cfg/vision.cfg
+        cfg/referee.cfg
 )
 
 ###################################
