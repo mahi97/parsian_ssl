@@ -7,7 +7,7 @@
 #include <parsian_protobuf_wrapper/common/net/robocup_ssl_client.h>
 #include <parsian_protobuf_wrapper/ssl-refbox/convert/convert_referee.h>
 
-#include "parsian_protobuf_wrapper/protoConfig.h"
+#include "parsian_protobuf_wrapper/refereeConfig.h"
 
 bool shutDown = false;
 RoboCupSSLClient *refBox;
@@ -37,13 +37,11 @@ void reconnect()
     else ROS_INFO("Connected!");
 }
 
-void callback(protobuf_wrapper_config::protoConfig &config, uint32_t level) {
+void callback(protobuf_wrapper_config::refereeConfig &config, uint32_t level) {
 //    ROS_INFO("Reconfigure Request: %s %d", config.vision_multicast_ip, config.vision_multicast_port);
     networkConfig.ip = config.refree_multicast_ip;
     networkConfig.port = config.refree_multicast_port;
     reconnect();
-
-    isOurColorYellow = (config.team_color == 0);
 
 }
 
@@ -62,13 +60,17 @@ int main(int argc, char **argv)
     reconnect();
     std::chrono::high_resolution_clock::time_point last_param_update_time;
 
-    dynamic_reconfigure::Server<protobuf_wrapper_config::protoConfig> server;
-    dynamic_reconfigure::Server<protobuf_wrapper_config::protoConfig>::CallbackType f;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig> server;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>::CallbackType f;
 
     f = boost::bind(&callback, _1, _2);
     server.setCallback(f);
 
     SSL_Referee ssl_referee;
+
+    std::string teamColor;
+    ros::param::get("/team_color", teamColor);
+    isOurColorYellow = (teamColor == "yellow");
 
     while (ros::ok() && !shutDown) {
 
