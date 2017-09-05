@@ -110,9 +110,7 @@ set(proto_gen_python_files "")
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-        cfg/SSLVision.cfg
-        cfg/RefBox.cfg
-        cfg/Common.cfg
+        cfg/proto.cfg
 )
 
 ###################################

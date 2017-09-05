@@ -8,16 +8,15 @@
 #include <parsian_protobuf_wrapper/ssl-vision/convert/convert_geometry.h>
 
 #include "parsian_protobuf_wrapper/messages_robocup_ssl_wrapper.pb.h"
-#include "parsian_protobuf_wrapper/SSLVisionConfig.h"
 #include "parsian_protobuf_wrapper/common/net/robocup_ssl_client.h"
 
-#include "parsian_protobuf_wrapper/CommonConfig.h"
+#include "parsian_protobuf_wrapper/protoConfig.h"
 
 
 bool shutDown = false;
 bool isOurColorYellow = false;
 RoboCupSSLClient *vision;
-parsian_protobuf_wrapper::SSLVisionConfig visionConfig;
+protobuf_wrapper_config::protoConfig visionConfig;
 
 
 void sigintHandler(int /*unused*/) {
@@ -38,19 +37,18 @@ void reconnect()
     else ROS_INFO("Connected!");
 }
 
-void callback(parsian_protobuf_wrapper::SSLVisionConfig  &config, uint32_t level) {
+void callback(protobuf_wrapper_config::protoConfig  &config, uint32_t level) {
     visionConfig.vision_multicast_ip = config.vision_multicast_ip;
     visionConfig.vision_multicast_port = config.vision_multicast_port;
     reconnect();
-}
 
-void callback2(parsian_protobuf_wrapper::CommonConfig  &config, uint32_t level) {
     isOurColorYellow = config.team_color == 0;
+
 }
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "parsian_vision", ros::init_options::NoSigintHandler);
+    ros::init(argc, argv, "vision_node", ros::init_options::NoSigintHandler);
     signal(SIGINT, sigintHandler);
     ros::NodeHandle n;
 
@@ -63,17 +61,11 @@ int main(int argc, char **argv)
     visionConfig.vision_multicast_ip = "224.5.23.2";
     reconnect();
 
-    dynamic_reconfigure::Server<parsian_protobuf_wrapper::SSLVisionConfig> server;
-    dynamic_reconfigure::Server<parsian_protobuf_wrapper::SSLVisionConfig>::CallbackType f;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::protoConfig> server;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::protoConfig>::CallbackType f;
 
     f = boost::bind(&callback, _1, _2);
     server.setCallback(f);
-
-    dynamic_reconfigure::Server<parsian_protobuf_wrapper::CommonConfig> server2;
-    dynamic_reconfigure::Server<parsian_protobuf_wrapper::CommonConfig>::CallbackType f2;
-
-    f2 = boost::bind(&callback2, _1, _2);
-    server2.setCallback(f2);
 
 
 
