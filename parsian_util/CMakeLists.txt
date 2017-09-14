@@ -102,8 +102,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES parsian_util
+  INCLUDE_DIRS include
+  LIBRARIES parsian_util_geom
 #  CATKIN_DEPENDS roscpp rospy
 #  DEPENDS system_lib
 )
@@ -115,14 +115,23 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/parsian_util.cpp
-# )
+add_library(${PROJECT_NAME}_geom 
+   src/geom/angle_deg.cpp
+   src/geom/circle_2d.cpp
+   src/geom/line_2d.cpp
+   src/geom/matrix_2d.cpp
+   src/geom/polygon_2d.cpp
+   src/geom/ray_2d.cpp
+   src/geom/rect_2d.cpp
+   src/geom/sector_2d.cpp
+   src/geom/triangle_2d.cpp
+   src/geom/vector_2d.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -145,9 +154,9 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(${PROJECT_NAME}_geom
+   ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
