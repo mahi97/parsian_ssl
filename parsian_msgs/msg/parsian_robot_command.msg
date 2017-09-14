@@ -1,6 +1,6 @@
-int robot_id
-int roller_speed
-int kickSpeed
+int8 robot_id
+int8 roller_speed
+int16 kickSpeed
 bool chip
 bool forceKick
 float64 vel_x
