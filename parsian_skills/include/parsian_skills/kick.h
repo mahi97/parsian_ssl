@@ -1,9 +1,8 @@
 #ifndef KICK_H
 #define KICK_H
 
-#include <parsian_skills/gotoball.h>
-#include "pid.h"
-
+#include "skill.h"
+#include "gotopoint.h"
 class QTime;
 
 class CSkillKickOneTouch;

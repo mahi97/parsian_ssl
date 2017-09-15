@@ -1,11 +1,12 @@
 #ifndef BASICSKILL_H
 #define BASICSKILL_H
 
-#include <agent.h>
-#include <statemachine.h>
-
-class CSkill;
-class CSkills;
+#include "parsian_util/statemachine.h"
+#include "parsian_util/base.h"
+#include "parsian_msgs/parsian_world_model.h"
+#include "parsian_msgs/parsian_robot_command.h"
+#include "parsian_msgs/parsian_robot.h"
+#include "parsian_msgs/parsian_agent.h"
 
 class CSkill
 {
@@ -14,18 +15,16 @@ protected:
     QString stateName();
 public:
     QString localAgentName;
-    CSkillConfigWidget* configWidget;
     CSkill() {}
     CSkill(CAgent* _agent);
     ~CSkill();
     virtual int level();
     bool done();
     bool failed();
-    void assign(CAgent* _agent);
+    void assign(parsian_msgs::parsian_agent* _agent);
     virtual void parse(QStringList params);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget* parent);
-    virtual void generateFromConfig(CAgent* a);
-    virtual CSkill* allocate(CAgent* _agent)=0;
+    virtual void generateFromConfig(parsian_msgs::parsian_agent* a);
+    virtual CSkill* allocate(parsian_msgs::parsian_agent* _agent)=0;
     virtual QString getName()=0;
     virtual double timeNeeded();  //in seconds
     virtual double successRate(); //between 0-1    
@@ -34,7 +33,7 @@ public:
     virtual double progress()=0;  //between 0-1 ; less than zero on failure
     virtual void execute()=0;
 
-    Property(CAgent*, Agent, agent);
+    Property(parsian_msgs::parsian_agent*, Agent, agent);
 friend class CSkills;
 };
 
@@ -61,10 +60,10 @@ private:
 
 #define DEF_SKILL(skill) \
     skill() {skill(NULL);} \
-    skill(CAgent* _agent); \
+    skill(parsian_msgs::parsian_agent* _agent); \
     ~skill(); \
     static const char *Name;\
-    virtual CSkill* allocate(CAgent* _agent); \
+    virtual CSkill* allocate(parsian_msgs::parsian_agent* _agent); \
     virtual void execute(); \
     virtual double progress(); \
     virtual QString getName(); \
@@ -73,10 +72,10 @@ private:
 #define INIT_SKILL(Skill,name) \
     bool Skill##_registered \
             = CSkills::registerSkill(Skill::Name,new Skill(NULL)); \
-    CSkill* Skill::allocate(CAgent* _agent) \
+    CSkill* Skill::allocate(parsian_msgs::parsian_agent* _agent) \
     {return new Skill(_agent);} \
     QString Skill::getName() {return QString(Name);} \
-    Skill* Skill::set(CAgent* a) \
+    Skill* Skill::set(parsian_msgs::parsian_agent* a) \
     { \
         if (QString(Skill::Name)!=a->skillName) \
         { \
@@ -86,7 +85,7 @@ private:
         } \
         return (Skill*) a->skill; \
     } \
-    Skill* Skill::get(CAgent* a) \
+    Skill* Skill::get(parsian_msgs::parsian_agent* a) \
     { \
         return (Skill*) a->skill; \
     } \

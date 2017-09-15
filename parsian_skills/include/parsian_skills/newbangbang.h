@@ -1,10 +1,8 @@
 #ifndef NEWBANGBANG_H
 #define NEWBANGBANG_H
 
-#include <base.h>
-#include "logger.h"
-#include "varswidget.h"
-#include <skill.h>
+#include <parsian_util/base.h>
+#include <parsian_skills/skill.h>
 
 
 enum bangBangMode

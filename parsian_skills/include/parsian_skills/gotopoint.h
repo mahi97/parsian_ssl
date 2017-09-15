@@ -2,15 +2,10 @@
 #define GotoPoint_H
 
 #include <parsian_skills/skill.h>
-#include "trajectoryplanner.h"
-#include "planner.h"
-#include "pid.h"
-#include "mathtools.h"
+#include "parsian_util/mathtools.h"
 #include "newbangbang.h"
 #include <QTime>
 #include <QFile>
-
-#include "navigation.h"
 
 class CSkillTurn : public CSkill
 {

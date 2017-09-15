@@ -1,7 +1,10 @@
-int8 robot_id
-int8 roller_speed
-int16 kickSpeed
+uint8 robot_id
+uint8 packet_id
+uint8 roller_speed
+uint16 kickSpeed
 bool chip
+bool release
+bool debug
 bool forceKick
 float64 vel_x
 float64 vel_y

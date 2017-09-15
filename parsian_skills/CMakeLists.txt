@@ -8,13 +8,12 @@ project(parsian_skills)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  parsian_msgs
-  parsian_util
-  roscpp
-  rospy
-  parsian_control_tools
-)
+		dynamic_reconfigure
+		parsian_msgs
+		parsian_util
+		roscpp
+		rospy
+		)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,10 +112,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES parsian_skills
-  CATKIN_DEPENDS parsian_util roscpp rospy
-#  DEPENDS system_lib
+		INCLUDE_DIRS include
+		LIBRARIES parsian_skills
+		CATKIN_DEPENDS parsian_util roscpp rospy
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -126,24 +125,20 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  )
+		include
+		${catkin_INCLUDE_DIRS}
+		${CMAKE_CURRENT_BINARY_DIR}
+)
 
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-	src/autoballplacement.cpp
-	src/gotoball.cpp
-	src/gotopoint.cpp
-	src/hittheball.cpp
-	src/kick.cpp
-	src/skill.cpp
-	src/spin.cpp
-	src/trackcurve.cpp
-	src/srskills.cpp
-)
+		src/autoballplacement.cpp
+		src/gotopoint.cpp
+		src/kick.cpp
+		src/skill.cpp
+		src/spin.cpp
+		)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -167,9 +162,9 @@ add_library(${PROJECT_NAME}
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
-	${catkin_LIBRARIES}
-	${QT_LIBRARIES}
-)
+		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
+		)
 
 #############
 ## Install ##

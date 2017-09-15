@@ -1,6 +1,8 @@
 #include "parsian_skills/kick.h"
 #include <QTime>
 
+#define vRobotTemp 1
+
 Vector2D penaltyAreaAvoidance(Vector2D agent, Vector2D target)
 {
 #if 1
@@ -53,250 +55,11 @@ Vector2D penaltyAreaAvoidance(Vector2D agent, Vector2D target)
 }
 
 
-//////////////////////////////////////////////////////////////////////////new kick code for Robocup 2015 by DON MHMMD
-CSkillNewKick::CSkillNewKick(CAgent *_agent)
-{
-    agent= _agent;
-    kickSpeed = 15;
-    chip = false;
-    spin = false;
-    slow = false;
-    turn = false;
-    autoChipSpeed = false;
-    clear = false;
-    avoidOurPenaltyArea = true;
-    avoidOppPenaltyArea = true;
-    dontRecvPass = false;
-    tol = 0.2;
-    waitFrames = 2;
-
-    interceptMode = false;
-    dontKick = false;
-    chipWait = 0;
-    chipSpinSpeed = 1;
-    readyToChip = false;
-    ballflag = false;
-    ballWasFar = false;
-    sagMode = false;
-    penaltyKick = false;
-    turnLastMomentForPenalty = false;
-    isGotoPointAvoid =true;
-}
-
-CSkillNewKick * CSkillNewKick::setTarget(Vector2D val)
-{
-    target =val;
-    return this;
-}
-
-bool CSkillNewKick::kickable()
-{
-    if (dontKick)
-    {
-        return false;
-    }
-    double tol = this->tol;
-    if (tol < 0.4 && knowledge->getExperimentalMode() == 0 )
-    {
-        tol = 0.4;
-    }
-    double tolerance = fabs(Vector2D::angleBetween( target - (target-agent->pos()).rotatedVector(90).norm()*tol - agent->pos(), target + (target-agent->pos()).rotatedVector(90).norm()*tol - agent->pos() ).degree()) / 2.0;
-    if (slow) waitFrames = 0;
-
-    if (( fabs (Vector2D::angleBetween(target - agent->pos(), agent->dir()).degree()) <  tolerance))
-    {
-
-        return true;
-    }
-    return false;
-}
-
-void CSkillNewKick ::setAgent(CAgent *_agent)
-{
-    agent = _agent;
-}
-
-void CSkillNewKick::execute(){
-    //////////////PID, set the direction
-    _PID angPidd(3,0,0,0,0);
-
-    /////
-    static Circle2D ballMargin,virtualBallMargin,realMargin;
-    /////////
-    static AngleDeg finalDir= 0;
-    ////////
-
-
-    ////////////////find ball margin
-    ballMargin.assign(wm->ball->pos,0.119);
-    realMargin.assign(wm->ball->pos,0.09);
-
-    if(fabs(((wm->ball->pos -  agent->pos()).th() - finalDir).degree() ) > 110 && agent->pos().dist(wm->ball->pos) > 0.5)
-        virtualBallMargin.assign(wm->ball->pos,0.3);
-    else
-        virtualBallMargin.assign(wm->ball->pos,0.2);
-    draw(realMargin,"blue");
-
-
-
-    ///////////////find the place to stop
-    Vector2D stopTarget;
-    Segment2D ballPath;
-    ballPath.assign(wm->ball->pos,wm->ball->pos+(((agent->pos().dist(wm->ball->pos))-0.09)*wm->ball->vel.norm()));
-    if(interceptMode)
-    {
-        if( wm->ball->vel.length() > 0.2)
-        {
-
-            stopTarget=ballPath.nearestPoint(agent->pos())- Vector2D(0.09*cos(finalDir.radian()), 0.09*sin(finalDir.radian()));
-            finalDir = (target - stopTarget).th();
-            draw(stopTarget,D_HOSSEIN,"blue");
-        }
-        else
-        {
-
-            stopTarget.assign(wm->ball->pos.x - 0.12*cos(finalDir.radian()) + 0.20*wm->ball->vel.x, wm->ball->pos.y - 0.12*sin(finalDir.radian())+ 0.2*wm->ball->vel.y);
-            finalDir = (target - wm->ball->pos).th();
-
-        }
-    }
-    else
-    {
-        stopTarget.assign(wm->ball->pos.x - 0.12*cos(finalDir.radian()) + 0.20*wm->ball->vel.x, wm->ball->pos.y - 0.12*sin(finalDir.radian())+ 0.2*wm->ball->vel.y);
-
-        finalDir = (target - wm->ball->pos).th();
-    }
-
-    draw(stopTarget,D_HOSSEIN,"black");
-    ///////////////find the path
-    Segment2D straightPath;
-    straightPath.assign(stopTarget,agent->pos());
-
-
-    Vector2D *path1 = new Vector2D(0,0);
-    Vector2D *path2 = new Vector2D(0,0);
-    Vector2D destin(0,0);
-
-
-    if(ballMargin.intersection(straightPath,path1,path2) > 1)
-    {
-        virtualBallMargin.tangent(agent->pos(),path1,path2);
-        draw(*path1,D_HOSSEIN,"green");
-        draw(*path2,D_HOSSEIN,"blue");
-        if(stopTarget.dist(*path1) < stopTarget.dist(*path2))
-            destin = *path1;
-        else
-            destin = *path2;
-    }
-    else
-    {
-        destin= stopTarget ;
-    }
-
-    /////////////////////// goto target
-
-
-    CSkillGotoPointAvoid *GPA = new CSkillGotoPointAvoid(agent);
-    CskillNewGotoPoint *GP = new CskillNewGotoPoint(agent);
-
-
-    if(agent->pos().dist(wm->ball->pos) >0.3 )
-    {
-        if(isGotoPointAvoid)
-        {
-            GPA->init(destin,Vector2D(cos(finalDir.radian()),sin(finalDir.radian())),Vector2D(0,0));
-            GPA->execute();
-        }
-        else
-        {
-            GP->setMaxAcceleration(4);
-            GP->setMaxDeceleration(-4);
-            GP->init(destin,Vector2D(cos(finalDir.radian()),sin(finalDir.radian())),Vector2D(0,0));
-            GP->execute();
-        }
-        agent->setKick(0);
-
-    }
-    else
-    {
-        double movement_theta;
-
-        /////////////////////////////////////////kick
-        if( fabs(agent->dir().th().degree() - finalDir.degree()) < 10  )
-        {
-            agent->setChip(chip);
-            agent->setKick(kickSpeed);
-        }
-        else
-        {
-            angPidd.kp = 3;
-            agent->setKick(0);
-        }
-
-        ///////////////////////////////////////turn for kick
-        double reduce =1;
-        if(slow)
-            reduce = 0.8;
-        else
-        {
-            if(fabs((agent->dir().th() - finalDir).degree()) > 20)
-                reduce =0.5;
-            else
-                reduce =1.2;
-        }
-        if ((agent->dir().th() - finalDir).degree()  <-50 )
-        {
-            angPidd.error = (wm->ball->pos - agent->pos()).th().radian();
-
-            agent->setRobotVel(cos((wm->ball->pos - agent->pos()).th().radian() - _PI/2),sin((wm->ball->pos - agent->pos()).th().radian() - _PI/2),angPidd.PID_OUT());
-
-
-        }else if ((agent->dir().th() - finalDir).degree()  >50 )
-        {
-            angPidd.error = (wm->ball->pos - agent->pos()).th().radian();
-
-            agent->setRobotAbsVel(cos((wm->ball->pos - agent->pos()).th().radian() + _PI/2),sin((wm->ball->pos - agent->pos()).th().radian() + _PI/2),angPidd.PID_OUT());
-
-        }
-        ////////////////////////////////////// catch ball
-        else
-        {
-            angPidd.error = (finalDir - agent->dir().th()).radian();
-
-            if( ((wm->ball->pos - agent->pos()).th() - finalDir).degree()  > 90  )
-                movement_theta = ((wm->ball->pos - agent->pos()).th().radian() + 0.8+1.5*(0.4-agent->pos().dist(wm->ball->pos))- agent->dir().th().radian());
-            else if(((wm->ball->pos - agent->pos()).th() - finalDir).degree() <- 90)
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() - 0.8- 1.5*(0.4-agent->pos().dist(wm->ball->pos))- agent->dir().th().radian());
-            else if(((wm->ball->pos - agent->pos()).th() - finalDir).degree() >30)
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() +0.6 + 1.5*(0.4-agent->pos().dist(wm->ball->pos)) - agent->dir().th().radian());
-            else if(((wm->ball->pos - agent->pos()).th() - finalDir).degree() < -30)
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() - 0.6 - 1.5*(0.4-agent->pos().dist(wm->ball->pos))- agent->dir().th().radian());
-            else if(((wm->ball->pos - agent->pos()).th() - finalDir).degree() >10)
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() +0.3 + 1.5*(0.4-agent->pos().dist(wm->ball->pos)) - agent->dir().th().radian());
-            else if(((wm->ball->pos - agent->pos()).th() - finalDir).degree() < -10)
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() - 0.3 - 1.5*(0.4-agent->pos().dist(wm->ball->pos))- agent->dir().th().radian());
-            else
-                movement_theta = ((wm->ball->pos- agent->pos()).th().radian() - agent->dir().th().radian());
-            /////////////////////////////////////////////////////////////////////////////////
-            double ballx= (wm->ball->vel.x)*cos(agent->dir().th().radian()) + (wm->ball->vel.y)*sin(agent->dir().th().radian());
-            double bally= -1*(wm->ball->vel.x)*sin(agent->dir().th().radian()) + (wm->ball->vel.y)*cos(agent->dir().th().radian());
-            if(interceptMode)
-                agent->setRobotVel(reduce*cos(movement_theta)  + 0.4*ballx,reduce*sin(movement_theta)+0.4*bally ,angPidd.PID_OUT());
-            else
-                agent->setRobotVel(reduce*cos(movement_theta) + 0.6*ballx,reduce*sin(movement_theta) + 0.6*bally,angPidd.PID_OUT());
-        }
-
-    }
-
-
-
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////Receive Pass Skill Created by DON MHMMD Shirazi
 
 INIT_SKILL(CSkillReceivePass,"receivepass");
 
-CSkillReceivePass::CSkillReceivePass(CAgent *_agent)
+CSkillReceivePass::CSkillReceivePass(parsian_msgs::parsian_agent *_agent)
 {
     agent = _agent;
     gotopointavoid = new CSkillGotoPointAvoid(_agent);
@@ -373,7 +136,7 @@ void CSkillReceivePass::execute()
     gotopointavoid->setAvoidBall(true);
 
     kkBallPos = wm->ball->pos;
-    kkAgentPos = agent->pos();
+    kkAgentPos = Vector2D(agent->self.pos.x, agent->self.pos.y);
     receivePassMode = decideMode();
 
     Segment2D ballPath;
@@ -476,7 +239,7 @@ CSkillKick::CSkillKick(CAgent *_agent) : CSkill(_agent)
     kickSpeed = 15;
     avoidOppPenaltyArea = true;
     chip = false;
-    spin = false;
+    spin = 0;
     slow = false;
     veryFine = false;
     turn = false;
@@ -912,7 +675,6 @@ void CSkillKick::indirect()
     if(sol1.dist(finalPos) >= sol2.dist(finalPos))
         sol1 = sol2;
 
-#define vRobotTemp 1
     if(wm->ball->vel.length() > 0.3)
     {
         for(double i = 0 ; i < 5 ; i += 0.1)
@@ -1562,7 +1324,6 @@ void CSkillKick::findPosToGo()
 
 void CSkillKick::findPosToGoAlt()
 {
-#define vRobotTemp 2
     Circle2D ballArea(ballPos,0.2);
     Vector2D sol1,sol2;
     if(wm->ball->vel.length() > 0.2)

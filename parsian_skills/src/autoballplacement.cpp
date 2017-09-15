@@ -1,12 +1,10 @@
 #include "parsian_skills/autoballplacement.h"
-#include "parsian_skills/gotoball.h"
 #include <QDebug>
 
 
 INIT_SKILL(CSkillAutoBallPlacement, "Auto ball Placement");
 
-CSkillAutoBallPlacement::CSkillAutoBallPlacement(CAgent *_agent) : CSkill(_agent)
-{
+CSkillAutoBallPlacement::CSkillAutoBallPlacement(parsian_msgs::parsian_agent *_agent) {
     isFinished = false;
     kick = new CSkillKick(_agent);
     kick->setAvoidOppPenaltyArea(false);
@@ -31,7 +29,7 @@ CSkillAutoBallPlacement::~CSkillAutoBallPlacement()
 
 void CSkillAutoBallPlacement::gotoBall()
 {
-    Circle2D dribblerArea (agent->pos() + agent->dir().norm()*0.09,0.1);
+    Circle2D dribblerArea (Vector2D(agent->self.pos.x, agent->self.pos.y) + Vector2D(agent->self.dir.x, agent->self.dir.y).norm()*0.09,0.1);
 
     kick->setKickSpeed(0);
     kick->setAvoidOppPenaltyArea(false);
@@ -87,15 +85,16 @@ void CSkillAutoBallPlacement::gotoTarget()
 
     double vx,vy,w;
     draw(target);
-    agent->setRoller(1);////inja
+    command->roller_speed = 1;
+//    agent->setRoller(1);////inja
     bangBang->setAngInPath(true);
     bangBang->setSlow(true);
     bangBang->setAngKp(0.5);
     bangBang->setAccMax(0.3);
     bangBang->setDecMax(1);
     bangBang->setVelMax(0.5);
-    bangBang->bangBangSpeed(agent->pos(),agent->vel(),agent->dir(),
-                            target,wm->ball->pos - agent->pos(),0,0.016,vx,vy,w);
+    bangBang->bangBangSpeed(agent->self.pos,agent->self.vel,agent->self.dir,
+                            target,wm->ball->pos - agent->self.pos,0,0.016,vx,vy,w);
 
     agent->accelerationLimiter(0,false);
     if(!dribblerArea.contains(ballPos))
@@ -171,8 +170,6 @@ void autoBallPlacement()
             lastMousePos = knowledge->getMousePos();
         }
     }
-    draw(clear,QColor(Qt::red),true);
-    draw(QString("Id : %1").arg(id),Vector2D(2.8,3));
     if(clear.contains(knowledge->getMousePos()))
     {
         id = -1;

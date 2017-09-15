@@ -1,30 +1,16 @@
 #include "parsian_skills/skill.h"
-#include "roles/role.h"
-#include <QWidget>
-CSkillConfigWidget::CSkillConfigWidget()
-{
-
-}
-
-CSkillConfigWidget::CSkillConfigWidget(QWidget *parent)
-    : QWidget(parent)
-{
-
-}
+//#include "roles/role.h"
 
 int CSkill::level()
 {
     return 1;
 }
 
-CSkill::CSkill(CAgent* _agent)
-{
+CSkill::CSkill(parsian_msgs::parsian_agent* _agent) : sm(), localAgentName() {
     agent = _agent;
 }
 
-CSkill::~CSkill()
-{
-}
+CSkill::~CSkill() = default;
 
 double CSkill::timeNeeded()
 {
@@ -53,15 +39,9 @@ void CSkill::parse(QStringList /*params*/)
 
 }
 
-CSkillConfigWidget* CSkill::generateConfigWidget(QWidget* /*parent*/)
-{
-    return NULL;
-}
-
-void CSkill::generateFromConfig(CAgent *a)
+void CSkill::generateFromConfig(parsian_msgs::parsian_agent *a)
 {
     agent = a;
-    return;
 }
 
 
@@ -70,15 +50,15 @@ QString CSkill::stateName()
     return sm.currentStateName();
 }
 
-void CSkill::assign(CAgent* _agent)
+void CSkill::assign(parsian_msgs::parsian_agent* _agent)
 {
 
     if (_agent!=NULL)
     {
         agent = _agent;
-        agent->skill = this;
-        agent->skillName = getName();
-        agent->localName = localAgentName;
+//        agent->skill = this;
+//        agent->skillName = getName();
+//        agent->localName = localAgentName;
     }
 }
 
@@ -87,9 +67,7 @@ void CSkill::assign(CAgent* _agent)
 QList<CSkills::RegisteredSkill>* CSkills::Skills;  
 bool CSkills::inited=false;  
 
-CSkills::CSkills()
-{
-}
+CSkills::CSkills() = default;
 
 CSkills::~CSkills()
 {
@@ -104,16 +82,16 @@ bool CSkills::registerSkill(const char *name, CSkill* Skill)
         inited = true;
     }
     void* info = NULL;
-    if (Skill->level()==2)
-    {
-        CRole* role = static_cast <CRole*> (Skill);
-        info = (void*) (role->generateInfoClass());
-    }    
+//    if (Skill->level()==2)
+//    {
+//        CRole* role = static_cast <CRole*> (Skill);
+//        info = (void*) (role->generateInfoClass());
+//    }
     Skills->append((RegisteredSkill) { name, Skill, info });
     return true;
 }
 
-CSkill* CSkills::initSkill(const char *name,CAgent* _agent)
+CSkill* CSkills::initSkill(const char *name, parsian_msgs::parsian_agent* _agent)
 {    
     for (int i=0;i<Skills->size();i++)
         if (strcmp((*Skills)[i].name,name)==0)

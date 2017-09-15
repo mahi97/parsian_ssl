@@ -1,4 +1,4 @@
-#include "mathtools.h"
+#include "parsian_util/mathtools.h"
 #include <QtAlgorithms>
 #include <QDebug>
 
@@ -513,8 +513,8 @@ QVector<double> CPolynomialRegression::PolynomialRegression(QList<double> value,
     if(value.count()>key.count())
         N=key.count();
     if( value.count()>0){
-        for(int j=0; j<N; j++){
-            double temp = value.at(j) , valj=value.at(j);
+        for(int i1=0; i1<N; i1++){
+            double temp = value.at(i1) , valj=value.at(i1);
             X[0] = N;
             for(int i=1;i<2*n+1;i++){
                 X[i]+=temp;
@@ -560,16 +560,13 @@ QVector<double> CPolynomialRegression::PolynomialRegression(QList<double> value,
     return coefs;
 }
 
-CHalfLogRegression::CHalfLogRegression()
-{
+CHalfLogRegression::CHalfLogRegression() : pr() {
     A=B=0;
     initialized = false;
 }
 
 CHalfLogRegression::~CHalfLogRegression()
-{
-
-}
+= default;
 
 void CHalfLogRegression::fitToDataSet(QList<QPair<double, double> > newDataSet)
 {
@@ -888,7 +885,7 @@ double MWBM::findMatching()
     int i, j, m, p, q, s, t, v;
 
     for (i = 0; i < n; i++) {
-        M[i] = N[i] = -1;
+        M[i] = static_cast<int>(N[i] = -1);
         U[i] = V[i] = 0;
 
         for (j = 0; j < n; j++)
@@ -909,9 +906,9 @@ double MWBM::findMatching()
                 S[i] = 0;
         }
 
-        while (1) {
+        while (true) {
             for (q = s = 0; s < p; s++) {
-                i = P[s];
+                i = static_cast<int>(P[s]);
 
                 for (j = 0; j < n; j++)
                     if (!T[j]) {
@@ -935,19 +932,19 @@ double MWBM::findMatching()
                 y = -1;
 
                 for (j = 0; j < n; j++)
-                    if (!T[j] && ((y == -1) || (Y[j] < y)))
+                    if ((T[j] == 0.0) && ((y == -1) || (Y[j] < y)))
                         y = Y[j];
 
                 for (j = 0; j < n; j++) {
-                    if (T[j])
+                    if (T[j] != 0.0)
                         V[j] += y;
 
-                    if (S[j])
+                    if (S[j] != 0.0)
                         U[j] -= y;
                 }
 
                 for (j = 0; j < n; j++)
-                    if (!T[j]) {
+                    if (T[j] == 0.0) {
                         Y[j] -= y;
 
                         if (Y[j] == 0) {
@@ -960,28 +957,28 @@ double MWBM::findMatching()
             }
 
             for (p = t = 0; t < q; t++) {
-                i = N[Q[t]];
+                i = static_cast<int>(N[Q[t]]);
                 S[i] = 1;
                 P[p++] = i;
             }
         }
 
 end_phase:
-        i = R[j];
+        i = static_cast<int>(R[j]);
         v = M[i];
         M[i] = j;
         N[j] = i;
 
         while (v != -1) {
             j = v;
-            i = R[j];
+            i = static_cast<int>(R[j]);
             v = M[i];
             M[i] = j;
             N[j] = i;
         }
     }
 
-    for (i = w = 0; i < n; i++)
+    for (i = w = 0.0; i < n; i++)
         w += W[i][M[i]];
 
     return w;

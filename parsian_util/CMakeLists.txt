@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(parsian_util)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,6 +14,16 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+
+find_package(Qt4 REQUIRED COMPONENTS QtCore)
+
+include(${QT_USE_FILE})
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
+
+QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+
+file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
+
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -117,6 +127,7 @@ catkin_package(
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ## Declare a C++ library
@@ -131,6 +142,12 @@ add_library(${PROJECT_NAME}_geom
    src/geom/sector_2d.cpp
    src/geom/triangle_2d.cpp
    src/geom/vector_2d.cpp
+)
+
+add_library(${PROJECT_NAME}_math
+	src/mathtools.cpp
+	src/matrix.cpp
+	src/statemachine.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -156,6 +173,11 @@ add_library(${PROJECT_NAME}_geom
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_geom
    ${catkin_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_math
+	${catkin_LIBRARIES}
+	${QT_LIBRARIES}
 )
 
 #############

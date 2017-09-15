@@ -1,11 +1,10 @@
 #ifndef AUTOBALLPLACEMENT_H
 #define AUTOBALLPLACEMENT_H
 
-#include "parsian_skills/gotopoint.h"
-#include "parsian_skills/trackcurve.h"
-#include "knowledge.h"
-#include "pid.h"
+#include "gotopoint.h"
 #include "kick.h"
+#include "parsian_msgs/parsian_robot_command.h"
+
 class CSkillAutoBallPlacement : public CSkill
 {
 private:
@@ -20,6 +19,7 @@ private:
     Vector2D agentPos;
     int ballCounter = 0;
     bool ballCatchFlag = false;
+    parsian_msgs::parsian_robot_command* command;
 public:
     DEF_SKILL(CSkillAutoBallPlacement);
 
