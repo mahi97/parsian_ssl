@@ -759,11 +759,11 @@ double Matrix::dot(Matrix &m)
 Matrix& Matrix::dotP(Matrix &m)
 {
   assert((r_ == m.nrows()) && (c_ == m.ncols()));
-  Matrix res(r_,c_);
+    auto * res = new Matrix(r_,c_);
 
   for(int r=0; r<this->r_; r++)
 	for(int c=0; c<this->c_; c++)
-	  res.e(r,c) = this->e(r,c) * m.e(r,c);
+	  res->e(r,c) = this->e(r,c) * m.e(r,c);
 
-  return res;
+  return *res;
 }
