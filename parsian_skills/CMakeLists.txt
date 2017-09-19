@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(parsian_util)
+project(parsian_skills)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-)
+		dynamic_reconfigure
+		parsian_msgs
+		parsian_util
+		roscpp
+		rospy
+		)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
 find_package(Qt4 REQUIRED COMPONENTS QtCore)
 
 include(${QT_USE_FILE})
@@ -23,8 +25,6 @@ file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.
 QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
-
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -79,7 +79,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+#   parsian_msgs
 # )
 
 ################################################
@@ -112,10 +112,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES parsian_util_geom
-#  CATKIN_DEPENDS roscpp rospy
-#  DEPENDS system_lib
+		INCLUDE_DIRS include
+		LIBRARIES parsian_skills
+		CATKIN_DEPENDS parsian_util roscpp rospy
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -125,30 +125,20 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
- include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
+		include
+		${catkin_INCLUDE_DIRS}
+		${CMAKE_CURRENT_BINARY_DIR}
 )
+
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_geom 
-   src/geom/angle_deg.cpp
-   src/geom/circle_2d.cpp
-   src/geom/line_2d.cpp
-   src/geom/matrix_2d.cpp
-   src/geom/polygon_2d.cpp
-   src/geom/ray_2d.cpp
-   src/geom/rect_2d.cpp
-   src/geom/sector_2d.cpp
-   src/geom/triangle_2d.cpp
-   src/geom/vector_2d.cpp
-)
-
-add_library(${PROJECT_NAME}_math
-	src/mathtools.cpp
-	src/matrix.cpp
-	src/statemachine.cpp
-)
+add_library(${PROJECT_NAME}
+		src/autoballplacement.cpp
+		src/gotopoint.cpp
+		src/kick.cpp
+		src/skill.cpp
+		src/spin.cpp
+		)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -158,7 +148,7 @@ add_library(${PROJECT_NAME}_math
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/parsian_util_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/parsian_skills_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -171,14 +161,10 @@ add_library(${PROJECT_NAME}_math
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_geom
-   ${catkin_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_math
-	${catkin_LIBRARIES}
-	${QT_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME}
+		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
+		)
 
 #############
 ## Install ##
@@ -220,7 +206,7 @@ target_link_libraries(${PROJECT_NAME}_math
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_util.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_skills.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

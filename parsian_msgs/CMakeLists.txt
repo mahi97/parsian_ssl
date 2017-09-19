@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   geometry_msgs
+  actionlib_msgs
+  actionlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -63,17 +65,20 @@ add_message_files(
 #   Service2.srv
 # )
 
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+file(GLOB ACTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/action action/*.action)
+message(STATUS "All action files: ${ACTS}")
 
+## Generate actions in the 'action' folder
+add_action_files(
+	DIRECTORY action
+	FILES
+	${ACTS}
+)
 # Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actionlib_msgs
   geometry_msgs
 )
 

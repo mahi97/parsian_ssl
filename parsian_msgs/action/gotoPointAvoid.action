@@ -1,0 +1,54 @@
+# Define The Goal
+uint8 robot_id
+vector2D targetPos
+vector2D targetDir
+vector2D targetVel
+bool dynamicStart
+float32 maxAcceleration
+float32 maxDeceleration
+float32 maxVelocity
+float32 maxAccelerationNormal
+float32 maxDecelerationNormal
+float32 maxVelocityNormal
+float32 constantVelocity
+float32 turningDist
+bool fasterEnd
+bool notEnd
+bool fastW
+bool recordProfile
+bool ballMode
+bool slowShot
+bool moveLookingTarget
+bool interceptMode
+bool lookForward
+bool oneTouchMode
+bool slowMode
+bool noPID
+bool penaltyKick
+bool goalieMode
+vector2D motionDir
+float32 forwardBias
+bool diveMode
+bool verySlow
+bool smooth
+vector2D addVel
+bool avoidPenaltyArea
+bool keeplooking
+float32 extendStep
+bool plan2
+bool noAvoid
+bool avoidCenterCircle
+float32 ballObstacleRadius
+bool avoidBall
+bool avoidGoalPosts
+bool drawPath
+vector2D nextPos
+---
+# Define The Result
+bool done
+bool faild
+---
+# Define The Feedback
+float32 progress
+float32 timeNeeded
+int32   state
