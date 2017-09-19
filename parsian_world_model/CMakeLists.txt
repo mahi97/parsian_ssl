@@ -7,14 +7,14 @@ project(parsian_world_model)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  geometry_msgs
-  nav_msgs
-  parsian_msgs
-  roscpp
-  rospy
-  tf2
-)
+        dynamic_reconfigure
+        geometry_msgs
+        nav_msgs
+        parsian_msgs
+        roscpp
+        rospy
+        tf2
+        )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -110,10 +110,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES parsian_world_model
-#  CATKIN_DEPENDS dynamic_reconfigure geometry_msgs nav_msgs parsian_msgs roscpp rospy tf2
-#  DEPENDS system_lib
+        #  INCLUDE_DIRS include
+        #  LIBRARIES parsian_world_model
+        #  CATKIN_DEPENDS dynamic_reconfigure geometry_msgs nav_msgs parsian_msgs roscpp rospy tf2
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -123,14 +123,14 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/parsian_world_model.cpp
-# )
+add_library(${PROJECT_NAME}
+        src/wm/worldmodel.cpp
+        )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -140,7 +140,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(worldmodel_node src/worldmodel.cpp)
+add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -152,11 +152,15 @@ add_executable(worldmodel_node src/worldmodel.cpp)
 ## same as for the library above
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+target_link_libraries(${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        ${catkin_LIBRARIES})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
-   ${catkin_LIBRARIES}
-   ${QT_LIBRARIES}
-   )
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        )
 
 #############
 ## Install ##
