@@ -1,0 +1,17 @@
+field_width             : 9.0
+field_height            : 6.00
+field_margin_height     : 0.675
+field_margin_width      : 0.675
+field_penalty           : 1.000
+goal_width              : 1.000
+goal_rad                : 1.000
+goal_rad_for_mark       : 1.150
+goal_rad_for_goalie     : 0.85
+goal_depth              : 0.250
+penalty_width           : 2.500
+center_circle_rad       : 0.500
+penalty_area_circle_x   : -4.20
+penalty_area_circle_rad : 1.350
+parsian_boundry         : 4.40
+mixteam_field_width     : 13.4
+mixteam_field_height    : 9.00

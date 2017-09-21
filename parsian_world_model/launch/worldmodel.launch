@@ -1,0 +1,8 @@
+<launch>
+
+        <rosparam command="load" file="$(find parsian_world_model)/param/field.yaml" />
+
+	<!-- WorldModel Launch -->
+	<node name="wm" pkg="parsian_world_model" type="worldmodel_node" respawn="true" />
+
+</launch>
