@@ -8,10 +8,10 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-		parsian_msgs
-)
+        roscpp
+        rospy
+        parsian_msgs
+        )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,10 +113,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES parsian_util_geom
-#  CATKIN_DEPENDS roscpp rospy
-#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES parsian_util_geom
+        #  CATKIN_DEPENDS roscpp rospy
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -126,30 +126,35 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
- include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
+        include
+        ${catkin_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_geom 
-   src/geom/angle_deg.cpp
-   src/geom/circle_2d.cpp
-   src/geom/line_2d.cpp
-   src/geom/matrix_2d.cpp
-   src/geom/polygon_2d.cpp
-   src/geom/ray_2d.cpp
-   src/geom/rect_2d.cpp
-   src/geom/sector_2d.cpp
-   src/geom/triangle_2d.cpp
-   src/geom/vector_2d.cpp
-)
+add_library(${PROJECT_NAME}_geom
+        src/geom/angle_deg.cpp
+        src/geom/circle_2d.cpp
+        src/geom/line_2d.cpp
+        src/geom/matrix_2d.cpp
+        src/geom/polygon_2d.cpp
+        src/geom/ray_2d.cpp
+        src/geom/rect_2d.cpp
+        src/geom/sector_2d.cpp
+        src/geom/triangle_2d.cpp
+        src/geom/vector_2d.cpp
+        )
 
 add_library(${PROJECT_NAME}_math
-	src/mathtools.cpp
-	src/matrix.cpp
-	src/statemachine.cpp
-)
+        src/mathtools.cpp
+        src/matrix.cpp
+        src/statemachine.cpp
+        )
+
+
+add_library(${PROJECT_NAME}_core
+        src/core/agent.cpp
+        src/core/worldmodel.cpp src/core/field.cpp include/parsian_util/core/field.h src/core/ball.cpp include/parsian_util/core/ball.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -173,13 +178,20 @@ add_library(${PROJECT_NAME}_math
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_geom
-   ${catkin_LIBRARIES}
-)
+        ${catkin_LIBRARIES}
+        )
 
 target_link_libraries(${PROJECT_NAME}_math
-	${catkin_LIBRARIES}
-	${QT_LIBRARIES}
-)
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+
+target_link_libraries(${PROJECT_NAME}_core
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}_geom
+        )
 
 #############
 ## Install ##

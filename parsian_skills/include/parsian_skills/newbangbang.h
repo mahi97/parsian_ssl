@@ -3,7 +3,7 @@
 
 #include <parsian_util/base.h>
 #include <parsian_skills/skill.h>
-
+#include <parsian_util/geom/geom.h>
 
 enum bangBangMode
 {

@@ -132,13 +132,6 @@ struct kkValue {
     int agentSize;
 };
 
-struct kkRobot {
-    int id;
-    Vector2D pos;
-    Vector2D vel;
-    Vector2D dir;
-};
-
 
 /* Structures */
 
@@ -192,27 +185,6 @@ struct GameStatePacket
 
 /* Skills */
 #define _DEFENCE_DIST       0.110
-
-/* Field */
-#define _FIELD_WIDTH            9.0
-#define _FIELD_HEIGHT           6.00
-#define _FIELD_MARGIN_HEIGHT    0.675
-#define _FIELD_MARGIN_WIDTH     0.675
-#define _FIELD_PENALTY          1.000
-#define _GOAL_WIDTH             1.000
-#define _GOAL_RAD               1.000
-#define _AHZ_GOAL_RAD_FOR_MARK  1.150
-#define _AHZ_GOAL_RAD_FOR_GOALKEEPER  0.85
-#define _GOAL_DEPTH             0.250
-#define _PENALTY_WIDTH          2.500
-#define _CENTER_CIRCLE_RAD      0.500
-#define _PENALTY_AREA_CIRCLE_X  -4.20
-#define _PENALTY_AREA_CIRCLE_RAD  1.350
-#define _PARSIAN_BOUNDRY         4.40
-#define _MAX_DIST               sqrt(_FIELD_WIDTH * _FIELD_WIDTH + _FIELD_HEIGHT * _FIELD_HEIGHT)
-
-#define _MIXTEAM_FIELD_WIDTH            13.4
-#define _MIXTEAM_FIELD_HEIGHT           9.00
 
 #define Property(type,name,local) \
     public: inline type& get##name() {return local;} \
