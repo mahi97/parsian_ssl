@@ -14,3 +14,5 @@ Vector2D CAgent::acc() { return self.acc; }
 Vector2D CAgent::vel() { return self.vel; }
 
 Vector2D CAgent::dir() { return self.dir; }
+
+int CAgent::id() { return self.id; }

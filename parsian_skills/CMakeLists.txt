@@ -137,7 +137,8 @@ add_library(${PROJECT_NAME}
 		src/kick.cpp
 		src/skill.cpp
 		src/receivepass.cpp
-        src/newbangbang.cpp)
+        src/newbangbang.cpp
+        src/onetouch.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

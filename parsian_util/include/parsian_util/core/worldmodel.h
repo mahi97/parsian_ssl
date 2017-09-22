@@ -6,11 +6,15 @@
 #include "parsian_util/core/field.h"
 #include "parsian_util/core/ball.h"
 #include "parsian_util/core/agent.h"
+#include "parsian_util/core/team.h"
+
+
 class CWorldModel {
 public:
     CWorldModel();
     CField* field;
-    CRobot* ball;
+    CBall* ball;
+    CTeam *our, *opp;
 
 private:
 };

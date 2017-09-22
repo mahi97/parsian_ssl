@@ -154,7 +154,13 @@ add_library(${PROJECT_NAME}_math
 
 add_library(${PROJECT_NAME}_core
         src/core/agent.cpp
-        src/core/worldmodel.cpp src/core/field.cpp include/parsian_util/core/field.h src/core/ball.cpp include/parsian_util/core/ball.h)
+        src/core/worldmodel.cpp
+        src/core/field.cpp
+        src/core/ball.cpp
+        src/core/team.cpp
+        src/knowledge.cpp
+        src/core/movingobject.cpp
+        )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

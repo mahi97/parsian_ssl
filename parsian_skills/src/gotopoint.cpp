@@ -204,7 +204,10 @@ void CSkillGotoPoint::trajectoryPlanner()
     ///////////////////////////////////////////// th pid
     thPid->kp =0;
     thPid->error = (agentMovementTh - agent->self.vel.norm().th()).radian();
-    if(fabs(thPid->error > 1) || agentVc < 0.5 || agentDist >3 ||( fabs((agentMovementTh - agent->dir().th()).degree()) > 80 && fabs((agentMovementTh - agent->dir().th()).degree()) < 100 )   )
+    if((fabs(thPid->error) > 1)
+       || agentVc < 0.5
+       || agentDist > 3
+       || fabs((agentMovementTh - agent->dir().th()).degree()) > 80 && fabs((agentMovementTh - agent->dir().th()).degree()) < 100)
         thPid->error =0;
 
     appliedTh = agentMovementTh.radian() +thPid->PID_OUT();
