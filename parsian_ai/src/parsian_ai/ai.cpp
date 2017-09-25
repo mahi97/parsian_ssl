@@ -6,7 +6,7 @@
 
 
 AI::AI() {
-
+    soccer = new CSoccer();
 }
 
 AI::~AI() {
@@ -14,7 +14,7 @@ AI::~AI() {
 }
 
 void AI::execute() {
-
+    soccer->execute();
 }
 
 void AI::updateRobotStatus(const parsian_msgs::parsian_robot &) {

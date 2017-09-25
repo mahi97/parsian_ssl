@@ -14,6 +14,10 @@ void robotStatusCallback(const parsian_msgs::parsian_robot& _robotStatus) {
     ai.updateRobotStatus(_robotStatus);
 }
 
+void gameStateCallBack(const int& ) {
+
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "ai_node");
@@ -22,11 +26,22 @@ int main(int argc, char **argv)
 
     ros::Subscriber worldModelSub   = n.subscribe("/world_model", 1000, wmCallback);
     ros::Subscriber robotStatusSub  = n.subscribe("/robot_status", 1000, robotStatusCallback);
+    ros::Subscriber gameStateSub    = n.subscribe("/game_state", 1000, gameStateCallBack);
+
+    ros::Publisher  drawPub    = n.advertise("/draws",1000);
+    ros::Publisher  debugPub   = n.advertise("/debugs",1000);
+    ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
 
     ros::Rate loop_rate(62);
 
+
+
     while (ros::ok()) {
         ai.execute();
+
+        drawPub.publish();
+
+
         ros::spinOnce();
         loop_rate.sleep();
     }
