@@ -1,5 +1,5 @@
-string   name
+string name
 circle2D circle
-Color    color
+std_msgs/ColorRGBA    color
 float64 startAng
 float64 endAng

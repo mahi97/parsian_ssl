@@ -1,3 +1,3 @@
 string name
 rect2D rect
-Color color
+std_msgs/ColorRGBA color

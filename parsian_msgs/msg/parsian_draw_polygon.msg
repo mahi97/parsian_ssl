@@ -1,3 +1,3 @@
 string     name
 vector2D[] points
-Color      color
+std_msgs/ColorRGBA      color
