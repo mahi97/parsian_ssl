@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(parsian_skills)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -133,12 +133,12 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-		src/autoballplacement.cpp
 		src/gotopoint.cpp
 		src/kick.cpp
 		src/skill.cpp
-		src/spin.cpp
-		)
+		src/receivepass.cpp
+        src/newbangbang.cpp
+        src/onetouch.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

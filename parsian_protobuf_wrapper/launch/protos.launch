@@ -3,9 +3,9 @@
         <rosparam command="load" file="$(find parsian_protobuf_wrapper)/param/common.yaml" />
 
 	<!-- Vision Launch -->
-	<node name="vision" pkg="parsian_protobuf_wrapper" type="vision_node" respawn="true"\>
+	<node name="vision" pkg="parsian_protobuf_wrapper" type="vision_node" respawn="true"/>
 
 	<!-- Refbox Launch -->
-	<node name="referee" pkg="parsian_protobuf_wrapper" type="refbox_node" respawn="true"\>
+	<node name="referee" pkg="parsian_protobuf_wrapper" type="refbox_node" respawn="true"/>
 
 </launch>

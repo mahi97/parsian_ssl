@@ -1,3 +1,5 @@
+uint8 id
+
 vector2D pos
 vector2D vel
 vector2D acc

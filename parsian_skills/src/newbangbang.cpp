@@ -1,9 +1,6 @@
-#include "newbangbang.h"
 #include <QDebug>
+#include <parsian_skills/newbangbang.h>
 
-#ifdef Q_OS_MAC
-using namespace std;
-#endif
 
 CNewBangBang::CNewBangBang()
 {
@@ -61,9 +58,9 @@ void CNewBangBang::trajectoryPlanner()
     double velnorm= -1*(cos(agentMovementTh.radian()))*sin(agentDir.th().radian()) + (sin(agentMovementTh.radian()))*cos(agentDir.th().radian());
 
     double thPIDKCoef =  atan(fabs(veltan)/fabs(velnorm))/_PI*2;
-    thPid->kp = conf()->BangBang_thKP() * thPIDKCoef;
-    thPid->ki = conf()->BangBang_thKI();
-    thPid->kd = conf()->BangBang_thKD();
+    thPid->kp = 1;//conf()->BangBang_thKP() * thPIDKCoef; // TODO : Config Server
+    thPid->ki = 1;//conf()->BangBang_thKI();// TODO : Config Server
+    thPid->kd = 1;//conf()->BangBang_thKD();// TODO : Config Server
 //    if(fabs(thPid->error > 1) || currentVel < 0.5 || agentPos.dist(pos2) >3 ||( fabs((agentMovementTh - agentDir.th()).degree()) > 80 && fabs((agentMovementTh - agentDir.th()).degree()) < 100 )   )
 //        thPid->error =0;
 
@@ -95,7 +92,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
     }
     angPid->error = (dir2.th() -  agentDir.th()).radian();
 
-    draw(QString("vel2 : %1 , realVel : %2").arg(Vel2).arg(agentVel.length()),Vector2D(2,1.5));
+//    draw(QString("vel2 : %1 , realVel : %2").arg(Vel2).arg(agentVel.length()),Vector2D(2,1.5));
     agentMovementTh = movementTh.th();
 
     if(oneTouch || diveMode)
@@ -112,33 +109,40 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
         posPid->kp = min(posPid->kp,2.5);
         posPid->kp = max(posPid->kp,1.5);
 
-        posPid->kd = conf()->BangBang_posKD();
-        posPid->ki = conf()->BangBang_posKI();
+        posPid->kd = 1; //conf()->BangBang_posKD();
+        posPid->ki = 1; //conf()->BangBang_posKI();
     }
     else if(diveMode)
     {
         posPid->kp = 7;
         posPid->kd = 20;
-        posPid->ki = conf()->BangBang_posKI();
+        posPid->ki = 1; //conf()->BangBang_posKI();
     }
     else if(oneTouch)
     {
-        posPid->kp = (conf()->BangBang_posKP())*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+//        posPid->kp = (conf()->BangBang_posKP())*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        posPid->kp = (1)*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
 //        debug(QString("kp: %1").arg(posPid->kp),D_MHMMD);
-        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*3);
-        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
+//        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*3);
+        posPid->kp = min(posPid->kp,1*3);
+//        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
+        posPid->kp = max(posPid->kp,1);
 
         posPid->kd = 15;
         posPid->ki = 0;
     }
     else
     {
-        posPid->kp = (conf()->BangBang_posKP())*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        // TODO : Config Server
+//        posPid->kp = (conf()->BangBang_posKP())*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        posPid->kp = (1)*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
 //        debug(QString("kp: %1").arg(posPid->kp),D_MHMMD);
-        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*2);
-        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
-        posPid->kd = conf()->BangBang_posKD();
-        posPid->ki = conf()->BangBang_posKI();
+        posPid->kp = min(posPid->kp,1*2);
+//        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*2);
+//        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
+        posPid->kp = max(posPid->kp,1);
+        posPid->kd = 1;//conf()->BangBang_posKD();
+        posPid->ki = 1;//conf()->BangBang_posKI();
     }
 
 
