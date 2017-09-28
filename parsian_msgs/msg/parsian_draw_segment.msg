@@ -1,4 +1,3 @@
-string name
 vector2D start
 vector2D end
 bool line

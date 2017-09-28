@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(parsian_util)
+project(parsian_ai)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -8,10 +8,12 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        roscpp
-        rospy
-        parsian_msgs
-        )
+		dynamic_reconfigure
+		parsian_msgs
+		parsian_util
+		roscpp
+		rospy
+		)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -80,7 +82,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+#   parsian_msgs
 # )
 
 ################################################
@@ -113,10 +115,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        INCLUDE_DIRS include
-        LIBRARIES parsian_util_geom
-        #  CATKIN_DEPENDS roscpp rospy
-        #  DEPENDS system_lib
+		#  INCLUDE_DIRS include
+		#  LIBRARIES parsian_ai
+		#  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -126,43 +128,16 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_BINARY_DIR}
+		include
+		${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_geom
-        src/geom/angle_deg.cpp
-        src/geom/circle_2d.cpp
-        src/geom/line_2d.cpp
-        src/geom/matrix_2d.cpp
-        src/geom/polygon_2d.cpp
-        src/geom/ray_2d.cpp
-        src/geom/rect_2d.cpp
-        src/geom/sector_2d.cpp
-        src/geom/triangle_2d.cpp
-        src/geom/vector_2d.cpp
-        )
-
-add_library(${PROJECT_NAME}_math
-        src/mathtools.cpp
-        src/matrix.cpp
-        src/statemachine.cpp
-        )
-
-add_library(${PROJECT_NAME}_tools
-        src/tools/drawer.cpp src/tools/debuger.cpp)
-
-add_library(${PROJECT_NAME}_core
-        src/core/agent.cpp
-        src/core/worldmodel.cpp
-        src/core/field.cpp
-        src/core/ball.cpp
-        src/core/team.cpp
-        src/knowledge.cpp
-        src/core/movingobject.cpp
-        )
+add_library(${PROJECT_NAME}
+		src/ai_node.cpp
+		src/parsian_ai/ai.cpp
+		src/parsian_ai/soccer.cpp
+        src/parsian_ai/coach.cpp include/parsian_ai/coach.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -172,7 +147,9 @@ add_library(${PROJECT_NAME}_core
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/parsian_util_node.cpp)
+add_executable(ai_node
+		src/ai_node.cpp
+		)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -182,28 +159,20 @@ add_library(${PROJECT_NAME}_core
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ai_node
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_geom
-        ${catkin_LIBRARIES}
+target_link_libraries(ai_node
+		${catkin_LIBRARIES}
+        ${PROJECT_NAME}
         )
 
-target_link_libraries(${PROJECT_NAME}_math
-        ${catkin_LIBRARIES}
+target_link_libraries(${PROJECT_NAME}
         ${QT_LIBRARIES}
-        )
-
-target_link_libraries(${PROJECT_NAME}_tools
         ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}_geom
-        )
-
-target_link_libraries(${PROJECT_NAME}_core
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}_geom
         )
 
 #############
@@ -246,7 +215,7 @@ target_link_libraries(${PROJECT_NAME}_core
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_util.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_ai.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
