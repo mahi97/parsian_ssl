@@ -151,6 +151,8 @@ add_library(${PROJECT_NAME}_math
         src/statemachine.cpp
         )
 
+add_library(${PROJECT_NAME}_tools
+        src/tools/drawer.cpp)
 
 add_library(${PROJECT_NAME}_core
         src/core/agent.cpp
@@ -192,6 +194,11 @@ target_link_libraries(${PROJECT_NAME}_math
         ${QT_LIBRARIES}
         )
 
+target_link_libraries(${PROJECT_NAME}_tools
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}_geom
+        )
 
 target_link_libraries(${PROJECT_NAME}_core
         ${catkin_LIBRARIES}

@@ -17,6 +17,7 @@ public:
     ~AI();
 
     void execute();
+
     void updateWM(const parsian_msgs::parsian_world_model&);
     void updateRobotStatus(const parsian_msgs::parsian_robot&);
 

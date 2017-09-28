@@ -1,6 +1,8 @@
 #include "ros/ros.h"
 
 #include "parsian_msgs/parsian_world_model.h"
+#include "parsian_msgs/parsian_debugs.h"
+#include "parsian_msgs/parsian_draw.h"
 #include "parsian_ai/ai.h"
 
 
@@ -18,6 +20,7 @@ void gameStateCallBack(const int& ) {
 
 }
 
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "ai_node");
@@ -28,19 +31,21 @@ int main(int argc, char **argv)
     ros::Subscriber robotStatusSub  = n.subscribe("/robot_status", 1000, robotStatusCallback);
     ros::Subscriber gameStateSub    = n.subscribe("/game_state", 1000, gameStateCallBack);
 
-    ros::Publisher  drawPub    = n.advertise("/draws",1000);
-    ros::Publisher  debugPub   = n.advertise("/debugs",1000);
-    ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
+    ros::Publisher  drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
+    ros::Publisher  debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
+//    ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
 
     ros::Rate loop_rate(62);
 
+    parsian_msgs::parsian_debugs debugs;
+    parsian_msgs::parsian_draw   draw;
 
 
     while (ros::ok()) {
         ai.execute();
 
-        drawPub.publish();
-
+        drawPub.publish(debugs);
+        debugPub.publish(draw);
 
         ros::spinOnce();
         loop_rate.sleep();
