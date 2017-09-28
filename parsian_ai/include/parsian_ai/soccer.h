@@ -66,7 +66,6 @@ private:
     GameStatePacket gsp;
     bool doClose;
     void primaryDraws();
-    void resetRoles();
     void findSupporterRoles();
     void sendPacketToSimulator();
     void sendPacketToRealWorld();

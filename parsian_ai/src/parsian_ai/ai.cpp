@@ -17,8 +17,10 @@ void AI::execute() {
     soccer->execute();
 }
 
-void AI::updateRobotStatus(const parsian_msgs::parsian_robot &) {
+void AI::updateRobotStatus(const parsian_msgs::parsian_robot & _rs) {
 
 }
 
-void AI::updateWM(const parsian_msgs::parsian_world_model &) {}
+void AI::updateWM(const parsian_msgs::parsian_world_model & _wm) {
+
+}

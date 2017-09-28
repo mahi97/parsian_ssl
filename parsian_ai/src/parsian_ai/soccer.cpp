@@ -84,16 +84,13 @@ void CSoccer::primaryDraws(){
 void CSoccer::execute()
 {
 
-    QTime timer;
-    timer.start();
+//    QTime timer;
+//    timer.start();
 
-    knowledge->frameCount++;
 
     primaryDraws();
 
-    resetRoles();
 
-    wm->setIsSimulMode(mode==Simulation);
 
     //////////////////set opponents roles more specificly and set priority for each of which////////////////////
     coach->setOpponents();
@@ -102,40 +99,38 @@ void CSoccer::execute()
     findSupporterRoles();
 
 
-    knowledge->calculateCommandFrameRate();
-    //  debug(QString("%1) MainLoop Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-    timer.restart();
-    if( mode != Spy && controlMode == AI && knowledge->frameCount > 50 )
+//    timer.restart();
+    if( mode != Spy && controlMode == AI)
     {
         for (int i=0;i<_NUM_PLAYERS;i++)
         {
-            agents[i]->waitHere();
+//            agents[i]->waitHere(); TODO : Robot Command
         }
-        bool custom = false;
-        customControl(custom);
-        if (!custom)
-        {
+//        bool custom = false;
+//        customControl(custom);
+//        if (!custom)
+//        {
             coach->execute();
 
-        }
+//        }
     }
     ////////////////////////////////////////////////////////////////////
 
     //  debug(QString("%1) MainLoop Time2: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-    timer.restart();
+//    timer.restart();
 
 
-    ////////////////////////////////if simulation mode is running send packets to simulator/////////////////////////////////////
-    if( mode == Simulation ){
-        sendPacketToSimulator();
-    }
-    else//////if real mode is running send packets to agents by communication module
-    {
-        sendPacketToRealWorld();
-    }
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ////////////////////////////////if simulation mode is running send packets to simulator/////////////////////////////////////
+//    if( mode == Simulation ){
+//        sendPacketToSimulator();
+//    }
+//    else//////if real mode is running send packets to agents by communication module
+//    {
+//        sendPacketToRealWorld();
+//    }
+//    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-    timer.restart();
+//    timer.restart();
 
 }

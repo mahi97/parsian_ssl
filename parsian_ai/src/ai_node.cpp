@@ -4,7 +4,7 @@
 #include "parsian_msgs/parsian_debugs.h"
 #include "parsian_msgs/parsian_draw.h"
 #include "parsian_ai/ai.h"
-
+#include "parsian_util/tools/drawer.h"
 
 AI ai;
 
@@ -37,15 +37,11 @@ int main(int argc, char **argv)
 
     ros::Rate loop_rate(62);
 
-    parsian_msgs::parsian_debugs debugs;
-    parsian_msgs::parsian_draw   draw;
-
-
     while (ros::ok()) {
         ai.execute();
-
-        drawPub.publish(debugs);
-        debugPub.publish(draw);
+        
+        drawPub.publish(drawer.draws);
+//        debugPub.publish();
 
         ros::spinOnce();
         loop_rate.sleep();
