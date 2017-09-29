@@ -27,7 +27,5 @@ private:
     std_msgs::ColorRGBA toColorRGBA(const QColor& _color);
     parsian_msgs::vector2D toParsianVec(const Vector2D& _vec);
 };
-
-Drawer drawer;
-
+extern Drawer* drawer;
 #endif //PARSIAN_UTIL_DRAWER_H_H

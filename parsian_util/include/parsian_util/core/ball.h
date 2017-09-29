@@ -7,9 +7,11 @@
 
 #include <parsian_msgs/parsian_robot.h>
 #include "parsian_util/core/movingobject.h"
+#include "parsian_msgs/parsian_robot.h"
 
 class CBall : public CMovingObject {
 public:
+    CBall();
     CBall(const parsian_msgs::parsian_robot& _robot);
     ~CBall();
     double whenBallReachToPoint(double dist) const;
