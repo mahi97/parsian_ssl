@@ -27,6 +27,7 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
+find_package(QJSON REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -160,6 +161,11 @@ add_library(${PROJECT_NAME}_plans
 		src/parsian_ai/plans/positioningplan.cpp
 		)
 
+add_library(${PROJECT_NAME}_util
+		src/parsian_ai/util/planloader.cpp
+		src/parsian_ai/util/loadplayoffjson.cpp
+		)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -207,7 +213,11 @@ target_link_libraries(${PROJECT_NAME}_plans
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
 		)
-
+target_link_libraries(${PROJECT_NAME}_util
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${QJSON_LIBRARIES}
+		)
 
 
 
