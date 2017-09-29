@@ -8,12 +8,12 @@ project(parsian_msgs)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  std_msgs
-  geometry_msgs
-  actionlib_msgs
-  actionlib
-)
+		message_generation
+		std_msgs
+		geometry_msgs
+		actionlib_msgs
+		actionlib
+		)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -48,14 +48,18 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
+
 file(GLOB MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg msg/*.msg)
+file(GLOB SKILL_MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg msg/skills/*.msg)
+
 message(STATUS "All msg files: ${MSGS}")
 
 # Generate messages in the 'msg' folder
 add_message_files(
-  DIRECTORY msg
-  FILES
-  ${MSGS}
+		DIRECTORY msg
+		FILES
+		${MSGS}
+		${SKILL_MSGS}
 )
 
 ## Generate services in the 'srv' folder
@@ -70,16 +74,16 @@ message(STATUS "All action files: ${ACTS}")
 
 ## Generate actions in the 'action' folder
 add_action_files(
-	DIRECTORY action
-	FILES
-	${ACTS}
+		DIRECTORY action
+		FILES
+		${ACTS}
 )
 # Generate added messages and services with any dependencies listed here
 generate_messages(
-  DEPENDENCIES
-  std_msgs
-  actionlib_msgs
-  geometry_msgs
+		DEPENDENCIES
+		std_msgs
+		actionlib_msgs
+		geometry_msgs
 )
 
 ################################################
@@ -112,10 +116,10 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES parsian_msgs
-  CATKIN_DEPENDS message_runtime
-#  DEPENDS system_lib
+		#  INCLUDE_DIRS include
+		#  LIBRARIES parsian_msgs
+		CATKIN_DEPENDS message_runtime
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -125,8 +129,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+		# include
+		${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
