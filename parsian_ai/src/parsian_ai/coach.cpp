@@ -68,7 +68,7 @@ CCoach::CCoach(CAgent**_agents)
     transientFlag = false;
     trasientTimeOut.start();
     translationTimeOutTime = 2000;
-    exeptionPlayMake = NULL;
+    exeptionPlayMake = nullptr;
     exeptionPlayMakeThr = 0;
 
     staticPlayoffPlansCounter = 0;
@@ -78,7 +78,7 @@ CCoach::CCoach(CAgent**_agents)
     firstPlanRepeatInit = true;
     staticPlayoffPlansShuffleIndexing.clear();
 //    m_planLoader = new CLoadPlayOffJson(QDir::currentPath() + QString("/playoff"));
-    goalieAgent = NULL;
+    goalieAgent = nullptr;
     firstPlay = true;
     firstIsFinished = false;
     preferedDefenseCounts = 2;
