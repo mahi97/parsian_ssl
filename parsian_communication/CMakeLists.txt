@@ -15,11 +15,25 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
 )
 
+FILE(GLOB_RECURSE HEADER_FILES include *.h)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(Qt4 REQUIRED COMPONENTS QtCore)
+
+include(${QT_USE_FILE})
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
+
+QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+
+file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
 
-## Uncomment this if the package has a setup.py. This macro ensures
+link_directories(/usr/include/qt4/QtExtSerialPort)
+##QT5 :D
+
+
+## Uncomment this if the package has a setup.py . This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
@@ -105,8 +119,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES parsian_communication
+  INCLUDE_DIRS include
+  LIBRARIES parsian_communication
 #  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy
 #  DEPENDS system_lib
 )
@@ -118,14 +132,15 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/parsian_communication.cpp
-# )
+add_library(${PROJECT_NAME}
+   src/${PROJECT_NAME}/communicator.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -135,7 +150,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/parsian_communication_node.cpp)
+add_executable(${PROJECT_NAME}_node
+    src/communication_node.cpp
+
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -145,12 +163,13 @@ include_directories(
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+ add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+   ${QT_LIBRARIES} -lqextserialport
+ )
 
 #############
 ## Install ##
