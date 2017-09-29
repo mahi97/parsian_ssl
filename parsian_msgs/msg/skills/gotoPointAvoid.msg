@@ -1,4 +1,4 @@
-gotoPoint base
+parsian_msgs/gotoPoint base
 vector2D addVel
 bool avoidPenaltyArea
 bool keeplooking

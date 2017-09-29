@@ -50,17 +50,27 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 file(GLOB MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg msg/*.msg)
-file(GLOB SKILL_MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg msg/skills/*.msg)
+file(GLOB SKILL_MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg/skills msg/skills/*.msg)
 
 message(STATUS "All msg files: ${MSGS}")
+message(STATUS "All msg files: ${SKILL_MSGS}")
 
 # Generate messages in the 'msg' folder
 add_message_files(
-		DIRECTORY msg
+		DIRECTORY
+		msg
 		FILES
 		${MSGS}
+)
+
+add_message_files(
+		DIRECTORY
+		msg/skills
+		FILES
 		${SKILL_MSGS}
 )
+
+
 
 ## Generate services in the 'srv' folder
 # add_service_files(
