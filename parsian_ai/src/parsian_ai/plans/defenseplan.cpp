@@ -1091,7 +1091,7 @@ void DefensePlan::initGoalKeeper(CAgent *_goalieAgent){
     }
 }
 
-void DefensePlan::initDefense(const QList <CAgent*> &_defenseAgents){
+void DefensePlan::initDefense(QList <CAgent*> _defenseAgents){
     //// Just like the "initGoalKeeper" function , for inializing the defense
     //// agent , we have a function like this. :)
 

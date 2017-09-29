@@ -1,8 +1,8 @@
 #ifndef DEFENSE_H
 #define DEFENSE_H
 
-#include <plans/plan.h>
 #include <cmath>
+#include <parsian_util/core/worldmodel.h>
 
 //#define OLD_FASTEST 1
 
@@ -159,7 +159,7 @@ public:
     DefensePlan();
     void execute();
     void initGoalKeeper(CAgent *_goalieAgent = NULL);
-    void initDefense(const QList <CAgent*> &_defenseAgents = QList<CAgent*>());
+    void initDefense(QList <CAgent*> _defenseAgents = QList<CAgent*>());
     int getNumberofThreeDefense();
     bool isAnyDefenderMarking() const;    
     void fillDefencePositionsTo(Vector2D *poses);    

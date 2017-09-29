@@ -4,7 +4,6 @@
 CSoccer::CSoccer()
 {
 //    wm = new CWorldModel;
-//    gameLogger = new CGameLogger;
     agents = new CAgent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < _MAX_NUM_PLAYERS; i++ )
     {
@@ -114,7 +113,6 @@ void CSoccer::execute()
 
 //        }
     }
-    ////////////////////////////////////////////////////////////////////
 
     //  debug(QString("%1) MainLoop Time2: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
