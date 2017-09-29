@@ -867,15 +867,15 @@ Vector2D CSkillKick::findMostPossible()
     QList<int> tempObstacles;
     QList <Circle2D> obstacles;
     obstacles.clear();
-    for(int i = 0 ; i < wm->opp->activeAgentsCount() ; i++)
+    for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++)
     {
-        obstacles.append(Circle2D(wm->opp->active(i)->pos,0.1));
+        obstacles.append(Circle2D(wm->opp.active(i)->pos,0.1));
     }
 
-    for(int i = 0 ; i < wm->our->activeAgentsCount() ; i++)
+    for(int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
     {
-        if(wm->our->active(i)->id != agent->id())
-            obstacles.append(Circle2D(wm->our->active(i)->pos,0.1));
+        if(wm->our.active(i)->id != agent->id())
+            obstacles.append(Circle2D(wm->our.active(i)->pos,0.1));
     }
     double prob,angle,biggestAngle;
 
