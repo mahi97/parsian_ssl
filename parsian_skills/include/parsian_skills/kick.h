@@ -1,17 +1,13 @@
 #ifndef KICK_H
 #define KICK_H
 
-#include "gotopoint.h"
+#include <parsian_skills/gotopointavoid.h>
 #include <QtCore/QQueue>
 #include "parsian_util/core/ball.h"
 #include "parsian_util/core/movingobject.h"
 
 #define penaltyAreaAvoidanceRadius (0.9)
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum kckMode {
     KDIRECT = 0,
     KINDIRECCT = 1,
