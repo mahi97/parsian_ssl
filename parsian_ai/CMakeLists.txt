@@ -27,6 +27,7 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
+find_package(QJSON REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -139,6 +140,32 @@ add_library(${PROJECT_NAME}
 		src/parsian_ai/soccer.cpp
         src/parsian_ai/coach.cpp include/parsian_ai/coach.h)
 
+add_library(${PROJECT_NAME}_plays
+		src/parsian_ai/plays/dynamicattack.cpp
+		src/parsian_ai/plays/masterplay.cpp
+		src/parsian_ai/plays/ourballplacement.cpp
+		src/parsian_ai/plays/playoff.cpp
+		src/parsian_ai/plays/ourpenalty.cpp
+		src/parsian_ai/plays/theirpenalty.cpp
+		src/parsian_ai/plays/theirkickoff.cpp
+		src/parsian_ai/plays/theirindirect.cpp
+		src/parsian_ai/plays/theirdirect.cpp
+		src/parsian_ai/plays/theirballplacement.cpp
+		src/parsian_ai/plays/stopplay.cpp
+		)
+
+add_library(${PROJECT_NAME}_plans
+		src/parsian_ai/plans/defenseplan.cpp
+		src/parsian_ai/plans/markplan.cpp
+		src/parsian_ai/plans/plan.cpp
+		src/parsian_ai/plans/positioningplan.cpp
+		)
+
+add_library(${PROJECT_NAME}_util
+		src/parsian_ai/util/planloader.cpp
+		src/parsian_ai/util/loadplayoffjson.cpp
+		)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -168,12 +195,31 @@ add_dependencies(ai_node
 target_link_libraries(ai_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
+		${PROJECT_NAME}_plays
+		${PROJECT_NAME}_plans
         )
 
 target_link_libraries(${PROJECT_NAME}
         ${QT_LIBRARIES}
         ${catkin_LIBRARIES}
         )
+
+target_link_libraries(${PROJECT_NAME}_plays
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
+
+target_link_libraries(${PROJECT_NAME}_plans
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
+target_link_libraries(${PROJECT_NAME}_util
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${QJSON_LIBRARIES}
+		)
+
+
 
 #############
 ## Install ##

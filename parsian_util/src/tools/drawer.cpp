@@ -3,7 +3,7 @@
 //
 
 #include "parsian_util/tools/drawer.h"
-
+Drawer* drawer;
 void Drawer::draw(const Rect2D& _rect, const QColor &_color, bool _filled)
 {
     parsian_msgs::parsian_draw_rect drawRect;

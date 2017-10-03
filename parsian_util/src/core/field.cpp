@@ -21,6 +21,9 @@ CField::CField()
     ros::param::get("/penalty_area_circle_x"  , _MIXTEAM_FIELD_WIDTH);
     ros::param::get("/penalty_area_circle_rad", _MIXTEAM_FIELD_HEIGHT);
 
+    _MAX_DIST = sqrt(_FIELD_WIDTH * _FIELD_WIDTH + _FIELD_HEIGHT * _FIELD_HEIGHT);
+
+
     fCenter = Vector2D(0.0 , 0.0);
     fOurGoal = Vector2D(- _FIELD_WIDTH/2.0 , 0.0);
     fOppGoal = Vector2D(_FIELD_WIDTH/2.0 , 0.0);

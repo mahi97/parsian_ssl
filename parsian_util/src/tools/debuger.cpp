@@ -3,7 +3,7 @@
 //
 
 #include "parsian_util/tools/debuger.h"
-
+Debugger* debugger;
 void Debugger::debug(const QString& _text , unsigned long _type , const QColor& _color) {
 
     parsian_msgs::parsian_debug parsianDebug;
