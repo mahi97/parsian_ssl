@@ -1,18 +1,26 @@
 #include "ros/ros.h"
 
-#include "parsian_msgs/parsian_world_model.h"
-#include "parsian_msgs/parsian_debugs.h"
-#include "parsian_msgs/parsian_draw.h"
-#include "parsian_msgs/ssl_refree_wrapper.h"
 #include <parsian_msgs/gotoPoint.h>
 #include <parsian_msgs/gotoPointAvoid.h>
 #include <parsian_msgs/receivePass.h>
 #include <parsian_msgs/kick.h>
-
-#include "parsian_ai/ai.h"
-
+#include <parsian_msgs/parsian_world_model.h>
+#include <parsian_msgs/parsian_debugs.h>
+#include <parsian_msgs/parsian_draw.h>
+#include <parsian_msgs/ssl_refree_wrapper.h>
+#include <parsian_ai/ai.h>
 #include <parsian_util/tools/drawer.h>
 #include <parsian_util/tools/debuger.h>
+#include <parsian_ai/gamestate.h>
+
+
+void robotStatusCallback(const parsian_msgs::parsian_robot& _robotStatus) {
+    ai.updateRobotStatus(_robotStatus);
+}
+
+void refreeCallback(const parsian_msgs::ssl_refree_wrapper& _refreeWrapper) {
+    gameState->setRefree(_refreeWrapper);
+}
 
 
 int main(int argc, char **argv)
@@ -20,7 +28,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "ai_node");
     ros::NodeHandle n;
 
-    AI ai;
+    ros::Subscriber worldModelSub   = n.subscribe("/world_model", 1000, wmCallback);
+    ros::Subscriber robotStatusSub  = n.subscribe("/robot_status", 1000, robotStatusCallback);
+    ros::Subscriber gameStateSub    = n.subscribe("/game_state", 1000, gameStateCallBack);
 
     ros::Subscriber worldModelSub   = n.subscribe("/world_model", 1000, ai.updateWM);
     ros::Subscriber robotStatusSub  = n.subscribe("/robot_status", 1000, ai.updateRobotStatus);

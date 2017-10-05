@@ -20,8 +20,11 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore)
-
 include(${QT_USE_FILE})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
 QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
@@ -117,7 +120,7 @@ find_package(QJSON REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-		#  INCLUDE_DIRS include
+                  INCLUDE_DIRS include
 		#  LIBRARIES parsian_ai
 		#  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy
 		#  DEPENDS system_lib
@@ -134,12 +137,17 @@ include_directories(
 		${catkin_INCLUDE_DIRS}
 )
 
+## show include dir in qt
+FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-		src/ai_node.cpp
 		src/parsian_ai/ai.cpp
 		src/parsian_ai/soccer.cpp
-        src/parsian_ai/coach.cpp include/parsian_ai/coach.h)
+                src/parsian_ai/gamestate.cpp
+        src/parsian_ai/coach.cpp
+)
 
 add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/dynamicattack.cpp
@@ -196,9 +204,16 @@ add_dependencies(ai_node
 target_link_libraries(ai_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
+        ${QT_LIBRARIES}
 		${PROJECT_NAME}_plays
 		${PROJECT_NAME}_plans
         )
+
+add_dependencies(${PROJECT_NAME}
+                ${${PROJECT_NAME}_EXPORTED_TARGETS}
+                ${catkin_EXPORTED_TARGETS}
+                )
+
 
 target_link_libraries(${PROJECT_NAME}
         ${QT_LIBRARIES}

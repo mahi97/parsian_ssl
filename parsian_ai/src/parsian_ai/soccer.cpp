@@ -92,10 +92,10 @@ void CSoccer::execute()
 
 
     //////////////////set opponents roles more specificly and set priority for each of which////////////////////
-    coach->setOpponents();
+//    coach->setOpponents();
     //////////////////////////////////////
 
-    findSupporterRoles();
+//    findSupporterRoles();
 
 
 //    timer.restart();
