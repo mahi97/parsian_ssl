@@ -17,12 +17,13 @@ public:
     CWorldModel();
     ~CWorldModel();
 
-    void updateDetection(const parsian_msgs::ssl_vision_detection&);
-    void updateGeom(const parsian_msgs::ssl_vision_geometry&);
-    void execute(parsian_msgs::parsian_world_model& rosWM);
+    void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
+    void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
+    void execute();
+    parsian_msgs::parsian_world_model getParsianWorldModel() const;
 
 private:
-
+    parsian_msgs::parsian_world_model rosWM;
 
 };
 
