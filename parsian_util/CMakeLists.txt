@@ -139,6 +139,7 @@ add_library(${PROJECT_NAME}_geom
         src/geom/matrix_2d.cpp
         src/geom/polygon_2d.cpp
         src/geom/ray_2d.cpp
+        src/geom/segment_2d.cpp
         src/geom/rect_2d.cpp
         src/geom/sector_2d.cpp
         src/geom/triangle_2d.cpp

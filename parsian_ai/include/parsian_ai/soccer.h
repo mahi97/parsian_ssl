@@ -38,12 +38,6 @@ public:
     void selectRobot(Vector2D pos);
 //    virtual void customControl(bool& custom);
 
-    ///////////////////////////////////////
-    char map_stage(SSL_Referee::Stage stage);
-    char map_command(SSL_Referee::Command command);
-    char compute_command(SSL_Referee refSC);
-    ///////////////////////////////////////
-
     CWorldModel* wm;
     CAgent **agents;
     CCoach *coach;
@@ -58,15 +52,13 @@ private:
 
     /****lasts****/
     char cached_command_char;
-    SSL_Referee::Stage last_stage;
-    SSL_Referee::Command last_command;
     int last_yellow_ycards, last_blue_ycards;
     unsigned int last_yellow_rcards, last_blue_rcards;
     int cmdCnt, lastCmdCnt;
     GameStatePacket gsp;
     bool doClose;
     void primaryDraws();
-    void findSupporterRoles();
+//    void findSupporterRoles();
     void sendPacketToSimulator();
     void sendPacketToRealWorld();
 
