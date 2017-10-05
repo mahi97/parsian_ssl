@@ -16,7 +16,6 @@ public:
 
     virtual void getParsianMessage();
 
-    parsian_msgs::gotoPoint data;
 protected:
 
 private:

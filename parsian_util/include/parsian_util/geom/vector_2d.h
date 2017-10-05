@@ -94,7 +94,7 @@ public:
         \brief convert vector2D to parsian message.
         \return parsian_message vector2D
     */
-    parsian_msgs::vector2D toParsianVector2D() {
+    parsian_msgs::vector2D toParsianVector2D() const {
         parsian_msgs::vector2D vec;
         vec.x = this->x;
         vec.y = this->y;
