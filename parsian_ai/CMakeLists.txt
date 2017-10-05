@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
 		dynamic_reconfigure
 		parsian_msgs
 		parsian_util
-		parsian_skill
 		roscpp
 		rospy
 		)
