@@ -168,6 +168,13 @@ target_link_libraries(${PROJECT_NAME}
         )
 
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
         worldmodel_nodelet
@@ -179,7 +186,6 @@ target_link_libraries(worldmodel_node
 add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_nodelet
-        ${PROJECT_NAME}
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         ${PROJECT_NAME}

@@ -13,6 +13,8 @@
 #include <parsian_util/core/agent.h>
 #include <QtCore/QTime>
 #include <QtCore/QFile>
+#include <QPair>
+#include <QTextStream>
 #include <parsian_ai/util/loadplayoffjson.h>
 
 
@@ -41,7 +43,7 @@ public:
     DefensePlan& getDefense();
     void swapAgents();   //refer to selectedId in knowledge
     bool swapAgents(int i, int j);
-    void setOpponents();
+//    void setOpponents();
     int mostSupporterNumber(int num);
     QList<int> findBestPoses(int numberOfPositionAgents);
     CKnowledge::ballPossesionState lastBallPossesionState;
@@ -116,20 +118,20 @@ private:
     QList <CAgent*> lastDefenseAgents;
     QList <int> lastDefenderAgents;
     void checkTransitionToForceStart();
-    void updateKnowledgeVars();
-    void doIntention();
+//    void updateKnowledgeVars();
+//    void doIntention();
     void clearIntentions();
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
-    void decidePreferedDefenseAgentsCountAndGoalieAgent();
+//    void decidePreferedDefenseAgentsCountAndGoalieAgent();
     void decideAttack();
     void decideDefense();
     void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
     void decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers);
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr ;
-    void virtualTheirPlayOffState();
+//    void virtualTheirPlayOffState();
     bool transientFlag;
     CKnowledge::State lastState;
     QTime trasientTimeOut;

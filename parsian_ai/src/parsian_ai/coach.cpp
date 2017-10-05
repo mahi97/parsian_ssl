@@ -8,6 +8,7 @@
 #include <parsian_util/base.h>
 #include <parsian_ai/ai.h>
 
+
 //QMap<QString, EditData*> CCoach::editData;
 CCoach::CCoach(CAgent**_agents)
 {
@@ -1867,12 +1868,12 @@ void CCoach::execute()
     // place your reset codes about knowledge vars in this function
 //    knowledge->resetEssentialVars();
 
-    updateKnowledgeVars();
+//    updateKnowledgeVars();
 
-    doIntention();
+//    doIntention();
 
-    virtualTheirPlayOffState();
-    decidePreferedDefenseAgentsCountAndGoalieAgent();
+//    virtualTheirPlayOffState();
+//    decidePreferedDefenseAgentsCountAndGoalieAgent();
 //    debug(QString("TS : %1").arg(transientFlag), D_GAME);
 //    //    draw(QString("TS : %1").arg(transientFlag), Vector2D(2,-3));
 //    /////////////////////////////////////// choose playmake
