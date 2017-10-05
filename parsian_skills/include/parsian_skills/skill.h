@@ -41,7 +41,6 @@ public:
     virtual void execute()=0;
 
     Property(CAgent*, Agent, agent);
-    Property(CWorldModel*, WorldModel, wm);
 friend class CSkills;
 };
 

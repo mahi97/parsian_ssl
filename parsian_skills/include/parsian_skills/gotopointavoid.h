@@ -6,8 +6,9 @@
 #define PARSIAN_SKILLS_GOTOPOINTAVOID_H
 
 #include <parsian_skills/gotopoint.h>
+#include <parsian_util/action/actiongotopointavoid.h>
 
-class CSkillGotoPointAvoid : public CSkillGotoPoint
+class CSkillGotoPointAvoid : public CSkillGotoPoint, public ActionGotoPointAvoid
 {
 private:
 //    CMotionProfile *prof;
@@ -22,7 +23,6 @@ protected:
     QList <Vector2D> pathPoints;
     int counter;
     bool inited;
-    void followPath();
     Vector2D averageDir;
 public:
     double timeStarted, timeEstimated; //for skill widget
@@ -34,21 +34,21 @@ public:
     CSkillGotoPointAvoid* setTargetLook(Vector2D finalPos, Vector2D lookAtPoint);
     CSkillGotoPointAvoid* setTarget(Vector2D finalPos, Vector2D finalDir);
     QList<Vector2D> result;
-    SkillProperty(CSkillGotoPointAvoid, Vector2D, AddVel, addVel);
-    SkillProperty(CSkillGotoPointAvoid, bool, AvoidPenaltyArea, avoidPenaltyArea);
-    SkillProperty(CSkillGotoPointAvoid, bool, KeepLooking, keeplooking);
-    SkillProperty(CSkillGotoPointAvoid, double, ExtendStep, extendStep);
-    SkillProperty(CSkillGotoPointAvoid, bool, DynamicStart, dynamicStart);
-    SkillProperty(CSkillGotoPointAvoid, bool, Plan2, plan2);
-    SkillProperty(CSkillGotoPointAvoid, bool, NoAvoid, noAvoid);
-    SkillProperty(CSkillGotoPointAvoid, bool, AvoidCenterCircle, avoidCenterCircle);
-    SkillProperty(CSkillGotoPointAvoid, double, BallObstacleRadius , ballObstacleRadius);
-    SkillProperty(CSkillGotoPointAvoid, bool, ADiveMode, diveMode);
-    SkillProperty(CSkillGotoPointAvoid, bool, AvoidBall, avoidBall);
-    SkillProperty(CSkillGotoPointAvoid, bool, AvoidGoalPosts, avoidGoalPosts);
-    SkillProperty(CSkillGotoPointAvoid, bool, DrawPath, drawPath);
-
-    SkillProperty(CSkillGotoPointAvoid, Vector2D, NextPos, nextPos);
+//    SkillProperty(CSkillGotoPointAvoid, Vector2D, AddVel, addVel);
+//    SkillProperty(CSkillGotoPointAvoid, bool, AvoidPenaltyArea, avoidPenaltyArea);
+//    SkillProperty(CSkillGotoPointAvoid, bool, KeepLooking, keeplooking);
+//    SkillProperty(CSkillGotoPointAvoid, double, ExtendStep, extendStep);
+//    SkillProperty(CSkillGotoPointAvoid, bool, DynamicStart, dynamicStart);
+//    SkillProperty(CSkillGotoPointAvoid, bool, Plan2, plan2);
+//    SkillProperty(CSkillGotoPointAvoid, bool, NoAvoid, noAvoid);
+//    SkillProperty(CSkillGotoPointAvoid, bool, AvoidCenterCircle, avoidCenterCircle);
+//    SkillProperty(CSkillGotoPointAvoid, double, BallObstacleRadius , ballObstacleRadius);
+//    SkillProperty(CSkillGotoPointAvoid, bool, ADiveMode, diveMode);
+//    SkillProperty(CSkillGotoPointAvoid, bool, AvoidBall, avoidBall);
+//    SkillProperty(CSkillGotoPointAvoid, bool, AvoidGoalPosts, avoidGoalPosts);
+//    SkillProperty(CSkillGotoPointAvoid, bool, DrawPath, drawPath);
+//
+//    SkillProperty(CSkillGotoPointAvoid, Vector2D, NextPos, nextPos);
 
 };
 
