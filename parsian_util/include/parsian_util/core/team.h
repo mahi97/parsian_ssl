@@ -6,15 +6,13 @@
 #define PARSIAN_UTIL_TEAM_H
 
 #include "parsian_util/core/agent.h"
-#include <QDebug>
-#include <QQueue>
 
 #define _MAX_NUM_PLAYERS 12
 
 struct CTeamData
 {
     CRobot* teamMembers[_MAX_NUM_PLAYERS];
-    QQueue<int> activeAgents;
+    QList<int> activeAgents;
     QString color;
     QString side;
     int goalieID;
@@ -24,15 +22,18 @@ class CTeam
 {
 public:
     CTeamData *data;
-    CTeam(bool isOurTeam);
+    CTeam(const bool isYellow, const bool isLeft);
+    CTeam(const bool isYellow, const bool isLeft, const std::vector<parsian_msgs::parsian_robot>&);
     ~CTeam();
     CRobot* operator [](const int i);
     CRobot* active(const int i);
     int activeAgentsCount();
     int activeAgentID(int i);
     void update();
+    void updateRobot(const std::vector<parsian_msgs::parsian_robot>& _robots);
 
-    void setColor(const QString& c);
+    void setColor(const bool& isYellow);
+    void setSide(const bool& isLeft);
     void updateGoaliID(int id);
 
 };

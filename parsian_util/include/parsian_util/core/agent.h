@@ -9,17 +9,16 @@
 
 class CRobot : public CMovingObject {
 public:
-    CRobot(const parsian_msgs::parsian_robot& _robot) {
-        this->pos = rcsc::Vector2D(_robot.pos.x, _robot.pos.y);
-        this->vel = rcsc::Vector2D(_robot.vel.x, _robot.vel.y);
-        this->acc = rcsc::Vector2D(_robot.acc.x, _robot.acc.y);
-        this->dir = rcsc::Vector2D(_robot.dir.x, _robot.dir.y);
-
-        this->id  = _robot.id;
-        this->angularVel = _robot.angularVel;
-    }
-    bool isActive() { return true ; }
+    CRobot();
+    CRobot(const parsian_msgs::parsian_robot& _robot) :
+            CMovingObject(_robot), id(_robot.id) {};
+    bool isActive() { return active ; }
+    void setActive(bool _active) { active = _active; }
     int id;
+
+private:
+    bool active;
+
 };
 
 class CAgent {
@@ -30,7 +29,7 @@ public:
     Vector2D dir();
     Vector2D acc();
     int       id();
-
+    bool isVisible() {return self.isActive(); }
 
     CRobot self;
 };

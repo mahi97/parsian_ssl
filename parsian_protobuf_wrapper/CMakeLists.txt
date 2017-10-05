@@ -129,7 +129,7 @@ catkin_package(
         ${protogen_include_dirs}
         LIBRARIES ${PROJECT_NAME}_proto
         CATKIN_DEPENDS message_runtime dynamic_reconfigure
-        DEPENDS Protobuf
+#        DEPENDS Protobuf
 )
 
 ###########

@@ -298,3 +298,20 @@ Vector2D CKnowledge::getReflectPos(Vector2D goal, double dist, Vector2D _ballpos
 
     return res;
 }
+
+int CKnowledge::getNearestRobotToPoint(CTeam _team, Vector2D _point) {
+    double minDist = 1.0e13;
+    int nearest = -1;
+    for(int i = 0; i < _team.activeAgentsCount(); i++ )
+    {
+        if (_team.active(i)->inSight <=0)
+            continue;
+        double dist = (_team.active(i)->pos - _point).length();
+        if( dist < minDist )
+        {
+            minDist = dist;
+            nearest = _team.active(i)->id;
+        }
+    }
+    return nearest;
+}

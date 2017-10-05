@@ -1,0 +1,13 @@
+parsian_msgs/gotoPoint base
+vector2D addVel
+bool avoidPenaltyArea
+bool keeplooking
+float32 extendStep
+bool plan2
+bool noAvoid
+bool avoidCenterCircle
+float32 ballObstacleRadius
+bool avoidBall
+bool avoidGoalPosts
+bool drawPath
+vector2D nextPos

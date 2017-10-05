@@ -30,6 +30,7 @@ public:
     static double _PARSIAN_BOUNDERY;
     static double _MIXTEAM_FIELD_WIDTH;
     static double _MIXTEAM_FIELD_HEIGHT;
+    static double _MAX_DIST;
 
 
     enum class Region {

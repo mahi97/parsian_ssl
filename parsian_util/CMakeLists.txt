@@ -152,7 +152,17 @@ add_library(${PROJECT_NAME}_math
         )
 
 add_library(${PROJECT_NAME}_tools
-        src/tools/drawer.cpp src/tools/debuger.cpp)
+        src/tools/drawer.cpp
+        src/tools/debuger.cpp
+        src/tools/filewatcher.cpp
+        )
+
+
+add_library(${PROJECT_NAME}_actions
+        src/action/action.cpp
+        src/action/actiongotopoint.cpp
+        src/action/actiongotopointavoid.cpp
+        )
 
 add_library(${PROJECT_NAME}_core
         src/core/agent.cpp
@@ -201,6 +211,13 @@ target_link_libraries(${PROJECT_NAME}_tools
         )
 
 target_link_libraries(${PROJECT_NAME}_core
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}_geom
+        )
+
+
+target_link_libraries(${PROJECT_NAME}_actions
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         ${PROJECT_NAME}_geom

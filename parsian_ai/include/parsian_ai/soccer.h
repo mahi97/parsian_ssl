@@ -45,6 +45,7 @@ public:
     ///////////////////////////////////////
 
     CWorldModel* wm;
+
     CAgent **agents;
     CCoach *coach;
 Property(ControlMode, ControlMode, controlMode);
@@ -67,14 +68,8 @@ private:
     bool doClose;
     void primaryDraws();
     void findSupporterRoles();
-    void sendPacketToSimulator();
-    void sendPacketToRealWorld();
 
     void refUpdate();
-    //////////////////mhmmd thread
-    void getRobotVel(int _id, double _x, double _y, double _w);
-    ////////////////
-    void runMonitorUpdate();
 
 
 

@@ -4,15 +4,10 @@
 
 #include <parsian_util/core/ball.h>
 
-CBall::CBall(const parsian_msgs::parsian_robot &_ball) : CMovingObject() {
-
-    this->pos = rcsc::Vector2D(_ball.pos.x, _ball.pos.y);
-    this->vel = rcsc::Vector2D(_ball.vel.x, _ball.vel.y);
-    this->acc = rcsc::Vector2D(_ball.acc.x, _ball.acc.y);
-    this->dir = rcsc::Vector2D(_ball.dir.x, _ball.dir.y);
-
-    this->angularVel = _ball.angularVel;
+CBall::CBall(const parsian_msgs::parsian_robot &_ball) : CMovingObject(_ball) {
 }
+
+CBall::CBall() : CMovingObject() {}
 
 CBall::~CBall() {
 

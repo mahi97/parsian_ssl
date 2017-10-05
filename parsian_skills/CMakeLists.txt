@@ -138,7 +138,7 @@ add_library(${PROJECT_NAME}
 		src/skill.cpp
 		src/receivepass.cpp
         src/newbangbang.cpp
-        src/onetouch.cpp)
+        src/onetouch.cpp src/gotopointavoid.cpp include/parsian_skills/gotopointavoid.h)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
