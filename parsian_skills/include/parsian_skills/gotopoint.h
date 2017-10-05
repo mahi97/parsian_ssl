@@ -12,6 +12,7 @@
 #include <parsian_util/core/agent.h>
 #include <algorithm>
 #include <math.h>
+#include <parsian_util/action/actiongotopoint.h>
 
 #define EPS 1e-6
 #define DELTA_T 0.060      //wm->commandSampleTime()
@@ -31,7 +32,7 @@ enum gpMode {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class CSkillGotoPoint : public CSkill
+class CSkillGotoPoint : public CSkill, public ActionGotoPoint
 {
 
 
@@ -92,43 +93,6 @@ public:
     gpMode lastGPmode;
     gpMode currentGPmode;
     void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0),bool dynamicStart = true);
-    SkillProperty(CSkillGotoPoint, bool, DynamicStart, dynamicStart);
-    SkillProperty(CSkillGotoPoint, Vector2D, InitialPos, pos1);
-    SkillProperty(CSkillGotoPoint, Vector2D, FinalPos, targetPos);
-    SkillProperty(CSkillGotoPoint, Vector2D, InitialDir, dir1);
-    SkillProperty(CSkillGotoPoint, Vector2D, FinalDir, targetDir);
-    SkillProperty(CSkillGotoPoint, Vector2D, InitialVel, vel1);
-    SkillProperty(CSkillGotoPoint, Vector2D, FinalVel, vel2);
-    SkillProperty(CSkillGotoPoint, Vector2D, LookAt, lookat);
-    SkillProperty(CSkillGotoPoint, Vector2D, BiasVel, biasVel);
-    SkillProperty(CSkillGotoPoint, Vector2D, ShotTarget, target);
-    SkillProperty(CSkillGotoPoint, double, MaxAcceleration, _Acc);
-    SkillProperty(CSkillGotoPoint, double, MaxDeceleration, _Dec);
-    SkillProperty(CSkillGotoPoint, double, MaxVelocity, _VmDesire);
-    SkillProperty(CSkillGotoPoint, double, MaxAccelerationNormal, aMaxNorm);
-    SkillProperty(CSkillGotoPoint, double, MaxDecelerationNormal, dMaxNorm);
-    SkillProperty(CSkillGotoPoint, double, MaxVelocityNormal, vMaxNorm);
-    SkillProperty(CSkillGotoPoint, double, ConstantVelocity, vConst);
-    SkillProperty(CSkillGotoPoint, double, TurningDist, turningDist);
-    SkillProperty(CSkillGotoPoint, bool, FasterEnd, fasterEnd);
-    SkillProperty(CSkillGotoPoint, bool, NotEnd, notEnd);
-    SkillProperty(CSkillGotoPoint, bool, FastW, fastw);
-    SkillProperty(CSkillGotoPoint, bool, RecordProfile, recordProf);
-    SkillProperty(CSkillGotoPoint, bool, BallMode, ballMode);
-    SkillProperty(CSkillGotoPoint, bool, SlowShot, slow);
-    SkillProperty(CSkillGotoPoint, bool, moveLookingTarget, lootTarget);
-    SkillProperty(CSkillGotoPoint, bool, InterceptMode, interceptMode);
-    SkillProperty(CSkillGotoPoint, bool, LookForward, lookForward);
-    SkillProperty(CSkillGotoPoint, bool, OneTouchMode, oneTouchMode);
-    SkillProperty(CSkillGotoPoint, bool, SlowMode, slowMode);
-    SkillProperty(CSkillGotoPoint, bool, NoPID, noPID);
-    SkillProperty(CSkillGotoPoint, bool, PenaltyKick, penaltyKick);
-    SkillProperty(CSkillGotoPoint, bool, GoalieMode, goalieMode);
-    SkillProperty(CSkillGotoPoint, Vector2D, MotionDir, motiondir);
-    SkillProperty(CSkillGotoPoint, float, ForwardBias, forwardBias);
-    SkillProperty(CSkillGotoPoint, bool, DiveMode, diveMode);
-    SkillProperty(CSkillGotoPoint, bool, VerySlow, verySlow);
-    SkillProperty(CSkillGotoPoint, bool , Smooth,smooth);
 };
 
 

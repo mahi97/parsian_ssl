@@ -11,25 +11,25 @@ INIT_SKILL(CSkillGotoPointAvoid, "gotopointavoid");
 CSkillGotoPointAvoid::CSkillGotoPointAvoid(CAgent *_agent) : CSkillGotoPoint(_agent)
 {
     counter = 0;
-    avoidPenaltyArea = true;
+    data.avoidPenaltyArea = static_cast<unsigned char>(true);
     inited = false;
-    keeplooking = false;
-    extendStep = -1.0;
+    data.keeplooking = static_cast<unsigned char>(false);
+    data.extendStep = static_cast<float>(-1.0);
     gotopoint = new CSkillGotoPoint(_agent);
     bangBang = new CNewBangBang();
-    dynamicStart = true;
-    plan2 = false;
-    noAvoid = false;
-    avoidCenterCircle = false;
-    avoidGoalPosts = true;
+    data.base.dynamicStart = static_cast<unsigned char>(true);
+    data.plan2 = static_cast<unsigned char>(false);
+    data.noAvoid = false;
+    data.avoidCenterCircle = false;
+    data.avoidGoalPosts = true;
     stucked = -1;
     counting = 0;
     averageDir.assign(0 , 0);
-    addVel.assign(0,0);
-    nextPos.invalidate();
-    diveMode = false;
-    oneTouchMode = false;
-    drawPath = false;
+    data.addVel = Vector2D(data.addVel).assign(0,0).toParsianVector2D();
+    data.nextPos = Vector2D::INVALIDATED.toParsianVector2D();
+    data.base.diveMode = false;
+    data.base.oneTouchMode = false;
+    data.drawPath = false;
 }
 
 CSkillGotoPointAvoid::~CSkillGotoPointAvoid()
@@ -64,9 +64,9 @@ void CSkillGotoPointAvoid::execute()
     agentVel = agent->vel();
     double dVx,dVy,dW;
     bangBang->setDecMax(1);//conf()->BangBang_DecMax()); // TODO : skill config
-    bangBang->setOneTouch(oneTouchMode );
+    bangBang->setOneTouch(data.oneTouchMode);
     bangBang->setDiveMode(diveMode);
-    if(slowMode || slow)
+    if(data.slowMode || data.slow)
     {
         bangBang->setVelMax(1.4);
         bangBang->setSlow(true);
@@ -76,13 +76,13 @@ void CSkillGotoPointAvoid::execute()
         bangBang->setSlow(false);
         bangBang->setVelMax(1);//conf()->BangBang_VelMax()); // TODO : skill Config
     }
-    if (!targetPos.valid())
+    if (!Vector2D(data.targetPos).valid())
     {
 //        agent->waitHere();
         return;
     }
     if (!targetVel.valid())
-        vel2.assign(0,0);
+        data.vel2.assign(0,0);
 
     if(drawPath)
     {
@@ -105,7 +105,7 @@ void CSkillGotoPointAvoid::execute()
     }
 
     /////////////////
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+    if (data.targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
     if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
@@ -127,7 +127,7 @@ void CSkillGotoPointAvoid::execute()
 //        }
     }
 
-    if (lookat.valid())
+    if (data.lookat.valid())
     {
         targetDir = (lookat - agentPos).norm();
     }
@@ -226,12 +226,12 @@ void CSkillGotoPointAvoid::execute()
 
 
     if( noAvoid || result.size() < 3){
-        lllll = targetPos;
+        lllll = data.targetPos;
         vf = 0;
     }
 
     bangBang->setSmooth(true);// = false;
-    bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
+    bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,data.targetDir,vf,0.016,dVx,dVy,dW);
 //    agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW); // TODO : Robot Command
 //    agent->accelerationLimiter(vf,oneTouchMode);
 
@@ -242,7 +242,7 @@ void CSkillGotoPointAvoid::execute()
 
 double CSkillGotoPointAvoid::progress()
 {
-    if(agentPos.dist(targetPos) < 0.05)
+    if(agentPos.dist(data.targetPos) < 0.05)
     {
         return 1;
     }
@@ -337,7 +337,7 @@ double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMa
 //        return max(0,(tAgentVel.length()/conf()->BangBang_DecMax() - offset) * distEffect);
         return max(0,(tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
     }
-    else if(tAgentVel.length() < (vMax)){
+    if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
         {
             return max(0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);

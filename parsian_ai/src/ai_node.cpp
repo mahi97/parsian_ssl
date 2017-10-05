@@ -4,6 +4,10 @@
 #include "parsian_msgs/parsian_debugs.h"
 #include "parsian_msgs/parsian_draw.h"
 #include "parsian_msgs/ssl_refree_wrapper.h"
+#include <parsian_msgs/gotoPoint.h>
+#include <parsian_msgs/gotoPointAvoid.h>
+#include <parsian_msgs/receivePass.h>
+#include <parsian_msgs/kick.h>
 
 #include "parsian_ai/ai.h"
 
@@ -25,6 +29,11 @@ int main(int argc, char **argv)
     ros::Publisher  drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
     ros::Publisher  debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
 //    ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
+    ros::Publisher  gpPub      = n.advertise<parsian_msgs::gotoPoint>("/gotoPoint", 1000);
+    ros::Publisher  gpaPub     = n.advertise<parsian_msgs::gotoPointAvoid>("/gotoPointAvoid", 1000);
+    ros::Publisher  kickPub    = n.advertise<parsian_msgs::kick>("/kick", 1000);
+    ros::Publisher  recvPub    = n.advertise<parsian_msgs::receivePass>("/receivePass", 1000);
+
 
     ros::Rate loop_rate(62);
     drawer = new Drawer();
@@ -35,6 +44,8 @@ int main(int argc, char **argv)
 
         drawPub.publish(drawer->draws);
         debugPub.publish(debugger->debugs);
+        ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
+
 
         ros::spinOnce();
         loop_rate.sleep();
