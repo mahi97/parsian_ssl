@@ -153,15 +153,12 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-
+#add_library(worldmodel_nodelet
+#        src/worldmodel_node.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        )
 
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -170,19 +167,19 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
-        worldmodel_nodelet
+#        worldmodel_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         ${PROJECT_NAME}
         )
 
-add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_nodelet
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
-        )
+#target_link_libraries(worldmodel_nodelet
+#        ${catkin_LIBRARIES}
+#        ${QT_LIBRARIES}
+#        ${PROJECT_NAME}
+#        )
 
 
 #############
