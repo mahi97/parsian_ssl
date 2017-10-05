@@ -1,0 +1,10 @@
+//
+// Created by parsian-ai on 9/29/17.
+//
+
+#ifndef PARSIAN_UTIL_ACTIONGOTOPOINTAVOID_H
+#define PARSIAN_UTIL_ACTIONGOTOPOINTAVOID_H
+
+class ActionGotoPoint
+
+#endif //PARSIAN_UTIL_ACTIONGOTOPOINTAVOID_H
