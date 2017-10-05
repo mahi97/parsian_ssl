@@ -8,6 +8,7 @@
 #include "QObject"
 #include "QDebug"
 
+
 #include "parsian_msgs/parsian_world_model.h"
 #include "parsian_msgs/ssl_vision_detection.h"
 #include "parsian_msgs/ssl_vision_geometry.h"
@@ -22,6 +23,8 @@ public:
     void execute(parsian_msgs::parsian_world_model& rosWM);
 
 private:
+
+
 
 
 };

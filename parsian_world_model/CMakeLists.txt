@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(parsian_world_model)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -11,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
         geometry_msgs
         nav_msgs
         parsian_msgs
+        parsian_util
         roscpp
         rospy
         tf2
@@ -130,6 +132,10 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
         src/wm/worldmodel.cpp
+        src/wm/visionclient.cpp
+        src/wm/visionbelief.cpp
+        src/wm/movingobject.cpp
+        src/wm/rawobject.cpp
         )
 
 ## Add cmake target dependencies of the library
@@ -150,6 +156,13 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+## Specify libraries to link a library or executable target against
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}
@@ -157,10 +170,20 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
+        worldmodel_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         ${PROJECT_NAME}
         )
+
+add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+## Specify libraries to link a library or executable target against
+target_link_libraries(worldmodel_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        )
+
 
 #############
 ## Install ##
