@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
         tf2
+        nodelet
         )
 
 ## System dependencies are found with CMake's conventions
@@ -146,6 +147,9 @@ add_library(${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+add_library(worldmodel_nodelet
+        src/worldmodel_nodelet.cpp)
+
 add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Rename C++ executable without prefix
@@ -166,8 +170,11 @@ target_link_libraries(${PROJECT_NAME}
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
-        ${catkin_LIBRARIES})
+        )
+
+add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
         worldmodel_nodelet
