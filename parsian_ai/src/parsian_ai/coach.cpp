@@ -806,7 +806,8 @@ void CCoach::virtualTheirPlayOffState()
     if(isBallcollide() ){ // TODO : till we fix function && 0
         // transientFlag = false;
     }
-    debugger->debug(QString("TS flag: %1").arg(transientFlag) , D_AHZ);
+    PDEBUG("TS flag:", transientFlag, D_AHZ);
+//    debugger->debug(QString("TS flag: %1").arg(transientFlag) , D_AHZ);
     knowledge->transientFlag = transientFlag;
     lastState  = currentState;
 
@@ -1839,7 +1840,7 @@ QList<SPlan *> CCoach::getValidPlans(const POMODE _mode, const QList<int>& _ourP
     if (validPlans.isEmpty()) {
         debugger->debug("[Warning] playoff -> there's no valid Plan", D_ERROR, QColor(Qt::red));
         debugger->debug("[Warning] playoff -> matching nearset plan", D_ERROR, QColor(Qt::red));
-        if (nearestPlan != NULL) {
+        if (nearestPlan != nullptr) {
             nearestPlan->execution.symmetry = symmetry;
             validPlans.append(nearestPlan);
             debugger->debug("[Warning] playoff -> nearset plan matched", D_ERROR, QColor(Qt::red));
@@ -1967,7 +1968,7 @@ void CCoach::loadPostAssignment()
             for (int i=0;i<q1.count();i++){
                 int ID = q1[i].toInt();
                 CAgent *agnt = agents[ID];
-                if( agnt != NULL ){
+                if( agnt != nullptr){
                     agnt->defIntent.assign(ID , knowledge->frameCount);
                     agnt->intention = &agnt->defIntent;
                     PDEBUG("Loaded defense", ID, D_MASOOD);

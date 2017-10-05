@@ -23,6 +23,8 @@ public:
     void updateRobotStatus(const parsian_msgs::parsian_robot&);
     void updateReferee(const parsian_msgs::ssl_refree_wrapper&);
 
+    void publish(std::vector<ros::Publisher*> publishers);
+
     parsian_msgs::parsian_debugs getDebugs() { return debugger->debugs; }
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
