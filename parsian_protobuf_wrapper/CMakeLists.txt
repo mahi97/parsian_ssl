@@ -191,10 +191,11 @@ add_library(refbox_convert
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 add_dependencies(
-        vision_convert
         refbox_convert
+        vision_convert
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_proto
 )
 
 ## Declare a C++ executable
@@ -273,6 +274,20 @@ target_link_libraries(refbox_node
         ${PROTOBUF_LIBRARIES}
         )
 
+
+target_link_libraries(vision_convert
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${PROJECT_NAME}_proto
+        )
+
+target_link_libraries(
+        refbox_convert
+        vision_convert
+        ${PROJECT_NAME}_proto
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
 #############
 ## Install ##
