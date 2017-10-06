@@ -1,7 +1,7 @@
 //
 // Created by parsian-ai on 9/21/17.
 //
-#include "parsian_util/core/field.h"
+#include <parsian_util/core/field.h>
 
 CField::CField()
 {
@@ -738,9 +738,7 @@ bool CField::isInOppPenaltyArea(Vector2D point)
         if( (th > 90) && (th < 180) )
             return true;
     }
-    if (Back.contains(point))
-        return true;
-    return false;
+    return Back.contains(point);
 }
 
 Rect2D   CField::getRegion(Region region, double k)
@@ -1089,27 +1087,26 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
     if (k==-1)
     {
         intersectpoint = fOurGoal + Vector2D(1.0, 0.0)*fOurPenaltyRect.size().length();
-        return Vector2D(1.0, 0.0);
+        return Vector2D{1.0, 0.0};
     }
-    else {
-        intersectpoint = results[k];
-        if (!fieldRect().contains(p))
+
+    intersectpoint = results[k];
+    if (!fieldRect().contains(p))
+    {
+        if (p.y < 0)
         {
-            if (p.y < 0)
-            {
-                intersectpoint = Vector2D(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4));
-                intersectpoint = (p-intersectpoint).norm() * 0.5 + intersectpoint;
-                return Vector2D(0.0, -1.0);
-            }
-            else
-            {
-                intersectpoint = Vector2D(fOurGoal + Vector2D(0,_GOAL_WIDTH/4));
-                intersectpoint = (p-intersectpoint).norm() * 0.5 + intersectpoint;
-                return Vector2D(0.0, 1.0);
-            }
+            intersectpoint = Vector2D(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4));
+            intersectpoint = (p-intersectpoint).norm() * 0.5 + intersectpoint;
+            return Vector2D(0.0, -1.0);
         }
-        return perps[k];
+
+        intersectpoint = Vector2D(fOurGoal + Vector2D(0,_GOAL_WIDTH/4));
+        intersectpoint = (p-intersectpoint).norm() * 0.5 + intersectpoint;
+        return Vector2D(0.0, 1.0);
+
     }
+    return perps[k];
+
 }
 
 double CField::ourPAreaPos(double angle)

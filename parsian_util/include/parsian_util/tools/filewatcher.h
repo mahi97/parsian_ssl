@@ -35,7 +35,7 @@ public:
     ~FileWatcher() override;
     bool addFile(const QString &filename);
 
-signals:
+Q_SIGNALS:
     void fileChanged(const QString &name);
 private slots:
     void handleDirectoryChange(const QString &name);

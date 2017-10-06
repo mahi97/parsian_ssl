@@ -10,7 +10,7 @@ CSoccer::CSoccer()
 //        agents[i] = new CAgent;
     }
 //    knowledge = new CKnowledge(agents);
-    coach = new CCoach(agents);
+//    coach = new CCoach(agents);
 
     mode = Simulation;
     controlMode = AI;
@@ -20,13 +20,6 @@ CSoccer::CSoccer()
     cmdCnt = 0;
     //shared variables
     doClose = false;
-}
-
-void CSoccer::getRobotVel(int _id, double _x, double _y, double _w)
-{
-
-    //debug(QString("i: %1, x: %2, y: %3, w: %4, t: %5").arg(_id).arg(_x).arg(_y).arg(_w).arg(tempTime[_id].elapsed()), D_MHMMD);
-//    tempTime[_id].restart();
 }
 
 CSoccer::~CSoccer()
@@ -46,7 +39,7 @@ CSoccer::~CSoccer()
     //   delete agents;
 
     // MASOUD: MUST BE CHECKED!!
-    delete coach;
+//    delete coach;
 //    delete knowledge;
     for(int i = _MAX_NUM_PLAYERS-1; i >= 0; i-- ){
         delete agents[i];
@@ -109,7 +102,7 @@ void CSoccer::execute()
 //        customControl(custom);
 //        if (!custom)
 //        {
-            coach->execute();
+//            coach->execute();
 
 //        }
     }

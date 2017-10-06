@@ -26,7 +26,7 @@ FileWatcher::FileWatcher(QObject *parent) :
     QObject(parent)
 {
     m_watcher = new QFileSystemWatcher(this);
-    connect(m_watcher, SIGNAL(fileChanged(QString)), SIGNAL(fileChanged(QString)));
+//    connect(m_watcher, SIGNAL(fileChanged(QString)), SIGNAL(fileChanged(QString)));
     connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(handleDirectoryChange(QString)));
 }
 
@@ -70,7 +70,7 @@ void FileWatcher::handleDirectoryChange(const QString &name)
 
     QList<QString> files = m_missingFiles.values(name);
     m_missingFiles.remove(name);
-    foreach (const QString &filename, files) {
+    Q_FOREACH (const QString &filename, files) {
         // update watcher to be as close to a file as possible
         if (addFile(filename)) {
             emit fileChanged(filename);

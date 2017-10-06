@@ -3,9 +3,9 @@
 #ifndef __game_state_h__
 #define __game_state_h__
 
-#include </home/ali/parsian_ws/devel/.private/parsian_msgs/include/parsian_msgs/ssl_refree_wrapper.h>
-#include </home/ali/parsian_ws/devel/.private/parsian_msgs/include/parsian_msgs/ssl_refree_command.h>
-#include </home/ali/parsian_ws/devel/.private/parsian_msgs/include/parsian_msgs/ssl_refree_stage.h>
+#include <parsian_msgs/ssl_refree_wrapper.h>
+#include <parsian_msgs/ssl_refree_command.h>
+#include <parsian_msgs/ssl_refree_stage.h>
 
 
 

@@ -19,9 +19,9 @@ public:
 
     void execute();
 
-    void updateWM(const parsian_msgs::parsian_world_model&);
-    void updateRobotStatus(const parsian_msgs::parsian_robot&);
-    void updateReferee(const parsian_msgs::ssl_refree_wrapper&);
+    static void updateWM(const parsian_msgs::parsian_world_model&);
+    static void updateRobotStatus(const parsian_msgs::parsian_robot&);
+    static void updateReferee(const parsian_msgs::ssl_refree_wrapper&);
 
     void publish(std::vector<ros::Publisher*> publishers);
 
