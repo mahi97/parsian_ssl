@@ -115,7 +115,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
         INCLUDE_DIRS include
-        LIBRARIES parsian_util_geom parsian_util_tools parsian_util_core parsian_util_math parsian_util_actions
+        LIBRARIES parsian_util_geom parsian_util_tools parsian_util_core #parsian_util_math parsian_util_actions
         #  CATKIN_DEPENDS roscpp rospy
         DEPENDS QT
 )
@@ -172,7 +172,7 @@ add_library(${PROJECT_NAME}_core
         src/core/field.cpp
         src/core/ball.cpp
         src/core/team.cpp
-        src/knowledge.cpp
+#        src/knowledge.cpp
         src/core/movingobject.cpp
         )
 

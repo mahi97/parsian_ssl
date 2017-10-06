@@ -24,21 +24,23 @@
 #include <QObject>
 #include <QString>
 #include <QMultiHash>
+#include <QFileSystemWatcher>
+#include <QFileInfo>
 
 class QFileSystemWatcher;
 
 class FileWatcher : public QObject
 {
-    Q_OBJECT
+//    Q_OBJECT
 public:
     explicit FileWatcher(QObject *parent = 0);
     ~FileWatcher() override;
     bool addFile(const QString &filename);
 
-Q_SIGNALS:
-    void fileChanged(const QString &name);
-private slots:
-    void handleDirectoryChange(const QString &name);
+//Q_SIGNALS:
+//    void fileChanged(const QString &name);
+//private Q_SLOTS:
+//    void handleDirectoryChange(const QString &name);
 private:
     QFileSystemWatcher* m_watcher;
     QMultiHash<QString, QString> m_missingFiles;

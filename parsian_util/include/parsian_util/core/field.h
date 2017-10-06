@@ -15,22 +15,22 @@ class CField {
 public:
 
     /* Field */
-    static double _FIELD_WIDTH;
-    static double _FIELD_HEIGHT;
-    static double _FIELD_MARGIN_HEIGHT;
-    static double _FIELD_MARGIN_WIDTH;
-    static double _FIELD_PENALTY;
-    static double _GOAL_WIDTH;
-    static double _GOAL_RAD;
-    static double _GOAL_DEPTH;
-    static double _PENALTY_WIDTH;
-    static double _CENTER_CIRCLE_RAD;
-    static double _PENALTY_AREA_CIRCLE_X;
-    static double _PENALTY_AREA_CIRCLE_RAD;
-    static double _PARSIAN_BOUNDERY;
-    static double _MIXTEAM_FIELD_WIDTH;
-    static double _MIXTEAM_FIELD_HEIGHT;
-    static double _MAX_DIST;
+    double _FIELD_WIDTH;
+    double _FIELD_HEIGHT;
+    double _FIELD_MARGIN_HEIGHT;
+    double _FIELD_MARGIN_WIDTH;
+    double _FIELD_PENALTY;
+    double _GOAL_WIDTH;
+    double _GOAL_RAD;
+    double _GOAL_DEPTH;
+    double _PENALTY_WIDTH;
+    double _CENTER_CIRCLE_RAD;
+    double _PENALTY_AREA_CIRCLE_X;
+    double _PENALTY_AREA_CIRCLE_RAD;
+    double _PARSIAN_BOUNDERY;
+    double _MIXTEAM_FIELD_WIDTH;
+    double _MIXTEAM_FIELD_HEIGHT;
+    double _MAX_DIST;
 
 
     enum class Region {
@@ -138,53 +138,53 @@ public:
 
     ~CField ();
 
-    static Vector2D center ();
+    Vector2D center ();
 
-    static Vector2D ourGoal ();
+    Vector2D ourGoal ();
 
-    static Vector2D oppGoal ();
+    Vector2D oppGoal ();
 
-    static Vector2D ourCornerL ();
+    Vector2D ourCornerL ();
 
-    static Vector2D ourCornerR ();
+    Vector2D ourCornerR ();
 
-    static Vector2D oppCornerL ();
+    Vector2D oppCornerL ();
 
-    static Vector2D oppCornerR ();
+    Vector2D oppCornerR ();
 
-    static Vector2D ourPenalty ();
+    Vector2D ourPenalty ();
 
-    static Vector2D oppPenalty ();
+    Vector2D oppPenalty ();
 
-    static Vector2D ourGoalL ();
+    Vector2D ourGoalL ();
 
-    static Vector2D ourGoalR ();
+    Vector2D ourGoalR ();
 
-    static Vector2D oppGoalL ();
+    Vector2D oppGoalL ();
 
-    static Vector2D oppGoalR ();
+    Vector2D oppGoalR ();
 
-    static Vector2D ourOneThirdL ();
+    Vector2D ourOneThirdL ();
 
-    static Vector2D ourOneThirdR ();
+    Vector2D ourOneThirdR ();
 
-    static Vector2D oppOneThirdL ();
+    Vector2D oppOneThirdL ();
 
-    static Vector2D oppOneThirdR ();
+    Vector2D oppOneThirdR ();
 
-    static Rect2D fieldRect ();
+    Rect2D fieldRect ();
 
-    static Rect2D marginedField ();
+    Rect2D marginedField ();
 
-    static Rect2D ourPenaltyRect ();
+    Rect2D ourPenaltyRect ();
 
-    static Rect2D oppPenaltyRect ();
+    Rect2D oppPenaltyRect ();
 
-    static bool isInField (Vector2D point);
+    bool isInField (Vector2D point);
 
-    static bool isInOurPenaltyArea (Vector2D point);
+    bool isInOurPenaltyArea (Vector2D point);
 
-    static bool isInOppPenaltyArea (Vector2D point);
+    bool isInOppPenaltyArea (Vector2D point);
 
     Rect2D getRegion (Region region , double k = 0.25);
 
@@ -212,27 +212,27 @@ public:
     double ourPAreaPos (double angle);
 
 private:
-    static Vector2D fCenter;
-    static Vector2D fOurGoal;
-    static Vector2D fOppGoal;
-    static Vector2D fOurCornerL;
-    static Vector2D fOurCornerR;
-    static Vector2D fOppCornerL;
-    static Vector2D fOppCornerR;
-    static Vector2D fOurPenalty;
-    static Vector2D fOppPenalty;
-    static Vector2D fOurGoalL;
-    static Vector2D fOurGoalR;
-    static Vector2D fOppGoalL;
-    static Vector2D fOppGoalR;
-    static Rect2D fFieldRect;
-    static Rect2D fMarginedFieldRect;
-    static Rect2D fOurPenaltyRect;
-    static Rect2D fOppPenaltyRect;
-    static Vector2D fOurOneThirdL;
-    static Vector2D fOppOneThirdL;
-    static Vector2D fOurOneThirdR;
-    static Vector2D fOppOneThirdR;
+    Vector2D fCenter;
+    Vector2D fOurGoal;
+    Vector2D fOppGoal;
+    Vector2D fOurCornerL;
+    Vector2D fOurCornerR;
+    Vector2D fOppCornerL;
+    Vector2D fOppCornerR;
+    Vector2D fOurPenalty;
+    Vector2D fOppPenalty;
+    Vector2D fOurGoalL;
+    Vector2D fOurGoalR;
+    Vector2D fOppGoalL;
+    Vector2D fOppGoalR;
+    Rect2D fFieldRect;
+    Rect2D fMarginedFieldRect;
+    Rect2D fOurPenaltyRect;
+    Rect2D fOppPenaltyRect;
+    Vector2D fOurOneThirdL;
+    Vector2D fOppOneThirdL;
+    Vector2D fOurOneThirdR;
+    Vector2D fOppOneThirdR;
 };
 
 #endif //PARSIAN_UTIL_FIELD_H

@@ -280,18 +280,18 @@ Vector2D CKnowledge::getReflectPos(Vector2D goal, double dist, Vector2D _ballpos
     Segment2D dummySeg(goal,goal+Vector2D(-5,0));
     Vector2D nearest(dummySeg.nearestPoint(_ballpos));
     Vector2D sol1,sol2;
-    Rect2D oppField(0,CField::_FIELD_HEIGHT/2 -0.01,CField::_FIELD_WIDTH/2 + 0.01,CField::_FIELD_HEIGHT -0.01);
-    Circle2D oppCircle(Vector2D(CField::_FIELD_WIDTH/2,0)- Vector2D(1,0),dist);
+    Rect2D oppField(0,field._FIELD_HEIGHT/2 -0.01,field._FIELD_WIDTH/2 + 0.01,field._FIELD_HEIGHT -0.01);
+    Circle2D oppCircle(Vector2D(field._FIELD_WIDTH/2,0)- Vector2D(1,0),dist);
 
 
 
     res.x = nearest.x;
     res.y = nearest.y*2 - _ballpos.y;
 
-    dummySeg.assign(CField::oppGoal(),(res - CField::oppGoal()).norm()*12);
+    dummySeg.assign(field.oppGoal(),(res - field.oppGoal()).norm()*12);
     //    oppField.intersection(dummySeg,&sol1,&sol2);
     oppCircle.intersection(dummySeg,&sol1,&sol2);
-    if(CField::isInField(sol1))
+    if(field.isInField(sol1))
         res = sol1;
     else
         res = sol2;

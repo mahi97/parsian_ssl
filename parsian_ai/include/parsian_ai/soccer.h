@@ -6,7 +6,7 @@
 #define PARSIAN_AI_SOCCER_H
 
 #include <parsian_util/base.h>
-#include <parsian_util/knowledge.h>
+//#include <parsian_util/knowledge.h>
 #include <parsian_util/core/agent.h>
 #include <parsian_util/core/worldmodel.h>
 //#include <parsian_ai/coach.h>

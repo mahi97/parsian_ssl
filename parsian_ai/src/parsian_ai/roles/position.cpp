@@ -3,7 +3,7 @@
 #include <geom/delaunay_triangulation.h>
 
 
-INIT_ROLE(CRolePosition, "position");
+//INIT_ROLE(CRolePosition, "position");
 
 QMap<QString, EditData*> CRolePosition::editData;
 
@@ -76,8 +76,8 @@ void CRolePosition::execute()
 	Vector2D p[5];
 	if (kickOff)
 	{
-		p[0] = wm->field->getRegion(CField::OurMidFieldTopWing).center();
-		p[1] = wm->field->getRegion(CField::OurMidFieldBottomWing).center();
+		p[0] = wm->field->getRegion(wm->field->OurMidFieldTopWing).center();
+		p[1] = wm->field->getRegion(wm->field->OurMidFieldBottomWing).center();
 
 //		if (!lastBestPoint1.valid())
 //			lastBestPoint1 = p[0];
@@ -106,13 +106,13 @@ void CRolePosition::execute()
 
 //		pos[0].ready = true;
 //		pos[0].rects.clear();
-//		pos[0].rects.append(mywm->field->getRegion(CField::OurMidFieldTopWing));
+//		pos[0].rects.append(mywm->field->getRegion(wm->field->OurMidFieldTopWing));
 //		nearestBestPos(mywm, pos[0]);
 //		targets[0] = pos[0].point;
 
 //		pos[1].ready = true;
 //		pos[1].rects.clear();
-//		pos[1].rects.append(mywm->field->getRegion(CField::OurMidFieldBottomWing));
+//		pos[1].rects.append(mywm->field->getRegion(wm->field->OurMidFieldBottomWing));
 //		nearestBestPos(mywm, pos[1]);
 //		targets[1] = pos[1].point;
 	}
