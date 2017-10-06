@@ -1267,34 +1267,34 @@ ShotSpot CCoach::getShotSpot(const Vector2D &_ball, const Vector2D &_shotPos) {
 
     Circle2D killZone(wm->field->oppGoal(), 1.6);
 
-    Rect2D nearCenter(CField::_FIELD_WIDTH/2 - 2,
-                      CField::_PENALTY_WIDTH/2,
+    Rect2D nearCenter(wm->field->_FIELD_WIDTH/2 - 2,
+                      wm->field->_PENALTY_WIDTH/2,
                       2,
-                      CField::_PENALTY_WIDTH);
+                      wm->field->_PENALTY_WIDTH);
 
-    Rect2D near1(CField::_FIELD_WIDTH/2 - 2,
-                 CField::_FIELD_HEIGHT/2,
+    Rect2D near1(wm->field->_FIELD_WIDTH/2 - 2,
+                 wm->field->_FIELD_HEIGHT/2,
                  2,
-                 (CField::_FIELD_HEIGHT - CField::_PENALTY_WIDTH)/2);
+                 (wm->field->_FIELD_HEIGHT - wm->field->_PENALTY_WIDTH)/2);
 
-    Rect2D near2(CField::_FIELD_WIDTH/2 - 2,
-                 - CField::_PENALTY_WIDTH/2,
+    Rect2D near2(wm->field->_FIELD_WIDTH/2 - 2,
+                 - wm->field->_PENALTY_WIDTH/2,
                  2,
-                 (CField::_FIELD_HEIGHT - CField::_PENALTY_WIDTH)/2);
+                 (wm->field->_FIELD_HEIGHT - wm->field->_PENALTY_WIDTH)/2);
 
     Rect2D far1(0,
-                CField::_FIELD_HEIGHT/2 - 4,
-                CField::_FIELD_WIDTH/2 - 2,
+                wm->field->_FIELD_HEIGHT/2 - 4,
+                wm->field->_FIELD_WIDTH/2 - 2,
                 2);
 
     Rect2D farcenter(0,
-                     CField::_FIELD_HEIGHT/2 - 2,
-                     CField::_FIELD_WIDTH/2 - 2,
+                     wm->field->_FIELD_HEIGHT/2 - 2,
+                     wm->field->_FIELD_WIDTH/2 - 2,
                      2);
 
     Rect2D far2(0,
-                CField::_FIELD_HEIGHT/2,
-                CField::_FIELD_WIDTH/2 - 2,
+                wm->field->_FIELD_HEIGHT/2,
+                wm->field->_FIELD_WIDTH/2 - 2,
                 2);
 
     ShotSpot tempSpot = EveryWhere;
@@ -1659,7 +1659,7 @@ void CCoach::initFastPlay(QList<int> _ourplayers) {
 
 void CCoach::initFirstPlay(QList<int> _ourplayers) {
 
-    double minDist = CField::_MAX_DIST;
+    double minDist = wm->field->_MAX_DIST;
     int minID = -1;
     int minOwner = 0;
     for (int i = 0; i < _ourplayers.size(); i++) {
@@ -1760,7 +1760,7 @@ void CCoach::LFUInit(QList<NGameOff::SPlan*> allPlans){
 QList<SPlan *> CCoach::getValidPlans(const POMODE _mode, const QList<int>& _ourPlayers) {
 
     NGameOff::SPlan* nearestPlan = nullptr;
-    double minDist = CField::_MAX_DIST;
+    double minDist = wm->field->_MAX_DIST;
     QList<NGameOff::SPlan*> allPlans = m_planLoader->getPlans(); // Get All of The Plans
 
     if(firstPlanRepeatInit){    // Initialize Plan Repeat

@@ -9,7 +9,7 @@
 
 class CRobot : public CMovingObject {
 public:
-    CRobot();
+    CRobot() {};
     CRobot(const parsian_msgs::parsian_robot& _robot) :
             CMovingObject(_robot), id(_robot.id) {};
     bool isActive() { return active ; }

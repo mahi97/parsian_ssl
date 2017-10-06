@@ -19,15 +19,14 @@
  ***************************************************************************/
 
 #include <parsian_util/tools/filewatcher.h>
-#include <QFileSystemWatcher>
-#include <QFileInfo>
+
 
 FileWatcher::FileWatcher(QObject *parent) :
     QObject(parent)
 {
     m_watcher = new QFileSystemWatcher(this);
-    connect(m_watcher, SIGNAL(fileChanged(QString)), SIGNAL(fileChanged(QString)));
-    connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(handleDirectoryChange(QString)));
+//    connect(m_watcher, SIGNAL(fileChanged(QString)), SIGNAL(fileChanged(QString)));
+//    connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(handleDirectoryChange(QString)));
 }
 
 FileWatcher::~FileWatcher()
@@ -61,19 +60,19 @@ bool FileWatcher::addFile(const QString &filename)
 
     return isReadable;
 }
-
-void FileWatcher::handleDirectoryChange(const QString &name)
-{
-    if (!m_missingFiles.contains(name)) {
-        return;
-    }
-
-    QList<QString> files = m_missingFiles.values(name);
-    m_missingFiles.remove(name);
-    foreach (const QString &filename, files) {
-        // update watcher to be as close to a file as possible
-        if (addFile(filename)) {
-            emit fileChanged(filename);
-        }
-    }
-}
+//
+//void FileWatcher::handleDirectoryChange(const QString &name)
+//{
+//    if (!m_missingFiles.contains(name)) {
+//        return;
+//    }
+//
+//    QList<QString> files = m_missingFiles.values(name);
+//    m_missingFiles.remove(name);
+//    Q_FOREACH (const QString &filename, files) {
+//        // update watcher to be as close to a file as possible
+//        if (addFile(filename)) {
+////            Q_EMIT fileChanged(filename);
+//        }
+//    }
+//}

@@ -15,13 +15,13 @@
 #include <QtCore/QFile>
 #include <QPair>
 #include <QTextStream>
-#include <parsian_ai/util/loadplayoffjson.h>
+//#include <parsian_ai/util/loadplayoffjson.h>
 
 
 #include "parsian_util/base.h"
 #include "parsian_util/core/worldmodel.h"
-#include "plans/plans.h"
-#include "plays/plays.h"
+//#include "plans/plans.h"
+//#include "plays/plays.h"
 
 
 

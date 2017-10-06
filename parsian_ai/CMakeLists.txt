@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-find_package(Qt4 REQUIRED COMPONENTS QtCore)
+find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
@@ -137,42 +137,42 @@ include_directories(
 )
 
 ## show include dir in qt
-FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
-add_custom_target(headers SOURCES ${LibFiles})
+#FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
+#add_custom_target(headers SOURCES ${LibFiles})
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
 		src/parsian_ai/ai.cpp
 		src/parsian_ai/soccer.cpp
-                src/parsian_ai/gamestate.cpp
-        src/parsian_ai/coach.cpp
+		src/parsian_ai/gamestate.cpp
+#        src/parsian_ai/coach.cpp
 )
 
-add_library(${PROJECT_NAME}_plays
-		src/parsian_ai/plays/dynamicattack.cpp
-		src/parsian_ai/plays/masterplay.cpp
-		src/parsian_ai/plays/ourballplacement.cpp
-		src/parsian_ai/plays/playoff.cpp
-		src/parsian_ai/plays/ourpenalty.cpp
-		src/parsian_ai/plays/theirpenalty.cpp
-		src/parsian_ai/plays/theirkickoff.cpp
-		src/parsian_ai/plays/theirindirect.cpp
-		src/parsian_ai/plays/theirdirect.cpp
-		src/parsian_ai/plays/theirballplacement.cpp
-		src/parsian_ai/plays/stopplay.cpp
-		)
+#add_library(${PROJECT_NAME}_plays
+#		src/parsian_ai/plays/dynamicattack.cpp
+#		src/parsian_ai/plays/masterplay.cpp
+#		src/parsian_ai/plays/ourballplacement.cpp
+#		src/parsian_ai/plays/playoff.cpp
+#		src/parsian_ai/plays/ourpenalty.cpp
+#		src/parsian_ai/plays/theirpenalty.cpp
+#		src/parsian_ai/plays/theirkickoff.cpp
+#		src/parsian_ai/plays/theirindirect.cpp
+#		src/parsian_ai/plays/theirdirect.cpp
+#		src/parsian_ai/plays/theirballplacement.cpp
+#		src/parsian_ai/plays/stopplay.cpp
+#		)
+#
+#add_library(${PROJECT_NAME}_plans
+#		src/parsian_ai/plans/defenseplan.cpp
+#		src/parsian_ai/plans/markplan.cpp
+#		src/parsian_ai/plans/plan.cpp
+#		src/parsian_ai/plans/positioningplan.cpp
+#		)
 
-add_library(${PROJECT_NAME}_plans
-		src/parsian_ai/plans/defenseplan.cpp
-		src/parsian_ai/plans/markplan.cpp
-		src/parsian_ai/plans/plan.cpp
-		src/parsian_ai/plans/positioningplan.cpp
-		)
-
-add_library(${PROJECT_NAME}_util
-		src/parsian_ai/util/planloader.cpp
-		src/parsian_ai/util/loadplayoffjson.cpp
-		)
+#add_library(${PROJECT_NAME}_util
+#		src/parsian_ai/util/planloader.cpp
+#		src/parsian_ai/util/loadplayoffjson.cpp
+#		)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -204,8 +204,8 @@ target_link_libraries(ai_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
-		${PROJECT_NAME}_plays
-		${PROJECT_NAME}_plans
+#		${PROJECT_NAME}_plays
+#		${PROJECT_NAME}_plans
         )
 
 add_dependencies(${PROJECT_NAME}
@@ -213,26 +213,25 @@ add_dependencies(${PROJECT_NAME}
                 ${catkin_EXPORTED_TARGETS}
                 )
 
-
 target_link_libraries(${PROJECT_NAME}
-        ${QT_LIBRARIES}
-        ${catkin_LIBRARIES}
-        )
-
-target_link_libraries(${PROJECT_NAME}_plays
-		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
 		)
 
-target_link_libraries(${PROJECT_NAME}_plans
-		${QT_LIBRARIES}
-		${catkin_LIBRARIES}
-		)
-target_link_libraries(${PROJECT_NAME}_util
-		${QT_LIBRARIES}
-		${catkin_LIBRARIES}
-		${QJSON_LIBRARIES}
-		)
+#target_link_libraries(${PROJECT_NAME}_plays
+#		${QT_LIBRARIES}
+#		${catkin_LIBRARIES}
+#		)
+#
+#target_link_libraries(${PROJECT_NAME}_plans
+#		${QT_LIBRARIES}
+#		${catkin_LIBRARIES}
+#		)
+#target_link_libraries(${PROJECT_NAME}_util
+#		${QT_LIBRARIES}
+#		${catkin_LIBRARIES}
+#		${QJSON_LIBRARIES}
+#		)
 
 
 

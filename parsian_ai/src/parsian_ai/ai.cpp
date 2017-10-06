@@ -31,9 +31,9 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapper & _ref) {
 }
 
 void AI::publish(std::vector<ros::Publisher*> publishers) {
-        for(CAgent* agent : soccer->agents) {
-            if (agent.)
-            publishers.at(i)->getTopic();
-        }
+//        for(CAgent* agent : soccer->agents) {
+//            if (agent.)
+//            publishers.at(i)->getTopic();
+//        }
 
 }

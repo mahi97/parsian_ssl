@@ -6,10 +6,10 @@
 #define PARSIAN_AI_SOCCER_H
 
 #include <parsian_util/base.h>
-#include <parsian_util/knowledge.h>
+//#include <parsian_util/knowledge.h>
 #include <parsian_util/core/agent.h>
 #include <parsian_util/core/worldmodel.h>
-#include <parsian_ai/coach.h>
+//#include <parsian_ai/coach.h>
 
 #include <QtCore/QtCore>
 
@@ -41,7 +41,7 @@ public:
     CWorldModel* wm;
 
     CAgent **agents;
-    CCoach *coach;
+//    CCoach *coach;
 Property(ControlMode, ControlMode, controlMode);
 PropertyGet(GameMode, Mode, mode);
 PropertyGet(ETeamSideType, TeamSide, teamSide);
