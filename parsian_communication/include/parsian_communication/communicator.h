@@ -1,4 +1,4 @@
-#include "parsian_msgs/parsian_packets.h"
+#include <parsian_msgs/parsian_packets.h>
 #include <QtExtSerialPort/qextserialport.h>
 #include <QString>
 #include <string>
