@@ -1,5 +1,5 @@
-#ifndef PARSIAN_AI_NODELET_H
-#define PARSIAN_AI_NODELET_H
+#ifndef AINODELET_H
+#define AINODELET_H
 
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
@@ -13,8 +13,8 @@
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_ai/ai.h>
-
-    class ai_nodelet : public nodelet::Nodelet {
+namespace parsian_ai {
+    class AINodelet : public nodelet::Nodelet {
     private:
         AI ai;
         ros::Subscriber worldModelSub;
@@ -25,7 +25,8 @@
         ros::Timer timer_;
 
         void onInit();
+
         void timerCb(const ros::TimerEvent &event);
     };
-
-#endif //PARSIAN_AI_NODELET_H
+}
+#endif //AINODELET_H

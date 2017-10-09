@@ -1,7 +1,8 @@
-#include <parsian_ai/aiNodelet.h>
+#include <parsian_ai/ai_nodelet.h>
 
+using namespace parsian_ai;
 
-  void ai_nodelet::onInit() {
+  void AINodelet::onInit() {
 
 
       ros::NodeHandle &nh = getNodeHandle();
@@ -11,7 +12,7 @@
       refereeSub = nh.subscribe("/referee", 1000, ai.updateReferee);
       drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
       debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-      timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&ai_nodelet::timerCb, this, _1));
+      timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 //      ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
 //      ros::Publisher  gpPub      = n.advertise<parsian_msgs::gotoPoint>("/gotoPoint", 1000);
 //      ros::Publisher  gpaPub     = n.advertise<parsian_msgs::gotoPointAvoid>("/gotoPointAvoid", 1000);
@@ -26,7 +27,7 @@
 
   }
 
-  void ai_nodelet::timerCb(const ros::TimerEvent& event){
+  void AINodelet::timerCb(const ros::TimerEvent& event){
       ai.execute();
 
       drawPub.publish(drawer->draws);
@@ -38,4 +39,4 @@
   }
 
 
-PLUGINLIB_DECLARE_CLASS(parsian_ai, ai_nodelet, ai_nodelet, nodelet::Nodelet);
+PLUGINLIB_DECLARE_CLASS(parsian_ai, AINodelet, parsian_ai::AINodelet, nodelet::Nodelet);
