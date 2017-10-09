@@ -148,7 +148,7 @@ add_library(${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_library(worldmodel_nodelet
+add_library(worldmodel_nodelet_lib
         src/worldmodel_nodelet.cpp)
 
 add_executable(worldmodel_node src/worldmodel_node.cpp)
@@ -173,7 +173,7 @@ target_link_libraries(${PROJECT_NAME}
         )
 
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
 #        worldmodel_nodelet
@@ -182,7 +182,7 @@ target_link_libraries(worldmodel_node
         ${PROJECT_NAME}
         )
 
-#add_dependencies(worldmodel_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 #target_link_libraries(worldmodel_nodelet
 #        ${catkin_LIBRARIES}
