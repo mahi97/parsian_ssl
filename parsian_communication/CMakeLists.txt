@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   parsian_msgs
   parsian_util
-        nodelet
+  nodelet
   roscpp
   rospy
 )
@@ -122,7 +122,7 @@ link_directories(/usr/include/qt4/QtExtSerialPort)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES parsian_communication
-#  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy
+  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
 #  DEPENDS system_lib
 )
 
@@ -142,6 +142,7 @@ include_directories(
 add_library(${PROJECT_NAME}
    src/${PROJECT_NAME}/communicator.cpp
 )
+
 
 
 ## Add cmake target dependencies of the library
@@ -167,7 +168,7 @@ add_library(${PROJECT_NAME}_nodelet
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
- add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(${PROJECT_NAME}_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -192,8 +193,6 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES} -lqextserialport
  )
-
-
 #############
 ## Install ##
 #############

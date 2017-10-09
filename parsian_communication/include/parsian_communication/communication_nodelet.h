@@ -19,9 +19,7 @@
 
 namespace parsian_communication {
     class CommunicationNodelet : public nodelet::Nodelet {
-    public:
-        CommunicationNodelet();
-        ~CommunicationNodelet();
+
     private:
         void onInit();
 

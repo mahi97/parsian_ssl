@@ -6,26 +6,20 @@
 
 using namespace parsian_communication;
 
-CommunicationNodelet::CommunicationNodelet() {
-
-}
-
-CommunicationNodelet::~CommunicationNodelet() {
-
-}
 
 void CommunicationNodelet::onInit() {
+
 
     ros::NodeHandle& n = getNodeHandle();
     ros::NodeHandle& private_n = getPrivateNodeHandle();
 
-    timer = n.createTimer(ros::Duration(1.0), boost::bind(&CommunicationNodelet::timerCb, this, _1));
+    timer = n.createTimer(ros::Duration(.062), boost::bind(&CommunicationNodelet::timerCb, this, _1));
 
     drawer = new Drawer();
     debugger = new Debugger();
 
-    drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
-    debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
+    drawPub    = private_n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
+    debugPub   = private_n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
     ros::Subscriber robotPacketSub   = n.subscribe("/robot_packets" , 1000, &CommunicationNodelet::callBack, this);
     /////connect serial
     if(!communicator.isSerialConnected()){
@@ -54,3 +48,4 @@ void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
 }
+PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);
