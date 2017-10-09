@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(parsian_world_model)
+project(parsian_communication)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -8,26 +8,33 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        dynamic_reconfigure
-        geometry_msgs
-        nav_msgs
-        parsian_msgs
-        parsian_util
-        roscpp
-        rospy
-        tf2
-        nodelet
-        )
+  dynamic_reconfigure
+  parsian_msgs
+  parsian_util
+  nodelet
+  roscpp
+  rospy
+)
+
+FILE(GLOB_RECURSE HEADER_FILES include *.h)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 
-find_package(Qt4 REQUIRED COMPONENTS QtCore)
 include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
-## Uncomment this if the package has a setup.py. This macro ensures
+QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+
+file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
+
+
+link_directories(/usr/include/qt4/QtExtSerialPort)
+##QT5 :D
+
+
+## Uncomment this if the package has a setup.py . This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
@@ -35,7 +42,6 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
-
 
 ## To declare and build messages, services or actions from within this
 ## package, follow these steps:
@@ -81,7 +87,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   geometry_msgs#   nav_msgs#   parsian_msgs
+#   parsian_msgs
 # )
 
 ################################################
@@ -114,10 +120,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        #  INCLUDE_DIRS include
-        #  LIBRARIES parsian_world_model
-          CATKIN_DEPENDS dynamic_reconfigure geometry_msgs nav_msgs parsian_msgs roscpp rospy tf2 nodelet
-        #  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES parsian_communication
+  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
+#  DEPENDS system_lib
 )
 
 ###########
@@ -127,18 +133,17 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-        src/wm/worldmodel.cpp
-        src/wm/visionclient.cpp
-        src/wm/visionbelief.cpp
-        src/wm/movingobject.cpp
-        src/wm/rawobject.cpp
-        )
+   src/${PROJECT_NAME}/communicator.cpp
+)
+
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -148,10 +153,12 @@ add_library(${PROJECT_NAME}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_library(worldmodel_nodelet_lib
-        src/worldmodel_nodelet.cpp)
+add_executable(${PROJECT_NAME}_node
+    src/communication_node.cpp
+)
 
-add_executable(worldmodel_node src/worldmodel_node.cpp)
+add_library(${PROJECT_NAME}_nodelet
+        src/communication_nodelet.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,34 +168,31 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_dependencies(${PROJECT_NAME}_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+ target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+   ${QT_LIBRARIES}
+    ${PROJECT_NAME}
+ )
+
+## Specify libraries to link a library or executable target against
+target_link_libraries(${PROJECT_NAME}_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        )
+
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 ## Specify libraries to link a library or executable target against
-
-
-target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        )
-
-add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_node
-        worldmodel_nodelet
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
-        )
-
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_nodelet
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
-        )
-
-
+ target_link_libraries(${PROJECT_NAME}
+   ${catkin_LIBRARIES}
+   ${QT_LIBRARIES} -lqextserialport
+ )
 #############
 ## Install ##
 #############
@@ -229,7 +233,7 @@ target_link_libraries(worldmodel_nodelet
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_world_model.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_communication.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

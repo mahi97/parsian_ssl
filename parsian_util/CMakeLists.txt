@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-find_package(Qt4 REQUIRED COMPONENTS QtCore)
+find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 
 include(${QT_USE_FILE})
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
