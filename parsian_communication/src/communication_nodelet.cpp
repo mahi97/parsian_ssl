@@ -3,6 +3,7 @@
 //
 
 #include <parsian_communication/communication_nodelet.h>
+PLUGINLIB_EXPORT_CLASS(parsian_communication::CommunicationNodelet, nodelet::Nodelet)
 
 using namespace parsian_communication;
 
@@ -48,4 +49,4 @@ void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
 }
-PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);
+//PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);
