@@ -26,7 +26,15 @@ namespace parsian_communication {
         void onInit();
 
         CCommunicator communicator;
+
+        ros::Publisher  drawPub;
+        ros::Publisher  debugPub;
+
+        ros::Timer      timer;
+
         void callBack(const parsian_msgs::parsian_packetsConstPtr& _packet);
+        // Timer CallBack (to publish)
+        void timerCb(const ros::TimerEvent& event);
 
     };
 }
