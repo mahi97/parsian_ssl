@@ -1,5 +1,7 @@
 #include <parsian_ai/ai_nodelet.h>
 
+PLUGINLIB_EXPORT_CLASS(parsian_ai::AINodelet, nodelet::Nodelet);
+
 using namespace parsian_ai;
 
   void AINodelet::onInit() {
@@ -37,6 +39,3 @@ using namespace parsian_ai;
 
 
   }
-
-
-PLUGINLIB_DECLARE_CLASS(parsian_ai, AINodelet, parsian_ai::AINodelet, nodelet::Nodelet);

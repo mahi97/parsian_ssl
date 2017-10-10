@@ -3,6 +3,7 @@
 //
 
 #include <parsian_world_model/worldmodel_nodelet.h>
+PLUGINLIB_EXPORT_CLASS(parsian_world_model::WMNodelet, nodelet::Nodelet);
 
 using namespace parsian_world_model;
 
@@ -36,4 +37,3 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
 
 }
 
-PLUGINLIB_DECLARE_CLASS(parsian_world_model, WMNodelet, parsian_world_model::WMNodelet, nodelet::Nodelet);
