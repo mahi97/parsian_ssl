@@ -9,14 +9,28 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
+        message_generation
         geometry_msgs
         parsian_msgs
         roscpp
         rospy
         std_msgs
+	nodelet
         )
 
 ## System dependencies are found with CMake's conventions
+
+find_package(Qt4 REQUIRED COMPONENTS QtCore)
+find_package(Qt4 REQUIRED COMPONENTS QtNetwork)
+
+include(${QT_USE_FILE})
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
+
+QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+
+file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
+
+
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Protobuf REQUIRED)
 
@@ -128,7 +142,7 @@ catkin_package(
         include
         ${protogen_include_dirs}
         LIBRARIES ${PROJECT_NAME}_proto
-        CATKIN_DEPENDS message_runtime dynamic_reconfigure
+        CATKIN_DEPENDS nodelet message_runtime dynamic_reconfigure
         DEPENDS Protobuf
 )
 
@@ -141,6 +155,7 @@ catkin_package(
 include_directories(
         include
         ${catkin_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_BINARY_DIR} ##dont know if its important-kian-
         ${PROTOBUF_INCLUDE_DIR}
         ${PROTOBUF_INCLUDE_DIR}/../../
 )
@@ -185,6 +200,17 @@ add_library(vision_convert
 add_library(refbox_convert
         src/ssl-refbox/convert/convert_referee.cpp)
 
+add_library(network
+        src/common/net/netraw.cpp
+        src/common/net/robocup_ssl_client.cpp
+        src/common/net/udpsend.cpp
+
+)
+
+add_library(grsim_nodelet
+        src/grsim/grsimnodelet.cpp
+       )
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -208,6 +234,12 @@ add_executable(refbox_node
         src/ssl-refbox/parsian_referee.cpp
         src/common/net/netraw.cpp
         src/common/net/robocup_ssl_client.cpp)
+
+add_executable(grsim_node
+        src/grsim/grsimnode.cpp
+       )
+
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -234,6 +266,21 @@ add_dependencies(refbox_node
         ${PROJECT_NAME}_gencfg
         )
 
+add_dependencies(grsim_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(grsim_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        parsian_protobuf_wrapper_gencpp
+        )
+
+add_dependencies(network
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_proto
@@ -243,6 +290,7 @@ target_link_libraries(${PROJECT_NAME}_proto
 
 target_link_libraries(vision_node
         vision_convert
+        network
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${PROJECT_NAME}_proto
@@ -252,10 +300,34 @@ target_link_libraries(vision_node
 target_link_libraries(refbox_node
         refbox_convert
         vision_convert
+	network
         ${PROJECT_NAME}_proto
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
+
+target_link_libraries(grsim_nodelet
+        ${PROJECT_NAME}_proto
+        network
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
+
+target_link_libraries(grsim_node
+        ${PROJECT_NAME}_proto
+        network
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
+
+target_link_libraries(network
+        ${PROJECT_NAME}_proto
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${QT_LIBRARIES}
+)
+
+
 
 
 #############
