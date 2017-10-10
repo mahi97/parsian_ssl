@@ -58,12 +58,15 @@ add_message_files(
   ${MSGS}
 )
 
+file(GLOB SRVS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/srv srv/*.srv)
+message(STATUS "All srv files: ${SRVS}")
+
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+  DIRECTORY srv
+  FILES
+  ${SRVS}
+ )
 
 file(GLOB ACTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/action action/*.action)
 message(STATUS "All action files: ${ACTS}")
