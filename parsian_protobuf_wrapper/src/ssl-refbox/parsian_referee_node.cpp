@@ -37,7 +37,7 @@ void reconnect()
     else ROS_INFO("Connected!");
 }
 
-void callback(protobuf_wrapper_config::refereeConfig &config, uint32_t level) {
+void callback(const protobuf_wrapper_config::refereeConfig &config, uint32_t level) {
 //    ROS_INFO("Reconfigure Request: %s %d", config.vision_multicast_ip, config.vision_multicast_port);
     networkConfig.ip = config.refree_multicast_ip;
     networkConfig.port = config.refree_multicast_port;

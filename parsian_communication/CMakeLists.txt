@@ -176,7 +176,7 @@ add_dependencies(${PROJECT_NAME}_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${c
  target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
-    ${PROJECT_NAME}
+   ${PROJECT_NAME}
  )
 
 ## Specify libraries to link a library or executable target against
