@@ -6,23 +6,25 @@
 
 
 CWorldModel::CWorldModel() {
-    qDebug() << "Worldmodel initilizer";
 }
 
 CWorldModel::~CWorldModel() {
 
 }
 
-void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detection &) {
-
-
-}
-
-void CWorldModel::updateGeom(const parsian_msgs::ssl_vision_geometry &) {
+void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&) {
 
 }
 
+void CWorldModel::updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr &) {
 
-void CWorldModel::execute(parsian_msgs::parsian_world_model &rosWM) {
+}
 
+
+void CWorldModel::execute() {
+
+}
+
+parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() const {
+    return rosWM;
 }

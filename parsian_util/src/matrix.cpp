@@ -17,7 +17,7 @@
 #include <cstdlib>
 #include <cmath>
 
-#include "matrix.h"
+#include "parsian_util/matrix.h"
 
 Matrix::Matrix(char* const init_string) : r_(), c_(), mat() {
   str_init(init_string);

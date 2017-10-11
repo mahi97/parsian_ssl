@@ -216,19 +216,23 @@ add_library(grsim_nodelet
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 add_dependencies(
-        vision_convert
         refbox_convert
+        vision_convert
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_proto
 )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(vision_node
-        src/ssl-vision/parsian_vision.cpp
+add_library(vision_nodelet
+        src/ssl-vision/parsian_vision_nodelet.cpp
         src/common/net/netraw.cpp
         src/common/net/robocup_ssl_client.cpp)
+
+add_executable(vision_node
+        src/ssl-vision/parsian_vision_node.cpp)
 
 add_executable(refbox_node
         src/ssl-refbox/parsian_referee.cpp
@@ -289,6 +293,7 @@ target_link_libraries(${PROJECT_NAME}_proto
         )
 
 target_link_libraries(vision_node
+        vision_nodelet
         vision_convert
         network
         ${catkin_LIBRARIES}
@@ -296,6 +301,12 @@ target_link_libraries(vision_node
         ${PROJECT_NAME}_proto
         )
 
+target_link_libraries(vision_nodelet
+        vision_convert
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${PROJECT_NAME}_proto
+        )
 
 target_link_libraries(refbox_node
         refbox_convert
@@ -329,6 +340,20 @@ target_link_libraries(network
 
 
 
+
+target_link_libraries(vision_convert
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${PROJECT_NAME}_proto
+        )
+
+target_link_libraries(
+        refbox_convert
+        vision_convert
+        ${PROJECT_NAME}_proto
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
 #############
 ## Install ##

@@ -7,6 +7,18 @@
 
 CMovingObject::CMovingObject() = default;
 
+CMovingObject::CMovingObject(const parsian_msgs::parsian_robot &_pr) :
+pos(_pr.pos),
+vel(_pr.vel),
+dir(_pr.dir),
+acc(_pr.acc),
+angularVel(_pr.angularVel),
+cam_id(_pr.camera_id),
+inSight(_pr.inSight),
+obstacleRadius(_pr.obstacleRadius)
+
+{}
+
 Vector2D CMovingObject::predict(double time)
 {
     //must be checked if it works precisely or not
@@ -77,3 +89,6 @@ double CMovingObject::whenIsAtVel(double L)
     return -2;
 }
 
+void CMovingObject::update(const parsian_msgs::parsian_robot &_newMO) {
+    *this = _newMO;
+}

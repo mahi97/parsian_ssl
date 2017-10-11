@@ -7,6 +7,7 @@
 
 #include "parsian_util/geom/geom.h"
 #include "parsian_util/core/field.h"
+#include <parsian_util/core/team.h>
 
 #include <QList>
 
@@ -72,10 +73,9 @@ public:
     CKnowledge();
     ~CKnowledge();
 
-
     static double getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circle2D> obs, double& percent, double &mostOpenAngle, double& biggestAngle, bool oppGoal = true, bool _draw = false);
     static Vector2D getReflectPos(Vector2D goal, double dist, Vector2D _ballpos);
-
+    static int getNearestRobotToPoint(CTeam _team, Vector2D _point);
 private:
     static CField field;
 };
