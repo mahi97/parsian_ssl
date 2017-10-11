@@ -1,0 +1,7 @@
+<library path="lib/libgrsim_nodelet">
+<class name="parsian_protobuf_wrapper/GrsimNodelet" type="GrsimNodelet" base_class_type="nodelet::Nodelet">
+<description>
+salam nodelet
+</description>
+</class>
+</library>
