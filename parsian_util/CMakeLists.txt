@@ -162,8 +162,6 @@ add_library(${PROJECT_NAME}_tools
 
 add_library(${PROJECT_NAME}_actions
         src/action/action.cpp
-        src/action/actiongotopoint.cpp
-        src/action/actiongotopointavoid.cpp
         )
 
 add_library(${PROJECT_NAME}_core
