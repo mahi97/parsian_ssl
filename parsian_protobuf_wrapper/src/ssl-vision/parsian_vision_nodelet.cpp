@@ -1,17 +1,15 @@
 #include <parsian_protobuf_wrapper/ssl-vision/parsian_vision_nodelet.h>
 
+PLUGINLIB_EXPORT_CLASS(parsian_protobuf_wrapper::VisionNodelet, nodelet::Nodelet);
+
 
 using namespace parsian_protobuf_wrapper;
-
-VisionNodelet::VisionNodelet() = default;
-
-VisionNodelet::~VisionNodelet() = default;
 
 void VisionNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
-    timer = nh.createTimer(ros::Duration(1.0), boost::bind(&VisionNodelet::timerCb, this, _1));
+    timer = nh.createTimer(ros::Duration(.062), boost::bind(&VisionNodelet::timerCb, this, _1));
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
@@ -68,6 +66,4 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
     ssl_geometry_pub.publish(geometry);
     ssl_detection_pub.publish(detection);
 }
-
-PLUGINLIB_DECLARE_CLASS(parsian_protobuf_wrapper, VisionNodelet, parsian_protobuf_wrapper::VisionNodelet, nodelet::Nodelet);
 

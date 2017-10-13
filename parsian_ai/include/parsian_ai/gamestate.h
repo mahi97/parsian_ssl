@@ -8,45 +8,46 @@
 #include <parsian_msgs/ssl_refree_stage.h>
 
 
+enum States{
+    Halt ,
+    PlayOff ,
+    PlayOn,
+
+    HalfTime,
+    PostGame,
+
+    OurBallPlacement, /// start of restart & our
+    OurDirectKick,
+    OurIndirectKick,
+    OurPenaltyKick,
+    OurPenaltyShootOut,
+    OurKickOff,
+
+
+    TheirBallPlacement,/// start of their
+    TheirDirectKick,
+    TheirIndirectKick,
+    TheirPenaltyKick,
+    TheirPenaltyShootOut,
+    TheirKickOff,
+
+
+};
 
 using namespace  parsian_msgs;
 
 class GameState {
+private:
+    enum States state;
+    int ourScore,theirScore;
+    bool isReady;
 public:
 
-    enum States{
-        Halt ,
-        PlayOff ,
-        PlayOn,
 
-        HalfTime,
-        PostGame,
-
-        OurBallPlacement, /// start of restart & our
-        OurDirectKick,
-        OurIndirectKick,
-        OurPenaltyKick,
-        OurPenaltyShootOut,
-        OurKickOff,
-
-
-        TheirBallPlacement,/// start of their
-        TheirDirectKick,
-        TheirIndirectKick,
-        TheirPenaltyKick,
-        TheirPenaltyShootOut,
-        TheirKickOff,
-
-
-    }state;
-
-  int ourScore,theirScore;
-  bool isReady;
 
   GameState();
-
-
-  void setRefree(ssl_refree_wrapper ref_wrapper);
+  bool ready();
+  void setRefree(ssl_refree_wrapperConstPtr ref_wrapper);
   bool isPlayOn();
   bool isPlayOff();
   bool restart();
@@ -79,6 +80,8 @@ public:
   bool penaltyShootout();
   bool ourPenaltyShootout();
   bool theirPenaltyShootout();
+    ////
+  enum States getState();
 };
 extern GameState *gameState;
 #endif

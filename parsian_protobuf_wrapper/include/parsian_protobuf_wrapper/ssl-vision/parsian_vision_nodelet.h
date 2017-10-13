@@ -25,28 +25,23 @@
 namespace parsian_protobuf_wrapper {
 
     class VisionNodelet : public nodelet::Nodelet {
-    public:
-        VisionNodelet();
-        virtual ~VisionNodelet();
 
-    protected:
+
     private:
         virtual void onInit();
 
-        void reconnect();
-        // Config CallBack
-        void configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level);
 
         // Timer CallBack (to publish)
         void timerCb(const ros::TimerEvent& event);
-
+        void reconnect();
+        void configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level);
 
         ros::Publisher ssl_geometry_pub;
         ros::Publisher ssl_detection_pub;
 
         ros::Timer timer;
 
-        bool shutDown = false;
+
         bool isOurColorYellow = false;
         RoboCupSSLClient *vision;
         protobuf_wrapper_config::visionConfig visionConfig;

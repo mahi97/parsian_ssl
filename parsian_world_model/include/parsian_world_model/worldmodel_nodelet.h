@@ -19,16 +19,12 @@
 namespace parsian_world_model {
 
     class WMNodelet : public nodelet::Nodelet {
-    public:
-        WMNodelet();
-        virtual ~WMNodelet();
 
-    protected:
     private:
         virtual void onInit();
 
         // Timer CallBack (to publish)
-        void timerCb(const ros::TimerEvent& event);
+        //void timerCb(const ros::TimerEvent& event);
 
         //Subs CallBack
         void geomCb(const parsian_msgs::ssl_vision_geometryConstPtr& _geom);

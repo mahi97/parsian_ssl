@@ -226,18 +226,23 @@ add_dependencies(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+add_library(network
+        src/common/net/netraw.cpp
+        src/common/net/robocup_ssl_client.cpp
+        )
+
 add_library(vision_nodelet
         src/ssl-vision/parsian_vision_nodelet.cpp
-        src/common/net/netraw.cpp
-        src/common/net/robocup_ssl_client.cpp)
-
+        )
+add_library(refbox_nodelet
+        src/ssl-refbox/parsian_referee_nodelet.cpp
+        )
 add_executable(vision_node
         src/ssl-vision/parsian_vision_node.cpp)
 
 add_executable(refbox_node
-        src/ssl-refbox/parsian_referee.cpp
-        src/common/net/netraw.cpp
-        src/common/net/robocup_ssl_client.cpp)
+        src/ssl-refbox/parsian_referee_node.cpp
+        )
 
 add_executable(grsim_node
         src/grsim/grsimnode.cpp
@@ -270,7 +275,18 @@ add_dependencies(refbox_node
         ${PROJECT_NAME}_gencfg
         )
 
+<<<<<<< parsian_protobuf_wrapper/CMakeLists.txt
+
+add_dependencies(refbox_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(vision_nodelet
+=======
 add_dependencies(grsim_nodelet
+>>>>>>> parsian_protobuf_wrapper/CMakeLists.txt
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         )
@@ -303,6 +319,7 @@ target_link_libraries(vision_node
 
 target_link_libraries(vision_nodelet
         vision_convert
+        network
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${PROJECT_NAME}_proto
@@ -311,11 +328,16 @@ target_link_libraries(vision_nodelet
 target_link_libraries(refbox_node
         refbox_convert
         vision_convert
-	network
+        network
         ${PROJECT_NAME}_proto
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
+
+target_link_libraries(refbox_nodelet
+        refbox_convert
+        vision_convert
+        network
 
 target_link_libraries(grsim_nodelet
         ${PROJECT_NAME}_proto
@@ -337,9 +359,6 @@ target_link_libraries(network
         ${PROTOBUF_LIBRARIES}
         ${QT_LIBRARIES}
 )
-
-
-
 
 target_link_libraries(vision_convert
         ${catkin_LIBRARIES}

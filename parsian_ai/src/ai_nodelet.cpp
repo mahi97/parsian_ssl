@@ -1,15 +1,17 @@
 #include <parsian_ai/ai_nodelet.h>
 
+PLUGINLIB_EXPORT_CLASS(parsian_ai::AINodelet, nodelet::Nodelet);
+
 using namespace parsian_ai;
 
   void AINodelet::onInit() {
 
-
       ros::NodeHandle &nh = getNodeHandle();
       ros::NodeHandle &private_nh = getPrivateNodeHandle();
-      worldModelSub = nh.subscribe("/world_model", 1000, ai.updateWM);
-      robotStatusSub = nh.subscribe("/robot_status", 1000, ai.updateRobotStatus);
-      refereeSub = nh.subscribe("/referee", 1000, ai.updateReferee);
+      worldModelSub = nh.subscribe("/world_model", 1000, &AI::updateWM, &ai);
+      robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
+      refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
+
       drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
       debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
       timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
@@ -29,7 +31,6 @@ using namespace parsian_ai;
 
   void AINodelet::timerCb(const ros::TimerEvent& event){
       ai.execute();
-
       drawPub.publish(drawer->draws);
       debugPub.publish(debugger->debugs);
 //        ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
@@ -37,6 +38,3 @@ using namespace parsian_ai;
 
 
   }
-
-
-PLUGINLIB_DECLARE_CLASS(parsian_ai, AINodelet, parsian_ai::AINodelet, nodelet::Nodelet);

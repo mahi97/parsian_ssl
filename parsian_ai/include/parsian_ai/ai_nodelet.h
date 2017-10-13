@@ -15,6 +15,7 @@
 #include <parsian_ai/ai.h>
 namespace parsian_ai {
     class AINodelet : public nodelet::Nodelet {
+
     private:
         AI ai;
         ros::Subscriber worldModelSub;
