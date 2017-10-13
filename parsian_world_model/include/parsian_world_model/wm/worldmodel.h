@@ -12,6 +12,9 @@
 #include "parsian_msgs/parsian_world_model.h"
 #include "parsian_msgs/ssl_vision_detection.h"
 #include "parsian_msgs/ssl_vision_geometry.h"
+#include <parsian_world_model/wm/visionclient.h>
+#include <parsian_world_model/wm/halfworld.h>
+
 
 class CWorldModel : public QObject {
 public:
@@ -26,8 +29,13 @@ public:
 private:
     parsian_msgs::parsian_world_model rosWM;
 
-
-
+    CVisionClient *vc;
+    CHalfWorld* hw;
+    bool simulationMode;
+    void reconnect();
+    void run();
+    void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
+    void printRobotInfo(const parsian_msgs::ssl_vision_detectionConstPtr & robot);
 
 
 };
