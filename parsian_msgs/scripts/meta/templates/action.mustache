@@ -6,6 +6,7 @@
 
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
+#include <parsian_msgs/{{message}}.h>
 {{#has_base}}#include <parsian_util/actions/{{base_action_file}}> {{/has_base}}
 
 class {{action_name}}Action : public Action{{#has_base}}, public {{base_action}} {{/has_base}} {
@@ -24,7 +25,7 @@ public:
     }
 
     parsian_msgs::{{message}} getMessage() {
-        parsian_msgs::{{message}}; _msg;
+        parsian_msgs::{{message}} _msg;
     {{#has_base}}
         _msg.base = {{base_action}}::getMessage();
     {{/has_base}}
