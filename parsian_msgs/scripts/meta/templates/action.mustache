@@ -4,15 +4,16 @@
 #define {{action_name}}_HEADER_
 
 
-#include <parsian_util/actions/action.h>
+#include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
+#include <parsian_msgs/{{message}}.h>
 {{#has_base}}#include <parsian_util/actions/{{base_action_file}}> {{/has_base}}
 
 class {{action_name}}Action : public Action{{#has_base}}, public {{base_action}} {{/has_base}} {
 
 public:
-    {{action_name}}();
-    ~{{action_name}}();
+    {{action_name}}Action();
+    ~{{action_name}}Action();
 
     void setMessage(const parsian_msgs::{{message}} _msg) {
         {{#properties}}
@@ -23,8 +24,8 @@ public:
         {{/has_base}}
     }
 
-    parsian_msgs::{{action_name}} getMessage() {
-        parsian_msgs::{{action_name}} _msg;
+    parsian_msgs::{{message}} getMessage() {
+        parsian_msgs::{{message}} _msg;
     {{#has_base}}
         _msg.base = {{base_action}}::getMessage();
     {{/has_base}}
@@ -38,10 +39,10 @@ public:
     }
 
 {{#properties}}
-    SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}})
+    SkillProperty({{action_name}}Action, {{type}}, {{name}}, {{local}})
 {{/properties}}
 {{#parsian_properties}}
-    SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}})
+    SkillProperty({{action_name}}Action, {{type}}, {{name}}, {{local}})
 {{/parsian_properties}}
 }
 

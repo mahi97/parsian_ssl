@@ -46,19 +46,16 @@ def convert_property(ros_property):
 
 
 def get_fulldict(file, properties_list):
-    print(file, properties_list)
-    new_dict = {"action_name": cap_word(file.split('.')[0]), "has_base": False, "properties": []}
+    new_dict = {"action_name": cap_word(file.split('.')[0]), "has_base": False, "properties": [], "message" : file.split('.')[0]}
     # message name
     for m_property in properties_list:
-        print(m_property[1])
         if str(m_property[1]) == 'base':
             new_dict["has_base"] = True
-            new_dict["base_action"] = m_property[0].replace('parsian_msgs/', '') + 'Action'
+            new_dict["base_action"] = cap_word(m_property[0].replace('parsian_msgs/', '')) + 'Action'
             new_dict["base_action_file"] = str(new_dict["base_action"]).lower() + '.h'
         else:
             p = {"type": m_property[0], "name": m_property[1].title(), "local": m_property[1]}
             new_dict['properties'].append(p)
-    print(new_dict)
     return new_dict
 
 
