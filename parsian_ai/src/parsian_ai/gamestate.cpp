@@ -12,7 +12,7 @@ GameState::GameState()
 int GameState::getOurScore(){return ourScore;}
 int GameState::getTheirScore(){ return theirScore;}
 
-void GameState::setRefree(ssl_refree_wrapper ref_wrapper) {
+void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
     ///////////////////// when we are ready any command means force start
     if(isReady && state!=PlayOn){
@@ -20,7 +20,7 @@ void GameState::setRefree(ssl_refree_wrapper ref_wrapper) {
         return;
     }
 
-    switch (ref_wrapper.stage.stage) {
+    switch (ref_wrapper->stage.stage) {
     case ssl_refree_stage::NORMAL_HALF_TIME:
     case ssl_refree_stage::EXTRA_HALF_TIME:
         state=HalfTime;
@@ -31,7 +31,7 @@ void GameState::setRefree(ssl_refree_wrapper ref_wrapper) {
         return;
     }
 
-    switch (ref_wrapper.command.command) {
+    switch (ref_wrapper->command.command) {
     case ssl_refree_command::FORCE_START:
         state=PlayOn;
         isReady=true;
@@ -96,12 +96,12 @@ void GameState::setRefree(ssl_refree_wrapper ref_wrapper) {
 
     case ssl_refree_command::PREPARE_PENALTY_THEM:
         isReady=false;
-        state= ((ref_wrapper.stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
+        state= ((ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
                     TheirPenaltyShootOut:TheirPenaltyKick);
         return;
     case ssl_refree_command::PREPARE_PENALTY_US:
         isReady=false;
-        state= (ref_wrapper.stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
+        state= (ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
                     OurPenaltyShootOut:OurPenaltyKick;
         return;
     }
@@ -147,3 +147,10 @@ bool GameState::halfTimeLineUp(){return state == HalfTime;}
 bool GameState::penaltyShootout() {return ourPenaltyShootout()|| theirPenaltyShootout();}
 bool GameState::ourPenaltyShootout(){return state == OurPenaltyShootOut;}
 bool GameState::theirPenaltyShootout(){return state == TheirPenaltyShootOut;}
+bool GameState::ready(){
+    return isReady;
+}
+/////
+enum States GameState::getState(){
+    return state;
+}

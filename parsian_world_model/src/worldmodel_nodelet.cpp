@@ -28,6 +28,7 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     wm.execute();
     worldModel = wm.getParsianWorldModel();
     wm_pub.publish(worldModel);
+    ROS_INFO("rec!");
 
 }
 
