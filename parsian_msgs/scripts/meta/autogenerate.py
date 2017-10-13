@@ -24,6 +24,8 @@ PARSIAN_TYPE_MAP = {
     "parsian_msgs/gotoPoint": 'gotoPoint'
 }
 
+PARSIAN_PROPERTIES_LIST = ["Vector2D",]
+
 min_max_regex = re.compile('\[([0-9\.\-]+)\:([0-9\.\-]+)\]')
 rend = pystache.Renderer()
 
@@ -46,7 +48,7 @@ def convert_property(ros_property):
 
 
 def get_fulldict(file, properties_list):
-    new_dict = {"action_name": cap_word(file.split('.')[0]), "has_base": False, "properties": [], "message" : file.split('.')[0]}
+    new_dict = {"action_name": cap_word(file.split('.')[0]), "has_base": False, "properties": [], "parsian_properties" : [], "message" : file.split('.')[0]}
     # message name
     for m_property in properties_list:
         if str(m_property[1]) == 'base':
@@ -55,7 +57,10 @@ def get_fulldict(file, properties_list):
             new_dict["base_action_file"] = str(new_dict["base_action"]).lower() + '.h'
         else:
             p = {"type": m_property[0], "name": m_property[1].title(), "local": m_property[1]}
-            new_dict['properties'].append(p)
+            if m_property[0] in PARSIAN_PROPERTIES_LIST:
+                new_dict['parsian_properties'].append(p)
+            else:
+                new_dict['properties'].append(p)
     return new_dict
 
 
