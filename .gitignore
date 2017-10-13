@@ -82,3 +82,4 @@ CATKIN_IGNORE
 # clion stuff
 */.idea/*
 */cmake-build-debug/*
+*/.idea/*
