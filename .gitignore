@@ -82,3 +82,7 @@ CATKIN_IGNORE
 # clion stuff
 */.idea/*
 */cmake-build-debug/*
+
+# Auto Generated
+parsian_util/include/parsian_util/action/autogenerate/*
+
