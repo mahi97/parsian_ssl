@@ -205,7 +205,7 @@ void CHalfWorld::update(QList<CBall *>& ball, CVisionBelief* v)
         {
             if (!flag[i])
             {
-                ball[i]->update(CRawObject(0, ball[i]->pos, 0.0, -1, 0.0, NULL, v->cam_id, v->time));
+                ball[i]->update(CRawObject(0, ball[i]->pos, 0.0, -1, 0.0, nullptr, v->cam_id, v->time));
             }
         }
     }
@@ -275,7 +275,7 @@ void CHalfWorld::update(QList<CRobot*>& robot, CVisionBelief* v, QList<CRawObjec
         {
             if (!flag[i])
             {
-                robot[i]->update(CRawObject(0, robot[i]->pos, robot[i]->dir.th().degree(), -1, 0.0, NULL, v->cam_id, v->time));
+                robot[i]->update(CRawObject(0, robot[i]->pos, robot[i]->dir.th().degree(), -1, 0.0, nullptr, v->cam_id, v->time));
             }
         }
     }
@@ -303,7 +303,8 @@ void CHalfWorld::update(CVisionBelief *v)
             else
             if (ourTeam[j][0]->inSight > 0)
             {
-                ourTeam[j][0]->update(CRawObject(0, ourTeam[j][0]->pos, ourTeam[j][0]->dir.th().degree(), -1, 0.0, NULL, v->cam_id, v->time));
+                ourTeam[j][0]->update(CRawObject(0, ourTeam[j][0]->pos, ourTeam[j][0]->dir.th().degree(), -1, 0.0,
+                                                 nullptr, v->cam_id, v->time));
             }
         }
     }
@@ -319,70 +320,11 @@ void CHalfWorld::update(CVisionBelief *v)
             else
             if (oppTeam[j][0]->inSight > 0)
             {
-                oppTeam[j][0]->update(CRawObject(0, oppTeam[j][0]->pos, oppTeam[j][0]->dir.th().degree(), -1, 0.0, NULL, v->cam_id, v->time));
+                oppTeam[j][0]->update(CRawObject(0, oppTeam[j][0]->pos, oppTeam[j][0]->dir.th().degree(), -1, 0.0,
+                                                 nullptr, v->cam_id, v->time));
             }
         }
     }
-
-
-/*    for (int j=0;j<_MAX_NUM_PLAYERS;j++)
-    {
-        p0.clear();
-        for (int i=0;i<min(ourTeam[j].count(), MAX_OBJECTS);i++)
-        {
-            p0.append(CRawObject(0, ourTeam[j][i]->pos, ourTeam[j][i]->dir.th().degree(), j, ourTeam[j][i]->inSight));
-        }
-        track(p0, v->ourTeam[j]);
-        for (int i=0;i<p0.count();i++)
-        {
-            if (p0[i].updated)
-            {
-                if (i>=ourTeam[j].count())
-                {
-                    ourTeam[j].append(new CRobot(j,true,false));
-                }
-                p0[i].time = v->time;
-                //if (ourTeam[j][i]->cam_id==v->cam_id)
-                    ourTeam[j][i]->update(p0[i]);
-                ourTeam[j][i]->lastFrameUpdated = currentFrame;
-                ourTeam[j][i]->cam_id = v->cam_id;
-            }
-            else {
-//                if (ourTeam[j][i]->cam_id==v->cam_id)
-                    ourTeam[j][i]->update(CRawObject(0, ourTeam[j][i]->pos, ourTeam[j][i]->dir.th().degree(), j, 0.0, NULL, v->cam_id, v->time));
-            }
-        }
-    }
-    for (int j=0;j<_MAX_NUM_PLAYERS;j++)
-    {
-        p0.clear();
-        for (int i=0;i<min(oppTeam[j].count(), MAX_OBJECTS);i++)
-        {
-            p0.append(CRawObject(0, oppTeam[j][i]->pos, oppTeam[j][i]->dir.th().degree(), j, oppTeam[j][i]->inSight));
-        }
-        track(p0, v->oppTeam[j]);
-        for (int i=0;i<p0.count();i++)
-        {
-            if (p0[i].updated)
-            {
-                if (i>=oppTeam[j].count())
-                {
-                    oppTeam[j].append(new CRobot(j,false,false));
-                }
-                p0[i].time = v->time;
-              //  if (oppTeam[j][i]->cam_id==v->cam_id)
-                    oppTeam[j][i]->update(p0[i]);
-                oppTeam[j][i]->lastFrameUpdated = currentFrame;
-                oppTeam[j][i]->cam_id = v->cam_id;
-            }
-            else
-            {
-//                if (oppTeam[j][i]->cam_id==v->cam_id)
-                    oppTeam[j][i]->update(CRawObject(0, oppTeam[j][i]->pos, oppTeam[j][i]->dir.th().degree(), j, 0.0, NULL, v->cam_id, v->time));
-            }
-        }
-    }*/
-
 }
 
 void CHalfWorld::update(CHalfWorld *w)

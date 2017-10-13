@@ -14,6 +14,8 @@
 #include "parsian_msgs/ssl_vision_geometry.h"
 #include <parsian_world_model/wm/visionclient.h>
 #include <parsian_world_model/wm/halfworld.h>
+#include <parsian_world_model/wm/ball.h>
+#include <parsian_world_model/wm/robot.h>
 
 
 class CWorldModel : public QObject {
@@ -24,6 +26,7 @@ public:
     void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute();
+    void init();
     parsian_msgs::parsian_world_model getParsianWorldModel() const;
 
 private:
@@ -31,11 +34,26 @@ private:
 
     CVisionClient *vc;
     CHalfWorld* hw;
+    CHalfWorld w;
+    CHalfWorld mergedHalfWorld;
+
+    CBall* ball;
+    CRobot* us[_MAX_NUM_PLAYERS];
+    CRobot* them[_MAX_NUM_PLAYERS];
+
+
     bool simulationMode;
-    void reconnect();
     void run();
+    void update(CHalfWorld*);
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
-    void printRobotInfo(const parsian_msgs::ssl_vision_detectionConstPtr & robot);
+    void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);
+
+    parsian_msgs::ssl_vision_detectionConstPtr detection;
+
+    double visionFPS;
+    double visionLatency;
+    double visionTimestep;
+    double visionProcessTime;
 
 
 };
