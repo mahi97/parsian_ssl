@@ -25,7 +25,7 @@ public:
     }
 
     parsian_msgs::{{message}} getMessage() {
-        parsian_msgs::{{message}}; _msg;
+        parsian_msgs::{{message}} _msg;
     {{#has_base}}
         _msg.base = {{base_action}}::getMessage();
     {{/has_base}}
