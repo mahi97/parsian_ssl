@@ -1,0 +1,48 @@
+// auto-generated don't edit !
+
+#ifndef {{action_name}}_HEADER_
+#define {{action_name}}_HEADER_
+
+
+#include <parsian_util/actions/action.h>
+#include <parsian_util/geom/geom.h>
+{{#has_base}}#include <parsian_util/actions/{{base_action_file}}> {{/has_base}}
+
+class {{action_name}}Action : public Action{{#has_base}}, public {{base_action}} {{/has_base}} {
+
+public:
+    {{action_name}}();
+    ~{{action_name}}();
+
+    void setMessage(const parsian_msgs::{{message}} _msg) {
+        {{#properties}}
+            {{local}} = _msg.{{local}};
+        {{/properties}}
+        {{#has_base}}
+            {{base_action}}::setMessage(_msg.base);
+        {{/has_base}}
+    }
+
+    parsian_msgs::{{action_name}} getMessage() {
+        parsian_msgs::{{action_name}} _msg;
+    {{#has_base}}
+        _msg.base = {{base_action}}::getMessage();
+    {{/has_base}}
+    {{#properties}}
+        _msg.{{local}} = {{local}};
+    {{/properties}}
+    {{#parsian_properties}}
+        _msg.{{local}} = {{local}}.toParsianMessage();
+    {{/parsian_properties}}
+
+    }
+
+{{#properties}}
+    SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}})
+{{/properties}}
+{{#parsian_properties}}
+    SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}})
+{{/parsian_properties}}
+}
+
+#endif // {{action_name}}_HEADER_
