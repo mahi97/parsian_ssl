@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(parsian_agent)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -140,11 +140,11 @@ include_directories(
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
-        src/${PROJECT_NAME}/gotopointavoid.cpp
-        src/${PROJECT_NAME}/kick.cpp
-        src/${PROJECT_NAME}/newbangbang.cpp
-        src/${PROJECT_NAME}/onetouch.cpp
-        src/${PROJECT_NAME}/receivepass.cpp
+       # src/${PROJECT_NAME}/gotopointavoid.cpp
+       # src/${PROJECT_NAME}/kick.cpp
+       # src/${PROJECT_NAME}/newbangbang.cpp
+       # src/${PROJECT_NAME}/onetouch.cpp
+       # src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
  )
 

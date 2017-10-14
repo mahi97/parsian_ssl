@@ -6,7 +6,7 @@
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
 #include <fstream>
-
+#include <QTime>
 
 using namespace std;
 
@@ -18,9 +18,8 @@ struct Fault {
 };
 
 class CSkill;
-class CAgent : public QObject
+class Agent
 {
-    Q_OBJECT
 public:
     class Abilities {
     public:
@@ -56,18 +55,12 @@ public:
 
     bool changeIsNeeded;
 
-    SoccerIntention *intention;
-    IntentionDefense defIntent;
-    IntentionMark markIntent;
-    IntentionPlayMake playMakeIntent;
-    IntentionBlock blockIntent;
-    IntentionPosition positionIntent;
     Vector2D homePos;
     void accelerationLimiter(double vf,bool diveMode = false);
     double goalVisibility;
     QTime agentStopTime;
     bool timerReset;
-    CAgent(short int _ID);
+    Agent(short int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;
@@ -76,9 +69,7 @@ public:
     QString skillName;
     int id();
     int commandId();
-    void generateRobotCommand();
     bool trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop);
-    char* getOutputBuffer();
     void loadProfiles();
     double getVisibility();
     void setVisibility(const double &inSight);
@@ -153,8 +144,8 @@ public:
     Vector2D plannerAverageDir;
 
     void setGyroZero();
-    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
-    void initPlanner( const int &_id , const Vector2D &_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
+//    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
+//    void initPlanner( const int &_id , const Vector2D &_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
@@ -163,13 +154,10 @@ private:
     bool calibrateGyro;
     unsigned int packetNum;
     double lastVf,lastVn;
-
-    char outputBuffer[_NEW_PACKET_SIZE];
     short int selfID;
-public slots:
-    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
-signals:
-    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
+    const double Gravity= 9.8;
+//    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
+//    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
 };
 
 #endif // CAGENT_H
