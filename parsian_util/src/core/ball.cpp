@@ -4,7 +4,10 @@
 
 #include <parsian_util/core/ball.h>
 
-CBall::CBall(const parsian_msgs::parsian_robot &_ball) : CMovingObject(_ball) {
+const double CBall::radius = 0.0215;
+
+CBall::CBall(const parsian_msgs::parsian_robot &_ball) : CMovingObject(_ball)
+{
 }
 
 CBall::CBall() : CMovingObject() {}

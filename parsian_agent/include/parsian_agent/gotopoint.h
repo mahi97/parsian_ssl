@@ -32,7 +32,7 @@ enum gpMode {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class CSkillGotoPoint : public CSkill, public ActionGotoPoint
+class CSkillGotoPoint : public CSkill, public GotopointAction
 {
 
 
@@ -46,13 +46,13 @@ private:
     _PID *thPid;
     _PID *velPid;
     Vector2D startingPoint;
-     ///////Arash.Z//////////
+    ///////Arash.Z//////////
     //////////if boll dec = true the function return optimal dec and
     //////////otherwise return optimal acc//////////
     double optimalAccOrDec(double agentDirInRadian, bool dec);
 
     ///////////////////////
-     void trajectoryPlanner();
+    void trajectoryPlanner();
     double appliedTh;
     //////////////////////
 

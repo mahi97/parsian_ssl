@@ -6,9 +6,10 @@
 #define PARSIAN_SKILLS_GOTOPOINTAVOID_H
 
 #include <parsian_agent/gotopoint.h>
-#include <parsian_util/action/actiongotopointavoid.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
-class CSkillGotoPointAvoid : public CSkillGotoPoint, public ActionGotoPointAvoid
+class CSkillGotoPointAvoid : public CSkillGotoPoint, public GotopointavoidAction
 {
 private:
 //    CMotionProfile *prof;

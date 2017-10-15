@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(parsian_agent)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -137,14 +137,16 @@ include_directories(
 )
 
 ## Declare a C++ library
+add_library(${PROJECT_NAME}_nodelet
+        src/AgentNodelet.cpp)
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
-        src/${PROJECT_NAME}/gotopointavoid.cpp
-        src/${PROJECT_NAME}/kick.cpp
-        src/${PROJECT_NAME}/newbangbang.cpp
-        src/${PROJECT_NAME}/onetouch.cpp
-        src/${PROJECT_NAME}/receivepass.cpp
+       # src/${PROJECT_NAME}/gotopointavoid.cpp
+       # src/${PROJECT_NAME}/kick.cpp
+       # src/${PROJECT_NAME}/newbangbang.cpp
+       # src/${PROJECT_NAME}/onetouch.cpp
+       # src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
  )
 
@@ -152,6 +154,16 @@ add_dependencies(${PROJECT_NAME}
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         )
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+target_link_libraries(${PROJECT_NAME}_nodelet
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES})
+
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
