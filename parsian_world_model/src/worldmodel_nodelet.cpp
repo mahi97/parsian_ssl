@@ -31,7 +31,6 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     wm->updateDetection(_detection);
     wm->execute();
     wm_pub.publish(wm->getParsianWorldModel());
-    ROS_INFO("reddddc!");
 //
 }
 

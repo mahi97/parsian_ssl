@@ -48,6 +48,10 @@ private:
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
     void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);
 
+    parsian_msgs::parsian_robot toParsianMessage(const CRobot& _robot);
+    parsian_msgs::parsian_robot toParsianMessage(const CBall& _ball);
+
+
     parsian_msgs::ssl_vision_detectionConstPtr detection;
 
     double visionFPS;

@@ -35,10 +35,18 @@ void CWorldModel::execute() {
 
 parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
 //    if (this->ball == nullptr) return rosWM;
-    rosWM.ball.pos = this->ball->pos.toParsianVector2D();
-    rosWM.ball.camera_id = this->ball->cam_id;
-    rosWM.ball.obstacleRadius = this->ball->obstacleRadius;
-    qDebug() << "Ball : " << rosWM.ball.pos.x;
+    rosWM.ball = toParsianMessage(*ball);
+    for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
+        if (us[i]->isActive()) {
+            rosWM.our.push_back(toParsianMessage(*us[i]));
+        }
+        if (them[i]->isActive()) {
+            rosWM.opp.push_back(toParsianMessage(*them[i]));
+        }
+    }
+    rosWM.isLeft = true; // TODO : fix read from param
+    rosWM.isYellow  = true;
+
     return rosWM;
 }
 
@@ -165,6 +173,35 @@ void CWorldModel::run()
 //    else mergedHalfWorld.playmakerID = knowledge->getPlayMaker()->id();
     //////////////////
 
+}
+
+parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CRobot &_robot) {
+    parsian_msgs::parsian_robot p;
+    p.camera_id = static_cast<unsigned char>(_robot.cam_id);
+    p.id = static_cast<unsigned char>(_robot.id);
+    p.pos = _robot.pos.toParsianVector2D();
+    p.acc = _robot.acc.toParsianVector2D();
+    p.vel = _robot.vel.toParsianVector2D();
+    p.angularVel = _robot.angularVel;
+    p.dir = _robot.dir.toParsianVector2D();
+    p.inSight = _robot.inSight;
+    p.obstacleRadius = _robot.obstacleRadius;
+
+    return  p;
+}
+
+parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CBall &_ball) {
+    parsian_msgs::parsian_robot p;
+    p.camera_id = static_cast<unsigned char>(_ball.cam_id);
+    p.pos = _ball.pos.toParsianVector2D();
+    p.acc = _ball.acc.toParsianVector2D();
+    p.vel = _ball.vel.toParsianVector2D();
+    p.angularVel = _ball.angularVel;
+    p.dir = _ball.dir.toParsianVector2D();
+    p.inSight = _ball.inSight;
+    p.obstacleRadius = _ball.obstacleRadius;
+
+    return p;
 }
 
 void CWorldModel::update(CHalfWorld* w0) {
