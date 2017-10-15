@@ -41,6 +41,7 @@ namespace parsian_protobuf_wrapper {
 
         ros::Timer timer;
 
+        boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> > configServer;
 
         bool isOurColorYellow = false;
         RoboCupSSLClient *vision;

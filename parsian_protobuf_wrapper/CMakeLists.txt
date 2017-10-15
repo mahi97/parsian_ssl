@@ -308,12 +308,7 @@ target_link_libraries(${PROJECT_NAME}_proto
         )
 
 target_link_libraries(vision_node
-        vision_nodelet
-        vision_convert
-        network
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${PROJECT_NAME}_proto
         )
 
 target_link_libraries(vision_nodelet
@@ -325,18 +320,16 @@ target_link_libraries(vision_nodelet
         )
 
 target_link_libraries(refbox_node
-        refbox_convert
-        vision_convert
-        network
-        ${PROJECT_NAME}_proto
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         )
 
 target_link_libraries(refbox_nodelet
         refbox_convert
         vision_convert
         network
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${PROJECT_NAME}_proto
         )
 
 target_link_libraries(grsim_nodelet
@@ -347,10 +340,7 @@ target_link_libraries(grsim_nodelet
         )
 
 target_link_libraries(grsim_node
-        ${PROJECT_NAME}_proto
-        network
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         )
 
 target_link_libraries(network
