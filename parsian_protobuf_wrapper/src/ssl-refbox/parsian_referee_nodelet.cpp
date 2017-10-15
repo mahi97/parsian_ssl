@@ -23,10 +23,10 @@ void RefreeNodelet::onInit() {
     reconnect();
     std::chrono::high_resolution_clock::time_point last_param_update_time;
 
-    dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig> server;
+    server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>);
     dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>::CallbackType f;
     f = boost::bind(&RefreeNodelet::callback,this, _1, _2);
-    server.setCallback(f);
+    server->setCallback(f);
     ros::param::get("/team_color", teamColor);
     isOurColorYellow = (teamColor == "yellow");
     timer = nh.createTimer(ros::Duration(.062), boost::bind(&RefreeNodelet::timerCb, this, _1));

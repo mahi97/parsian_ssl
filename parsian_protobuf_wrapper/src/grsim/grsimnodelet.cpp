@@ -20,8 +20,8 @@ void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg)
     GrsimRobotCommand->set_wheel2(msg->wheel2);
     GrsimRobotCommand->set_wheel3(msg->wheel3);
     GrsimRobotCommand->set_wheel4(msg->wheel4);
-    GrsimRobotCommand->set_spinner(msg->spinner);
-    GrsimRobotCommand->set_wheelsspeed(msg->wheelsspeed);
+    GrsimRobotCommand->set_spinner(msg->spinner != 0u);
+    GrsimRobotCommand->set_wheelsspeed(msg->wheelsspeed != 0u);
 
 }
 
@@ -81,7 +81,7 @@ void send()
     grSim_Packet packet;
     std::string color;
     ros::param::get("team_color", color);
-    bool col = (color == "yellow") ? false : true;          //check if it is true!
+    bool col = ! (color == "yellow");          //check if it is true!
     GrsimCommand->set_isteamyellow(col);
     GrsimCommand->set_timestamp(0.0);                       //should fix this
     packet.set_allocated_commands(GrsimCommand);
