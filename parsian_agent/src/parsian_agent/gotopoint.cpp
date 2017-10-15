@@ -6,7 +6,7 @@
 INIT_SKILL(CSkillGotoPoint, "gotopoint");
 CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
 {
-    lookat.invalidate();
+    lookAt.invalidate();
     agent = _agent;
     speedPidX = new _PID(1,0,0,0,0);
     speedPidY = new _PID(1,0,0,0,0);
@@ -17,11 +17,11 @@ CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
     posYpid = new _PID(1,0,0,0,0);
     thPid = new _PID(1,0,0,0,0);
 
-    _Acc = 4;
-    _Dec = 4;
+    maxAcceleration = 4;
+    maxDeceleration = 4;
+    
 
-
-    lookat.invalidate();
+    lookAt.invalidate();
 
     lastGPmode = GPACC1;
     posPidDist = 0.5;
@@ -29,11 +29,12 @@ CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
     decThr = 0.2;
     posThr = 0;
     vConstThr = 0;
-    _VmDesire = 5;
+
+    maxVelocity = 5;
 
     agentVDesire = 0;
     ////modes
-    slow = false;
+    slowShot= false;
     slowMode = false;
     verySlow = false;
     diveMode = false;
@@ -73,7 +74,7 @@ gpMode CSkillGotoPoint::decideMode()
         return GPPOS;
     }
     else {
-        agentX3 = fabs(((posPidDist*posPid->kp)*(posPidDist*posPid->kp) - (agentVc*agentVc))/(2*_Dec)) + 0.05 *agentVc;
+        agentX3 = fabs(((posPidDist*posPid->kp)*(posPidDist*posPid->kp) - (agentVc*agentVc))/(2*maxDeceleration)) + 0.05 *agentVc;
 
         if(agentDist <= agentX3 + decThr) {
             if(agentVc < 0.5)
@@ -82,7 +83,7 @@ gpMode CSkillGotoPoint::decideMode()
                 decThr = 0.5;
             return GPDEC1;
         }
-        else if(agentVc >= _VmDesire)
+        else if(agentVc >= maxVelocity)
         {
             decThr = 0;
             return GPVCONST;
@@ -125,9 +126,9 @@ double CSkillGotoPoint::optimalAccOrDec(double agentDir, bool dec)
     Ff = ((fWheels[3]-fWheels[0])*(sqrt(3)/2)) + ((fWheels[2] - fWheels[1])*(sqrt(2)/2));
     Fn = ((fWheels[3]+fWheels[0])*0.5) + (-1*(fWheels[2] + fWheels[1])*(sqrt(2)/2));
     ////////////////////////////////////////////////////////////////////////////////////
-    /////////////////2.8868 is max of sum Ff and Fn and this derivation is for nomalization of Max Acc = _Acc/////////
-    optimalAcc = _Acc * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
-    optimalDec = _Dec * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
+    /////////////////2.8868 is max of sum Ff and Fn and this derivation is for nomalization of Max Acc = maxAcceleration/////////
+    optimalAcc = maxAcceleration * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
+    optimalDec = maxDeceleration * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////if boll dec = true the function return optimal dec///////////
     if(dec) {
@@ -160,9 +161,9 @@ void CSkillGotoPoint::targetValidate()
 //        }
     }
 
-    if (lookat.valid())
+    if (lookAt.valid())
     {
-        targetDir = (lookat - agentPos).norm();
+        targetDir = (lookAt - agentPos).norm();
     }
 }
 
@@ -172,31 +173,31 @@ void CSkillGotoPoint::trajectoryPlanner()
     //////////////////acc dec
     agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),false);
     agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),true);
-    appliedAcc =1.5* _Acc;
+    appliedAcc =1.5* maxAcceleration;
 
     if(smooth)
     {
         if((agentMovementTh - lastPath).degree() > 20 && (agentMovementTh - lastPath).degree() < 100 && agentVc > 1) {
             agentMovementTh = lastPath + 60;
-            _VmDesire = 1;
+            maxVelocity = 1;
             appliedAcc = 0;
 
         }
         else if((agentMovementTh - lastPath).degree() < -20 && (agentMovementTh - lastPath).degree() > -100 && agentVc > 1) {
             agentMovementTh = lastPath - 60;
-            _VmDesire = 1;
+            maxVelocity = 1;
             appliedAcc = 0;
 
         }
         else if((agentMovementTh - lastPath).degree() >= 100 && agentVc > 1) {
             agentMovementTh = lastPath + 80;
-            _VmDesire = 0.5;
+            maxVelocity = 0.5;
             appliedAcc = 0;
 
         }
         else if((agentMovementTh - lastPath).degree() <= -100 && agentVc > 1) {
             agentMovementTh = lastPath - 80;
-            _VmDesire = 0.5;
+            maxVelocity = 0.5;
             appliedAcc = 0;
 
         }
@@ -217,17 +218,17 @@ void CSkillGotoPoint::trajectoryPlanner()
 
 void CSkillGotoPoint::execute()
 {
-    _VmDesire = 4;
-    if(slow || slowMode || penaltyKick)
+    maxVelocity = 4;
+    if(slowShot|| slowMode || penaltyKick)
     {
-        _VmDesire = 1.5;
+        maxVelocity = 1.5;
     }
     if(diveMode)
     {
-        _VmDesire = 4;
+        maxVelocity = 4;
     }
 //    if(wm->getIsSimulMode()) {
-//        _VmDesire = 2;
+//        maxVelocity = 2;
 //    } //TODO : CHECK
     targetValidate();
 
@@ -258,7 +259,7 @@ void CSkillGotoPoint::execute()
         posPid->kp = 1.9;
 
 
-    if(slow || slowMode || penaltyKick)
+    if(slowShot|| slowMode || penaltyKick)
     {
         posPid->kp = 1.6;
     }
@@ -299,8 +300,8 @@ void CSkillGotoPoint::execute()
     ////////////////////////////
     if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-//        agent->_ACC = 0; // TODO : skill config
-//        agent->_DEC = 0; // TODO : skill config
+//        agent->maxAcceleration = 0; // TODO : skill config
+//        agent->maxDeceleration = 0; // TODO : skill config
         ////////////////
         posPid->error = agentDist;
         _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
@@ -315,19 +316,19 @@ void CSkillGotoPoint::execute()
     }
     else if(currentGPmode == GPVCONST) {
         /////////////////ACC + DEC
-//        agent->_ACC = 0;
-//        agent->_DEC = 0;
-        agentVDesire = _VmDesire;
+//        agent->maxAcceleration = 0;
+//        agent->maxDeceleration = 0;
+        agentVDesire = maxVelocity;
         velPid->_I = 0;
         ////////////////
-        _Vx = _VmDesire*cos(appliedTh);
-        _Vy = _VmDesire*sin(appliedTh);
+        _Vx = maxVelocity*cos(appliedTh);
+        _Vy = maxVelocity*sin(appliedTh);
 
     }
     else if(currentGPmode == GPDEC1) {
-//        agent->_ACC = 0;
-//        agent->_DEC = 0;
-        agentVDesire = sqrt(fabs(2*_Dec*agentDist*moreDec) + vp *vp) - decOffset;
+//        agent->maxAcceleration = 0;
+//        agent->maxDeceleration = 0;
+        agentVDesire = sqrt(fabs(2*maxDeceleration*agentDist*moreDec) + vp *vp) - decOffset;
         _Vx =  agentVDesire*cos(appliedTh) ;
         _Vy =  agentVDesire*sin(appliedTh) ;
 
@@ -335,20 +336,20 @@ void CSkillGotoPoint::execute()
     else if(currentGPmode == GPACC1) {
         if(agentVc > 0.3)
         {
-//            agent->_ACC = appliedAcc;
-//            agent->_DEC = 0;
-            agentVDesire = _VmDesire;
+//            agent->maxAcceleration = appliedAcc;
+//            agent->maxDeceleration = 0;
+            agentVDesire = maxVelocity ;
         }
-        else if(!slow && !slowMode && !penaltyKick)
+        else if(!slowShot&& !slowMode && !penaltyKick)
         {
-//            agent->_ACC = 0;
-//            agent->_DEC = 0;
+//            agent->maxAcceleration = 0;
+//            agent->maxDeceleration = 0;
             agentVDesire = 0.7;
         }
         else
         {
-//            agent->_ACC = 0;
-//            agent->_DEC = 0;
+//            agent->maxAcceleration = 0;
+//            agent->maxDeceleration = 0;
             agentVDesire = 0.5;
         }
         ////////////////

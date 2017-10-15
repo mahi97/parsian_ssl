@@ -19,6 +19,7 @@ bool ballMode
 bool slowShot
 bool moveLookingTarget
 bool interceptMode
+vector2D lookAt
 bool lookForward
 bool oneTouchMode
 bool slowMode
