@@ -19,12 +19,10 @@ void VisionNodelet::onInit() {
     visionConfig.vision_multicast_ip = "224.5.23.2";
     reconnect();
 
-    dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> server;
+    configServer.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>(nh_private));
     dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>::CallbackType f;
-
     f = boost::bind(&VisionNodelet::configCb,this, _1, _2);
-    server.setCallback(f);
-
+    configServer->setCallback(f);
     ros::param::get("/team_color", teamColor);
     isOurColorYellow = (teamColor == "yellow");
 
@@ -32,16 +30,11 @@ void VisionNodelet::onInit() {
 
 void VisionNodelet::reconnect()
 {
-//    mergedHalfWorld.ball.clear();
-//    for (int i=0;i<_NUM_PLAYERS;i++)
-//    {
-//        mergedHalfWorld.ourTeam[i].clear();
-//        mergedHalfWorld.oppTeam[i].clear();
-//    }
     delete vision;
     vision = new RoboCupSSLClient(visionConfig.vision_multicast_port, visionConfig.vision_multicast_ip);
-    if (!vision->open(false)) ROS_WARN("Connection Failed.");
-    else ROS_INFO("Connected!");
+    if (!vision->open(false)) NODELET_WARN("Connection Failed.");
+    else NODELET_INFO("Connected!");
+
 }
 
 void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level){
