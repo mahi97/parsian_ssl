@@ -9,7 +9,7 @@
 #include <parsian_msgs/{{message}}.h>
 {{#has_base}}#include <parsian_util/action/autogenerate/{{base_action_file}}> {{/has_base}}
 
-class {{action_name}}Action : public Action{{#has_base}}, public {{base_action}} {{/has_base}} {
+class {{action_name}}Action : {{#has_base}}public {{base_action}} {{/has_base}}{{^has_base}}public Action{{/has_base}} {
 
 public:
     {{action_name}}Action();
