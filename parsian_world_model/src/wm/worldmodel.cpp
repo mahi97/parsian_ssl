@@ -11,6 +11,11 @@ CWorldModel::CWorldModel(int c) {
     simulationMode = true;
     visionFPS = 61.0;
     ball = new CBall(false);
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        us[i] = new CRobot(i, true);
+        them[i] = new CRobot(i, false);
+    }
+
     packs = 0;
 
 }
@@ -176,11 +181,11 @@ void CWorldModel::update(CHalfWorld* w0) {
         } else {
             us[i]->inSight = 0.0;
         }
-//        if (!w.oppTeam[i].isEmpty()) {
-//            them[i]->update(w.oppTeam[i][0]);
-//        } else {
-//            them[i]->inSight = 0.0;
-//        }
+        if (!w.oppTeam[i].isEmpty()) {
+            them[i]->update(w.oppTeam[i][0]);
+        } else {
+            them[i]->inSight = 0.0;
+        }
     }
 
 }
