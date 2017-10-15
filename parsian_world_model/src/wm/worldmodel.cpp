@@ -5,12 +5,13 @@
 #include "parsian_world_model/wm/worldmodel.h"
 
 
-CWorldModel::CWorldModel() {
+CWorldModel::CWorldModel(int c) {
     vc = new CVisionClient();
 //    vc->ourSide = _SIDE_LEFT;
     simulationMode = true;
-
     visionFPS = 61.0;
+    ball = new CBall(false);
+    packs = 0;
 
 }
 
@@ -27,7 +28,12 @@ void CWorldModel::execute() {
     run();
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() const {
+parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
+//    if (this->ball == nullptr) return rosWM;
+    rosWM.ball.pos = this->ball->pos.toParsianVector2D();
+    rosWM.ball.camera_id = this->ball->cam_id;
+    rosWM.ball.obstacleRadius = this->ball->obstacleRadius;
+    qDebug() << "Ball : " << rosWM.ball.pos.x;
     return rosWM;
 }
 
@@ -78,7 +84,7 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     //Yellow robot info:
     for (int i = 0; i < robots_yellow_n; i++) {
         parsian_msgs::ssl_vision_detection_robot robot = detection->them[i];
-        printf("-Robot(Y) (%2d/%2d): ",i+1, robots_yellow_n);
+        printf("-Robot(THEM) (%2d/%2d): ",i+1, robots_yellow_n);
         printRobotInfo(robot);
     }
 }
@@ -90,33 +96,31 @@ void CWorldModel::run()
     double lastSecond = 0.0, t=0.0;
     int frame=0;
     int lastSecondFrames=0;
-    int packs = 0;
     int packmax;
     double procTime = -1;
 
     usleep(1000);
     packmax = 4;// TODO : Config conf()->BallTracker_activeCamNum();
-    double pt = -1;
-
-    frame ++;
+    if (vc == nullptr) return;
     vc->parse(detection);
+    frame ++;
     packs ++;
-    //			testFunc(packet);
+//    testFunc(detection);
 
     if ( packs >= packmax ) {
         packs = 0;
-        if (vc->lastCamera < CAMERA_NUM && vc->lastCamera>=0)
+        if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
         {
             vc->merge(packmax);
             mergedHalfWorld.currentFrame = frame;
             mergedHalfWorld.update(&(vc->res));
             mergedHalfWorld.vanishOutOfSights();
         }
-        if (t-lastSecond>1.0)
+        if (t - lastSecond > 1.0)
         {
-            if (lastSecond>0.0)
+            if (lastSecond > 0.0)
             {
-                visionFPS = frame-lastSecondFrames;
+                visionFPS = frame - lastSecondFrames;
             }
             lastSecond = t;
             lastSecondFrames = frame;
@@ -124,10 +128,12 @@ void CWorldModel::run()
         visionLatency  = vc->res.visionLatency;
         visionTimestep = vc->res.timeStep;
         if (procTime > 0) visionProcessTime = procTime;
+
+
+        // UPDATE WM
+        this->update(&mergedHalfWorld);
     }
 
-    // UPDATE WM
-    this->update(&mergedHalfWorld);
 
 
     // UPDATE OLD KNOWLEDGE
@@ -156,8 +162,7 @@ void CWorldModel::run()
 
 }
 
-void CWorldModel::update(CHalfWorld* w0)
-{
+void CWorldModel::update(CHalfWorld* w0) {
     w.update(w0);
     if (w.ball.count()>0) {
         ball->update(w.ball[0]);
@@ -171,11 +176,11 @@ void CWorldModel::update(CHalfWorld* w0)
         } else {
             us[i]->inSight = 0.0;
         }
-        if (!w.oppTeam[i].isEmpty()) {
-            them[i]->update(w.oppTeam[i][0]);
-        } else {
-            them[i]->inSight = 0.0;
-        }
+//        if (!w.oppTeam[i].isEmpty()) {
+//            them[i]->update(w.oppTeam[i][0]);
+//        } else {
+//            them[i]->inSight = 0.0;
+//        }
     }
 
 }

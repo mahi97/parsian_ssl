@@ -20,14 +20,14 @@
 
 class CWorldModel : public QObject {
 public:
-    CWorldModel();
+    CWorldModel(int c);
     ~CWorldModel();
 
     void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute();
     void init();
-    parsian_msgs::parsian_world_model getParsianWorldModel() const;
+    parsian_msgs::parsian_world_model getParsianWorldModel();
 
 private:
     parsian_msgs::parsian_world_model rosWM;
@@ -54,6 +54,8 @@ private:
     double visionLatency;
     double visionTimestep;
     double visionProcessTime;
+
+    int packs;
 
 
 };

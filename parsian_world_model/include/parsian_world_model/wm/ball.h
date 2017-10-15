@@ -12,13 +12,12 @@
 #include <parsian_world_model/wm/movingobject.h>
 #include <parsian_world_model/util/balltracker.h>
 #include <parsian_util/base.h>
-#include <parsian_util/core/field.h>
 
 class CBall : public CMovingObject
 {
 private:
-    CField field;
-    Rect2D fieldRect;
+//    CField field;
+//    Rect2D fieldRect;
     //Vector2D replPos, replVel;
     BallTracker* tracker;
 //	BallTracker* kalmantracker;

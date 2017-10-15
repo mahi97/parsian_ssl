@@ -60,7 +60,7 @@ void CBall::init()
     elementNotInSight = true;
     float Margin = 0.2;
     ballInsistanceCounter = 1;
-    fieldRect.assign(-field._FIELD_WIDTH/2.0 - Margin,field._FIELD_HEIGHT/2.0 + Margin,field._FIELD_WIDTH+2*Margin,field._FIELD_HEIGHT+2*Margin);
+//    fieldRect.assign(-field._FIELD_WIDTH/2.0 - Margin,field._FIELD_HEIGHT/2.0 + Margin,field._FIELD_WIDTH+2*Margin,field._FIELD_HEIGHT+2*Margin);
 }
 
 void CBall::setReplace(Vector2D newPos, Vector2D newVel)

@@ -140,7 +140,8 @@ add_library(${PROJECT_NAME}
         src/wm/rawobject.cpp
         src/wm/halfworld.cpp
         src/wm/robot.cpp
-        src/wm/ball.cpp)
+        src/wm/ball.cpp
+        )
 
 add_library(${PROJECT_NAME}_util
         src/util/robottracker.cpp
@@ -194,8 +195,6 @@ add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
         ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
         )
 
 ## Specify libraries to link a library or executable target against

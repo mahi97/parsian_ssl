@@ -86,7 +86,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
             && packet->balls[i].pos.x != 5000
             && packet->balls[i].pos.y != 5000)
         {
-            CRawObject raw = CRawObject(frameCnt, Vector2D(packet->balls[i].pos.x, packet->balls[i].pos.y)/1000.0f, 0, i
+            CRawObject raw = CRawObject(frameCnt, Vector2D(packet->balls[i].pos.x, packet->balls[i].pos.y), 0, i
                     , packet->balls[i].confidence, nullptr, id);
             for (int k=0;k<v[id].ball.count();k++)
             {
@@ -108,7 +108,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     for (const auto &u : packet->us) {
         int rob_id = u.robot_id;
         if (v[id].ourTeam[rob_id].count() >= MAX_OBJECT) continue;
-        CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x / 1000.0f, u.pos.y / 1000.0f),
+        CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x, u.pos.y),
                                     u.orientation*180.0f/M_PI*90.0
                 ,rob_id ,u.confidence, nullptr, id);
         for (int k=0;k<v[id].ourTeam[rob_id].count();k++)
@@ -126,7 +126,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     for (const auto &i : packet->them) {
         int rob_id = i.robot_id;
         if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) continue;
-        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x / 1000.0f,i.pos.y / 1000.0f),
+        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x, i.pos.y),
                                     i.orientation*180.0f/M_PI*90.0
                 ,rob_id ,i.confidence, nullptr, id);
         for (int k=0;k<v[id].oppTeam[rob_id].count();k++)
