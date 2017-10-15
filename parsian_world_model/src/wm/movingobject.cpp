@@ -40,7 +40,6 @@ void CMovingObject::update(CMovingObject* obj)
     dir = obj->dir;
     angularVel = obj->angularVel;
     inSight = obj->inSight;
-    for (auto& h : hist) delete h;
     hist.clear();
     hist.append(obj->hist);
     modelObjStopped = obj->modelObjStopped;

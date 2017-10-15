@@ -26,19 +26,19 @@ namespace parsian_world_model {
         // Timer CallBack (to publish)
         //void timerCb(const ros::TimerEvent& event);
 
-        //Subs CallBack
+//        Subs CallBack
         void geomCb(const parsian_msgs::ssl_vision_geometryConstPtr& _geom);
         void detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr& _detection);
 
 
-        CWorldModel wm;
+        CWorldModel* wm;
 
         ros::Publisher wm_pub;
 
         ros::Subscriber vision_detection_sub;
         ros::Subscriber vision_geom_sub;
 
-        ros::Timer timer;
+//        ros::Timer timer;
 
 
 

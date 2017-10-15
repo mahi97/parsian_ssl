@@ -1,10 +1,8 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#include "parsian_util/geom/geom.h"
 #include "parsian_msgs/parsian_agent.h"
-#include "parsian_msgs/parsian_robot.h"
-#include "parsian_util/core/movingobject.h"
+#include <parsian_util/core/robot.h>
 
 
 class CRobot : public CMovingObject {
