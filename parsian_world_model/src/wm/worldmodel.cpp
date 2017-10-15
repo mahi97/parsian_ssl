@@ -179,11 +179,11 @@ parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CRobot &_robot) 
     parsian_msgs::parsian_robot p;
     p.camera_id = static_cast<unsigned char>(_robot.cam_id);
     p.id = static_cast<unsigned char>(_robot.id);
-    p.pos = _robot.pos.toParsianVector2D();
-    p.acc = _robot.acc.toParsianVector2D();
-    p.vel = _robot.vel.toParsianVector2D();
+    p.pos = _robot.pos.toParsianMessage();
+    p.acc = _robot.acc.toParsianMessage();
+    p.vel = _robot.vel.toParsianMessage();
     p.angularVel = _robot.angularVel;
-    p.dir = _robot.dir.toParsianVector2D();
+    p.dir = _robot.dir.toParsianMessage();
     p.inSight = _robot.inSight;
     p.obstacleRadius = _robot.obstacleRadius;
 
@@ -193,11 +193,11 @@ parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CRobot &_robot) 
 parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CBall &_ball) {
     parsian_msgs::parsian_robot p;
     p.camera_id = static_cast<unsigned char>(_ball.cam_id);
-    p.pos = _ball.pos.toParsianVector2D();
-    p.acc = _ball.acc.toParsianVector2D();
-    p.vel = _ball.vel.toParsianVector2D();
+    p.pos = _ball.pos.toParsianMessage();
+    p.acc = _ball.acc.toParsianMessage();
+    p.vel = _ball.vel.toParsianMessage();
     p.angularVel = _ball.angularVel;
-    p.dir = _ball.dir.toParsianVector2D();
+    p.dir = _ball.dir.toParsianMessage();
     p.inSight = _ball.inSight;
     p.obstacleRadius = _ball.obstacleRadius;
 
