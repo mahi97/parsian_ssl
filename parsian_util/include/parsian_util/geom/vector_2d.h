@@ -33,6 +33,7 @@
 #define RCSC_GEOM_VECTOR2D_H
 
 #include <parsian_util/geom/angle_deg.h>
+#include <parsian_msgs/vector2D.h>
 
 #include <functional>
 #include <iostream>
@@ -72,13 +73,33 @@ public:
     /*!
       \brief create Vector with XY value directly.
       \param xx assigned x value
-      \param yy assigned x value
+      \param yy assigned y value
     */
     Vector2D( const double & xx,
               const double & yy)
         : x( xx )
         , y( yy )        
       { }
+
+    /*!
+      \brief create Vector with parsian message.
+      \param vec assigned to this
+    */
+    Vector2D( const parsian_msgs::vector2D& vec)
+            : x( vec.x )
+            , y( vec.y )
+    { }
+
+    /*!
+        \brief convert vector2D to parsian message.
+        \return parsian_message vector2D
+    */
+    parsian_msgs::vector2D toParsianMessage() const {
+        parsian_msgs::vector2D vec;
+        vec.x = this->x;
+        vec.y = this->y;
+        return vec;
+    }
 
     /*!
       \brief check if this vector has validate values.

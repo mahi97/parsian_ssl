@@ -33,8 +33,8 @@
 #include <config.h>
 #endif
 
-#include "segment_2d.h"
-#include "triangle_2d.h"
+#include <parsian_util/geom/segment_2d.h>
+#include <parsian_util/geom/triangle_2d.h>
 
 #include <algorithm>
 #include <iostream>
