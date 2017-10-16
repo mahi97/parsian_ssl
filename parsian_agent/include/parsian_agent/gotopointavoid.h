@@ -9,7 +9,7 @@
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
-class CSkillGotoPointAvoid : public CSkillGotoPoint, public GotopointavoidAction
+class CSkillGotoPointAvoid : public GotopointavoidAction
 {
 private:
 //    CMotionProfile *prof;

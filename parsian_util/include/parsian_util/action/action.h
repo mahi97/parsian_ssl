@@ -9,7 +9,6 @@ class Action {
 public:
     Action();
     virtual ~Action();
-    virtual void getParsianMessage();
 
 protected:
 private:

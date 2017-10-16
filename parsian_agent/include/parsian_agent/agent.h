@@ -2,6 +2,8 @@
 #define CAGENT_H
 
 #include <parsian_util/base.h>
+#include <parsian_agent/skill.h>
+#include <parsian_agent/gotopoint.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
@@ -17,7 +19,7 @@ struct Fault {
 
 };
 
-class CSkill;
+
 class Agent
 {
 public:
@@ -52,6 +54,8 @@ public:
         int boardID;
 
     } status;
+
+ //   void generateRobotCommand();
 
     bool changeIsNeeded;
 
@@ -156,6 +160,8 @@ private:
     double lastVf,lastVn;
     short int selfID;
     const double Gravity= 9.8;
+    double getVar( double data[] );
+    Matrix ANN_forward( Matrix input );
 //    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
 //    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
 };

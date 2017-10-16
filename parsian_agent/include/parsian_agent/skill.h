@@ -12,10 +12,11 @@
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/geom/geom.h>
 #include <QtCore/QStringList>
+#include <parsian_util/action/action.h>
 
 using namespace rcsc;
 
-class CSkill
+class CSkill : public Action
 {
 protected:
     CStateMachine sm;
