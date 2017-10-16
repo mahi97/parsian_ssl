@@ -15,7 +15,7 @@ public:
 
     const double robot_radius_old = 0.090;
 //const double CRobot::robot_radius_new = 0.080;
-    const double robot_radius_new = 0.0890;
+    static constexpr double robot_radius_new = 0.0890;
     const double center_from_kicker_old = 0.075;
 //const double CRobot::center_from_kicker_new = 0.070;
     const double center_from_kicker_new = 0.06;
