@@ -756,7 +756,7 @@ double Matrix::dot(Matrix &m)
 }
 
 
-Matrix& Matrix::dotP(Matrix &m)
+Matrix Matrix::dotP(Matrix &m)
 {
     assert((r_ == m.nrows()) && (c_ == m.ncols()));
     Matrix res(r_,c_);

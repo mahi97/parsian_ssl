@@ -91,7 +91,7 @@ public:
 
     bool equals(double val);
     double  dot(Matrix &m);
-    Matrix& dotP(Matrix &m);
+    Matrix dotP(Matrix &m);
 };
 
 Matrix kron(const Matrix &a , const Matrix &b);
