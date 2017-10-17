@@ -105,10 +105,9 @@ link_directories(/usr/include/qt4/QtExtSerialPort)
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/communication.cfg
+)
 
 ###################################
 ## catkin specific configuration ##

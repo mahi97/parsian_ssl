@@ -1,6 +1,8 @@
 #include "parsian_protobuf_wrapper/grsim/grsimnodelet.h"
 #include <pluginlib/class_list_macros.h>
 
+PLUGINLIB_EXPORT_CLASS(GrsimNodelet, nodelet::Nodelet);
+
 
 grSim_Commands* GrsimCommand = new grSim_Commands;
 grSim_Replacement* GrsimReplacement = new grSim_Replacement;
@@ -74,10 +76,10 @@ bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement_srv::Request& req,
 }
 
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
-void send()
+void send(std::string ip, int port)
 {
-    int port{12340};
-    std::string ip{"127.0.0.1"};
+    //int port{12340};
+    //std::string ip{"127.0.0.1"};
     grSim_Packet packet;
     std::string color;
     ros::param::get("team_color", color);
@@ -97,18 +99,8 @@ void send()
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
   // Using timers is the preferred 'ROS way' to manual threading
- send();
+ send(this->ip, this->port);
   }
-
-GrsimNodelet::GrsimNodelet()
-{
-  ROS_INFO("grsim_nodelet is running");
-}
-
-GrsimNodelet::~GrsimNodelet()
-{
-  //ROS_INFO("Destructor");
-}
 
 void GrsimNodelet::onInit()
 {
@@ -125,7 +117,18 @@ void GrsimNodelet::onInit()
     service0 = n.advertiseService("GrsimRobotReplacesrv", GrsimRobotReplacesrv);
     service1 = n.advertiseService("GrsimBallReplacesrv", GrsimBallReplacesrv);
     timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
+
+    server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>);
+    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
+    f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
+    server->setCallback(f);
 }
 
-PLUGINLIB_DECLARE_CLASS(parsian_protobuf_wrapper, GrsimNodelet, GrsimNodelet, nodelet::Nodelet);
+void GrsimNodelet::UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level)
+{
+  ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
+  port = config.grsim_send_port;
+  ip = config.grsim_send_ip;
+}
+
 //PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)

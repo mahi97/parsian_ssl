@@ -15,6 +15,12 @@ using namespace parsian_ai;
       drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
       debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
       timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
+
+      //config server settings
+      server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
+      dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
+      f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
+      server->setCallback(f);
 //      ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
 //      ros::Publisher  gpPub      = n.advertise<parsian_msgs::gotoPoint>("/gotoPoint", 1000);
 //      ros::Publisher  gpaPub     = n.advertise<parsian_msgs::gotoPointAvoid>("/gotoPointAvoid", 1000);
@@ -37,4 +43,9 @@ using namespace parsian_ai;
 
 
 
+  }
+
+  void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
+  {
+    ROS_INFO_STREAM("callback called! with" << config.test_param);
   }

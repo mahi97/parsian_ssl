@@ -14,11 +14,14 @@
 #include "parsian_msgs/grsim_robot_replacement_srv.h"
 #include "parsian_msgs/grsim_ball_replacement_srv.h"
 
+#include <dynamic_reconfigure/server.h>
+#include "parsian_protobuf_wrapper/grsimConfig.h"
+
+
+
 class GrsimNodelet : public nodelet::Nodelet
 {
 public:
-    GrsimNodelet();
-    ~GrsimNodelet();
 
     virtual void onInit();
     void timerCb(const ros::TimerEvent& event);
@@ -34,6 +37,13 @@ public:
     ros::Subscriber _sub;
     ros::ServiceServer service0;
     ros::ServiceServer service1;
+
+    int port{12340};
+    std::string ip{"127.0.0.1"};
+
+    boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
+    void UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level) ;
+
 };
 
 #endif /* GRSIMNODELET_H_ */

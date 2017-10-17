@@ -15,25 +15,30 @@ CVisionClient::~CVisionClient()
     delete vcTimer;
 }
 
-void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet)
+void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config)
 {
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
 
+    my_config.camera_one_active = config.camera_one_active;
+    my_config.camera_two_active = config.camera_two_active;
+    my_config.camera_three_active = config.camera_three_active;
+    my_config.camera_four_active = config.camera_four_active;
+
 
     // TODO : Config
-//    if(!conf()->BallTracker_cam1on()){
-//        if (packet.detection().camera_id()==0) return;
-//    }
-//    if(!conf()->BallTracker_cam2on()){
-//        if (packet.detection().camera_id()==1) return;
-//    }
-//    if(!conf()->BallTracker_cam3on()){
-//        if (packet.detection().camera_id()==2) return;
-//    }
-//    if(!conf()->BallTracker_cam4on()){
-//        if (packet.detection().camera_id()==3) return;
-//    }
+   if(!config.camera_one_active){
+       if (packet.detection().camera_id()==0) return;
+   }
+   if(!config.camera_two_active){
+       if (packet.detection().camera_id()==1) return;
+   }
+   if(!config.camera_three_active){
+       if (packet.detection().camera_id()==2) return;
+   }
+   if(!config.camera_four_active){
+       if (packet.detection().camera_id()==3) return;
+   }
 
 
     frameCnt ++;
@@ -164,19 +169,19 @@ inline float inSightReduce(float v,int n)
 void CVisionClient::countActiveCameras()
 {
 
-    // TODO : Config
-//    if(!conf()->BallTracker_cam1on()){
-//        v[0].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam2on()){
-//        v[1].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam3on()){
-//        v[2].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam4on()){
-//        v[3].updated = false;
-//    }
+    //countActiveCamerasTODO : Config
+   if(!my_config.camera_one_active){
+       v[0].updated = false;
+   }
+   if(!my_config.camera_two_active){
+       v[1].updated = false;
+   }
+   if(!my_config.camera_three_active){
+       v[2].updated = false;
+   }
+   if(!my_config.camera_four_active){
+       v[3].updated = false;
+   }
 
     int now = vcTimer->elapsed();
     for (auto &i : v) {
@@ -315,4 +320,3 @@ void CVisionClient::merge(int camera_count)
     res.visionLatency /= camera_count;
 
 }
-

@@ -17,6 +17,9 @@
 #include <parsian_world_model/wm/ball.h>
 #include <parsian_world_model/wm/robot.h>
 
+#include "parsian_world_model/world_modelConfig.h"
+
+
 
 class CWorldModel : public QObject {
 public:
@@ -25,7 +28,7 @@ public:
 
     void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
-    void execute();
+    void execute(world_model_config::world_modelConfig & config);
     void init();
     parsian_msgs::parsian_world_model getParsianWorldModel();
 
@@ -43,7 +46,7 @@ private:
 
 
     bool simulationMode;
-    void run();
+    void run(world_model_config::world_modelConfig & config);
     void update(CHalfWorld*);
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
     void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);
