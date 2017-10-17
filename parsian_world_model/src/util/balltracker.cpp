@@ -27,18 +27,18 @@ const double Ball_Acceleration_Variance = 0.5;//0.5
 
 BallTracker::BallTracker( double _kalman_gain_acceleration ) : Tracker(6, 2, getFramePeriod())
 {
-  _reset = true;
-  occluded = Visible;  
-  prediction_lookahead = getLatencyDelay();
-  kalman_gain_acceleration = _kalman_gain_acceleration;
-  input_gain_acceleration = 1.0 - kalman_gain_acceleration;
+    _reset = true;
+    occluded = Visible;
+    prediction_lookahead = getLatencyDelay();
+    kalman_gain_acceleration = _kalman_gain_acceleration;
+    input_gain_acceleration = 1.0 - kalman_gain_acceleration;
 }
 
 BallTracker::~BallTracker()
 = default;
 
 double BallTracker::velocity_variance(const Matrix &x)
-{  
+{
     return Ball_Velocity_Variance;
 //
 //  Vector2D ball = Vector2D(x.e(0, 0), x.e(1, 0));
@@ -156,15 +156,15 @@ void BallTracker::tick_occlusion(double dt)
 }
 
 Vector2D BallTracker::occluded_position(double time)
-{  
+{
 
-  Vector2D camera(0, 0);
-  Vector2D b;
+    Vector2D camera(0, 0);
+    Vector2D b;
 
 //  b = tracker->robots[occluding_team][occluding_robot].position(time);
 //  b += occluding_offset.rotate((b - camera).angle());
 
-  return b;
+    return b;
 }
 
 Vector2D BallTracker::occluded_velocity(double time)
@@ -177,67 +177,67 @@ void BallTracker::observeNew(vraw obs,double _acc_x_sign,double _acc_y_sign)
 {
     obs.timestamp = time + stepsize;
     observe(obs, time + stepsize);
-	acc_x_sign = _acc_x_sign;
-	acc_y_sign = _acc_y_sign;
+    acc_x_sign = _acc_x_sign;
+    acc_y_sign = _acc_y_sign;
 }
 
 void BallTracker::observe(vraw obs, double timestamp)
 {
-  // mhb: Need this?
-  if (isnan(xs[0].e(0,0))) _reset = true;
+    // mhb: Need this?
+    if (isnan(xs[0].e(0,0))) _reset = true;
 
-  if (_reset && obs.timestamp >= timestamp) {
-	Matrix x(6,1), P(6);
+    if (_reset && obs.timestamp >= timestamp) {
+        Matrix x(6,1), P(6);
 
-    x.e(0,0) = obs.pos.x;
-    x.e(1,0) = obs.pos.y;
-    x.e(2,0) = 0.0;
-    x.e(3,0) = 0.0;
-	x.e(4,0) = 0.0;
-	x.e(5,0) = 0.0;
+        x.e(0,0) = obs.pos.x;
+        x.e(1,0) = obs.pos.y;
+        x.e(2,0) = 0.0;
+        x.e(3,0) = 0.0;
+        x.e(4,0) = 0.0;
+        x.e(5,0) = 0.0;
 
-    P.e(0,0) *= Ball_Position_Variance;
-    P.e(1,1) *= Ball_Position_Variance;
-    P.e(2,2) *= Ball_Velocity_Variance;
-    P.e(3,3) *= Ball_Velocity_Variance;
-	P.e(4,4) *= Ball_Acceleration_Variance;
-	P.e(5,5) *= Ball_Acceleration_Variance;
+        P.e(0,0) *= Ball_Position_Variance;
+        P.e(1,1) *= Ball_Position_Variance;
+        P.e(2,2) *= Ball_Velocity_Variance;
+        P.e(3,3) *= Ball_Velocity_Variance;
+        P.e(4,4) *= Ball_Acceleration_Variance;
+        P.e(5,5) *= Ball_Acceleration_Variance;
 
-    initial(obs.timestamp, x, P);
+        initial(obs.timestamp, x, P);
 
-    occluded = Visible;
+        occluded = Visible;
 
-    _reset = false;
+        _reset = false;
 
-  } else {
+    } else {
 
 //    if (_reset && occluded != Occluded) return;
 
-    // If this is a new observation.
-    if (timestamp > time) {
+        // If this is a new observation.
+        if (timestamp > time) {
 
-      // Tick to current time.
-      if (occluded == Occluded) {
-        tick_occlusion(timestamp - time);
-      } else {
-        tick(timestamp - time);
-      }
+            // Tick to current time.
+            if (occluded == Occluded) {
+                tick_occlusion(timestamp - time);
+            } else {
+                tick(timestamp - time);
+            }
 
-      // Make Observation Matrix
-      Matrix o(2,1);
-      o.e(0,0) = obs.pos.x;
-      o.e(1,0) = obs.pos.y;
+            // Make Observation Matrix
+            Matrix o(2,1);
+            o.e(0,0) = obs.pos.x;
+            o.e(1,0) = obs.pos.y;
 
 
-      // Make observation
+            // Make observation
 //      if (obs.timestamp == timestamp)
-      {
-        update(o);
+            {
+                update(o);
 
 //        occluded = Visible;
 //        occluded_last_obs_time = obs.timestamp;
 
-      }
+            }
 //      else {
 //
 //        if (occluded == Visible)
@@ -251,23 +251,23 @@ void BallTracker::observe(vraw obs, double timestamp)
 //        }
 //      }
 
-      if (error_time_elapsed() > 10.0) {
+            if (error_time_elapsed() > 10.0) {
 //        fprintf(stderr, "Kalman Error (pos, vpos): ");
 //        fprintf(stderr, "%f ",
 //                hypot(error_mean().e(0, 0), error_mean().e(1, 0)));
 //        fprintf(stderr, "%f\n",
 //                hypot(error_mean().e(2, 0), error_mean().e(3, 0)));
-        error_reset();
-      }
+                error_reset();
+            }
 
+        }
     }
-  }
 
 }
 
 void BallTracker::reset()
 {
-	_reset = true;
+    _reset = true;
 }
 
 void BallTracker::reset(double timestamp, float state[6], float variances[16],
@@ -275,59 +275,59 @@ void BallTracker::reset(double timestamp, float state[6], float variances[16],
                         char _occluding_team, char _occluding_robot,
                         Vector2D _occluding_offset)
 {
-  Matrix x(6,1,state), P(6,6,variances);
+    Matrix x(6,1,state), P(6,6,variances);
 
-  initial(timestamp, x, P);
+    initial(timestamp, x, P);
 
-  occluded = _occluded;
-  occluding_team = _occluding_team;
-  occluding_robot = _occluding_robot;
-  occluding_offset = Vector2D(_occluding_offset.x, _occluding_offset.y);
+    occluded = _occluded;
+    occluding_team = _occluding_team;
+    occluding_robot = _occluding_robot;
+    occluding_offset = Vector2D(_occluding_offset.x, _occluding_offset.y);
 
-  _reset = false;
+    _reset = false;
 }
 
 Vector2D BallTracker::position(double time)
 {
-  if (occluded == Occluded) return occluded_position(time);
+    if (occluded == Occluded) return occluded_position(time);
 
 //  qDebug()<<"Ball Prediction";
-  Matrix x = predict(time);
-  return Vector2D(x.e(0,0), x.e(1,0));
+    Matrix x = predict(time);
+    return Vector2D(x.e(0,0), x.e(1,0));
 }
 
 Vector2D BallTracker::velocity(double time)
 {
-  if (occluded == Occluded) return occluded_velocity(time);
+    if (occluded == Occluded) return occluded_velocity(time);
 
 //  qDebug()<<"Ball Prediction";
-  Matrix x = predict(time);
-  return Vector2D(x.e(2,0), x.e(3,0));
+    Matrix x = predict(time);
+    return Vector2D(x.e(2,0), x.e(3,0));
 }
 
 Vector2D BallTracker::acceleration(double time)
 {
 
 //  qDebug()<<"Ball Prediction";
-  Matrix x = predict(time);
-  return Vector2D(x.e(4,0), x.e(5,0));
+    Matrix x = predict(time);
+    return Vector2D(x.e(4,0), x.e(5,0));
 }
 
 Matrix BallTracker::covariances(double time)
 {
-  return predict_cov(time);
+    return predict_cov(time);
 }
 
 bool BallTracker::collision(double time, int &team, int &robot)
 {
-  Matrix I = predict_info(time);
+    Matrix I = predict_info(time);
 
-  if (I.nrows() <= 1) return false;
+    if (I.nrows() <= 1) return false;
 
-  team = (int) rint(I.e(0, 0));
-  robot = (int) rint(I.e(1, 0));
+    team = (int) rint(I.e(0, 0));
+    robot = (int) rint(I.e(1, 0));
 
-  return true;
+    return true;
 }
 
 #ifndef MIN
@@ -336,24 +336,24 @@ bool BallTracker::collision(double time, int &team, int &robot)
 
 Matrix& BallTracker::f(const Matrix &x, Matrix &I)
 {
-  I = Matrix();
+    I = Matrix();
 
-  static Matrix f;
+    static Matrix f;
 
-  f = x; // Copy Matrix
-  double &_x = f.e(0,0), &_y = f.e(1,0), &_vx = f.e(2,0), &_vy = f.e(3,0), &_ax = f.e(4,0), &_ay = f.e(5,0);
-  double _v = sqrt(_vx * _vx + _vy * _vy);
+    f = x; // Copy Matrix
+    double &_x = f.e(0,0), &_y = f.e(1,0), &_vx = f.e(2,0), &_vy = f.e(3,0), &_ax = f.e(4,0), &_ay = f.e(5,0);
+    double _v = sqrt(_vx * _vx + _vy * _vy);
     //mhmmd
-  double _a =  MIN(BallFriction()*Gravity, _v / stepsize);
+    double _a =  MIN(BallFriction()*Gravity, _v / stepsize);
 //  double _a = BallFriction()*Gravity;
 //  double _a = 0;
 //  double _ax = (_v == 0.0) ? 0.0 : -_a * _vx / _v;
 //  double _ay = (_v == 0.0) ? 0.0 : -_a * _vy / _v;
 
-  _ax = kalman_gain_acceleration * _ax + ( (_v < 0.01) ? 0.0 : -( input_gain_acceleration * _a * _vx / _v ) );
-  _ay = kalman_gain_acceleration * _ay + ( (_v < 0.01) ? 0.0 : -( input_gain_acceleration * _a * _vy / _v ) );
+    _ax = kalman_gain_acceleration * _ax + ( (_v < 0.01) ? 0.0 : -( input_gain_acceleration * _a * _vx / _v ) );
+    _ay = kalman_gain_acceleration * _ay + ( (_v < 0.01) ? 0.0 : -( input_gain_acceleration * _a * _vy / _v ) );
 
-  double walls = 0.0;
+    double walls = 0.0;
 //
 //  if (IVAR(BALL_WALLS_SLOPED)) {
 //    if (fabs(_x) > FIELD_LENGTH_H && fabs(_y) > GOAL_WIDTH_H) {
@@ -380,104 +380,107 @@ Matrix& BallTracker::f(const Matrix &x, Matrix &I)
 //    }
 //  }
 
-  // Update Position
-  _x += _vx * stepsize + 0.5 * _ax * stepsize * stepsize;
-  _y += _vy * stepsize + 0.5 * _ay * stepsize * stepsize;
+    // Update Position
+    _x += _vx * stepsize + 0.5 * _ax * stepsize * stepsize;
+    _y += _vy * stepsize + 0.5 * _ay * stepsize * stepsize;
 
-  // If there's a collision... then set ball's velocity to the colliding
-  //  object's velocity.
-  Vector2D cv, cp;
-  int team = 0 , robot = 0;
+    // If there's a collision... then set ball's velocity to the colliding
+    //  object's velocity.
+    Vector2D cv, cp;
+    int team = 0 , robot = 0;
 
-  if (walls == 0.0) {
-	_vx = cv.x; _vy = cv.y;
-	I = Matrix(2, 1);
-	I.e(0, 0) = team;
-	I.e(1, 0) = robot;
-  } else {
-	_vx += _ax * stepsize;
-	_vy += _ay * stepsize;
-  }
+    if (walls == 0.0) {
+        _vx = cv.x; _vy = cv.y;
+        I = Matrix(2, 1);
+        I.e(0, 0) = team;
+        I.e(1, 0) = robot;
+    } else {
+        _vx += _ax * stepsize;
+        _vy += _ay * stepsize;
+    }
 
-  return f;
+    return f;
 }
 
 Matrix& BallTracker::h(const Matrix &x)
 {
-  static Matrix h(2,1);
-  h.e(0,0) = x.e(0,0);
-  h.e(1,0) = x.e(1,0);
-  return h;
+    static Matrix h(2,1);
+    h.e(0,0) = x.e(0,0);
+    h.e(1,0) = x.e(1,0);
+    return h;
 }
 
 Matrix& BallTracker::Q(const Matrix &x)
 {
-  static Matrix Q(4);
+    static Matrix Q(4);
 
-  // Base noise covariances on distance to nearest robot.
-  Q.e(0, 0) = Q.e(1, 1) = velocity_variance(x);
-  Q.e(2, 2) = Q.e(3, 3) = Ball_Acceleration_Variance;
+    // Base noise covariances on distance to nearest robot.
+    Q.e(0, 0) = Q.e(1, 1) = velocity_variance(x);
+    Q.e(2, 2) = Q.e(3, 3) = Ball_Acceleration_Variance;
 
-  return Q;
+    return Q;
 }
 
 Matrix& BallTracker::R(const Matrix &x)
 {
-  static Matrix R;
+    static Matrix R;
 
-  if (!R.nrows()) {
-    R.identity(2); R.scale(Ball_Position_Variance);
-  }
+    if (!R.nrows()) {
+        R.identity(2); R.scale(Ball_Position_Variance);
+    }
 
-  return R;
+    return R;
 }
 
 Matrix& BallTracker::A(const Matrix &x)
 {
-  static Matrix A;
+    static Matrix A;
 
-  // This is not quite right since this doesn't account for friction
-  // But the Jacobian with friction is pretty messy.
+    // This is not quite right since this doesn't account for friction
+    // But the Jacobian with friction is pretty messy.
 
-  if (!A.nrows()) {
-	A.identity(6);
-    A.e(0,2) = stepsize;
-	A.e(0,4) = stepsize * stepsize * 0.5;
-    A.e(1,3) = stepsize;
-	A.e(1,5) = stepsize * stepsize * 0.5;
-	A.e(2,4) = stepsize;
-	A.e(3,5) = stepsize;
-	A.e(4,4) = kalman_gain_acceleration;
-	A.e(5,5) = kalman_gain_acceleration;
-  }
+    if (!A.nrows()) {
+        A.identity(6);
+        A.e(0,2) = stepsize;
+        A.e(0,4) = stepsize * stepsize * 0.5;
+        A.e(1,3) = stepsize;
+        A.e(1,5) = stepsize * stepsize * 0.5;
+        A.e(2,4) = stepsize;
+        A.e(3,5) = stepsize;
+        A.e(4,4) = kalman_gain_acceleration;
+        A.e(5,5) = kalman_gain_acceleration;
+    }
 
-  return A;
+    return A;
 }
 
 Matrix& BallTracker::W(const Matrix &x)
 {
-	static Matrix W("[0, 0, 0, 0;"
-					" 0, 0, 0, 0;"
-					" 1, 0, 0, 0;"
-					" 0, 1, 0, 0;"
-					" 0, 0, 1, 0;"
-					" 0, 0, 0, 1]");
-  return W;
+    static Matrix W((char *const)(
+                                    "[0, 0, 0, 0;"
+                                    " 0, 0, 0, 0;"
+                                    " 1, 0, 0, 0;"
+                                    " 0, 1, 0, 0;"
+                                    " 0, 0, 1, 0;"
+                                    " 0, 0, 0, 1]"));
+    return W;
 }
 
 Matrix& BallTracker::H(const Matrix &x)
 {
-  static Matrix H("[ 1, 0, 0, 0, 0, 0; "
-				  "  0, 1, 0, 0, 0, 0 ] ");
-  return H;
+    static Matrix H((char *const)(
+                                "[ 1, 0, 0, 0, 0, 0; "
+                                "  0, 1, 0, 0, 0, 0 ] "));
+    return H;
 }
 
 Matrix& BallTracker::V(const Matrix &x)
 {
-  static Matrix V("[ 1, 0; "
-                  "  0, 1 ]");
+    static Matrix V((char *const)(
+                                "[ 1, 0; "
+                                "  0, 1 ]"));
 
-  return V;
+    return V;
 }
 
 
@@ -486,6 +489,6 @@ double BallFriction()
 //    return 0.013;// 0.19;
 /*	if (wm->getIsSimulMode())
 		return 0.07;*/
-        return 0.19;// 0.175;// 0.19;
+    return 0.19;// 0.175;// 0.19;
 
 }

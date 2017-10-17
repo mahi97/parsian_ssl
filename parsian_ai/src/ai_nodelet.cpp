@@ -36,6 +36,7 @@ using namespace parsian_ai;
   }
 
   void AINodelet::timerCb(const ros::TimerEvent& event){
+
       ai.execute();
       drawPub.publish(drawer->draws);
       debugPub.publish(debugger->debugs);

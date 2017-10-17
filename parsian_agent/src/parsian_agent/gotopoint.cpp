@@ -227,7 +227,7 @@ void CSkillGotoPoint::execute()
     {
         maxVelocity = 4;
     }
-//    if(wm->getIsSimulMode()) {
+//   if(wm->getIsSimulMode()) {
 //        maxVelocity = 2;
 //    } //TODO : CHECK
     targetValidate();

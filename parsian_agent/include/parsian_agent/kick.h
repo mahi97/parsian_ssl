@@ -5,7 +5,7 @@
 #include <QtCore/QQueue>
 #include <parsian_util/core/ball.h>
 #include <parsian_util/core/movingobject.h>
-
+#include <parsian_util/action/autogenerate/kickaction.h>
 #define penaltyAreaAvoidanceRadius (0.9)
 
 enum kckMode {
@@ -24,7 +24,7 @@ enum kckMode {
 
 };
 
-class CSkillKick : public CSkill
+class CSkillKick : public CSkill, public KickAction
 {
 private:
     double kkRadLimit;
@@ -95,40 +95,7 @@ public:
     bool kickable();
     Vector2D findMostPossible();
     static double kickTimeEstimation(CAgent * _agent, Vector2D target, const CBall& _ball);
-SkillProperty(CSkillKick, double, Tolerance, tol);
-SkillProperty(CSkillKick, bool, Chip, chip);
-SkillProperty(CSkillKick, int, KickSpeed, kickSpeed);
-SkillProperty(CSkillKick, int, Spin, spin);
-SkillProperty(CSkillKick, bool, Slow, slow);
-SkillProperty(CSkillKick, bool, Turn, turn);
-SkillProperty(CSkillKick, bool, AutoChipSpeed, autoChipSpeed);
-SkillProperty(CSkillKick, bool, ThroughMode, throughMode);
-SkillProperty(CSkillKick, bool, ParallelMode, parallelMode);
-SkillProperty(CSkillKick, bool, Clear, clear);
-SkillProperty(CSkillKick, int, WaitFrames, waitFrames);
-SkillProperty(CSkillKick, bool, AvoidPenaltyArea, avoidPenaltyArea);
-SkillProperty(CSkillKick, bool, AvoidOppPenaltyArea, avoidOppPenaltyArea);
-SkillProperty(CSkillKick, bool, InterceptMode, interceptMode);
-SkillProperty(CSkillKick, bool, DontKick, dontKick);
-SkillProperty(CSkillKick, bool, SagMode, sagMode);
-SkillProperty(CSkillKick, bool, DontRecvPass, dontRecvPass);
-SkillProperty(CSkillKick, bool, RecvChip, recvChip);
-SkillProperty(CSkillKick, bool, PenaltyKick, penaltyKick);
-SkillProperty(CSkillKick, bool, TurnLastMomentForPenalty, turnLastMomentForPenalty);
-SkillPropertyNoSet(CSkillKick, Vector2D, Target, target);
-SkillProperty(CSkillKick, bool, IsGotoPointAvoid, isGotoPointAvoid);
-SkillProperty(CSkillKick, bool, ShotToEmptySpot, kkShotEmpySpot);
-SkillProperty(CSkillKick, bool, PassProfiler, passProfiler);
-SkillProperty(CSkillKick, bool, VeryFine, veryFine);
-SkillProperty(CSkillKick, bool, GoalieMode, goalieMode);
-SkillProperty(CSkillKick, bool, AlternateMode, alternateMode);
-SkillProperty(CSkillKick, double,KickAngTol, kickAngTol);
-SkillProperty(CSkillKick, bool,KickWithCenterOfDribbler, kickWithCenterOfDribbler);
-SkillProperty(CSkillKick, bool,PlayMakeMode, playMakeMode);
-SkillProperty(CSkillKick, bool,FastIntercept, fastIntercept);
 };
-
-
 
 
 #endif // KICK_H
