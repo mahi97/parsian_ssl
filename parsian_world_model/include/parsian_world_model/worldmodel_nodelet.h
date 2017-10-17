@@ -18,7 +18,6 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "parsian_world_model/world_modelConfig.h"
-
 namespace parsian_world_model {
 
     class WMNodelet : public nodelet::Nodelet {
@@ -43,8 +42,11 @@ namespace parsian_world_model {
 
         boost::shared_ptr<dynamic_reconfigure::Server<world_model_config::world_modelConfig>> server;
         void ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level);
-
         world_model_config::world_modelConfig m_config;
+
+        bool side_left, colour_yellow;
+
+
 
 //        ros::Timer timer;
 

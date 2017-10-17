@@ -28,16 +28,16 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
 
     // TODO : Config
    if(!config.camera_one_active){
-       if (packet.detection().camera_id()==0) return;
+       if (packet->camera_id==0) return;
    }
    if(!config.camera_two_active){
-       if (packet.detection().camera_id()==1) return;
+       if (packet->camera_id==1) return;
    }
    if(!config.camera_three_active){
-       if (packet.detection().camera_id()==2) return;
+       if (packet->camera_id==2) return;
    }
    if(!config.camera_four_active){
-       if (packet.detection().camera_id()==3) return;
+       if (packet->camera_id==3) return;
    }
 
 

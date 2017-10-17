@@ -30,7 +30,7 @@ public:
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute(world_model_config::world_modelConfig & config);
     void init();
-    parsian_msgs::parsian_world_model getParsianWorldModel();
+    parsian_msgs::parsian_world_model getParsianWorldModel(bool colour_yellow, bool side_left);
 
 private:
     parsian_msgs::parsian_world_model rosWM;

@@ -33,7 +33,7 @@ void CWorldModel::execute(world_model_config::world_modelConfig & config) {
     run(config);
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
+parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
 //    if (this->ball == nullptr) return rosWM;
     rosWM.ball = toParsianMessage(*ball);
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
@@ -44,8 +44,10 @@ parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
             rosWM.opp.push_back(toParsianMessage(*them[i]));
         }
     }
-    rosWM.isLeft = true; // TODO : get from protobuf_wrapper_params
-    rosWM.isYellow  = true;
+
+    // TODO : get from protobuf_wrapper_params
+    rosWM.isYellow  = colour_yellow;
+    rosWM.isLeft = side_left;
 
     return rosWM;
 }

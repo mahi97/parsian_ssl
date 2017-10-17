@@ -35,14 +35,18 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
 
     wm->updateDetection(_detection);
     wm->execute(m_config);
-    wm_pub.publish(wm->getParsianWorldModel());
+
+
+    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
+    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
+
+    wm_pub.publish(wm->getParsianWorldModel(colour_yellow, side_left));
 //
 }
 
 void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
 {
   m_config.active_cam_num = config.active_cam_num;
-
   m_config.camera_one_active = config.camera_one_active;
   m_config.camera_two_active = config.camera_two_active;
   m_config.camera_three_active = config.camera_three_active;
