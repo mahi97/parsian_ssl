@@ -10,9 +10,49 @@
 // todo uncomment conf
 #define errlen 100
 
-double getVar( double data[errlen] );
 
-double getVar(double *data) {
+
+//void Agent::generateRobotCommand()
+//{
+//
+//    //accelerationLimiter();
+//    double veltan= (vel().x)*cos(dir().th().radian()) + (vel().y)*sin(dir().th().radian());
+//    double velnorm= -1*(vel().x)*sin(dir().th().radian()) + (vel().y)*cos(dir().th().radian());
+//    //    debug(QString("vf: %1 , Vn :%2").arg(vforward).arg(vnormal),D_MHMMD);
+//
+//    calibrated++;
+//
+//    if ( isnan(vangular)){
+//        drawer->draw(QString("Vel : %1").arg(vangular),Vector2D(0,0),"brown",18);
+//        vangular = 0.0;
+//    }
+//
+//    int kickNumber = static_cast<int>(round(kickSpeed));//*160.0;
+//
+//    double ang=-dir().th().radian();
+//
+//    int vel_tangent = static_cast<int>(floor(vforward * 487.0));
+//    int vel_normal  = static_cast<int>(floor(vnormal * 487.0));
+//    int vel_angular  = static_cast<int>(((double)vangular) * ((double)256.0 / (double) 360.0));
+//
+//    if (vel_tangent > 2047) vel_tangent = 2047;
+//    if (vel_tangent < -2047) vel_tangent = -2047;
+//
+//    if (vel_normal > 2047) vel_normal = 2047;
+//    if (vel_normal < -2047) vel_normal = -2047;
+//
+//    if (vel_angular > 2047) vel_angular = 2047;
+//    if (vel_angular < -2047) vel_angular = -2047;
+//
+//    int vel_angular_abs = abs(vel_angular_abs);
+//    int vel_tangent_abs = abs(vel_tangent_abs);
+//    int vel_normal_abs  = abs(vel_normal_abs);
+//    requestBit = true; // change to release mode command
+//    unsigned int velTanSend = static_cast<unsigned int>(fabs(veltan) * 100);
+//    unsigned int velNormSend = (static_cast<unsigned int>(fabs(velnorm) * 100));
+//}
+
+double Agent::getVar(double *data) {
     double mean = 0.0;
     for( int i = 0 ; i < errlen ; i++ )
     {
@@ -40,7 +80,7 @@ Matrix tansig( Matrix n )
     return n;
 }
 
-Matrix ANN_forward( Matrix input )
+Matrix Agent::ANN_forward( Matrix input )
 {
     static Matrix b1(10,1),b2(4,1),IW(10,3),LW(4,10);
     static bool run = true;
@@ -275,8 +315,8 @@ static double lastVely[errlen];
 static double lastOmega[errlen];
 const int decay_accel=10;
 static int counter = 0;
-static double bvf=0.0,bvn=0.0,bva=0.0;
-static Matrix Epsilon(12,1);
+//static double bvf=0.0,bvn=0.0,bva=0.0;
+//static Matrix Epsilon(12,1);
 
 bool Agent::trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop)
 {
@@ -1013,3 +1053,5 @@ void Agent::setGyroZero()
     calibrateGyro = true;
     //	debug(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
 }
+
+
