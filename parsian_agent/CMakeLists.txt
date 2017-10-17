@@ -19,7 +19,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+        include
+        ${CMAKE_CURRENT_BINARY_DIR})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
@@ -119,7 +121,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+   INCLUDE_DIRS
+   include
 #  LIBRARIES parsian_agent
   CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
 #  DEPENDS system_lib
