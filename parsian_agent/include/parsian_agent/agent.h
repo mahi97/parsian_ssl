@@ -5,6 +5,7 @@
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
+#include "planner/planner.h"
 #include <fstream>
 #include <QTime>
 
@@ -145,7 +146,7 @@ public:
 
     void setGyroZero();
 //    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
-//    void initPlanner( const int &_id , const Vector2D &_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
+    void initPlanner( const int &_id , /*const*/ Vector2D /*&*/_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
@@ -156,6 +157,7 @@ private:
     double lastVf,lastVn;
     short int selfID;
     const double Gravity= 9.8;
+    CPlannerThread planner;
 //    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
 //    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
 };

@@ -1130,13 +1130,15 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
 //    plannerAverageDir = _averageDir.norm();
 //}
 ////#include <QCoreApplication>
-//void Agent::initPlanner( const int &_id , const Vector2D &_target , const QList<int>& _ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius){
-//    //  QTime timer;
-//    //  timer.start();
-//    emit initPathPlanning(_id,  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-//    //  qApp->processEvents();
-//    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-//}
+void Agent::initPlanner( const int &_id , /*const*/ Vector2D /*&*/_target , const QList<int>& _ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius){
+
+    planner.initPathPlanner(_id, _target, _ourRelaxList, _oppRelaxList, _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+    //  QTime timer;
+    //  timer.start();
+    ////emit initPathPlanning(_id,  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+    //  qApp->processEvents();
+    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+}
 
 //IMPORTANT
 ////CKS

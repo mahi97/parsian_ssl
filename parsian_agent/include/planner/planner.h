@@ -112,7 +112,7 @@ public:
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
     void run();
-    void initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius );
+    void initPathPlanner( const int& _id ,/*const*/ Vector2D/*&*/ _goal,const QList<int>& _ourRelaxList,const QList<int>& _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
     CWorldModel mywma;      //kian transport from private to public
     CPlanner planner[_MAX_NUM_PLAYERS];     //kian transport from private to public
     bool flag;  ///declare it here to have access in ndoelet!!??

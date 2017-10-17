@@ -455,10 +455,10 @@ void CPlanner::runPlanner(){
             nearestToGoal = copyNearest;
             flag = true;
             /*if( CProfiler::getTime()*1000.0 - drawTimer*1000.0 > 100.0 )
-    draw("planner: incomplete planning!" , Vector2D(0.3,-2.2) , "red");*/
+    draw("planner: incomplete planning!" , Vector2D(0.3,-2.2) , "red");*/       //kian what about draw
         }
         else{
-            /*	if( CProfiler::getTime()*1000.0 - drawTimer*1000.0 > 100.0 )
+            /*	if( CProfiler::getTime()*1000.0 - drawTimer*1000.0 > 100.0 )    //kian what about draw
     draw("Merge" , Vector2D(0.3,-2.2) , "red");*/
         }
 
@@ -480,7 +480,7 @@ void CPlanner::runPlanner(){
 
     for(int i = (result.size() - 1 ); i > 0 ; i --)
     {
-        // draw(Segment2D(result[i],result[i-1]),QColor(Qt::red));
+        //draw(Segment2D(result[i],result[i-1]),QColor(Qt::red));
     }
     //////////////////////////////////////////////////path smoothing
     if( temp.size() >1)
@@ -567,9 +567,9 @@ void CPlanner::runPlanner(){
 
 
         //		if( resultModified.size() )
-        //			draw(Circle2D(resultModified[0] , 0.05) , "blue" , true);
+        //			draw(Circle2D(resultModified[0] , 0.05) , "blue" , true);   //kian what about draw
         //		if( resultModified.size() > 1 )
-        //			draw(Circle2D(resultModified[resultModified.size()-1] , 0.05) , "red" , true);
+        //			draw(Circle2D(resultModified[resultModified.size()-1] , 0.05) , "red" , true);  //kian what about draw
         for( int j=1 ; j<resultModified.size() ; j++ ){
             drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j)));
             //			draw(result[j]);
@@ -648,7 +648,7 @@ CPlannerThread::~CPlannerThread(){
 }
 
 ////////TODO change slot to ...///////
-void CPlannerThread::initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius ){
+void CPlannerThread::initPathPlanner(const int& _id ,/*const*/ Vector2D/*&*/ _goal,const QList<int>& _ourRelaxList,const QList<int>& _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
 
         //  QTime timer;
         //  timer.start();
@@ -668,8 +668,7 @@ void CPlannerThread::initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRe
         }
         if( flag ){
             //debug(QString("Planner ID (%1): RETURNED!").arg(_id) , D_MASOOD);
-           /* parsian_msgs::pass_plannerResponse empty;
-            return empty; */                      //kian what should i do here? here i dont want to respond!!
+            return;
         }
 
         if( mywma.our[idx]->pos.dist(_goal) < 0.1 ){
