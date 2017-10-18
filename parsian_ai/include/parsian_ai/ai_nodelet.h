@@ -26,12 +26,15 @@ namespace parsian_ai {
         ros::Publisher debugPub;
         ros::Timer timer_;
 
+        ros::Publisher robTask[_MAX_NUM_PLAYERS];
+
         //config server setup
         boost::shared_ptr<dynamic_reconfigure::Server<ai_config::aiConfig>> server;
         void ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) ;
 
         void onInit();
 
+        void wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
         void timerCb(const ros::TimerEvent &event);
     };
 }

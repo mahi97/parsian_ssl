@@ -124,4 +124,15 @@ void CSoccer::execute()
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
 
+    setTask();
+}
+
+void CSoccer::setTask(){
+//    auto* kick = new KickAction;
+//    auto* gpt  = new GotoPoint;
+
+//    kick->setTarget(wm->field->oppGoal());
+
+//    agents[0]->action = gpt;
+
 }

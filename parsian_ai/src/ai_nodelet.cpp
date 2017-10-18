@@ -8,7 +8,7 @@ using namespace parsian_ai;
 
       ros::NodeHandle &nh = getNodeHandle();
       ros::NodeHandle &private_nh = getPrivateNodeHandle();
-      worldModelSub = nh.subscribe("/world_model", 1000, &AI::updateWM, &ai);
+      worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::wmCb, this);
       robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
       refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
 
@@ -21,12 +21,11 @@ using namespace parsian_ai;
       dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
       f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
       server->setCallback(f);
-//      ros::Publisher  statusPub  = n.advertise("/ai_status",1000);
-//      ros::Publisher  gpPub      = n.advertise<parsian_msgs::gotoPoint>("/gotoPoint", 1000);
-//      ros::Publisher  gpaPub     = n.advertise<parsian_msgs::gotoPointAvoid>("/gotoPointAvoid", 1000);
-//      ros::Publisher  kickPub    = n.advertise<parsian_msgs::kick>("/kick", 1000);
-//      ros::Publisher  recvPub    = n.advertise<parsian_msgs::receivePass>("/receivePass", 1000);
 
+      for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
+          robTask[i] =
+                  nh.advertise<parsian_msgs::parsian_robot_task_>("robot_tsk_"+std::to_string(i), 1000);
+      }
 
 
       drawer = new Drawer();
@@ -50,3 +49,13 @@ using namespace parsian_ai;
   {
     ROS_INFO_STREAM("callback called! with" << config.test_param);
   }
+
+void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm){
+    ai.updateWM(_wm);
+    ai.execute();
+
+ //    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
+     robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
+ //    }
+
+}

@@ -31,6 +31,8 @@ public:
     ~CSoccer();
     void execute();
 
+    void setTask();
+
     void setMode(GameMode _mode);
     void setTeamColor(ETeamColorType _color);
     void setTeamSide(ETeamSideType _side);
