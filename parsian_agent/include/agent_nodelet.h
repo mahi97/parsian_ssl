@@ -1,7 +1,3 @@
-//
-// Created by ali on 10/15/17.
-//
-
 #ifndef AGENTNODELET_H
 #define AGENTNODELET_H
 
@@ -19,19 +15,14 @@
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_agent/agent.h>
+
 namespace parsian_agent {
     class AgentNodelet : public nodelet::Nodelet {
     private:
-        //to match simulator with code [use parsianNew.ini in simulator 0.845 if you use parsian.ini (old robots)]
-        //const double gain = 2*1.068; //to match simulator with code [use parsianNew.ini in simulator 0.845 if you use parsian.ini (old robots)]
-        const double gain = 1.013;
 
         virtual void onInit();
 
         void timerCb(const ros::TimerEvent &event);
-
-        // must use a ConstPtr callback to use zero-copy transport
-        //void messageCb(const std_msgs::StringConstPtr message);
 
         ros::Subscriber world_model_sub;
         ros::Subscriber ai_sub;

@@ -9,7 +9,6 @@
 #include <QDebug>
 #include <QFile>
 #include <parsian_util/mathtools.h>
-#include <parsian_util/core/agent.h>
 #include <algorithm>
 #include <math.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>

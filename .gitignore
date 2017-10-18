@@ -83,6 +83,3 @@ CATKIN_IGNORE
 */.idea/*
 */cmake-build-debug/*
 
-# Auto Generated
-parsian_util/include/parsian_util/action/autogenerate/*
-

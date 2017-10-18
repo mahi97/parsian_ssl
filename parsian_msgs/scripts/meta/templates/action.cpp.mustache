@@ -1,0 +1,32 @@
+// auto-generated don't edit !
+
+#include <parsian_util/action/autogenerate/{{file_name}}.h>
+
+void {{action_name}}::setMessage(void* _msg) {
+    parsian_msgs::{{message}} msg = *((parsian_msgs::{{message}}*)_msg);
+    {{#properties}}
+        {{local}} = msg.{{local}};
+    {{/properties}}
+    {{#parsian_properties}}
+        {{local}} = msg.{{local}};
+    {{/parsian_properties}}
+
+    {{#has_base}}
+        {{base_action}}::setMessage(&msg.base);
+    {{/has_base}}
+}
+
+void* {{action_name}}::getMessage() {
+    parsian_msgs::{{message}}* _msg = new parsian_msgs::{{message}};
+{{#has_base}}
+    _msg->base = *{{base_action}}::getMessage();
+{{/has_base}}
+{{#properties}}
+    _msg->{{local}} = {{local}};
+{{/properties}}
+{{#parsian_properties}}
+    _msg->{{local}} = {{local}}.toParsianMessage();
+{{/parsian_properties}}
+    return _msg;
+
+}

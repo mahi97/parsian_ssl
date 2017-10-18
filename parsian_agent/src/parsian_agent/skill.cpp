@@ -6,7 +6,7 @@ int CSkill::level()
     return 1;
 }
 
-CSkill::CSkill(CAgent* _agent) : localAgentName() {
+CSkill::CSkill(Agent* _agent) : localAgentName() {
     agent = _agent;
 }
 
@@ -39,7 +39,7 @@ void CSkill::parse(QStringList /*params*/)
 
 }
 
-void CSkill::generateFromConfig(CAgent *a)
+void CSkill::generateFromConfig(Agent *a)
 {
     agent = a;
 }
@@ -50,7 +50,7 @@ QString CSkill::stateName()
     return sm.currentStateName();
 }
 
-void CSkill::assign(CAgent* _agent)
+void CSkill::assign(Agent* _agent)
 {
 
     if (_agent != nullptr)
@@ -91,19 +91,19 @@ bool CSkills::registerSkill(const char *name, CSkill* Skill)
     return true;
 }
 
-CSkill* CSkills::initSkill(const char *name, CAgent* _agent)
+CSkill* CSkills::initSkill(const char *name, Agent* _agent)
 {    
-    for (int i=0;i<Skills->size();i++)
-        if (strcmp((*Skills)[i].name,name)==0)
-            return (*Skills)[i].Skill->allocate(_agent);
+    for (auto &Skill : *Skills)
+        if (strcmp(Skill.name,name)==0)
+            return Skill.Skill->allocate(_agent);
     return nullptr;
 }
 
 void* CSkills::getInfo(const char *name)
 {
-    for (int i=0;i<Skills->size();i++)
-        if (strcmp((*Skills)[i].name,name)==0)
-            return (*Skills)[i].Info;
+    for (auto &Skill : *Skills)
+        if (strcmp(Skill.name,name)==0)
+            return Skill.Info;
     return nullptr;
 }
 
