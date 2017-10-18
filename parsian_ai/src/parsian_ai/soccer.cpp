@@ -75,13 +75,11 @@ void CSoccer::primaryDraws(){
 
 void CSoccer::execute()
 {
-
 //    QTime timer;
 //    timer.start();
 
 
-    primaryDraws();
-
+//    primaryDraws();
 
 
     //////////////////set opponents roles more specificly and set priority for each of which////////////////////
@@ -98,13 +96,13 @@ void CSoccer::execute()
         {
 //            agents[i]->waitHere(); TODO : Robot Command
         }
-//        bool custom = false;
-//        customControl(custom);
-//        if (!custom)
-//        {
+        bool custom = false;
+        customControl(custom);
+        if (!custom)
+        {
 //            coach->execute();
 
-//        }
+        }
     }
 
     //  debug(QString("%1) MainLoop Time2: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
@@ -123,5 +121,33 @@ void CSoccer::execute()
 
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
+
+    setTask();
+}
+
+void CSoccer::setTask() {
+
+
+//    auto* kick = new KickAction;
+//    auto* gpt  = new GotoPoint;
+
+//    kick->setTarget(wm->field->oppGoal());
+
+//    agents[0]->action = gpt;
+
+
+
+//    std::vector<parsian_msgs::parsian_robot_task>::iterator iter;
+//    iter = robotsTask->begin();
+
+//    parsian_msgs::parsian_robot_task kicktask;
+
+//    kicktask.kickTask[0].robot_id = (unsigned char)wm->our.activeAgentID(0);
+//    kicktask.kickTask[0].kickSpeed = 1023;
+//    kicktask.kickTask[0].slow = (unsigned char)false;
+
+//    kicktask.kickTask[0].target = wm->field->oppGoal().toParsianMessage();
+
+//    robotsTask->insert(iter+wm->our.activeAgentID(0), kicktask);
 
 }
