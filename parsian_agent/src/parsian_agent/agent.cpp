@@ -1,7 +1,8 @@
 #include <parsian_agent/agent.h>
 #include <QDebug>
 #include <QFile>
-#include <parsian_agent/onetouch.h>
+//#include <parsian_agent/onetouch.h>
+#include <parsian_agent/skills.h>
 #include <parsian_util/core/worldmodel.h>
 
 //#define debug_train
@@ -219,8 +220,8 @@ void Agent::loadProfiles()
 {
     //Set shotProfile From File
     {
-        for( int i = 0 ; i<32 ; i++ )
-            shotProfile[i][0] = shotProfile[i][1] = -1.0;
+        for (auto &i : shotProfile)
+            i[0] = i[1] = -1.0;
         QFile file(QString("profiles/robot%1.shot").arg(selfID));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
             //            qDebug()<<(QString("Parsing profiles/robot%1.shot").arg(selfID));
@@ -1054,4 +1055,61 @@ void Agent::setGyroZero()
     //	debug(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
 }
 
+void Agent::setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
 
+}
+void Agent::execute() {
+
+}
+parsian_msgs::parsian_robot_task Agent::getTask() {
+
+}
+
+parsian_msgs::parsian_robot_command Agent::getCommand() {
+    parsian_msgs::parsian_robot_command command;
+    int counter = 1;
+
+    command.robot_id= static_cast<unsigned char>(id());
+    command.chip= static_cast<unsigned char>(chip);
+    command.packet_id= static_cast<unsigned char>(counter++);
+    command.roller_speed= static_cast<unsigned char>(roller);
+    command.forceKick= static_cast<unsigned char>(forceKick);
+    command.kickSpeed= static_cast<unsigned short>(kickSpeed);
+    command.vel_x = vel().x;
+    command.vel_y = vel().y;
+    command.vel_w = angularVel();
+    command.release = static_cast<unsigned char>(onOffState);
+    return command;
+}
+
+parsian_msgs::grsim_robot_command Agent::getGrSimCommand() {
+    parsian_msgs::grsim_robot_command  grsim_robot_command_msg;
+    grsim_robot_command_msg.id= static_cast<unsigned char>(id());
+
+    double w1 = v1*gain;
+    double w2 = v2*gain;
+    double w3 = v3*gain;
+    double w4 = v4*gain;
+
+    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+
+    grsim_robot_command_msg.wheelsspeed=1;//true
+    grsim_robot_command_msg.wheel1= static_cast<float>(w1);
+    grsim_robot_command_msg.wheel2= static_cast<float>(w2);
+    grsim_robot_command_msg.wheel3= static_cast<float>(w3);
+    grsim_robot_command_msg.wheel4= static_cast<float>(w4);
+
+    grsim_robot_command_msg.velangular=0;
+    grsim_robot_command_msg.velnormal=0;
+    grsim_robot_command_msg.veltangent=0;
+    grsim_robot_command_msg.kickspeedx= static_cast<float>(kickSpeed);
+    if (chip){
+        grsim_robot_command_msg.kickspeedz= static_cast<float>(kickSpeed);
+    }
+    else
+        grsim_robot_command_msg.kickspeedz=0;
+    grsim_robot_command_msg.spinner= static_cast<unsigned char>(false);
+
+    return grsim_robot_command_msg;
+
+}

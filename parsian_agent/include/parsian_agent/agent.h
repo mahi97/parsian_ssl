@@ -2,11 +2,12 @@
 #define CAGENT_H
 
 #include <parsian_util/base.h>
-#include <parsian_agent/skill.h>
-#include <parsian_agent/gotopoint.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
+#include <parsian_msgs/grsim_robot_command.h>
+#include <parsian_msgs/parsian_robot_command.h>
+#include <parsian_msgs/parsian_robot_task.h>
 #include <fstream>
 #include <QTime>
 
@@ -19,6 +20,7 @@ struct Fault {
 
 };
 
+class CSkill;
 
 class Agent
 {
@@ -164,6 +166,17 @@ private:
     Matrix ANN_forward( Matrix input );
 //    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
 //    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
+public:
+    const double gain = 1.013;
+
+
+    void setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task);
+    void execute();
+    parsian_msgs::parsian_robot_command getCommand();
+    parsian_msgs::grsim_robot_command getGrSimCommand();
+    parsian_msgs::parsian_robot_task getTask();
+
+
 };
 
 #endif // CAGENT_H

@@ -2,7 +2,6 @@
 #define NEWBANGBANG_H
 
 #include <parsian_util/base.h>
-#include <parsian_agent/skill.h>
 #include <parsian_util/geom/geom.h>
 
 enum bangBangMode

@@ -4,7 +4,7 @@
 
 
 INIT_SKILL(CSkillGotoPoint, "gotopoint");
-CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
+CSkillGotoPoint::CSkillGotoPoint(Agent *_agent) : CSkill(_agent)
 {
     lookAt.invalidate();
     agent = _agent;
@@ -171,8 +171,8 @@ void CSkillGotoPoint::trajectoryPlanner()
 {
     agentMovementTh = (targetPos -agentPos ).th();
     //////////////////acc dec
-    agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),false);
-    agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),true);
+    agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),false);
+    agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),true);
     appliedAcc =1.5* maxAcceleration;
 
     if(smooth)
@@ -204,7 +204,7 @@ void CSkillGotoPoint::trajectoryPlanner()
     }
     ///////////////////////////////////////////// th pid
     thPid->kp =0;
-    thPid->error = (agentMovementTh - agent->self.vel.norm().th()).radian();
+    thPid->error = (agentMovementTh - agent->vel().norm().th()).radian();
     if((fabs(thPid->error) > 1)
        || agentVc < 0.5
        || agentDist > 3
@@ -234,11 +234,11 @@ void CSkillGotoPoint::execute()
 
     /////////////////decide and exec
 
-    agentPos = agent->self.pos;
-    agentVel = agent->self.vel;
+    agentPos = agent->pos();
+    agentVel = agent->vel();
     agentDist = agentPos.dist(targetPos);
     currentGPmode = decideMode();
-    angPid->error = (targetDir.th() - agent->self.dir.th()).radian();
+    angPid->error = (targetDir.th() - agent->dir().th()).radian();
     agentVc = agentVel.length();
     //////////////// set params
     posPid->kd = 3;
