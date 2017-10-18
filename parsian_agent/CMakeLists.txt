@@ -141,7 +141,8 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_nodelet
-        src/AgentNodelet.cpp)
+        src/agent_nodelet.cpp)
+
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
@@ -151,7 +152,23 @@ add_library(${PROJECT_NAME}
        # src/${PROJECT_NAME}/onetouch.cpp
        # src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
- )
+        )
+
+add_executable(${PROJECT_NAME}_node
+        src/agent_node.cpp
+        )
+
+add_dependencies(${PROJECT_NAME}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+target_link_libraries(${PROJECT_NAME}_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        )
+
 
 add_dependencies(${PROJECT_NAME}
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -165,7 +182,8 @@ add_dependencies(${PROJECT_NAME}_nodelet
 target_link_libraries(${PROJECT_NAME}_nodelet
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
-        ${QT_LIBRARIES})
+        ${QT_LIBRARIES}
+        )
 
 
 target_link_libraries(${PROJECT_NAME}
