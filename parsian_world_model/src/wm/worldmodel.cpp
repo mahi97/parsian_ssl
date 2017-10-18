@@ -29,11 +29,11 @@ void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstP
     detection = _detection;
 }
 
-void CWorldModel::execute() {
-    run();
+void CWorldModel::execute(world_model_config::world_modelConfig & config) {
+    run(config);
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
+parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
 //    if (this->ball == nullptr) return rosWM;
     rosWM.ball = toParsianMessage(*ball);
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
@@ -44,8 +44,10 @@ parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
             rosWM.opp.push_back(toParsianMessage(*them[i]));
         }
     }
-    rosWM.isLeft = true; // TODO : fix read from param
-    rosWM.isYellow  = true;
+
+    // TODO : get from protobuf_wrapper_params
+    rosWM.isYellow  = colour_yellow;
+    rosWM.isLeft = side_left;
 
     return rosWM;
 }
@@ -104,7 +106,7 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
 
 
 // This Function Run in a Loop
-void CWorldModel::run()
+void CWorldModel::run(world_model_config::world_modelConfig & config)
 {
     double lastSecond = 0.0, t=0.0;
     int frame=0;
@@ -113,9 +115,9 @@ void CWorldModel::run()
     double procTime = -1;
 
     usleep(1000);
-    packmax = 4;// TODO : Config conf()->BallTracker_activeCamNum();
+    packmax = config.active_cam_num;// TODO : Config conf()->BallTracker_activeCamNum();
     if (vc == nullptr) return;
-    vc->parse(detection);
+    vc->parse(detection, config);
     frame ++;
     packs ++;
 //    testFunc(detection);

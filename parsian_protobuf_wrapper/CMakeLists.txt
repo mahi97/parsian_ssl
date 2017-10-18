@@ -64,6 +64,7 @@ set(proto_gen_python_files "")
 generate_dynamic_reconfigure_options(
         cfg/vision.cfg
         cfg/referee.cfg
+	cfg/grsim.cfg
 )
 
 ###################################
@@ -184,6 +185,7 @@ add_dependencies(
 add_dependencies(
         refbox_convert
         vision_convert
+	grsim_node ${PROJECT_NAME}_gencfg
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_proto
