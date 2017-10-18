@@ -50,10 +50,10 @@ bool GrsimNodelet::ballReplaceCb(parsian_msgs::grsim_ball_replacementRequest &re
 }
 
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
-void GrsimNodelet::send()
+void GrsimNodelet::send(const std::string & _ip, const int & _port)
 {
-    int port{12340};
-    std::string ip{"127.0.0.1"};
+    int port{_port};
+    std::string ip{_ip};
     std::string color;
     ros::param::get("team_color", color);
     bool col = ! (color == "yellow");          //check if it is true!
@@ -85,10 +85,23 @@ void GrsimNodelet::onInit()
     grsimCommand = packet.mutable_commands();
     grsimReplacement = packet.mutable_replacement();
 
+    server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>);
+    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
+    f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
+    server->setCallback(f);
+
+
 }
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
     // Using timers is the preferred 'ROS way' to manual threading
-    send();
+    send(this->ip, this->port);
+}
+
+void GrsimNodelet::UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level)
+{
+    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
+    port = config.grsim_send_port;
+    ip = config.grsim_send_ip;
 }
 

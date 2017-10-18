@@ -20,13 +20,6 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
 
-    my_config.camera_one_active = config.camera_one_active;
-    my_config.camera_two_active = config.camera_two_active;
-    my_config.camera_three_active = config.camera_three_active;
-    my_config.camera_four_active = config.camera_four_active;
-
-
-    // TODO : Config
    if(!config.camera_one_active){
        if (packet->camera_id==0) return;
    }
@@ -146,9 +139,6 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
         our_insight[rob_id] = true;
     }
 
-    // TODO : FIX MACRO IDIOT
-//    __RECEIVE_ROBOTS_DATA(us, our);
-//    __RECEIVE_ROBOTS_DATA(them, opp);
 
     for (int i=0;i<_MAX_NUM_PLAYERS;i++) {
         if (!our_insight[i]) {
@@ -164,45 +154,6 @@ inline float inSightReduce(float v,int n)
 {
     if (n>0) return v/((float) n*n);
     return v;
-}
-
-void CVisionClient::countActiveCameras()
-{
-
-    //countActiveCamerasTODO : Config
-   if(!my_config.camera_one_active){
-       v[0].updated = false;
-   }
-   if(!my_config.camera_two_active){
-       v[1].updated = false;
-   }
-   if(!my_config.camera_three_active){
-       v[2].updated = false;
-   }
-   if(!my_config.camera_four_active){
-       v[3].updated = false;
-   }
-
-    int now = vcTimer->elapsed();
-    for (auto &i : v) {
-        if (now - i.lastUpdateTime>100){
-            i.updated=false;
-        }
-    }
-    activeCameras = 0;
-    for (auto &i : v) {
-        if (i.updated)
-        {
-            activeCameras ++;
-        }
-    }
-}
-
-
-///////////////////////////////////////////////
-void CVisionClient::newVision()
-{
-
 }
 
 ///////////////////////////////////////////

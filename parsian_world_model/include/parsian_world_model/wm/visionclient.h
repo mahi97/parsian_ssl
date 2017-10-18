@@ -35,9 +35,6 @@ public:
     int activeCameras;
 	int frameCnt;
 
-  world_model_config::world_modelConfig my_config;
-
-
 	std::vector<Vector2D> boundaries[CAMERA_NUM];
 
     CVisionClient();
@@ -45,9 +42,6 @@ public:
 
     void parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config );
 	void merge(int camera_count=CAMERA_NUM);
-	void countActiveCameras();
-
-        void newVision();
 };
 
 #define MAX_OBJECT 5
