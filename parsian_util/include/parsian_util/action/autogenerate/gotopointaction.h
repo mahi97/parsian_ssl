@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
     SkillProperty(GotopointAction, quint8, Robot_Id, robot_id);
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);
     SkillProperty(GotopointAction, float, Maxacceleration, maxAcceleration);

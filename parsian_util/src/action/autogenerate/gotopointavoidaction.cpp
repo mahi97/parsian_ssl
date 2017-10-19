@@ -38,3 +38,9 @@ void* GotopointavoidAction::getMessage() {
     return _msg;
 
 }
+
+
+QString GotopointavoidAction::getActionName(){
+    static QString name("GotopointavoidAction");
+    return name;
+}

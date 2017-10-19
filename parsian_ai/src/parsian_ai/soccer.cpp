@@ -126,25 +126,10 @@ void CSoccer::execute()
 }
 
 void CSoccer::setTask(){
-//    auto* kick = new KickAction;
-//    auto* gpt  = new GotoPoint;
+    auto* kick = new KickAction;
+    kick->setKickspeed(1023);
+    kick->setTarget(wm->field->oppGoal());
+    kick->setSlow(true);
 
-//    kick->setTarget(wm->field->oppGoal());
-
-//    agents[0]->action = gpt;
-
-
-//    std::vector<parsian_msgs::parsian_robot_task>::iterator iter;
-//    iter = robotsTask->begin();
-
-//    parsian_msgs::parsian_robot_task kicktask;
-
-//    kicktask.kickTask[0].robot_id = (unsigned char)wm->our.activeAgentID(0);
-//    kicktask.kickTask[0].kickSpeed = 1023;
-//    kicktask.kickTask[0].slow = (unsigned char)false;
-
-//    kicktask.kickTask[0].target = wm->field->oppGoal().toParsianMessage();
-
-//    robotsTask->insert(iter+wm->our.activeAgentID(0), kicktask);
-
+    agents[0]->action = kick;
 }

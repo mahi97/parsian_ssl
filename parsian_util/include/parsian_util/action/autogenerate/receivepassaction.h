@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
     SkillProperty(ReceivepassAction, quint8, Robot_Id, robot_id);
     SkillProperty(ReceivepassAction, bool, Avoidourpenaltyarea, avoidOurPenaltyArea);
     SkillProperty(ReceivepassAction, bool, Avoidopppenaltyarea, avoidOppPenaltyArea);

@@ -34,3 +34,9 @@ void* OnetouchAction::getMessage() {
     return _msg;
 
 }
+
+
+QString OnetouchAction::getActionName(){
+    static QString name("OnetouchAction");
+    return name;
+}

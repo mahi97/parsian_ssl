@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
     SkillProperty(KickAction, quint8, Robot_Id, robot_id);
     SkillProperty(KickAction, double, Tolerance, tolerance);
     SkillProperty(KickAction, bool, Chip, chip);
