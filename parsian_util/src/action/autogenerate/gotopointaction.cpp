@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
-void GotopointAction::setMessage(const void* _msg) {
+void GotopointAction::setMessage(void* _msg) {
     parsian_msgs::parsian_skill_gotoPoint msg = *((parsian_msgs::parsian_skill_gotoPoint*)_msg);
         robot_id = msg.robot_id;
         dynamicStart = msg.dynamicStart;
