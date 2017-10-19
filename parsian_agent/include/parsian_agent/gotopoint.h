@@ -91,7 +91,7 @@ public:
     double timeRemaining();
     gpMode lastGPmode;
     gpMode currentGPmode;
-    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0),bool dynamicStart = true);
+    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0));
 };
 
 

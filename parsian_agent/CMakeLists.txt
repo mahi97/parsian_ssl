@@ -106,10 +106,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
+generate_dynamic_reconfigure_options(
+  cfg/agent.cfg
 #   cfg/DynReconf2.cfg
-# )
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -147,10 +147,10 @@ add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
         src/${PROJECT_NAME}/gotopointavoid.cpp
-       # src/${PROJECT_NAME}/kick.cpp
-       # src/${PROJECT_NAME}/newbangbang.cpp
-       # src/${PROJECT_NAME}/onetouch.cpp
-       # src/${PROJECT_NAME}/receivepass.cpp
+        src/${PROJECT_NAME}/kick.cpp
+        src/${PROJECT_NAME}/newbangbang.cpp
+        src/${PROJECT_NAME}/onetouch.cpp
+        src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
         )
 

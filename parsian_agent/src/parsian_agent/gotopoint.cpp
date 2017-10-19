@@ -19,7 +19,7 @@ CSkillGotoPoint::CSkillGotoPoint(Agent *_agent) : CSkill(_agent)
 
     maxAcceleration = 4;
     maxDeceleration = 4;
-    
+
 
     lookAt.invalidate();
 
@@ -53,7 +53,7 @@ CSkillGotoPoint::~CSkillGotoPoint()
     //    delete thPid;
 }
 
-void CSkillGotoPoint::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel, bool dynamicStart)
+void CSkillGotoPoint::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel)
 {
     targetPos = target;
     targetDir = _targetDir;
@@ -144,7 +144,7 @@ void CSkillGotoPoint::targetValidate()
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
 //        {
 //            if(targetPos.x < 0.2)
@@ -159,7 +159,7 @@ void CSkillGotoPoint::targetValidate()
 //                targetPos.x = 4.3;
 //            }
 //        }
-    }
+//    }
 
     if (lookAt.valid())
     {
@@ -227,9 +227,7 @@ void CSkillGotoPoint::execute()
     {
         maxVelocity = 4;
     }
-//   if(wm->getIsSimulMode()) {
-//        maxVelocity = 2;
-//    } //TODO : CHECK
+
     targetValidate();
 
     /////////////////decide and exec
@@ -280,7 +278,7 @@ void CSkillGotoPoint::execute()
 
 
 
-    //    debug(QString("dive %1").arg(diveMode),D_MHMMD);
+    DEBUG(QString("dive %1").arg(diveMode),D_MHMMD);
 
     angPid->kp = 3;
     angPid->kd = 1;
@@ -300,8 +298,8 @@ void CSkillGotoPoint::execute()
     ////////////////////////////
     if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-//        agent->maxAcceleration = 0; // TODO : skill config
-//        agent->maxDeceleration = 0; // TODO : skill config
+        agent->_ACC = 0; // TODO : skill config
+        agent->_DEC = 0; // TODO : skill config
         ////////////////
         posPid->error = agentDist;
         _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
@@ -316,8 +314,8 @@ void CSkillGotoPoint::execute()
     }
     else if(currentGPmode == GPVCONST) {
         /////////////////ACC + DEC
-//        agent->maxAcceleration = 0;
-//        agent->maxDeceleration = 0;
+        agent->_ACC = 0;
+        agent->_DEC = 0;
         agentVDesire = maxVelocity;
         velPid->_I = 0;
         ////////////////
@@ -359,10 +357,10 @@ void CSkillGotoPoint::execute()
     }
     else
     {
-//        agent->waitHere();
+        agent->waitHere();
         velPid->_I = 0;
     }
-//    agent->setRobotAbsVel(_Vx,_Vy,angPid->PID_OUT());
+    agent->setRobotAbsVel(_Vx,_Vy,angPid->PID_OUT());
     angPid->pError = angPid->error;
 
 

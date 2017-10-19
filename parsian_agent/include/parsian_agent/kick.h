@@ -6,6 +6,10 @@
 #include <parsian_util/core/ball.h>
 #include <parsian_util/core/movingobject.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
+#include <parsian_util/knowledge.h>
+
+#define vRobotTemp 1
+
 #define penaltyAreaAvoidanceRadius (0.9)
 
 enum kckMode {
@@ -94,7 +98,7 @@ public:
     void resetI();
     bool kickable();
     Vector2D findMostPossible();
-    static double kickTimeEstimation(CAgent * _agent, Vector2D target, const CBall& _ball);
+    static double kickTimeEstimation(Agent * _agent, Vector2D target, const CBall& _ball);
 };
 
 

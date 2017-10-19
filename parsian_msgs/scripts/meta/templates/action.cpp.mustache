@@ -30,3 +30,9 @@ void* {{action_name}}::getMessage() {
     return _msg;
 
 }
+
+
+QString {{action_name}}::getActionName(){
+    static QString name("{{action_name}}");
+    return name;
+}

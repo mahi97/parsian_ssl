@@ -76,3 +76,9 @@ void* KickAction::getMessage() {
     return _msg;
 
 }
+
+
+QString KickAction::getActionName(){
+    static QString name("KickAction");
+    return name;
+}

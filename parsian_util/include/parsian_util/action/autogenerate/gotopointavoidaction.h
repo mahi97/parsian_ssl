@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
     SkillProperty(GotopointavoidAction, bool, Keeplooking, keeplooking);
     SkillProperty(GotopointavoidAction, float, Extendstep, extendStep);
