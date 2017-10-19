@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
 {{#properties}}
     SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}});
 {{/properties}}

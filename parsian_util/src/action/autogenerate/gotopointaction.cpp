@@ -78,3 +78,9 @@ void* GotopointAction::getMessage() {
     return _msg;
 
 }
+
+
+QString GotopointAction::getActionName(){
+    static QString name("GotopointAction");
+    return name;
+}

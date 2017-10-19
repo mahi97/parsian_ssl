@@ -12,6 +12,7 @@ public:
 
     virtual void setMessage(void*) = 0;
     virtual void* getMessage() = 0;
+    static QString getActionName();
 
 protected:
 private:

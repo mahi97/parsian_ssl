@@ -17,6 +17,9 @@ public:
 
     void* getMessage();
 
+    static QString getActionName();
+
+
     SkillProperty(OnetouchAction, quint8, Robot_Id, robot_id);
     SkillProperty(OnetouchAction, bool, Chip, chip);
     SkillProperty(OnetouchAction, qint32, Kickspeed, kickSpeed);
