@@ -78,7 +78,7 @@ void CSkillGotoPointAvoid::execute()
     }
     if (!Vector2D(targetPos).valid())
     {
-//        agent->waitHere();
+        agent->waitHere();
         return;
     }
     if (!targetVel.valid())
@@ -95,7 +95,7 @@ void CSkillGotoPointAvoid::execute()
             pathPoints.append(agentPos);
             for(int i = 0 ; i < pathPoints.size() ; i++)
             {
-//                draw(Circle2D(pathPoints[i],0.02),QColor(Qt::blue),true);
+                drawer->draw(Circle2D(pathPoints[i],0.02),QColor(Qt::blue),true);
             }
         }
     }
@@ -110,7 +110,7 @@ void CSkillGotoPointAvoid::execute()
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
 //        {
 //            if(targetPos.x < 0.2)
@@ -125,7 +125,7 @@ void CSkillGotoPointAvoid::execute()
 //                targetPos.x = 4.3;
 //            }
 //        }
-    }
+//    }
 
     if (lookAt.valid())
     {
@@ -141,7 +141,7 @@ void CSkillGotoPointAvoid::execute()
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
 //        {
 //            if(targetPos.x < 0.2)
@@ -156,7 +156,7 @@ void CSkillGotoPointAvoid::execute()
 //                targetPos.x = 4.3;
 //            }
 //        }
-    }
+//    }
 
     if (lookAt.valid())
     {
@@ -296,7 +296,14 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2
     return this;
 }
 
-double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
+void CSkillGotoPointAvoid::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel)
+{
+    targetPos = target;
+    targetDir = _targetDir;
+    targetVel = _targetVel;
+}
+
+double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
 {
 
     double _x3;
