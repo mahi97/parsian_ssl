@@ -14,7 +14,6 @@ class GotopointavoidAction : public Action {
 public:
 
     virtual void setMessage(void* _msg);
-
     virtual void* getMessage();
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);

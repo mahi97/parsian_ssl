@@ -26,16 +26,16 @@ public:
     CSkill() {}
     CSkill(Agent* _agent);
     ~CSkill();
-    virtual int level();
+    int level();
     bool done();
     bool failed();
     void assign(Agent* _agent);
-    virtual void parse(QStringList params);
-    virtual void generateFromConfig(Agent* a);
+    void parse(QStringList params);
+    void generateFromConfig(Agent* a);
     virtual CSkill* allocate(Agent* _agent)=0;
     virtual QString getName()=0;
-    virtual double timeNeeded();  //in seconds
-    virtual double successRate(); //between 0-1    
+    double timeNeeded();  //in seconds
+    double successRate(); //between 0-1
 
     //these functions should be defined in child classes    
     virtual double progress()=0;  //between 0-1 ; less than zero on failure
@@ -78,8 +78,7 @@ private:
     static skill* set(Agent* a); \
     static skill* get(Agent* a)
 
-//bool Skill##_registered
-//       = CSkills::registerSkill(Skill::Name,new Skill());
+
 #define INIT_SKILL(_Skill,name) \
     CSkill* _Skill::allocate(Agent* _agent) \
     {return new _Skill(_agent);} \
@@ -98,6 +97,8 @@ private:
     { \
         return (_Skill*) a->skill; \
     } \
+        bool _Skill##_registered \
+      = CSkills::registerSkill(_Skill::Name,new _Skill());\
     const char* _Skill::Name = name
 
 #define SkillState(classname,statenumber) void classname::State##statenumber ()
