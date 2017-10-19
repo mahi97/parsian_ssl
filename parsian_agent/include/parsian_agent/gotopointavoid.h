@@ -17,6 +17,11 @@ private:
     CNewBangBang *bangBang;
 
 protected:
+
+    Vector2D targetVel;
+    Vector2D agentPos;
+    Vector2D agentVel;
+
     int stucked;
     Vector2D lastPoint;
     CSkillGotoPoint* gotopoint;
@@ -26,6 +31,8 @@ protected:
     bool inited;
     Vector2D averageDir;
 public:
+    int counting;
+
     double timeStarted, timeEstimated; //for skill widget
     static double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
     DEF_SKILL(CSkillGotoPointAvoid);

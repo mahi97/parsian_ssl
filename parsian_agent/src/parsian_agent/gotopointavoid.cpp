@@ -8,25 +8,6 @@
 //--------------------------------------------------
 //INIT_SKILL(CSkillGotoPointAvoid, "gotopointavoid");
 
-CSkill* CSkillGotoPointAvoid::allocate(Agent* _agent)
-    {return new CSkillGotoPointAvoid(_agent);}
-    QString CSkillGotoPointAvoid::getName() {return QString(Name);}
-    CSkillGotoPointAvoid* CSkillGotoPointAvoid::set(Agent* a)
-    {
-        if (QString(CSkillGotoPointAvoid::Name)!=a->skillName)
-        {
-            if (a->skill!=NULL && a->skillName!="") delete ((CSkillGotoPointAvoid*) a->skill);
-            else a->skill = (CSkill*) (new CSkillGotoPointAvoid(a));
-            a->skillName = CSkillGotoPointAvoid::Name;
-        }
-        return (CSkillGotoPointAvoid*) a->skill;
-    }
-    CSkillGotoPointAvoid* CSkillGotoPointAvoid::get(Agent* a)
-    {
-        return (CSkillGotoPointAvoid*) a->skill;
-    }
-bool CSkillGotoPointAvoid_registered = CSkills::registerSkill(CSkillGotoPointAvoid::Name,new CSkillGotoPointAvoid());
-const char* CSkillGotoPointAvoid::Name = "gotopointavoid";
 
 CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkill(_agent)
 {
@@ -43,10 +24,10 @@ CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkill(_agent)
     avoidCenterCircle = false;
     avoidGoalPosts = true;
     stucked = -1;
-    counting = 0;
-    averageDir.assign(0 , 0);
-    addVel = Vector2D(addVel).assign(0,0);
-    nextPos = Vector2D::INVALIDATED;
+    counting = 0; // SGP
+    averageDir.assign(0, 0);
+    addVel.assign(0, 0);
+    nextPos.invalidate();
     diveMode = false;
     oneTouchMode = false;
     drawPath = false;
@@ -101,7 +82,7 @@ void CSkillGotoPointAvoid::execute()
 //        agent->waitHere();
         return;
     }
-    if (!targetVel.valid())// todo vel2.assign(0,0);my change is correct?
+    if (!targetVel.valid())
         targetVel.assign(0,0);
 
     if(drawPath)
@@ -155,7 +136,34 @@ void CSkillGotoPointAvoid::execute()
 //    knowledge->plotWidgetCustom[1] = agentVel.length();
     //    debug(QString("speed: %1").arg(agentVel.length()),D_MHMMD);
     ///////////
-    targetValidate();
+
+    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+
+    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
+//        if(conf()->LocalSettings_OurTeamSide() == "Right")
+//        {
+//            if(targetPos.x < 0.2)
+//            {
+//                targetPos.x = 0.2;
+//            }
+//        }
+//        else
+//        {
+//            if(targetPos.x > 4.3)
+//            {
+//                targetPos.x = 4.3;
+//            }
+//        }
+    }
+
+    if (lookAt.valid())
+    {
+        targetDir = (lookAt - agentPos).norm();
+    }
+
     if(noAvoid)
     {
         result.clear();
@@ -271,8 +279,9 @@ double CSkillGotoPointAvoid::progress()
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTargetLook(Vector2D finalPos, Vector2D lookAtPoint)
 {
-    init(finalPos, Vector2D(1.0, 0.0));
-    // todo setFinalVel(Vector2D(0.0, 0.0));
+    setTargetpos(finalPos);
+    setTargetdir(Vector2D{1.0, 0.0});
+    setTargetvel(Vector2D(0.0, 0.0));
     setLookat(lookAtPoint);
     setKeeplooking(true);
     return this;
@@ -280,8 +289,9 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTargetLook(Vector2D finalPos, Vec
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2D finalDir)
 {
-    init(finalPos, finalDir);
-    // todo setFinalVel(Vector2D(0.0, 0.0));
+    setTargetpos(finalPos);
+    setTargetdir(finalDir);
+    setTargetvel(Vector2D(0.0, 0.0));
     setLookat(Vector2D::INVALIDATED);
     setKeeplooking(false);
     return this;
@@ -331,7 +341,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         }
         distEffect = dist / _agentT->pos().dist(posT);
         distEffect += rrtAngSum*angCoef;
-        distEffect = std::max(1.0,distEffect);
+        distEffect = std::max(1.0, distEffect);
     }
 
     if(tAgentVel.length() < 0.2)
@@ -355,7 +365,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 
     if(_agentT->pos().dist(posT) < _x3 ) {
 //        return max(0,(tAgentVel.length()/conf()->BangBang_DecMax() - offset) * distEffect);
-        return std::max(0.0,(tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
+        return std::max(0.0, (tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
@@ -367,7 +377,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     }
     else
     {
-        return std::max(0.0,(vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
+        return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
     }
 
 }

@@ -19,7 +19,7 @@ void {{action_name}}::setMessage(void* _msg) {
 void* {{action_name}}::getMessage() {
     parsian_msgs::{{message}}* _msg = new parsian_msgs::{{message}};
 {{#has_base}}
-    _msg->base = *{{base_action}}::getMessage();
+    _msg->base = *((parsian_msgs::{{base_message}}*) {{base_action}}::getMessage());
 {{/has_base}}
 {{#properties}}
     _msg->{{local}} = {{local}};
