@@ -159,7 +159,7 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(short int _ID)
+Agent::Agent(int _ID):planner(_ID)
 {
     srand48(time(0));
     packetNum = 0;
@@ -1011,28 +1011,12 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
     *oneTouchDirection = oneTouchDir;
     return q;
 }
-//
-//void Agent::getPathPlannerResult(int agentID , vector<Vector2D> _result , Vector2D _averageDir){
-//    if( agentID != id() )
-//        return;
-//    pathPlannerResult.assign(_result.begin() , _result.end());
-//    plannerAverageDir = _averageDir.norm();
-//}
-////#include <QCoreApplication>
-//void Agent::initPlanner( const int &_id , const Vector2D &_target , const QList<int>& _ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius){
-//    //  QTime timer;
-//    //  timer.start();
-//    emit initPathPlanning(_id,  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-//    //  qApp->processEvents();
-//    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-//}
 
 //IMPORTANT
 ////CKS
 
 bool Agent::canOneTouch()
 {
-    //todo
     drawer->draw(QString("%1 , %2").arg(1/*self()->ballComingSpeed()*/).arg(fabs(Vector2D::angleBetween(wm->ball->vel.norm(),(pos() - wm->ball->pos).norm()).degree())),Vector2D(0,1));
     drawer->draw(Segment2D(Vector2D(0,0) ,(pos() - wm->ball->pos).norm()),"blue");
     drawer->draw(Segment2D(Vector2D(0,0) , wm->ball->vel.norm()),"red");
@@ -1052,14 +1036,24 @@ void Agent::setGyroZero()
     //    if( id() == 4)
     agentAngelForGyro = self()->dir;
     calibrateGyro = true;
-    //	debug(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
+    	DEBUG(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
 }
+void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+                        const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
+                        const double &_ballObstacleRadius){
+    //  timer.start();
+    planner.initPathPlanner(this->id(),  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
 
+    //emit pathPlannerResult(resultModified ,averageDir); get this variables
+    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+}
 void Agent::setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
 
 }
 void Agent::execute() {
-
+    //planner.generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
+    //planner.runPlanner();
+    //emit pathPlannerResult(resultModified ,averageDir); get this variables
 }
 parsian_msgs::parsian_robot_task Agent::getTask() {
 

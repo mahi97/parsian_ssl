@@ -152,6 +152,10 @@ add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/onetouch.cpp
         src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
+        src/planner/obstacle.cpp
+        src/planner/planner.cpp
+        include/planner/state.h
+
         )
 
 add_executable(${PROJECT_NAME}_node
