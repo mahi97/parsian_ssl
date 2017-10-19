@@ -13,9 +13,9 @@ class GotopointAction : public Action {
 
 public:
 
-    virtual void setMessage(void* _msg);
+    void setMessage(void* _msg);
 
-    virtual void* getMessage();
+    void* getMessage();
 
     SkillProperty(GotopointAction, quint8, Robot_Id, robot_id);
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);

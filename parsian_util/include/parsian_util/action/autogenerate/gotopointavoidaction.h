@@ -13,9 +13,9 @@ class GotopointavoidAction : public GotopointAction  {
 
 public:
 
-    virtual void setMessage(void* _msg);
+    void setMessage(void* _msg);
 
-    virtual void* getMessage();
+    void* getMessage();
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
     SkillProperty(GotopointavoidAction, bool, Keeplooking, keeplooking);

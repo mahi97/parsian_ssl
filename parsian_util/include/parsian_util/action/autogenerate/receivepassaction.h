@@ -13,9 +13,9 @@ class ReceivepassAction : public Action {
 
 public:
 
-    virtual void setMessage(void* _msg);
+    void setMessage(void* _msg);
 
-    virtual void* getMessage();
+    void* getMessage();
 
     SkillProperty(ReceivepassAction, quint8, Robot_Id, robot_id);
     SkillProperty(ReceivepassAction, bool, Avoidourpenaltyarea, avoidOurPenaltyArea);
