@@ -2,6 +2,7 @@
 #define CAGENT_H
 
 #include <parsian_util/base.h>
+#include <planner/planner.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
@@ -66,7 +67,7 @@ public:
     double goalVisibility;
     QTime agentStopTime;
     bool timerReset;
-    Agent(short int _ID);
+    Agent(int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;
@@ -150,12 +151,12 @@ public:
     Vector2D plannerAverageDir;
 
     void setGyroZero();
-//    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
-//    void initPlanner( const int &_id , const Vector2D &_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
+    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
 private:
+    CPlanner planner;
     void jacobianInverse(double _v1, double _v2, double _v3, double _v4,double &_vx, double &_vy, double &_w);
     bool calibrateGyro;
     unsigned int packetNum;
@@ -164,12 +165,13 @@ private:
     const double Gravity= 9.8;
     double getVar( double data[] );
     Matrix ANN_forward( Matrix input );
-//    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
-//    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
-public:
-    const double gain = 1.013;
 
+   public:
+    void initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+                            const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
+                            const double &_ballObstacleRadius);
 
+        const double gain = 1.013;
     void setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task);
     void execute();
     parsian_msgs::parsian_robot_command getCommand();

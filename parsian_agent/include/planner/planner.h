@@ -60,6 +60,15 @@ private:
 class CPlanner
 {
 public:
+    ///////////////////////////////////////////////////////////////////
+    CPlanner(int );
+    ~CPlanner();
+    void runPlanner();
+    void resetPlanner(Vector2D);
+    void pathPlannerResult(vector<Vector2D> _resultModified , Vector2D _averageDir);
+    void initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius );
+
+private:
     vector<Vector2D> result , Rresult , resultModified , RresultModified;
     Vector2D goal , lastGoal , Rgoal , unchangedGoal;
     double goalProb , wayPointProb;
@@ -73,16 +82,7 @@ public:
     int ID , counter;
     Vector2D robotVel;
     Vector2D averageDir;
-    bool readyToPlan;
     bool flag;
-
-    CPlanner();
-    ~CPlanner();
-    void runPlanner();
-    void resetPlanner(Vector2D);
-
-
-private:
     CField field;
     QList <Vector2D> dirs;
     Vector2D chooseTarget(Vector2D &);
@@ -90,46 +90,15 @@ private:
     bool validState( state *& );
     void checkAgent();
     void Draw();
-
+    ///////////////////////////////////////////////////////////////
     double drawTimer;
     bool isRandomState;
-};
-
-
-class CPlannerThread :public QObject{
-    Q_OBJECT
-private:
-    int agent_id;
-    CField field;
-//  CPlanner planner[_MAX_NUM_PLAYERS];
-//    CWorldModel mywma;
-   // QMutex mutex;
     Segment2D agentPath;
-
-public:
-    CPlannerThread(int );
-    ~CPlannerThread();
     void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id, Vector2D agentGoal);
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
-    void run();
     void initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
-    CWorldModel mywma;      //kian transport from private to public
-    CPlanner planner;
-    //[_MAX_NUM_PLAYERS];     //kian transport from private to public
-    bool flag;  ///declare it here to have access in ndoelet!!??
 
-
-
-signals:
-    void pathPlannerResultReady(vector<Vector2D> _resultModified , Vector2D _averageDir);
-
-//public slots:
-//    void initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius );
-//    void updatePlannerWorldModel(SNewWorldModelStruct newWorldModel);
 };
-
-//extern CPlannerThread *pathPlanner;/////////////////threading del
-//extern QMutex plannerMutex;////////////////////////threading del
 
 #endif // PLANNER_H
