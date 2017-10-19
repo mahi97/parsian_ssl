@@ -52,7 +52,7 @@ void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
 
 }
 
-void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
-{
-    ROS_INFO_STREAM("callback called! with" << config.test_param);
-}
+  void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
+  {
+
+  }
