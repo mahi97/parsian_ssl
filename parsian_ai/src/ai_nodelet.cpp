@@ -23,8 +23,9 @@ using namespace parsian_ai;
       server->setCallback(f);
 
       for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
+          std::string topic("robot_tsk_"+std::to_string(i));
           robTask[i] =
-                  nh.advertise<parsian_msgs::parsian_robot_task_>("robot_tsk_"+std::to_string(i), 1000);
+                  nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
       }
 
 
