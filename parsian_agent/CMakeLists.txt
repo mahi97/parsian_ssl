@@ -106,10 +106,9 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/agent.cfg
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -165,6 +164,7 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+	${PROJECT_NAME}_gencfg
         )
 
 target_link_libraries(${PROJECT_NAME}_node
