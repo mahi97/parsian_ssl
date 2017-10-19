@@ -166,6 +166,7 @@ add_dependencies(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
+        ${PROJECT_NAME}_nodelet
         ${QT_LIBRARIES}
         )
 
