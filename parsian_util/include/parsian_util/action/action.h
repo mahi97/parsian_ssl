@@ -17,7 +17,6 @@ protected:
 private:
 };
 
-
 #define SkillProperty(skill,type,name,local) \
         public: inline type get##name() {return local;} \
         public: inline skill* set##name(type val) {local = val;return this;} \

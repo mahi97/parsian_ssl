@@ -146,7 +146,7 @@ add_library(${PROJECT_NAME}_nodelet
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
-       # src/${PROJECT_NAME}/gotopointavoid.cpp
+        src/${PROJECT_NAME}/gotopointavoid.cpp
        # src/${PROJECT_NAME}/kick.cpp
        # src/${PROJECT_NAME}/newbangbang.cpp
        # src/${PROJECT_NAME}/onetouch.cpp

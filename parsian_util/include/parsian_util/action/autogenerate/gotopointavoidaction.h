@@ -4,19 +4,18 @@
 #define GotopointavoidAction_HEADER_
 
 
-#include <parsian_util/action/action.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h> 
+
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 
-
-
-class GotopointavoidAction : public Action {
+class GotopointavoidAction : public GotopointAction  {
 
 public:
 
-    virtual void setMessage(void* _msg);
+    void setMessage(void* _msg);
 
-    virtual void* getMessage();
+    void* getMessage();
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
     SkillProperty(GotopointavoidAction, bool, Keeplooking, keeplooking);

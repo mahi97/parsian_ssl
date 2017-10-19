@@ -4,19 +4,18 @@
 #define GotopointAction_HEADER_
 
 
+
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
-
-
 
 class GotopointAction : public Action {
 
 public:
 
-    virtual void setMessage(void* _msg);
+    void setMessage(void* _msg);
 
-    virtual void* getMessage();
+    void* getMessage();
 
     SkillProperty(GotopointAction, quint8, Robot_Id, robot_id);
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);

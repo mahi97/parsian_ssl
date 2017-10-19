@@ -292,11 +292,16 @@ target_link_libraries(vision_nodelet
 
 target_link_libraries(refbox_node
         ${catkin_LIBRARIES}
+
         )
 
 target_link_libraries(refbox_nodelet
         refbox_convert
         network
+        vision_convert
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        ${PROJECT_NAME}_proto
         )
 
 target_link_libraries(grsim_nodelet
@@ -308,6 +313,7 @@ target_link_libraries(grsim_nodelet
 
 target_link_libraries(grsim_node
         ${catkin_LIBRARIES}
+        grsim_nodelet
         )
 #############
 ## Install ##
