@@ -75,13 +75,11 @@ void CSoccer::primaryDraws(){
 
 void CSoccer::execute()
 {
-
 //    QTime timer;
 //    timer.start();
 
 
-    primaryDraws();
-
+//    primaryDraws();
 
 
     //////////////////set opponents roles more specificly and set priority for each of which////////////////////
@@ -98,13 +96,13 @@ void CSoccer::execute()
         {
 //            agents[i]->waitHere(); TODO : Robot Command
         }
-//        bool custom = false;
+        bool custom = false;
 //        customControl(custom);
-//        if (!custom)
-//        {
+        if (!custom)
+        {
 //            coach->execute();
 
-//        }
+        }
     }
 
     //  debug(QString("%1) MainLoop Time2: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
@@ -124,4 +122,14 @@ void CSoccer::execute()
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
 
+    setTask();
+}
+
+void CSoccer::setTask(){
+    auto* kick = new KickAction;
+    kick->setKickspeed(1023);
+    kick->setTarget(wm->field->oppGoal());
+    kick->setSlow(true);
+
+    agents[0]->action = kick;
 }

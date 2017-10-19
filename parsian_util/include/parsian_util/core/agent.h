@@ -3,6 +3,7 @@
 
 #include "parsian_msgs/parsian_agent.h"
 #include <parsian_util/core/robot.h>
+#include <parsian_util/action/action.h>
 
 class CAgent {
 public:
@@ -14,6 +15,7 @@ public:
     int       id();
     bool isVisible() {return self.isActive(); }
 
+    Action* action;
     CRobot self;
 };
 
