@@ -306,7 +306,7 @@ target_link_libraries(refbox_nodelet
 
 target_link_libraries(grsim_nodelet
         ${PROJECT_NAME}_proto
-        networkg
+        network
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )

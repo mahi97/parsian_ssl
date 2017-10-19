@@ -17,10 +17,12 @@ void GotopointavoidAction::setMessage(void* _msg) {
         addVel = msg.addVel;
         nextPos = msg.nextPos;
 
+        GotopointAction::setMessage(&msg.base);
 }
 
 void* GotopointavoidAction::getMessage() {
     parsian_msgs::parsian_skill_gotoPointAvoid* _msg = new parsian_msgs::parsian_skill_gotoPointAvoid;
+    _msg->base = *((parsian_msgs::parsian_skill_gotoPoint*) GotopointAction::getMessage());
     _msg->avoidPenaltyArea = avoidPenaltyArea;
     _msg->keeplooking = keeplooking;
     _msg->extendStep = extendStep;

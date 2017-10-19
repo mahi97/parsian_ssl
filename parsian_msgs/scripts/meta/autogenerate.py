@@ -21,7 +21,7 @@ PARSIAN_TYPE_MAP = {
     "enum": "enum",
     "vector2D": "Vector2D",
     "parsian_msgs/vector2D": "Vector2D",
-    "parsian_msgs/gotoPoint": 'gotoPoint'
+    "parsian_msgs/parsian_skill_gotoPoint": 'gotoPoint'
 }
 
 PARSIAN_PROPERTIES_LIST = ["Vector2D",]
@@ -57,6 +57,7 @@ def get_fulldict(file, properties_list):
     print(file.split('.')[0])
     new_dict = {"action_name": action_name,
                 "has_base": False,
+                "base_message": '',
                 "properties": [],
                 "parsian_properties": [],
                 "message": file.split('.')[0],
@@ -69,12 +70,14 @@ def get_fulldict(file, properties_list):
             new_dict["has_base"] = True
             new_dict["base_action"] = cap_word(m_property[0].replace('parsian_msgs/', '')) + 'Action'
             new_dict["base_action_file"] = str(new_dict["base_action"]).lower() + '.h'
+            new_dict["base_message"] = "parsian_skill_" + str(m_property[0].replace('parsian_msgs/', ''))
         else:
             p = {"type": m_property[0], "name": m_property[1].title(), "local": m_property[1]}
             if m_property[0] in PARSIAN_PROPERTIES_LIST:
                 new_dict['parsian_properties'].append(p)
             else:
                 new_dict['properties'].append(p)
+    print(new_dict)
     return new_dict
 
 
