@@ -3,8 +3,6 @@
 //
 
 #include <parsian_ai/ai.h>
-#include <parsian_ai/gamestate.h>
-
 
 AI::AI() {
     soccer = new CSoccer();
@@ -20,23 +18,23 @@ void AI::execute() {
     soccer->execute();
 }
 
-parsian_msgs::parsian_robot_task AI::getTask(int robotID){
-    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
+parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
+    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
         if (wm->our.activeAgentID(i) == robotID) {
-            if (soccer->agents[robotID]->action->getName() == "kick" /*KickAction::getName()*/) {
+            if (soccer->agents[robotID]->action/*->getActionName() == KickAction::getActionName()*/) {
                 parsian_msgs::parsian_skill_kick *task;
                 task = reinterpret_cast<parsian_skill_kick *>(soccer->agents[robotID]->action->getMessage());
-                robotTask[robotID].kickTask = *task;
-                robotTask[robotID].select = robotTask[robotID].KICK;
+                robotsTask[robotID].kickTask = *task;
+                robotsTask[robotID].select = robotsTask[robotID].KICK;
             } else if (false) {
 
             }
 
-            return robotTask[robotID];
+            return robotsTask[robotID];
         }
     }
-
 }
+
 
 void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 
@@ -65,5 +63,4 @@ void AI::publish(std::vector<ros::Publisher*> publishers) {
 //            if (agent.)
 //            publishers.at(i)->getTopic();
 //        }
-
 }

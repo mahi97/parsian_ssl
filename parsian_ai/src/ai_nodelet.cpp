@@ -28,35 +28,31 @@ using namespace parsian_ai;
                   nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
       }
 
+    drawer = new Drawer();
+    debugger = new Debugger();
 
-      drawer = new Drawer();
-      debugger = new Debugger();
+}
 
+void AINodelet::timerCb(const ros::TimerEvent& event) {
 
-  }
-
-  void AINodelet::timerCb(const ros::TimerEvent& event){
-
-      ai.execute();
-      drawPub.publish(drawer->draws);
-      debugPub.publish(debugger->debugs);
+//      ai.execute();
+    drawPub.publish(drawer->draws);
+    debugPub.publish(debugger->debugs);
 //        ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
+}
 
 
-
-  }
-
-  void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
-  {
-    ROS_INFO_STREAM("callback called! with" << config.test_param);
-  }
-
-void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm){
+void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ai.updateWM(_wm);
     ai.execute();
 
- //    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
-     robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
- //    }
+//    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
+    robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
+//    }
 
+}
+
+void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
+{
+    ROS_INFO_STREAM("callback called! with" << config.test_param);
 }

@@ -10,6 +10,7 @@
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/knowledge.h>
+#include <parsian_ai/gamestate.h>
 #include <parsian_ai/soccer.h>
 #include <parsian_msgs/parsian_robot_task.h>
 
@@ -30,10 +31,11 @@ public:
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
-    parsian_msgs::parsian_robot_task robotTask[_MAX_NUM_PLAYERS];
+    
 
 
 private:
+    parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 
     CSoccer*    soccer;
 

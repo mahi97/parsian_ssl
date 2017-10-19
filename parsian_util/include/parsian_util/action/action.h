@@ -10,9 +10,9 @@
 class Action {
 public:
 
-    virtual void setMessage(const void*) = 0;
+    virtual void setMessage(void*) = 0;
     virtual void* getMessage() = 0;
-
+//    virtual QString getActionName();
 protected:
 private:
 };

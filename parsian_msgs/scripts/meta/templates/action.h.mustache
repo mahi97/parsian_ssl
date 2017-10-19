@@ -7,7 +7,6 @@
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/{{message}}.h>
-#include <typeinfo>
 
 {{#has_base}}#include <parsian_util/action/autogenerate/{{base_action_file}}> {{/has_base}}
 
@@ -18,8 +17,6 @@ public:
     virtual void setMessage(void* _msg);
 
     virtual void* getMessage();
-
-    virtual std::string getName();
 
 {{#properties}}
     SkillProperty({{action_name}}, {{type}}, {{name}}, {{local}});
