@@ -9,7 +9,7 @@ void VisionNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
-    timer = nh.createTimer(ros::Duration(.062), boost::bind(&VisionNodelet::timerCb, this, _1));
+    timer = nh.createTimer(ros::Duration(.016), boost::bind(&VisionNodelet::timerCb, this, _1));
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
@@ -56,7 +56,9 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
             geometry = pr::convert_geometry_data(vision_packet.geometry());
         }
     }
-    ssl_geometry_pub.publish(geometry);
-    ssl_detection_pub.publish(detection);
+    if (detection.camera_id < 10) {
+        ssl_geometry_pub.publish(geometry);
+        ssl_detection_pub.publish(detection);
+    }
 }
 
