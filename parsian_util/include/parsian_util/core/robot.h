@@ -13,18 +13,18 @@
 class CRobot : public CMovingObject {
 public:
 
-    const double robot_radius_old = 0.090;
-//const double CRobot::robot_radius_new = 0.080;
-    const double robot_radius_new = 0.0890;
-    const double center_from_kicker_old = 0.075;
-//const double CRobot::center_from_kicker_new = 0.070;
-    const double center_from_kicker_new = 0.06;
-    const double kicker_width_old = 0.074;
-//const double CRobot::kicker_width_new = 0.080;
-    const double kicker_width_new = 0.082;
-    const double wheel_rad_old = 0.035;
-//const double CRobot::wheel_rad_new = 0.03;
-    const double wheel_rad_new = 0.027;
+    static constexpr double robot_radius_old = 0.090;
+//static const double CRobot::robot_radius_new = 0.080;
+    static constexpr double robot_radius_new = 0.0890;
+    static constexpr double center_from_kicker_old = 0.075;
+//static const double CRobot::center_from_kicker_new = 0.070;
+    static constexpr double center_from_kicker_new = 0.06;
+    static constexpr double kicker_width_old = 0.074;
+//static const double CRobot::kicker_width_new = 0.080;
+    static constexpr double kicker_width_new = 0.082;
+    static constexpr double wheel_rad_old = 0.035;
+//static const double CRobot::wheel_rad_new = 0.03;
+    static constexpr double wheel_rad_new = 0.027;
     CRobot();
 
 

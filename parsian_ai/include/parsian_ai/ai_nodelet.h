@@ -39,7 +39,10 @@ namespace parsian_ai {
 
         void onInit();
 
-        void wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
+        void worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm);
+        void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
+        void robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs);
+
         void timerCb(const ros::TimerEvent &event);
     };
 }
