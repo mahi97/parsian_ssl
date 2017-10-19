@@ -48,5 +48,5 @@ using namespace parsian_ai;
 
   void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
   {
-    ROS_INFO_STREAM("callback called! with" << config.test_param);
+    
   }
