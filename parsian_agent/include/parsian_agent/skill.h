@@ -78,27 +78,27 @@ private:
     static skill* set(Agent* a); \
     static skill* get(Agent* a)
 
-#define INIT_SKILL(Skill,name) \
-    bool Skill##_registered \
-            = CSkills::registerSkill(Skill::Name,new Skill(NULL)); \
-    CSkill* Skill::allocate(Agent* _agent) \
-    {return new Skill(_agent);} \
-    QString Skill::getName() {return QString(Name);} \
-    Skill* Skill::set(Agent* a) \
+//bool Skill##_registered
+//       = CSkills::registerSkill(Skill::Name,new Skill());
+#define INIT_SKILL(_Skill,name) \
+    CSkill* _Skill::allocate(Agent* _agent) \
+    {return new _Skill(_agent);} \
+    QString _Skill::getName() {return QString(Name);} \
+    _Skill* _Skill::set(Agent* a) \
     { \
-        if (QString(Skill::Name)!=a->skillName) \
+        if (QString(_Skill::Name)!=a->skillName) \
         { \
-            if (a->skill!=NULL && a->skillName!="") delete ((Skill*) a->skill); \
-            else a->skill = (CSkill*) (new Skill(a)); \
-            a->skillName = Skill::Name; \
+            if (a->skill!=NULL && a->skillName!="") delete ((_Skill*) a->skill); \
+            else a->skill = (CSkill*) (new _Skill(a)); \
+            a->skillName = _Skill::Name; \
         } \
-        return (Skill*) a->skill; \
+        return (_Skill*) a->skill; \
     } \
-    Skill* Skill::get(Agent* a) \
+    _Skill* _Skill::get(Agent* a) \
     { \
-        return (Skill*) a->skill; \
+        return (_Skill*) a->skill; \
     } \
-    const char* Skill::Name = name
+    const char* _Skill::Name = name
 
 #define SkillState(classname,statenumber) void classname::State##statenumber ()
 #define SkillInitState(statenumber,statename) \

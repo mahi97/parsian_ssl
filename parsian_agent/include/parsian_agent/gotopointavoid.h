@@ -9,7 +9,7 @@
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
-class CSkillGotoPointAvoid : public GotopointavoidAction
+class CSkillGotoPointAvoid : public GotopointavoidAction,public CSkillGotoPoint
 {
 private:
 //    CMotionProfile *prof;
@@ -27,7 +27,7 @@ protected:
     Vector2D averageDir;
 public:
     double timeStarted, timeEstimated; //for skill widget
-    static double timeNeeded(CAgent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
+    static double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
     DEF_SKILL(CSkillGotoPointAvoid);
     CSkillGotoPointAvoid* noRelax();
     CSkillGotoPointAvoid* ourRelax(int element);

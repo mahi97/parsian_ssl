@@ -8,7 +8,7 @@
 //--------------------------------------------------
 INIT_SKILL(CSkillGotoPointAvoid, "gotopointavoid");
 
-CSkillGotoPointAvoid::CSkillGotoPointAvoid(CAgent *_agent) : CSkillGotoPoint(_agent)
+CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkillGotoPoint(_agent)
 {
     counter = 0;
     data.avoidPenaltyArea = static_cast<unsigned char>(true);
@@ -242,7 +242,7 @@ void CSkillGotoPointAvoid::execute()
 
 double CSkillGotoPointAvoid::progress()
 {
-    if(agentPos.dist(data.targetPos) < 0.05)
+    if(agentPos.dist(targetPos) < 0.05)
     {
         return 1;
     }
@@ -267,7 +267,7 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2
     return this;
 }
 
-double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
+double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
 {
 
     double _x3;
@@ -351,4 +351,3 @@ double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMa
     }
 
 }
-

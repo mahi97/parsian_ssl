@@ -1,4 +1,4 @@
-#include "planner/planner.h"
+#include <planner/planner.h>
 
 ///////////////////////////////
 ////////IMPORTANT TODOs////////
@@ -484,7 +484,7 @@ void CPlanner::runPlanner(){
     }
     //////////////////////////////////////////////////path smoothing
     if( temp.size() >1)
-        resultModified.push_back(temp.back());
+        resultModified.push_back(std::move(temp.back()));
     else
         resultModified.push_back(target);
 
@@ -632,7 +632,8 @@ void CPlanner::resetPlanner( Vector2D _goal ){
 //CPlannerThread *pathPlanner;////////////////////threading del
 //QMutex plannerMutex;/////////////////////////threading del
 
-CPlannerThread::CPlannerThread(){
+CPlannerThread::CPlannerThread(int agent_id){
+    this->agent_id=agent_id;
     qRegisterMetaType< vector<Vector2D> >("vector<Vector2D>");
     qRegisterMetaType< Vector2D >("Vector2D");
     qRegisterMetaType< QList<int> >("QList<int>");
@@ -648,7 +649,7 @@ CPlannerThread::~CPlannerThread(){
 }
 
 ////////TODO change slot to ...///////
-void CPlannerThread::initPathPlanner(const int& _id ,/*const*/ Vector2D/*&*/ _goal,const QList<int>& _ourRelaxList,const QList<int>& _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
+void CPlannerThread::initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
 
         //  QTime timer;
         //  timer.start();
@@ -660,7 +661,7 @@ void CPlannerThread::initPathPlanner(const int& _id ,/*const*/ Vector2D/*&*/ _go
         /*bool*/ flag = true;/////kian make it in class too access it in nodelet
         int idx;
         for( int i=0 ; i<mywma.our.activeAgentsCount() ; i++ ){
-            if( mywma.our[i]->id == _id ){
+            if( mywma.our[i]->id == agent_id ){
                 idx = i;
                 flag = false;
                 break;
@@ -672,27 +673,14 @@ void CPlannerThread::initPathPlanner(const int& _id ,/*const*/ Vector2D/*&*/ _go
         }
 
         if( mywma.our[idx]->pos.dist(_goal) < 0.1 ){
-            planner[_id].resultModified.clear();
-            planner[_id].resultModified.push_back(mywma.our[idx]->pos);
-            planner[_id].resultModified.push_back(_goal);
-            planner[_id].averageDir = _goal - mywma.our[idx]->pos;
+            planner.resultModified.clear();
+            planner.resultModified.push_back(mywma.our[idx]->pos);
+            planner.resultModified.push_back(_goal);
+            planner.averageDir = _goal - mywma.our[idx]->pos;
                //////TODO change signal to service response///////
 
-            //emit pathPlannerResultReady(_id , planner[_id].resultModified , planner[_id].averageDir);
-//            parsian_msgs::pass_plannerResponse res;
-//            res.id = _id;
-//            for(int i{}; i<planner[_id].resultModified.size(); i++)
-//            {
-//                parsian_msgs::vector2D tmp;
-//                tmp.x = planner[_id].resultModified[i].x;
-//                tmp.y = planner[_id].resultModified[i].y;
-//                res.resultModified.push_back(tmp);
-//            }
-//            parsian_msgs::vector2D tmp;
-//            tmp.x = planner[_id].averageDir.x;
-//            tmp.y = planner[_id].averageDir.y;
-//            res.averageDir = tmp;
-//            return res;
+            emit pathPlannerResultReady(planner.resultModified , planner.averageDir);
+
         }
 
         if( mywma.field->marginedField().contains(_goal) == false ){
@@ -705,49 +693,50 @@ void CPlannerThread::initPathPlanner(const int& _id ,/*const*/ Vector2D/*&*/ _go
                 _goal = Vector2D(0,0);
         }
 
-        planner[_id].resetPlanner(_goal);
-        planner[_id].lastGoal = planner[_id].goal;
-        planner[_id].goal = _goal;
-        planner[_id].Rgoal = mywma.our[idx]->pos;
-        planner[_id].avoidPenaltyArea = _avoidPenaltyArea;
-        planner[_id].avoidCenterArea = _avoidCenterArea;
+        planner.resetPlanner(_goal);
+        planner.lastGoal = planner.goal;
+        planner.goal = _goal;
+        planner.Rgoal = mywma.our[idx]->pos;
+        planner.avoidPenaltyArea = _avoidPenaltyArea;
+        planner.avoidCenterArea = _avoidCenterArea;
 
-        planner[_id].ourRelaxList.clear();
-        for( int i=0 ; i<_ourRelaxList.size() ; i++ )
-            planner[_id].ourRelaxList.append(_ourRelaxList.at(i));
-        planner[_id].ourRelaxList.append(_id);
+        planner.ourRelaxList.clear();
+        for(int i=0 ; i<_ourRelaxList.size();i++)
+            planner.ourRelaxList.append(_ourRelaxList.at(i));
+        planner.ourRelaxList.append(agent_id);
 
-        planner[_id].oppRelaxList.clear();
-        for( int i=0 ; i<_oppRelaxList.size() ; i++ )
-            planner[_id].oppRelaxList.append(_oppRelaxList.at(i));
+        planner.oppRelaxList.clear();
+        for(int i=0 ; i<_oppRelaxList.size();i++)
+           planner.oppRelaxList.append(_oppRelaxList.at(i));
+        planner.oppRelaxList.append(agent_id);
 
-        planner[_id].ballObstacleRadius = _ballObstacleRadius;
-        planner[_id].stepSize = 1; //TODO conf()->ERRT_Extend_Step();
-        planner[_id].threshold = 1; //TODO conf()->ERRT_Target_Distance_Threshold();
-        planner[_id].wayPointProb = 1; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
-        if( planner[_id].result.size() )
-            planner[_id].goalProb = 1; // TODO conf()->ERRT_Goal_Probablity();
+        planner.ballObstacleRadius = _ballObstacleRadius;
+        planner.stepSize = 1; //TODO conf()->ERRT_Extend_Step();
+        planner.threshold = 1; //TODO conf()->ERRT_Target_Distance_Threshold();
+        planner.wayPointProb = 1; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
+        if( planner.result.size() )
+            planner.goalProb = 1; // TODO conf()->ERRT_Goal_Probablity();
         else
-            planner[_id].goalProb = 0.5;
-        planner[_id].ID = _id;
-        planner[_id].robotVel = mywma.our[idx]->vel;
+            planner.goalProb = 0.5;
+        planner.ID = agent_id;
+        planner.robotVel = mywma.our[idx]->vel;
 
-        planner[_id].nodes.first = new state((mywma.our[idx]->pos+mywma.our[idx]->vel*0.09) , NULL , planner[_id].result);
-        planner[_id].nodes.add(planner[_id].nodes.first);
+        planner.nodes.first = new state((mywma.our[idx]->pos+mywma.our[idx]->vel*0.09) , NULL , planner.result);
+        planner.nodes.add(planner.nodes.first);
 
-        planner[_id].Rnodes.first = new state(_goal , NULL , planner[_id].Rresult);
-        planner[_id].Rnodes.add(planner[_id].Rnodes.first);
+        planner.Rnodes.first = new state(_goal , NULL , planner.Rresult);
+        planner.Rnodes.add(planner.Rnodes.first);
 
-        planner[_id].readyToPlan = true;
+        planner.readyToPlan = true;
 
-        planner[_id].counter++;
+        planner.counter++;
 
         // CAUSE DOUBLE DEFENDER!!!
-        //    if( planner[_id].resultModified.size() < 2 ){
-        //      planner[_id].resultModified.clear();
-        //      planner[_id].resultModified.push_back(mywma.our[idx].pos);
-        //      planner[_id].resultModified.push_back(_goal);
-        //      planner[_id].averageDir = _goal - mywma.our[idx].pos;
+        //    if( planner.resultModified.size() < 2 ){
+        //      planner.resultModified.clear();
+        //      planner.resultModified.push_back(mywma.our[idx].pos);
+        //      planner.resultModified.push_back(_goal);
+        //      planner.averageDir = _goal - mywma.our[idx].pos;
         //    }
 
 
@@ -787,21 +776,21 @@ double CPlannerThread::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir
     _x3 = ( -1* _vel.length()*_vel.length()) / (-2 * fabs(1 /* TODO conf()->BangBang_DecMax()*/)) ;
 
     if(_pos.dist(posT) < _x3 ) {
-        return max(0,(_vel.length()/ 1 /* TODO conf()->BangBang_DecMax()*/ - offset) );
+        return std::max(0.0,(_vel.length()/ 1 /* TODO conf()->BangBang_DecMax()*/ - offset) );
     }
     else if(_vel.length() < (vMax)){
         if(_pos.dist(posT) < xSat)
         {
-            return max(0,(-1*offset + vMax/dec + (vMax-_vel.length())/acc + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+_vel.length())*(vMax-_vel.length())/acc))/2)/vMax) );
+            return std::max(0.0,(-1*offset + vMax/dec + (vMax-_vel.length())/acc + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+_vel.length())*(vMax-_vel.length())/acc))/2)/vMax) );
         }
         else
         {
-            return max(0,(vMax/dec + (vMax-_vel.length())/acc - offset));
+            return std::max(0.0,(vMax/dec + (vMax-_vel.length())/acc - offset));
         }
     }
     else
     {
-        return max(0,(vMax/dec + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) );
+        return std::max(0.0,(vMax/dec + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) );
 
     }
 
@@ -954,28 +943,21 @@ void CPlannerThread::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelax
 //}
 
 void CPlannerThread::run(){
-    while(true){
-        usleep(1000);
-
-        for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-
-           // if( plannerMutex.tryLock(1) ){////threading del
-                if( planner[i].readyToPlan ){
-
-                    generateObstacleSpace(planner[i].obst  , planner[i].ourRelaxList , planner[i].oppRelaxList , planner[i].avoidPenaltyArea , planner[i].avoidCenterArea , planner[i].ballObstacleRadius,planner[i].ID,planner[i].goal);
-
-                    planner[i].runPlanner();
-                    ////////TODO change signal to service response///////
-                    //emit pathPlannerResultReady(i , planner[i].resultModified , planner[i].averageDir);
-
-                    planner[i].readyToPlan = false;
 
 
-                }
-               // plannerMutex.unlock();//////threading del
-            //}
+        if( planner.readyToPlan ){
+
+            generateObstacleSpace(planner.obst  , planner.ourRelaxList , planner.oppRelaxList , planner.avoidPenaltyArea
+                    , planner.avoidCenterArea , planner.ballObstacleRadius,planner.ID,planner.goal);
+
+            planner.runPlanner();
+            ////////TODO change signal to service response///////
+            //emit pathPlannerResultReady(i , planner[i].resultModified , planner[i].averageDir);
+
+            planner.readyToPlan = false;
+
+
         }
-    }
 }
 
 
