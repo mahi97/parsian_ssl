@@ -8,9 +8,9 @@ using namespace parsian_ai;
 
       ros::NodeHandle &nh = getNodeHandle();
       ros::NodeHandle &private_nh = getPrivateNodeHandle();
-      worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::wmCb, this);
-      robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
-      refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
+      worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
+      robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
+      refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
 
       drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
       debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -42,15 +42,25 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
 }
 
 
-void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-    ai.updagitteWM(_wm);
-//    ai.execute();
-//
+
+void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
+    ai.updateWM(_wm);
+    ai.execute();
+
 //    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
 //    robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
 //    }
 
 }
+void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
+    ai.updateReferee(_ref);
+}
+
+void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs) {
+    ai.updateRobotStatus(_rs);
+}
+
+
 
   void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
   {

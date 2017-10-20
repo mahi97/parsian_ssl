@@ -5,9 +5,9 @@ CSoccer::CSoccer()
 {
 //    wm = new CWorldModel;
     agents = new CAgent*[_MAX_NUM_PLAYERS];
-    for(int i = 0; i < _MAX_NUM_PLAYERS; i++ )
+    for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
-//        agents[i] = new CAgent;
+        agents[i]->self = *wm->our.active(i);
     }
 //    knowledge = new CKnowledge(agents);
 //    coach = new CCoach(agents);
@@ -122,14 +122,27 @@ void CSoccer::execute()
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
 
-    setTask();
+//    updateTask();
 }
 
-void CSoccer::setTask(){
+void CSoccer::updateTask(GameState _gs){
     auto* kick = new KickAction;
     kick->setKickspeed(1023);
     kick->setTarget(wm->field->oppGoal());
     kick->setSlow(true);
+    kick->setKkshotempyspot(true);
 
-    agents[0]->action = kick;
+    auto* gtp = new GotopointavoidAction;
+    Circle2D aroundBall = Circle2D(wm->ball->pos, 0.5);
+    Vector2D vec1, vec2;
+    aroundBall.intersection(Line2D(Vector2D(0,0), wm->ball->pos), &vec1, &vec2);
+    gtp->setTargetpos(vec1.absX() < vec2.absX() ? vec1 : vec2);
+
+
+    if(!_gs.canMove()) {    //HALT
+        agents[0]->action = gtp;
+    }
+    else {
+        agents[0]->action = kick;
+    }
 }

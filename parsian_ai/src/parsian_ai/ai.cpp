@@ -68,16 +68,21 @@ void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
 
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
-    if(gameState->ready())
+    if(gameState->ready()) {
         DEBUG("is ready", D_MAHI);
-    if(gameState->isPlayOff())
+    }
+    if(gameState->isPlayOff()) {
         DEBUG("is play off", D_MAHI);
-    if(gameState->isPlayOn())
+    }
+    if(gameState->isPlayOn()) {
         DEBUG("is play on", D_MAHI);
-    if(gameState->canMove())
+    }
+    if(gameState->canMove()) {
         DEBUG("is not halt", D_MAHI);
+    }
     DEBUG("is running", D_MAHI);
 
+    soccer->updateTask(*gameState);
 }
 
 void AI::publish(std::vector<ros::Publisher*> publishers) {
