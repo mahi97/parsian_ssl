@@ -12,6 +12,7 @@
 #include <parsian_util/core/agent.h>
 #include <parsian_util/core/worldmodel.h>
 //#include <parsian_ai/coach.h>
+#include <parsian_ai/gamestate.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
@@ -38,7 +39,7 @@ public:
     ~CSoccer();
     void execute();
 
-    void setTask();
+    void updateTask(GameState _gs);
 
     void setMode(GameMode _mode);
     void setTeamColor(ETeamColorType _color);
