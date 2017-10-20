@@ -909,7 +909,12 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     }
 }
 
-
+vector<Vector2D> CPlanner::getResultModified (){
+    return resultModified;
+}
+Vector2D CPlanner::getAverageDir(){
+    return  averageDir;
+}
 
 
 

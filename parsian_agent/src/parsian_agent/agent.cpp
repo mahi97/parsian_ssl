@@ -165,7 +165,7 @@ Agent::Agent(int _ID):planner(_ID)
     packetNum = 0;
     stopTrain=false;wh1=wh2=wh3=wh4=0.0;startTrain=false;
     selfID = _ID;
-    skill = nullptr;
+
 
     onOffState = true;
     commandID = selfID;
@@ -660,7 +660,6 @@ void Agent::waitHere()
     setBeep(false);
     setForceKick(false);
     idle = true;
-    skill = nullptr;
     _ACC = 0;
     _DEC = 0;
 }
@@ -1047,16 +1046,39 @@ void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int
     //emit pathPlannerResult(resultModified ,averageDir); get this variables
     //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 }
-void Agent::setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
 
-}
-void Agent::execute() {
+void Agent::execute(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
+
+    switch (_task->select){
+        case parsian_msgs::parsian_robot_task::GOTOPOINT:
+            CSkillGotoPoint gotoPoint(this);
+            gotoPoint.setMessage(&_task->gotoPointTask);
+            gotoPoint.execute();
+            ROS_INFO("GOTOPOINT executed!");
+            break;
+        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID:
+            CSkillGotoPointAvoid gotoPointAvoid(this);
+            gotoPointAvoid.setMessage(&_task->gotoPointAvoidTask);
+            gotoPointAvoid.execute();
+            ROS_INFO("GOTOPOINTAVOID executed!");
+            break;
+        case parsian_msgs::parsian_robot_task::KICK:
+            ROS_INFO("KICK executed!");
+            break;
+        case parsian_msgs::parsian_robot_task::ONETOUCH:
+            ROS_INFO("ONETOUCH executed!");
+            break;
+        case parsian_msgs::parsian_robot_task::RECIVEPASS:
+            ROS_INFO("RECIVEPASS executed!");
+            break;
+
+
+    }
+
+
     //planner.generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
     //planner.runPlanner();
     //emit pathPlannerResult(resultModified ,averageDir); get this variables
-}
-parsian_msgs::parsian_robot_task Agent::getTask() {
-
 }
 
 parsian_msgs::parsian_robot_command Agent::getCommand() {
