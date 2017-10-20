@@ -16,38 +16,38 @@ using namespace parsian_ai;
       debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
       timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
-      //config server settings
-      server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
-      dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
-      f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
-      server->setCallback(f);
+////      //config server settings
+////      server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
+////      dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
+////      f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
+////      server->setCallback(f);
+//
+//      for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
+//          std::string topic("robot_tsk_"+std::to_string(i));
+//          robTask[i] =
+//                  private_nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
+ //     }
 
-      for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
-          std::string topic("robot_tsk_"+std::to_string(i));
-          robTask[i] =
-                  nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
-      }
-
-    drawer = new Drawer();
-    debugger = new Debugger();
+//    drawer = new Drawer();
+ //   debugger = new Debugger();
 
 }
 
 void AINodelet::timerCb(const ros::TimerEvent& event) {
 
-//      ai.execute();
-    drawPub.publish(drawer->draws);
-    debugPub.publish(debugger->debugs);
-//        ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
+    //  ai.execute();
+    //drawPub.publish(drawer->draws);
+    //debugPub.publish(debugger->debugs);
+    //    ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
 }
 
 
 void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-    ai.updateWM(_wm);
-    ai.execute();
-
+    ai.updagitteWM(_wm);
+//    ai.execute();
+//
 //    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
-    robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
+//    robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
 //    }
 
 }

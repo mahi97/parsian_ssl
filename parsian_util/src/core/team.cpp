@@ -7,6 +7,8 @@
 CTeam::CTeam(const bool isYellow, const bool isLeft)
 {
     data = new CTeamData;
+    for (auto& member : data->teamMembers) member = new CRobot();
+
     setColor(isYellow);
     setSide(isLeft);
 
@@ -14,7 +16,6 @@ CTeam::CTeam(const bool isYellow, const bool isLeft)
 
 CTeam::CTeam(const  bool isYellow, const bool isLeft, const std::vector<parsian_msgs::parsian_robot> & _robots) :
         CTeam(isYellow, isLeft) {
-    for (auto& member : data->teamMembers) member = new CRobot();
     updateRobot(_robots);
 }
 
