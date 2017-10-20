@@ -1,7 +1,7 @@
 //
 // Created by rebinnaf on 10/19/17.
 //
-#include "rqt_parsian_gui/drawer.h"
+#include "rqt_parsian_gui/guiDrawer.h"
 #include <ros/ros.h>
 #include <QWidget>
 #include <qcolor.h>
@@ -39,7 +39,7 @@ namespace rqt_parsian_gui
     public:
         MonitorWidget();
         void drawField();
-        CDrawer *drawerBuffer;
+        CguiDrawer *drawerBuffer;
         //TODO: get these values from util CRobot
         static const double robot_radius_new = 0.0890;
         static const double robot_radius_old = 0.0900;
