@@ -16,6 +16,9 @@
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_agent/agent.h>
 
+#include <dynamic_reconfigure/server.h>
+#include "parsian_agent/agentConfig.h"
+
 namespace parsian_agent {
     class AgentNodelet : public nodelet::Nodelet {
     private:
@@ -43,6 +46,9 @@ namespace parsian_agent {
         void aiCb(const parsian_msgs::parsian_ai_statusConstPtr &);
 
         boost::shared_ptr<Agent> agent;
+
+        boost::shared_ptr<dynamic_reconfigure::Server<agent_config::agentConfig>> server;
+        void ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level) ;
 
 
     };

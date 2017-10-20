@@ -24,6 +24,11 @@ void AgentNodelet::onInit(){
 
     agent.reset(new Agent(1));
     wm = new CWorldModel;
+
+    server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>);
+    dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
+    f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -41,5 +46,10 @@ void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& robot_ta
     agent->execute(robot_task);
     parsian_robot_command_pub.publish(agent->getCommand());
     grsim_robot_command_pub.publish(agent->getGrSimCommand());
+
+}
+
+void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
+{
 
 }
