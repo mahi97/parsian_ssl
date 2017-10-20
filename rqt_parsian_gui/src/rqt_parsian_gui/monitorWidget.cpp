@@ -1,6 +1,7 @@
 //
 // Created by rebinnaf on 10/19/17.
 //
+#include <parsian_msgs/parsian_draw_circle.h>
 #include "rqt_parsian_gui/monitorWidget.h"
 
 namespace rqt_parsian_gui
@@ -27,7 +28,7 @@ namespace rqt_parsian_gui
         stadiumSize.setWidth((_STADIUM_WIDTH));
         stadiumSize.setHeight((_STADIUM_HEIGHT));
 //        setViewportWidth(conf()->Common_Viewport_Width());
-        drawerBuffer=new CDrawer();
+//        drawerBuffer=new CguiDrawer();
     }
     void MonitorWidget::setViewportWidth(int width)
     {
@@ -60,6 +61,8 @@ namespace rqt_parsian_gui
         glTranslated(0, 0, -10.0);
         drawField();
 
+
+
         CGraphicalRobot rob;
         while (!drawerBuffer->robotBuffer.isEmpty())
         {
@@ -74,18 +77,22 @@ namespace rqt_parsian_gui
                       rob.newRobots);
 
         }
-        CGraphicalArc arc;
-        while (!drawerBuffer->arcBuffer.isEmpty())
-        {
-            arc = drawerBuffer->arcBuffer.dequeue();
-            drawArc(arc.circle.center().x,
-                    arc.circle.center().y,
-                    arc.circle.radius(),
-                    arc.startAng,
-                    arc.endAng,
-                    arc.color,
-                    arc.filled);
-        }
+
+//        parsian_msgs::parsian_draw_circle arc;
+////        CGraphicalArc arc;
+//        while (!drawerBuffer->arcBuffer.isEmpty())
+//        {
+//            arc = drawerBuffer->arcBuffer.dequeue();
+//            QColor col=QColor(arc.color.r,arc.color.g,arc.color.b);
+//
+//            drawArc(arc.circle.center.x,
+//                    arc.circle.center.y,
+//                    arc.circle.radius,
+//                    arc.startAng,
+//                    arc.endAng,
+//                    col,
+//                    arc.filled);
+//        }
     }
     void MonitorWidget::resizeGL(int width, int height)
     {

@@ -113,7 +113,7 @@ roslint_cpp()
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-#  CATKIN_DEPENDS roscpp rqt_gui_cpp std_msgs parsian_util parsian_msgs
+  CATKIN_DEPENDS roscpp rqt_gui_cpp std_msgs parsian_util parsian_msgs
 #  DEPENDS system_lib
 )
 
@@ -122,7 +122,7 @@ set (rqt_parsian_gui_SRCS
   src/rqt_parsian_gui/monitor.cpp
   src/rqt_parsian_gui/robotstatus.cpp
   src/rqt_parsian_gui/monitorWidget.cpp
-  src/rqt_parsian_gui/drawer.cpp
+  src/rqt_parsian_gui/guiDrawer.cpp
         )
 
 set(rqt_parsian_gui_HDRS
@@ -130,7 +130,7 @@ set(rqt_parsian_gui_HDRS
   include/rqt_parsian_gui/robotstatus.h
   include/rqt_parsian_gui/robotstatus_widget.h
   include/rqt_parsian_gui/monitorWidget.h
-  include/rqt_parsian_gui/drawer.h
+  include/rqt_parsian_gui/guiDrawer.h
 )
 
 

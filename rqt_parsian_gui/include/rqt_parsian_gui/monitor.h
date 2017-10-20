@@ -13,6 +13,7 @@
 #include <parsian_util/core/worldmodel.h>
 
 
+
 namespace rqt_parsian_gui
 {
 
@@ -34,6 +35,8 @@ namespace rqt_parsian_gui
         ros::NodeHandle n_private;
 
         ros::Subscriber wm_sub;
+        ros::Subscriber draw_sub;
+
         ros::Timer timer;
 
         Vector2D ballpos;
@@ -41,6 +44,7 @@ namespace rqt_parsian_gui
 
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
+        void drawCb(const parsian_msgs::parsian_drawConstPtr& _draw);
         void timerCb(const ros::TimerEvent& _timer);
 
         // Comment in to signal that the plugin has a way to configure it
