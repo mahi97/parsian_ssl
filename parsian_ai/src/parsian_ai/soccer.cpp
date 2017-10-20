@@ -7,6 +7,7 @@ CSoccer::CSoccer()
     agents = new CAgent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
+        agents[i] = new CAgent();
         agents[i]->self = *wm->our.active(i);
     }
 //    knowledge = new CKnowledge(agents);
