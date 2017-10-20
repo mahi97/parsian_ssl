@@ -165,8 +165,8 @@ Agent::Agent(int _ID):planner(_ID)
     packetNum = 0;
     stopTrain=false;wh1=wh2=wh3=wh4=0.0;startTrain=false;
     selfID = _ID;
-
-
+    skill= nullptr;
+    skillName="";
     onOffState = true;
     commandID = selfID;
 
@@ -1042,34 +1042,54 @@ void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int
                         const double &_ballObstacleRadius){
     //  timer.start();
     planner.initPathPlanner(this->id(),  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-
-    //emit pathPlannerResult(resultModified ,averageDir); get this variables
+    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
+    this->plannerAverageDir=planner.getAverageDir().norm();
     //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 }
 
 void Agent::execute(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
 
     switch (_task->select){
-        case parsian_msgs::parsian_robot_task::GOTOPOINT:
+        case parsian_msgs::parsian_robot_task::GOTOPOINT: {
             CSkillGotoPoint gotoPoint(this);
             gotoPoint.setMessage(&_task->gotoPointTask);
+            skill=&gotoPoint;
             gotoPoint.execute();
             ROS_INFO("GOTOPOINT executed!");
+        }
             break;
-        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID:
+        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
             CSkillGotoPointAvoid gotoPointAvoid(this);
             gotoPointAvoid.setMessage(&_task->gotoPointAvoidTask);
+            skill=&gotoPointAvoid;
             gotoPointAvoid.execute();
             ROS_INFO("GOTOPOINTAVOID executed!");
+        }
             break;
-        case parsian_msgs::parsian_robot_task::KICK:
+        case parsian_msgs::parsian_robot_task::KICK: {
+            CSkillKick skillKick(this);
+            skillKick.setMessage(&_task->kickTask);
+            skill=&skillKick;
+            skillKick.execute();
+
             ROS_INFO("KICK executed!");
             break;
-        case parsian_msgs::parsian_robot_task::ONETOUCH:
+        }
+        case parsian_msgs::parsian_robot_task::ONETOUCH: {
+            CSkillKickOneTouch oneTouch(this);
+            oneTouch.setMessage(&_task->oneTouchTask);
+            skill=&oneTouch;
+            oneTouch.execute();
             ROS_INFO("ONETOUCH executed!");
+        }
             break;
-        case parsian_msgs::parsian_robot_task::RECIVEPASS:
+        case parsian_msgs::parsian_robot_task::RECIVEPASS: {
+            CSkillReceivePass receivePass(this);
+            receivePass.setMessage(this);
+            skill=&receivePass;
+            receivePass.execute();
             ROS_INFO("RECIVEPASS executed!");
+        }
             break;
 
 

@@ -15,7 +15,7 @@ void WMNodelet::onInit() {
     wm = nullptr;
     wm = new CWorldModel(5);
 //    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
-    wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("wm", 1000);
+    wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
     vision_detection_sub = nh.subscribe("vision_detection", 10, &WMNodelet::detectionCb, this);
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
 

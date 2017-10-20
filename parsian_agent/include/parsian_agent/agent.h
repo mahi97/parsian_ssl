@@ -22,7 +22,7 @@ struct Fault {
 };
 
 
-
+class CSkill;
 class Agent
 {
 public:
@@ -58,8 +58,8 @@ public:
 
     } status;
 
- //   void generateRobotCommand();
-
+    CSkill *skill;
+    QString skillName;
     bool changeIsNeeded;
 
     Vector2D homePos;

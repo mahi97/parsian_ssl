@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/kickaction.h>
 
-void KickAction::setMessage(void* _msg) {
+void KickAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_kick msg = *((parsian_msgs::parsian_skill_kick*)_msg);
         robot_id = msg.robot_id;
         tolerance = msg.tolerance;

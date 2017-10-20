@@ -13,7 +13,7 @@ class OnetouchAction : public Action {
 
 public:
 
-    void setMessage(void* _msg);
+    void setMessage(const void* _msg);
 
     void* getMessage();
 
