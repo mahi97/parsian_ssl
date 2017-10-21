@@ -1,7 +1,3 @@
-//
-// Created by parsian-ai on 9/21/17.
-//
-
 #include "parsian_util/core/team.h"
 
 CTeam::CTeam(const bool isYellow, const bool isLeft)

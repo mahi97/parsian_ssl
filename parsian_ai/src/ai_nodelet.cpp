@@ -27,7 +27,6 @@ void AINodelet::onInit() {
         robTask[i] =
                 nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
     }
-
     drawer = new Drawer();
     debugger = new Debugger();
 
@@ -35,24 +34,32 @@ void AINodelet::onInit() {
 
 void AINodelet::timerCb(const ros::TimerEvent& event) {
 
-//      ai.execute();
+      ai.execute();
     drawPub.publish(drawer->draws);
     debugPub.publish(debugger->debugs);
-//        ai.publish({&gpaPub, &gpaPub, &kickPub, &recvPub});
 }
 
 
-void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
+
+void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ai.updateWM(_wm);
     ai.execute();
 
-//    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
+    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
     robTask[wm->our.activeAgentID(0)].publish(ai.getTask(wm->our.activeAgentID(0)));
-//    }
+    }
 
+}
+void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
+    ai.updateReferee(_ref);
+}
+
+void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs) {
+    ai.updateRobotStatus(_rs);
 }
 
 void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
 {
     conf = config;
 }
+

@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/{{file_name}}.h>
 
-void {{action_name}}::setMessage(void* _msg) {
+void {{action_name}}::setMessage(const void* _msg) {
     parsian_msgs::{{message}} msg = *((parsian_msgs::{{message}}*)_msg);
     {{#properties}}
         {{local}} = msg.{{local}};

@@ -13,7 +13,7 @@ class {{action_name}} : {{#has_base}}public {{base_action}} {{/has_base}}{{^has_
 
 public:
 
-    void setMessage(void* _msg);
+    void setMessage(const void* _msg);
 
     void* getMessage();
 

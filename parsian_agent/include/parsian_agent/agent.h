@@ -21,8 +21,8 @@ struct Fault {
 
 };
 
-class CSkill;
 
+class CSkill;
 class Agent
 {
 public:
@@ -58,8 +58,8 @@ public:
 
     } status;
 
- //   void generateRobotCommand();
-
+    CSkill *skill;
+    QString skillName;
     bool changeIsNeeded;
 
     Vector2D homePos;
@@ -72,8 +72,6 @@ public:
     bool starter;
     bool canRecvPass;
     bool idle;
-    CSkill* skill;
-    QString skillName;
     int id();
     int commandId();
     bool trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop);
@@ -155,7 +153,8 @@ public:
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
-private:
+
+    private:
     CPlanner planner;
     void jacobianInverse(double _v1, double _v2, double _v3, double _v4,double &_vx, double &_vy, double &_w);
     bool calibrateGyro;
@@ -166,14 +165,13 @@ private:
     double getVar( double data[] );
     Matrix ANN_forward( Matrix input );
 
-   public:
+    public:
     void initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
                             const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                             const double &_ballObstacleRadius);
 
-        const double gain = 1.013;
-    void setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task);
-    void execute();
+    const double gain = 1.013;
+    void execute(const parsian_msgs::parsian_robot_taskConstPtr& _task);
     parsian_msgs::parsian_robot_command getCommand();
     parsian_msgs::grsim_robot_command getGrSimCommand();
     parsian_msgs::parsian_robot_task getTask();

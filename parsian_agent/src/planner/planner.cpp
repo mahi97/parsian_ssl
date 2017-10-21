@@ -720,7 +720,6 @@ void CPlanner::initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _o
         //    debug(QString("%1) PathPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
     generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
     runPlanner();
-
 }
 
 double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vector2D posT){
@@ -909,7 +908,12 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     }
 }
 
-
+vector<Vector2D> CPlanner::getResultModified (){
+    return resultModified;
+}
+Vector2D CPlanner::getAverageDir(){
+    return  averageDir;
+}
 
 
 

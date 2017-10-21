@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/onetouchaction.h>
 
-void OnetouchAction::setMessage(void* _msg) {
+void OnetouchAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_oneTouch msg = *((parsian_msgs::parsian_skill_oneTouch*)_msg);
         robot_id = msg.robot_id;
         chip = msg.chip;

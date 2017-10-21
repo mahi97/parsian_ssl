@@ -140,7 +140,8 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_nodelet
-        src/agent_nodelet.cpp)
+        src/agent_nodelet.cpp
+        )
 
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
@@ -164,14 +165,17 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
-	${PROJECT_NAME}_gencfg
+	    ${PROJECT_NAME}_gencfg
+        )
+
+
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
         )
 
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
-        ${PROJECT_NAME}
-        ${PROJECT_NAME}_nodelet
-        ${QT_LIBRARIES}
         )
 
 
@@ -182,6 +186,7 @@ add_dependencies(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME}_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
@@ -191,10 +196,6 @@ target_link_libraries(${PROJECT_NAME}_nodelet
         )
 
 
-target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        )
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
