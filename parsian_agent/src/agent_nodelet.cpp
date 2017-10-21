@@ -42,9 +42,10 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& robot_task){
 
-
+    ROS_INFO("callBack called");
     agent->execute(robot_task);
     parsian_robot_command_pub.publish(agent->getCommand());
+
     grsim_robot_command_pub.publish(agent->getGrSimCommand());
 
 }

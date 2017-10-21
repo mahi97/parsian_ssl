@@ -1102,6 +1102,7 @@ void Agent::execute(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
 }
 
 parsian_msgs::parsian_robot_command Agent::getCommand() {
+    ROS_INFO("CommunicationCommand_generated");
     parsian_msgs::parsian_robot_command command;
     int counter = 1;
 
@@ -1119,6 +1120,7 @@ parsian_msgs::parsian_robot_command Agent::getCommand() {
 }
 
 parsian_msgs::grsim_robot_command Agent::getGrSimCommand() {
+    ROS_INFO("grsimCommand_generated");
     parsian_msgs::grsim_robot_command  grsim_robot_command_msg;
     grsim_robot_command_msg.id= static_cast<unsigned char>(id());
 
