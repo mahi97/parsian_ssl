@@ -27,7 +27,7 @@ namespace parsian_communication {
         void onInit();
 
         CCommunicator communicator;
-
+        ros::Subscriber robotPacketSub;
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
 
