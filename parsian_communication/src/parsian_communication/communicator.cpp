@@ -78,7 +78,7 @@ void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &
             tempStr[j] = robotPacket.packets.at(j);
         }
         sprintf(test,"packet :%lu", robotPacket.packets.size());
-        ROS_INFO(test);
+        ROS_INFO_STREAM(test);
         tempStr[0] = static_cast<char>(0x99);
 
         sendString(tempStr, static_cast<int>(robotPacket.packets.size()));
