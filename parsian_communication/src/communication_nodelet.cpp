@@ -21,9 +21,9 @@ void CommunicationNodelet::onInit() {
 
     drawPub    = private_n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
     debugPub   = private_n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
-    ros::Subscriber robotPacketSub   = n.subscribe("/robot_packets" , 1000, &CommunicationNodelet::callBack, this);
+    robotPacketSub   = n.subscribe("/packet_node/packets" , 1000, &CommunicationNodelet::callBack, this);
     /////connect serial
-    if(!communicator.isSerialConnected()){
+    while(!communicator.isSerialConnected()){
         communicator.connectSerial("/dev/ttyUSB0");
     }
 //    ros::Rate loop_rate(62);
@@ -40,7 +40,9 @@ void CommunicationNodelet::onInit() {
 }
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
+  //ROS_INFO("salam");
     communicator.packetCallBack(_packet);
+
 }
 
 void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {

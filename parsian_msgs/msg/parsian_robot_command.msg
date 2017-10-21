@@ -5,7 +5,6 @@ uint16 kickSpeed
 bool chip
 bool release
 bool debug
-bool forceKick
-float64 vel_x
-float64 vel_y
+float64 vel_F
+float64 vel_N
 float64 vel_w

@@ -5,7 +5,7 @@
 #ifndef PARSIAN_COMMUNICATION_COMMUNICATION_NODELET_H
 #define PARSIAN_COMMUNICATION_COMMUNICATION_NODELET_H
 #define _MAX_ROBOT_NUM 12
-#define _ROBOT_PACKET_SIZE 13
+#define _ROBOT_PACKET_SIZE 14
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
@@ -25,12 +25,28 @@ namespace parsian_packet {
         void onInit();
 
         Packet packet;
+        parsian_msgs::parsian_packets robotPacks;
 
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
         ros::Publisher  packetPub;
         ros::Timer      timer;
 
+        ros::Subscriber robotPacketSub0 ;
+        ros::Subscriber robotPacketSub1 ;
+        ros::Subscriber robotPacketSub2 ;
+        ros::Subscriber robotPacketSub3 ;
+        ros::Subscriber robotPacketSub4 ;
+        ros::Subscriber robotPacketSub5 ;
+        ros::Subscriber robotPacketSub6 ;
+        ros::Subscriber robotPacketSub7 ;
+        ros::Subscriber robotPacketSub8 ;
+        ros::Subscriber robotPacketSub9 ;
+        ros::Subscriber robotPacketSub10;
+        ros::Subscriber robotPacketSub11;
+
+
+        ros::Subscriber visinSub;
         void callBack(const parsian_msgs::parsian_robot_commandConstPtr& _packet);
         void syncData(const parsian_msgs::ssl_vision_detectionConstPtr& _packet);
 
