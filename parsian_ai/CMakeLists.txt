@@ -202,6 +202,8 @@ add_executable(ai_node
 add_dependencies(ai_node
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+
 		)
 add_dependencies(ai_nodelet_lib
 		${${PROJECT_NAME}_EXPORTED_TARGETS}

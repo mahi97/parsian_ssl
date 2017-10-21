@@ -42,7 +42,7 @@ namespace parsian_protobuf_wrapper {
         ros::Publisher ssl_referee_pub;
         ros::Timer timer;
 
-};
+    };
 
 }
 #endif //PARSIAN_PROTOBUF_WRAPPER_PARSIAN_REFEREE_NODELET_H

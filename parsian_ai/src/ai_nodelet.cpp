@@ -4,29 +4,29 @@ PLUGINLIB_EXPORT_CLASS(parsian_ai::AINodelet, nodelet::Nodelet);
 
 using namespace parsian_ai;
 
-  void AINodelet::onInit() {
+void AINodelet::onInit() {
 
-      ros::NodeHandle &nh = getNodeHandle();
-      ros::NodeHandle &private_nh = getPrivateNodeHandle();
-      worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::wmCb, this);
-      robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
-      refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
+    ros::NodeHandle &nh = getNodeHandle();
+    ros::NodeHandle &private_nh = getPrivateNodeHandle();
+    worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::wmCb, this);
+    robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
+    refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
 
-      drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
-      debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-      timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
+    drawPub = private_nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
+    debugPub = private_nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
+    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
-      //config server settings
-      server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
-      dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
-      f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
-      server->setCallback(f);
+    //config server settings
+    server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
+    dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
+    f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
 
-      for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
-          std::string topic("robot_tsk_"+std::to_string(i));
-          robTask[i] =
-                  nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
-      }
+    for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
+        std::string topic("robot_tsk_"+std::to_string(i));
+        robTask[i] =
+                nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
+    }
 
     drawer = new Drawer();
     debugger = new Debugger();
@@ -52,7 +52,7 @@ void AINodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
 
 }
 
-  void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
-  {
-
-  }
+void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
+{
+    conf = config;
+}

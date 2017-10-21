@@ -51,5 +51,6 @@ void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& robot_ta
 
 void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
 {
-
+    conf = config;
+    ROS_INFO_STREAM(conf.AccMaxForward);
 }

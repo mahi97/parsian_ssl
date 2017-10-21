@@ -16,6 +16,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "parsian_ai/aiConfig.h"
+#include <parsian_ai/config.h>
 
 
 namespace parsian_ai {

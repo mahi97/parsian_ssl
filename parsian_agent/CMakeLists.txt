@@ -154,7 +154,7 @@ add_library(${PROJECT_NAME}
         src/planner/obstacle.cpp
         src/planner/planner.cpp
         include/planner/state.h
-
+        include/parsian_agent/config.h
         )
 
 add_executable(${PROJECT_NAME}_node
