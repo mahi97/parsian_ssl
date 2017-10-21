@@ -8,7 +8,7 @@ void AINodelet::onInit() {
 
     ros::NodeHandle &nh = getNodeHandle();
     ros::NodeHandle &private_nh = getPrivateNodeHandle();
-    worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::wmCb, this);
+    worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, &ai);
     refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, &ai);
 

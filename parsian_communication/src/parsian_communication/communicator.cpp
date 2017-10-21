@@ -10,7 +10,7 @@ CBaseCommunicator::CBaseCommunicator()
     serial_open= false;
     error      = false;
     p = new CMySerialPort();
-    p->serial_port = NULL;
+    p->serial_port = nullptr;
     PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF,40};
 }
 
@@ -34,7 +34,7 @@ void CBaseCommunicator::connectSerial(const char* port)
 
     p->serial_port = new QextSerialPort(p->portSettings);
     p->serial_port->setPortName(_port);
-    if( p->serial_port->open(QIODevice::ReadWrite) == true ){
+    if(p->serial_port->open(QIODevice::ReadWrite)){
         serial_open = true;
         ROS_INFO("successfully");
 //        connect(recTime,SIGNAL(timeout()),this,SLOT(readData()));
@@ -50,10 +50,10 @@ void CBaseCommunicator::connectSerial(const char* port)
 
 void CBaseCommunicator::closeSerial()
 {
-    if (p->serial_port==NULL) return;
+    if (p->serial_port == nullptr) return;
     p->serial_port->close();
     delete p->serial_port;
-    p->serial_port = NULL;
+    p->serial_port = nullptr;
     serial_open = false;
 }
 
@@ -65,26 +65,23 @@ CCommunicator::CCommunicator() : CBaseCommunicator()
 {
 }
 
-CCommunicator::~CCommunicator()
-{
-}
+CCommunicator::~CCommunicator() = default;
 
 void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &_packet)
 {
     char* tempStr;
     char test[100];
-    for(int i = 0 ; i < _packet->value.size() ; i ++)
-    {
-        tempStr = new char[_packet->value.at(i).packets.size()];
-        for(int j = 0 ; j < _packet->value.at(i).packets.size() ; j++)
+    for (const auto &robotPacket : _packet->value) {
+        tempStr = new char[robotPacket.packets.size()];
+        for(int j = 0 ; j < robotPacket.packets.size() ; j++)
         {
-            tempStr[j] = _packet->value.at(i).packets.at(j);
+            tempStr[j] = robotPacket.packets.at(j);
         }
-        sprintf(test,"packet :%d",_packet->value.at(i).packets.size());
+        sprintf(test,"packet :%lu", robotPacket.packets.size());
         ROS_INFO(test);
-        tempStr[0] = 0x99;
+        tempStr[0] = static_cast<char>(0x99);
 
-        sendString(tempStr,_packet->value.at(i).packets.size());
+        sendString(tempStr, static_cast<int>(robotPacket.packets.size()));
 
         delete tempStr;
     }
@@ -94,12 +91,9 @@ void CCommunicator::sendString(const char* s,int len)
 {
     bool flag = false;
 
-    if (true /*use_serial && serial_open*/)
+    for(int i = 0 ; i < len ; i++)
     {
-        for(int i = 0 ; i < len ; i++)
-        {
-            p->serial_port->write(s + i,1);
-        }
+        p->serial_port->write(s + i,1);
     }
 }
 
@@ -108,4 +102,3 @@ void CCommunicator::sendByte(char c)
     char ch = c;
     sendString(&ch,1);
 }
-
