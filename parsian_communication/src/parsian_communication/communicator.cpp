@@ -1,6 +1,6 @@
 #include <parsian_communication/communicator.h>
-
-
+#include <string.h>
+#include <stdio.h>
 
 
 /*************************************** CBaseCommunicator Class ******************************************/
@@ -30,6 +30,8 @@ void CBaseCommunicator::connectSerial(const char* port)
 {
     closeSerial();
     _port = QString(port);
+    p->setSerialParams(115200,8,0,1);
+
     p->serial_port = new QextSerialPort(p->portSettings);
     p->serial_port->setPortName(_port);
     if( p->serial_port->open(QIODevice::ReadWrite) == true ){
@@ -70,6 +72,7 @@ CCommunicator::~CCommunicator()
 void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &_packet)
 {
     char* tempStr;
+    char test[100];
     for(int i = 0 ; i < _packet->value.size() ; i ++)
     {
         tempStr = new char[_packet->value.at(i).packets.size()];
@@ -77,7 +80,12 @@ void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &
         {
             tempStr[j] = _packet->value.at(i).packets.at(j);
         }
+        sprintf(test,"packet :%d",_packet->value.at(i).packets.size());
+        ROS_INFO(test);
+        tempStr[0] = 0x99;
+
         sendString(tempStr,_packet->value.at(i).packets.size());
+
         delete tempStr;
     }
 }
@@ -88,7 +96,10 @@ void CCommunicator::sendString(const char* s,int len)
 
     if (true /*use_serial && serial_open*/)
     {
-        p->serial_port->write(s,len);
+        for(int i = 0 ; i < len ; i++)
+        {
+            p->serial_port->write(s + i,1);
+        }
     }
 }
 
