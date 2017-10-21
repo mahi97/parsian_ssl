@@ -34,6 +34,8 @@ namespace parsian_protobuf_wrapper {
         void timerCb(const ros::TimerEvent& event);
         void callback(const protobuf_wrapper_config::refereeConfig &config, uint32_t level) ;
 
+        boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>> server;
+
 
         SSL_Referee ssl_referee;
         std::string teamColor;

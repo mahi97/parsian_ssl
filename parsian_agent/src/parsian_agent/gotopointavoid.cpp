@@ -5,31 +5,32 @@
 #include <parsian_agent/gotopointavoid.h>
 
 
-//--------------------------------------------------
+
 INIT_SKILL(CSkillGotoPointAvoid, "gotopointavoid");
 
-CSkillGotoPointAvoid::CSkillGotoPointAvoid(CAgent *_agent) : CSkillGotoPoint(_agent)
+
+CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkill(_agent)
 {
     counter = 0;
-    data.avoidPenaltyArea = static_cast<unsigned char>(true);
+    avoidPenaltyArea = static_cast<unsigned char>(true);
     inited = false;
-    data.keeplooking = static_cast<unsigned char>(false);
-    data.extendStep = static_cast<float>(-1.0);
+    keeplooking = static_cast<unsigned char>(false);
+    extendStep = static_cast<float>(-1.0);
     gotopoint = new CSkillGotoPoint(_agent);
     bangBang = new CNewBangBang();
-    data.base.dynamicStart = static_cast<unsigned char>(true);
-    data.plan2 = static_cast<unsigned char>(false);
-    data.noAvoid = false;
-    data.avoidCenterCircle = false;
-    data.avoidGoalPosts = true;
+    dynamicStart = static_cast<unsigned char>(true);
+    plan2 = static_cast<unsigned char>(false);
+    noAvoid = false;
+    avoidCenterCircle = false;
+    avoidGoalPosts = true;
     stucked = -1;
-    counting = 0;
-    averageDir.assign(0 , 0);
-    data.addVel = Vector2D(data.addVel).assign(0,0).toParsianVector2D();
-    data.nextPos = Vector2D::INVALIDATED.toParsianVector2D();
-    data.base.diveMode = false;
-    data.base.oneTouchMode = false;
-    data.drawPath = false;
+    counting = 0; // SGP
+    averageDir.assign(0, 0);
+    addVel.assign(0, 0);
+    nextPos.invalidate();
+    diveMode = false;
+    oneTouchMode = false;
+    drawPath = false;
 }
 
 CSkillGotoPointAvoid::~CSkillGotoPointAvoid()
@@ -64,9 +65,9 @@ void CSkillGotoPointAvoid::execute()
     agentVel = agent->vel();
     double dVx,dVy,dW;
     bangBang->setDecMax(1);//conf()->BangBang_DecMax()); // TODO : skill config
-    bangBang->setOneTouch(data.oneTouchMode);
+    bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
-    if(data.slowMode || data.slow)
+    if(slowMode || slowShot)
     {
         bangBang->setVelMax(1.4);
         bangBang->setSlow(true);
@@ -76,13 +77,13 @@ void CSkillGotoPointAvoid::execute()
         bangBang->setSlow(false);
         bangBang->setVelMax(1);//conf()->BangBang_VelMax()); // TODO : skill Config
     }
-    if (!Vector2D(data.targetPos).valid())
+    if (!Vector2D(targetPos).valid())
     {
-//        agent->waitHere();
+        agent->waitHere();
         return;
     }
     if (!targetVel.valid())
-        data.vel2.assign(0,0);
+        targetVel.assign(0,0);
 
     if(drawPath)
     {
@@ -95,7 +96,7 @@ void CSkillGotoPointAvoid::execute()
             pathPoints.append(agentPos);
             for(int i = 0 ; i < pathPoints.size() ; i++)
             {
-//                draw(Circle2D(pathPoints[i],0.02),QColor(Qt::blue),true);
+                drawer->draw(Circle2D(pathPoints[i],0.02),QColor(Qt::blue),true);
             }
         }
     }
@@ -105,12 +106,12 @@ void CSkillGotoPointAvoid::execute()
     }
 
     /////////////////
-    if (data.targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
     if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
 //        {
 //            if(targetPos.x < 0.2)
@@ -125,30 +126,56 @@ void CSkillGotoPointAvoid::execute()
 //                targetPos.x = 4.3;
 //            }
 //        }
-    }
+//    }
 
-    if (data.lookat.valid())
+    if (lookAt.valid())
     {
-        targetDir = (lookat - agentPos).norm();
+        targetDir = (lookAt - agentPos).norm();
     }
 
 //    knowledge->plotWidgetCustom[1] = agentVel.length();
     //    debug(QString("speed: %1").arg(agentVel.length()),D_MHMMD);
     ///////////
-    targetValidate();
+
+    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
+//        if(conf()->LocalSettings_OurTeamSide() == "Right")
+//        {
+//            if(targetPos.x < 0.2)
+//            {
+//                targetPos.x = 0.2;
+//            }
+//        }
+//        else
+//        {
+//            if(targetPos.x > 4.3)
+//            {
+//                targetPos.x = 4.3;
+//            }
+//        }
+//    }
+
+    if (lookAt.valid())
+    {
+        targetDir = (lookAt - agentPos).norm();
+    }
+
     if(noAvoid)
     {
         result.clear();
     }
     else
     {
-        // TODO : Avoidance service call
-//        agent->initPlanner(agent->id() , targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
-//        result.clear();
-//        for( int i=agent->pathPlannerResult.size()-1 ; i>=0 ; i-- )
-//        {
-//            result.append(agent->pathPlannerResult[i]);
-//        }
+        agent->initPlanner(agent->id() , targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
+        result.clear();
+        for(unsigned long i=agent->pathPlannerResult.size()-1 ; i>=0 ; i-- )
+        {
+            result.append(agent->pathPlannerResult[i]);
+        }
     }
 
     double dist = 0.0;
@@ -192,7 +219,7 @@ void CSkillGotoPointAvoid::execute()
     if(result.size() >= 3)
     {
         alpha = fabs(Vector2D::angleBetween(result[1] - result[0] , result[2] - result[1]).degree());
-//        debug(QString("alpha : %1").arg(alpha),D_MHMMD);
+        DEBUG(QString("alpha : %1").arg(alpha),D_MHMMD);
         lllll = result[1];
         vf = -2 * log(alpha) + 9;
         vf = max(vf , 0.5);
@@ -226,14 +253,14 @@ void CSkillGotoPointAvoid::execute()
 
 
     if( noAvoid || result.size() < 3){
-        lllll = data.targetPos;
+        lllll = targetPos;
         vf = 0;
     }
 
     bangBang->setSmooth(true);// = false;
-    bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,data.targetDir,vf,0.016,dVx,dVy,dW);
-//    agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW); // TODO : Robot Command
-//    agent->accelerationLimiter(vf,oneTouchMode);
+    bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
+    agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
+    agent->accelerationLimiter(vf,oneTouchMode);
 
 
 
@@ -242,7 +269,7 @@ void CSkillGotoPointAvoid::execute()
 
 double CSkillGotoPointAvoid::progress()
 {
-    if(agentPos.dist(data.targetPos) < 0.05)
+    if(agentPos.dist(targetPos) < 0.05)
     {
         return 1;
     }
@@ -251,27 +278,36 @@ double CSkillGotoPointAvoid::progress()
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTargetLook(Vector2D finalPos, Vector2D lookAtPoint)
 {
-    init(finalPos, Vector2D(1.0, 0.0));
-    setFinalVel(Vector2D(0.0, 0.0));
-    setLookAt(lookAtPoint);
-    setKeepLooking(true);
+    setTargetpos(finalPos);
+    setTargetdir(Vector2D{1.0, 0.0});
+    setTargetvel(Vector2D(0.0, 0.0));
+    setLookat(lookAtPoint);
+    setKeeplooking(true);
     return this;
 }
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2D finalDir)
 {
-    init(finalPos, finalDir);
-    setFinalVel(Vector2D(0.0, 0.0));
-    setLookAt(Vector2D::INVALIDATED);
-    setKeepLooking(false);
+    setTargetpos(finalPos);
+    setTargetdir(finalDir);
+    setTargetvel(Vector2D(0.0, 0.0));
+    setLookat(Vector2D::INVALIDATED);
+    setKeeplooking(false);
     return this;
 }
 
-double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
+void CSkillGotoPointAvoid::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel)
+{
+    targetPos = target;
+    targetDir = _targetDir;
+    targetVel = _targetVel;
+}
+
+double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax,QList <int> _ourRelax,QList <int> _oppRelax ,bool avoidPenalty,double ballObstacleReduce,bool _noAvoid)
 {
 
     double _x3;
-    double acc = 1;//conf()->BangBang_AccMaxForward(); // TODO :config
+    double acc;//conf()->BangBang_AccMaxForward(); // TODO :config
     double dec = 1;//conf()->BangBang_DecMax();
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
@@ -291,13 +327,13 @@ double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMa
     }
     else
     {
-        // TODO : Avoidance Service
-//        _agentT->initPlanner(_agentT->id(),posT,_ourRelax,_oppRelax,avoidPenalty,false,ballObstacleReduce);
-//        _result.clear();
-//        for( int i = _agentT->pathPlannerResult.size()-1 ; i>=0 ; i-- )
-//        {
-//            _result.append(_agentT->pathPlannerResult[i]);
-//        }
+
+        _agentT->initPlanner(_agentT->id(),posT,_ourRelax,_oppRelax,avoidPenalty,false,ballObstacleReduce);
+        _result.clear();
+        for(unsigned long i = _agentT->pathPlannerResult.size()-1 ; i>=0 ; i-- )
+        {
+            _result.append(_agentT->pathPlannerResult[i]);
+        }
     }
 
     if( _result.size() >= 3) {
@@ -311,7 +347,7 @@ double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMa
         }
         distEffect = dist / _agentT->pos().dist(posT);
         distEffect += rrtAngSum*angCoef;
-        distEffect = max(1,distEffect);
+        distEffect = std::max(1.0, distEffect);
     }
 
     if(tAgentVel.length() < 0.2)
@@ -335,20 +371,19 @@ double CSkillGotoPointAvoid::timeNeeded(CAgent *_agentT,Vector2D posT,double vMa
 
     if(_agentT->pos().dist(posT) < _x3 ) {
 //        return max(0,(tAgentVel.length()/conf()->BangBang_DecMax() - offset) * distEffect);
-        return max(0,(tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
+        return std::max(0.0, (tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
         {
-            return max(0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
+            return std::max(0.0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
         }
-        return max(0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
+        return std::max(0.0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
 
     }
     else
     {
-        return max(0,(vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
+        return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
     }
 
 }
-

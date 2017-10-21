@@ -1,16 +1,59 @@
 #include <parsian_agent/agent.h>
 #include <QDebug>
 #include <QFile>
-//#include <time.h>
+//#include <parsian_agent/onetouch.h>
+#include <parsian_agent/skills.h>
+#include <parsian_util/core/worldmodel.h>
 
 //#define debug_train
 //#define skuba_control
 //#define use_ANN
-
+// todo uncomment conf
 #define errlen 100
 
-double getVar( double data[errlen] )
-{
+
+
+//void Agent::generateRobotCommand()
+//{
+//
+//    //accelerationLimiter();
+//    double veltan= (vel().x)*cos(dir().th().radian()) + (vel().y)*sin(dir().th().radian());
+//    double velnorm= -1*(vel().x)*sin(dir().th().radian()) + (vel().y)*cos(dir().th().radian());
+//    //    debug(QString("vf: %1 , Vn :%2").arg(vforward).arg(vnormal),D_MHMMD);
+//
+//    calibrated++;
+//
+//    if ( isnan(vangular)){
+//        drawer->draw(QString("Vel : %1").arg(vangular),Vector2D(0,0),"brown",18);
+//        vangular = 0.0;
+//    }
+//
+//    int kickNumber = static_cast<int>(round(kickSpeed));//*160.0;
+//
+//    double ang=-dir().th().radian();
+//
+//    int vel_tangent = static_cast<int>(floor(vforward * 487.0));
+//    int vel_normal  = static_cast<int>(floor(vnormal * 487.0));
+//    int vel_angular  = static_cast<int>(((double)vangular) * ((double)256.0 / (double) 360.0));
+//
+//    if (vel_tangent > 2047) vel_tangent = 2047;
+//    if (vel_tangent < -2047) vel_tangent = -2047;
+//
+//    if (vel_normal > 2047) vel_normal = 2047;
+//    if (vel_normal < -2047) vel_normal = -2047;
+//
+//    if (vel_angular > 2047) vel_angular = 2047;
+//    if (vel_angular < -2047) vel_angular = -2047;
+//
+//    int vel_angular_abs = abs(vel_angular_abs);
+//    int vel_tangent_abs = abs(vel_tangent_abs);
+//    int vel_normal_abs  = abs(vel_normal_abs);
+//    requestBit = true; // change to release mode command
+//    unsigned int velTanSend = static_cast<unsigned int>(fabs(veltan) * 100);
+//    unsigned int velNormSend = (static_cast<unsigned int>(fabs(velnorm) * 100));
+//}
+
+double Agent::getVar(double *data) {
     double mean = 0.0;
     for( int i = 0 ; i < errlen ; i++ )
     {
@@ -38,7 +81,7 @@ Matrix tansig( Matrix n )
     return n;
 }
 
-Matrix ANN_forward( Matrix input )
+Matrix Agent::ANN_forward( Matrix input )
 {
     static Matrix b1(10,1),b2(4,1),IW(10,3),LW(4,10);
     static bool run = true;
@@ -116,16 +159,13 @@ Matrix ANN_forward( Matrix input )
     return output;
 }
 
-CAgent::CAgent(short int _ID)
+Agent::Agent(int _ID):planner(_ID)
 {
     srand48(time(0));
     packetNum = 0;
     stopTrain=false;wh1=wh2=wh3=wh4=0.0;startTrain=false;
     selfID = _ID;
-    skill = NULL;
-
-    for( int i=0 ; i<_PACKET_SIZE ; i++ )
-        outputBuffer[i] == 0x0;
+    skill = nullptr;
 
     onOffState = true;
     commandID = selfID;
@@ -168,7 +208,6 @@ CAgent::CAgent(short int _ID)
     this->abilities.hasGyro = false;
 
     homePos.assign(0 , 0);
-    intention = NULL;
     _ACC = 0;
     _DEC = 0;
     agentStopTime.start();
@@ -177,12 +216,12 @@ CAgent::CAgent(short int _ID)
 
 }
 
-void CAgent::loadProfiles()
+void Agent::loadProfiles()
 {
     //Set shotProfile From File
     {
-        for( int i = 0 ; i<32 ; i++ )
-            shotProfile[i][0] = shotProfile[i][1] = -1.0;
+        for (auto &i : shotProfile)
+            i[0] = i[1] = -1.0;
         QFile file(QString("profiles/robot%1.shot").arg(selfID));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
             //            qDebug()<<(QString("Parsing profiles/robot%1.shot").arg(selfID));
@@ -210,8 +249,8 @@ void CAgent::loadProfiles()
 
     //Set chipProfile From File
     {
-        for( int i = 0 ; i<32 ; i++ )
-            chipProfile[i][0] = chipProfile[i][1] = -1.0;
+        for (auto &i : chipProfile)
+            i[0] = i[1] = -1.0;
         QFile file(QString("profiles/robot%1.chip").arg(selfID));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
             //            qDebug()<<(QString("Parsing profiles/robot%1.chip").arg(selfID));
@@ -239,28 +278,28 @@ void CAgent::loadProfiles()
     }
 }
 
-int CAgent::id()
+int Agent::id()
 {
     return selfID;
 }
 
-double CAgent::getVisibility(){
+double Agent::getVisibility(){
     return self()->inSight;
 }
 
-void CAgent::setVisibility( const double &inSight ){
+void Agent::setVisibility( const double &inSight ){
     self()->inSight = inSight;
 }
 
-bool CAgent::isVisible(){
+bool Agent::isVisible(){
     return self()->inSight > 0;
 }
 
-bool CAgent::notVisible(){
+bool Agent::notVisible(){
     return self()->inSight <= 0;
 }
 
-int CAgent::commandId()
+int Agent::commandId()
 {
     return commandID;
 }
@@ -277,10 +316,10 @@ static double lastVely[errlen];
 static double lastOmega[errlen];
 const int decay_accel=10;
 static int counter = 0;
-static double bvf=0.0,bvn=0.0,bva=0.0;
-static Matrix Epsilon(12,1);
+//static double bvf=0.0,bvn=0.0,bva=0.0;
+//static Matrix Epsilon(12,1);
 
-bool CAgent::trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop)
+bool Agent::trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop)
 {
     static int error_set = true;
     if(error_set)
@@ -300,17 +339,6 @@ bool CAgent::trajectory(double& vf,double& vn,double& va,double w1,double w2,dou
     double thry = 0.10;
     double thrw = 10.0;
 
-#ifdef debug_train
-    if( counter == errlen + 10 )
-    {
-        QFile mfile("./test/error.txt");
-        mfile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-        QTextStream mts(&mfile);
-        mts << vf << " " << cvx << "\t" << vn << " " << cvy << "\t" << va << " " << cvw;
-        mts << endl;
-        mfile.close();
-    }
-#endif
 
     if( cvx < thrx && cvy < thry && cvw < thrw && counter == errlen + 10 )
     {
@@ -336,32 +364,15 @@ bool CAgent::trajectory(double& vf,double& vn,double& va,double w1,double w2,dou
         mVelx /= errlen;
         mVely /= errlen;
         mOmega /= errlen;
-
-        ts1 << w1 << " " << w2 << " " << w3 << " " << w4 << endl;
-        ts2 << mVelx << " " << mVely << " " << mOmega << endl;
-        ts3 << vf << " " << vn << " " << va << endl;
+       //todo
+       // ts1 << w1 << " " << w2 << " " << w3 << " " << w4 << endl;
+       // ts2 << mVelx << " " << mVely << " " << mOmega << endl;
+       // ts3 << vf << " " << vn << " " << va << endl;
 
         file1.close();
         file2.close();
         file3.close();
 
-#ifdef skuba_control
-        Matrix iden(3);
-        Matrix phi(1,4);
-        Matrix zita_captured(3,1);
-        Matrix zita_desired(3,1);
-        phi.e(0,0) = w1;
-        phi.e(0,1) = w2;
-        phi.e(0,2) = w3;
-        phi.e(0,3) = w4;
-        zita_captured.e(0,0) = mVelx;
-        zita_captured.e(1,0) = mVely;
-        zita_captured.e(2,0) = mOmega;
-        zita_desired.e(0,0) = vf;
-        zita_desired.e(1,0) = vn;
-        zita_desired.e(2,0) = va;
-        Epsilon = Epsilon + pseudoinverse(kron(iden,phi))*(zita_desired-zita_captured);
-#endif
 
         for(int i=0 ; i<errlen ; i++)
         {
@@ -377,31 +388,7 @@ bool CAgent::trajectory(double& vf,double& vn,double& va,double w1,double w2,dou
         {
             speed = 0.5;
         }
-        va = boundTo((((((double)(qrand()%181))*2)-180.0)/(speed)),-180.0,180.0);
-        //		if( va >= 49 )
-        //		{
-        //			va = -50;
-        //			if( vn >= 0.4 )
-        //			{
-        //				vn = -.5;
-        //				if( vf >= 0.4 )
-        //				{
-        //					return true;
-        //				}
-        //				else
-        //				{
-        //					vf += 0.25;
-        //				}
-        //			}
-        //			else
-        //			{
-        //				vn += 0.25;
-        //			}
-        //		}
-        //		else
-        //		{
-        //			va += 25;
-        //		}
+
         decay_x = fabs(vf) / decay_accel;
         decay_y = fabs(vn) / decay_accel;
         decay_w = fabs(va) / decay_accel;
@@ -426,7 +413,7 @@ bool CAgent::trajectory(double& vf,double& vn,double& va,double w1,double w2,dou
     return false;
 }
 
-void CAgent::accelerationLimiter(double vf,bool diveMode)
+void Agent::accelerationLimiter(double vf,bool diveMode)
 {
     ////first Stage Accelerate Limit
     double veltan= (vel().x)*cos(dir().th().radian()) + (vel().y)*sin(dir().th().radian());
@@ -447,7 +434,7 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
         agentStopTime.restart();
         timerReset = false;
     }
-    if(agentStopTime.elapsed() > 100 && timerReset == false)
+    if(agentStopTime.elapsed() > 100 && ! timerReset)
     {
         lastVn = velnorm;
         lastVf = veltan;
@@ -468,16 +455,15 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
     accCoef = atan(fabs(vforward)/fabs(vnormal))/_PI*2;
     if(diveMode)
     {
-        realAcc = 1.5 * accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal();
+        realAcc = 1.5 * 1/*accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal()*/;
     }
     else
     {
-        realAcc = accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal();
+        realAcc = 1/*accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal()*/;
 
     }
 
 
-#if 1
     commandV = sqrt((vforward*vforward)+(vnormal*vnormal));
     lastV = sqrt((lastVf*lastVf)+(lastVn*lastVn));
 
@@ -488,31 +474,29 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
     vforward = commandV * sin(atan2(tempVf,tempVn));
     vnormal = commandV * cos(atan2(tempVf,tempVn));
 
-#endif
-
     /////////////////Second order acc limit for trajectory planning
     if(!diveMode)
     {
         if(vforward >= 0 )
         {
-            if(vforward > (lastVf + conf()->BangBang_AccMaxForward()* 0.0166667))
+            if(vforward > (lastVf + 1/*conf()->BangBang_AccMaxForward()* 0.0166667*/))
             {
-                vforward = lastVf + (conf()->BangBang_AccMaxForward()* 0.0166667)*sign(vforward);
+                vforward = lastVf + 1/*(conf()->BangBang_AccMaxForward()* 0.0166667)*sign(vforward)*/;
             }
-            if(vforward < (lastVf - decCoef*conf()->BangBang_DecMax()* 0.0166667))
+            if(vforward < (lastVf - 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/))
             {
-                vforward = lastVf - (decCoef*conf()->BangBang_DecMax()* 0.0166667);
+                vforward = lastVf - 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
             }
         }
         else
         {
-            if(vforward < (lastVf - conf()->BangBang_AccMaxForward()* 0.0166667))
+            if(vforward < (lastVf - 1/*conf()->BangBang_AccMaxForward()* 0.0166667*/))
             {
-                vforward = lastVf - (conf()->BangBang_AccMaxForward()* 0.0166667);
+                vforward = lastVf - 1/*(conf()->BangBang_AccMaxForward()* 0.0166667)*/;
             }
-            if(vforward > (lastVf + decCoef*conf()->BangBang_DecMax()* 0.0166667))
+//            if(vforward > (lastVf + decCoef*conf()->BangBang_DecMax()* 0.0166667))
             {
-                vforward = lastVf + (decCoef*conf()->BangBang_DecMax()* 0.0166667);
+                vforward = lastVf + 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
             }
         }
     }
@@ -528,15 +512,15 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal > (lastVn + conf()->BangBang_AccMaxNormal()* 0.0166667))
+            if(vnormal > (lastVn + 1/*conf()->BangBang_AccMaxNormal()* 0.0166667*/))
             {
-                vnormal = lastVn + (conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + 1/*(conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal)*/;
             }
         }
 
-        if(!diveMode&&(vnormal < (lastVn - decCoef*conf()->BangBang_DecMax()* 0.0166667)))
+        if(!diveMode&&(vnormal < (lastVn - 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/)))
         {
-            vnormal = lastVn - (decCoef*conf()->BangBang_DecMax()* 0.0166667);
+            vnormal = lastVn - (decCoef*1/*conf()->BangBang_DecMax()* 0.0166667*/);
         }
     }
     else
@@ -550,15 +534,15 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal < (lastVn - conf()->BangBang_AccMaxNormal()* 0.0166667))
+            if(vnormal < (lastVn - 1/*conf()->BangBang_AccMaxNormal()* 0.0166667*/))
             {
-                vnormal = lastVn + (conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + 1/*(conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal)*/;
             }
         }
 
-        if(!diveMode&&(vnormal > (lastVn + decCoef*conf()->BangBang_DecMax()* 0.0166667)))
+        if(!diveMode&&(vnormal > (lastVn + 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/)))
         {
-            vnormal = lastVn + (decCoef*conf()->BangBang_DecMax()* 0.0166667);
+            vnormal = lastVn + 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
         }
     }
 
@@ -573,172 +557,66 @@ void CAgent::accelerationLimiter(double vf,bool diveMode)
     lastVn = vnormal;
 }
 
-void CAgent::generateRobotCommand()
-{
-
-    //accelerationLimiter();
-    double veltan= (vel().x)*cos(dir().th().radian()) + (vel().y)*sin(dir().th().radian());
-    double velnorm= -1*(vel().x)*sin(dir().th().radian()) + (vel().y)*cos(dir().th().radian());
-    //    debug(QString("vf: %1 , Vn :%2").arg(vforward).arg(vnormal),D_MHMMD);
-
-    calibrated++;
-    for( int i = 0; i < _PACKET_SIZE; i++)
-        outputBuffer[i] = 0x00;
-    if ( isnan(vangular)){
-        draw(QString("Vel : %1").arg(vangular),Vector2D(0,0),"brown",18);
-        vangular = 0.0;
-    }
-    outputBuffer[0] = 0x99;
-    outputBuffer[1] = commandID & 0x0F;
-    int kickNumber = round(kickSpeed);//*160.0;
-    if (roller != 0)
-        outputBuffer[1] = outputBuffer[1] | ((roller & 0x07) << 4);
-    outputBuffer[2] = kickNumber & 0x7F;
-    outputBuffer[3] = (kickNumber >> 7) & 0x07;
-
-    double ang=-dir().th().radian();
-
-    //setting BU for kalman
-    self()->kalman_velocs.vx = (vforward*cos(ang)) + (vnormal*sin(ang));
-
-    self()->kalman_velocs.vy = -(vforward*sin(ang)) + (vnormal*cos(ang));
-    self()->kalman_velocs.vw = vangular;
-
-    int vforwardI = floor(vforward * 487.0);
-    int vnormalI  = floor(vnormal * 487.0);
-    int vangularI  = ((double)vangular) * ((double)256.0 / (double) 360.0);
-
-    if (vforwardI > 2047) vforwardI = 2047;
-    if (vforwardI < -2047) vforwardI = -2047;
-
-    if (vnormalI > 2047) vnormalI = 2047;
-    if (vnormalI < -2047) vnormalI = -2047;
-
-    if (vangularI > 2047) vangularI = 2047;
-    if (vangularI < -2047) vangularI = -2047;
-
-    int vangularAbs = abs(vangularI);
-    int vforwardAbs = abs(vforwardI);
-    int vnormalAbs  = abs(vnormalI);
-
-    outputBuffer[3] = (((vangularAbs >> 7) & 0x0F) << 3) | outputBuffer[3];
-
-    outputBuffer[4] = vforwardAbs & 0x7F;
-    outputBuffer[5] = vnormalAbs & 0x7F;
-    outputBuffer[6] = (vforwardAbs >> 7) & 0x0F;
-    if (vforwardI < 0) outputBuffer[6] = outputBuffer[6] | 0x10;
-    if (vnormalI < 0) outputBuffer[6] = outputBuffer[6] | 0x20;
-
-    outputBuffer[7] = vangularAbs & 0x7F;
-
-    requestBit = true; // change to release mode command
-    if (requestBit && knowledge->getGameState() != CKnowledge::Halt)
-    {
-        outputBuffer[8] |= 0x01;
-    }
-
-    if (chip)
-        outputBuffer[8] = outputBuffer[8] | 0x02;
-    if (vangularI < 0)
-        outputBuffer[8] = outputBuffer[8] | 0x04;
-    outputBuffer[8] = outputBuffer[8] | (((vnormalAbs >> 7) & 0x0F) << 3);
-    //    outputBuffer[9] =  (int)(_ACC*5) & (0x7F);
-    //    outputBuffer[10] = (int)(_DEC*5) & (0x7F);
-
-
-
-    unsigned int velTanSend = (int)(fabs(veltan)*100);
-
-    unsigned int velNormSend = (int)(fabs(velnorm)*100);
-    outputBuffer[11] = packetNum & 0x07;
-    outputBuffer[12] = ((velTanSend >> 6 ) & 0X07) | ((velNormSend & 0x0F) << 3);
-    outputBuffer[13] = (velNormSend >> 4) & 0x1F;
-
-    if(veltan < 0)
-        outputBuffer[11] |= 0x40;
-    else
-        outputBuffer[11] &= 0xBF;
-
-    if( velnorm < 0)
-        outputBuffer[13] |= 0x40;
-    else
-        outputBuffer[13] &= 0xBF;
-    if(packetNum < 8 )
-    {
-        packetNum ++;
-    }
-    else
-    {
-        packetNum = 0;
-    }
-}
-
-char* CAgent::getOutputBuffer()
-{
-    generateRobotCommand();
-    return outputBuffer;
-}
-
-void CAgent::setOnOffState(bool state){
+void Agent::setOnOffState(bool state){
     onOffState = state;
 }
 
-void CAgent::setCommandID  (int ID){
+void Agent::setCommandID  (int ID){
     commandID = ID;
 }
 
-Vector2D CAgent::pos()
+Vector2D Agent::pos()
 {
     return wm->our[selfID]->pos;
 }
 
-Vector2D CAgent::vel()
+Vector2D Agent::vel()
 {
     return wm->our[selfID]->vel;
 }
 
-Vector2D CAgent::dir()
+Vector2D Agent::dir()
 {
     return wm->our[selfID]->dir;
 }
 
-bool CAgent::shootSensor()
+bool Agent::shootSensor()
 {
     return 0 ; //wm->our[selfID]->shootSensor;
 }
 
-void CAgent::setShootSensor(bool b)
+void Agent::setShootSensor(bool b)
 {
     //wm->our[selfID]->shootSensor = b;
 }
 
-double CAgent::angularVel()
+double Agent::angularVel()
 {
     return wm->our[selfID]->angularVel;
 }
 
-double CAgent::dirDegree()
+double Agent::dirDegree()
 {
     return wm->our[selfID]->dir.th().degree();
 }
 
-CRobot* CAgent::self()
+CRobot* Agent::self()
 {
     return wm->our[selfID];
 }
 
-Vector2D CAgent::distToBall()
+Vector2D Agent::distToBall()
 {
     return wm->ball->pos - wm->our[selfID]->pos;
 }
 
-void CAgent::setRobotAbsVel(double _vx, double _vy, double _w)
+void Agent::setRobotAbsVel(double _vx, double _vy, double _w)
 {
     double ang = -dir().th().radian();
     setRobotVel((cos(ang) * _vx) - (sin(ang) * _vy), (sin(ang) * _vx) + (cos(ang) * _vy), _w);
 }
 
-void CAgent::setRobotVel(double _vtan , double _vnorm , double _w )
+void Agent::setRobotVel(double _vtan , double _vnorm , double _w )
 {
 
 
@@ -752,11 +630,9 @@ void CAgent::setRobotVel(double _vtan , double _vnorm , double _w )
     v2 = _v2;
     v3 = _v3;
     v4 = _v4;
-    //	if( commandID == 2 )
-    //		knowledge->plotWidgetCustom[2] = v3/40.0;
 }
 
-void CAgent::addRobotVel(double _vtan, double _vnorm, double _w)
+void Agent::addRobotVel(double _vtan, double _vnorm, double _w)
 {
 
     double _v1,_v2,_v3,_v4;
@@ -775,7 +651,7 @@ void CAgent::addRobotVel(double _vtan, double _vnorm, double _w)
     vangular += w*_RAD2DEG;
 }
 
-void CAgent::waitHere()
+void Agent::waitHere()
 {
     setRobotVel(0.0, 0.0, 0.0);
     //	accelerationLimiter();
@@ -784,61 +660,61 @@ void CAgent::waitHere()
     setBeep(false);
     setForceKick(false);
     idle = true;
-    skill = NULL;
+    skill = nullptr;
     _ACC = 0;
     _DEC = 0;
 }
 
-void CAgent::setForceKick(bool force)
+void Agent::setForceKick(bool force)
 {
     forceKick = force;
 }
 
-void CAgent::setKick(double _kickSpeed)
+void Agent::setKick(double _kickSpeed)
 {
     kickSpeed = _kickSpeed;
     chip = false;
 }
 
-void CAgent::setChip(double _kickSpeed)
+void Agent::setChip(double _kickSpeed)
 {
     kickSpeed = _kickSpeed;
     chip = true;
 }
 
 
-void CAgent::setBeep(bool _beep)
+void Agent::setBeep(bool _beep)
 {
     beep = _beep;
 }
 
-void CAgent::setRoller(int state)
+void Agent::setRoller(int state)
 {
     roller = state;
 }
 
-char CAgent::getRoller()
+char Agent::getRoller()
 {
-    return roller;
+    return static_cast<char>(roller);
 }
 
-float CAgent::getMotorMaxRadPerSec()
+float Agent::getMotorMaxRadPerSec()
 {
 
-    return 1000*2*M_PI/60.0f;
+    return static_cast<float>(1000 * 2 * M_PI / 60.0f);
 }
 
-float CAgent::getvLimit()
+float Agent::getvLimit()
 {
-    return (1.0f / (float)_BIT_RESOLUTION) * getMotorMaxRadPerSec() * self()->wheelRadius();
+    return static_cast<float>((1.0f / (float)_BIT_RESOLUTION) * getMotorMaxRadPerSec() * self()->wheelRadius());
 }
 
-float CAgent::getwLimit()
+float Agent::getwLimit()
 {
-    return ((1.0f / (float)_BIT_RESOLUTION) * getMotorMaxRadPerSec() * self()->wheelRadius()) / self()->robotRadius();
+    return static_cast<float>(((1.0f / (float)_BIT_RESOLUTION) * getMotorMaxRadPerSec() * self()->wheelRadius()) / self()->robotRadius());
 }
 
-void CAgent::jacobian(double vx, double vy, double w, double &v1, double &v2, double &v3, double &v4)
+void Agent::jacobian(double vx, double vy, double w, double &v1, double &v2, double &v3, double &v4)
 {
     float robotRadius = 0.0795;
     float wheelRadius = 0.0275;
@@ -864,7 +740,7 @@ void CAgent::jacobian(double vx, double vy, double w, double &v1, double &v2, do
     v4 = (char) (round(dw4));
 }
 
-void CAgent::jacobianInverse(double v1, double v2, double v3, double v4, double &vx, double &vy, double &w)
+void Agent::jacobianInverse(double v1, double v2, double v3, double v4, double &vx, double &vy, double &w)
 {
     float motorMaxRadPerSec = getMotorMaxRadPerSec();
     double dw1 = ((double)v1)*motorMaxRadPerSec*self()->wheelRadius()/(double)_BIT_RESOLUTION;
@@ -884,12 +760,12 @@ double F( double d, double bnd)
     return (temp);
 }
 
-CAgent::Abilities::Abilities()
+Agent::Abilities::Abilities()
 {
     hasGyro = canChip = canKick = canSpin = highBattery = true;
 }
 
-CAgent::Status::Status() {
+Agent::Status::Status() {
     spin = shotSensor = fault = faild = halt = shotBoard = false;
     kickFault = chipFault = false;
     encoderFault[0] = encoderFault[1] = encoderFault[2] = encoderFault[3] = false;
@@ -900,26 +776,30 @@ CAgent::Status::Status() {
 
 }
 
-double CAgent::kickValueSpeed(double value,bool spinner)//for onetouch
+double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
 {
-    if (wm->getIsSimulMode())
+    //todo
+    //if (wm->getIsSimulMode())
     {
         return value;
     }
-    else {
+    //else
+    {
         int sp = spinner?1:0;
         int v = round(value);
         return shotProfile[v][sp];
     }
 }
 
-double CAgent::kickSpeedValue(double speed,bool spinner)//for pass speed
+double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
 {
-    if (wm->getIsSimulMode())
+    //todo
+    //if (wm->getIsSimulMode())
     {
         return speed;
     }
-    else {
+    //else
+    {
         //        int sp = spinner?1:0;
         //        double mdist = 1e10;
         //        int    mi    = 0;
@@ -980,20 +860,22 @@ double CAgent::kickSpeedValue(double speed,bool spinner)//for pass speed
     }
 }
 
-double CAgent::chipValueDistance(double value,bool spinner) //for chip recieve
+double Agent::chipValueDistance(double value,bool spinner) //for chip recieve
 {
-    if (wm->getIsSimulMode())
+    //todo
+    //if (wm->getIsSimulMode())
     {
         return sqrt(value * value / Gravity);
     }
-    else {
-        int v = round(value);
+    //else
+    {
+        int v = static_cast<int>(round(value));
         int sp = spinner?1:0;
         return chipProfile[v][sp];
     }
 }
 
-double CAgent::getKickValue(bool chip, bool spin, double v)
+double Agent::getKickValue(bool chip, bool spin, double v)
 {
     double y, x, x2, x3, x4, x5, x6;
     int myId = selfID;
@@ -1070,114 +952,18 @@ double CAgent::getKickValue(bool chip, bool spin, double v)
         myId = selfID;
         selfID = 1;
         y = getKickValue(chip, spin, v);
-        selfID = myId;
+        selfID = static_cast<short>(myId);
         return y;
     }
 }
 
 
-
-double CAgent::chipDistanceValue(double distance,bool spinner) //auto chip
-{
-    if (wm->getIsSimulMode())
-    {
-        return sqrt(distance * Gravity);
-    }
-    else {
-
-        //        int sp = spinner?1:0;
-        //        double mdist = 1e10;
-        //        int    mi    = 0;
-        //        for(int i=0;i<32;i++)
-        //        {
-        //            if(fabs(distance-chipProfile[i][sp]) < mdist)
-        //            {
-        //                mi = i;
-        //                mdist = fabs(distance-chipProfile[i][sp]);
-        //            }
-        //        }
-
-        //		draw(QString("CHIPPING = %1").arg(mi), Vector2D(0,0), "red", 31);
-
-        //        return mi;
-        double desiredSpeed;// = getKickValue(true, spinner, distance);
-        //		qDebug() << "dist : " << distance << " Speed : " << desiredSpeed;
-        //
-        double x = distance;
-        switch( self()->id ){
-        case 0:
-            if( spinner )
-                desiredSpeed = -0.0005*x*x  + 3.0458*x - 17.439;
-            else
-                desiredSpeed = -0.0005*x*x  + 3.0458*x - 17.439;
-            break;
-        case 1:
-            if( spinner )
-                desiredSpeed = 0.0015*x*x + 3.523*x + 53.18;
-            else
-                desiredSpeed = 0.0015*x*x + 3.523*x + 53.18;
-            break;
-        case 2:
-            if( spinner )
-                desiredSpeed = 0.000*x*x + 2.008*x + 23.98;
-            else
-                desiredSpeed = 0.002*x*x + 1.675*x + 34.61;
-            break;
-        case 3:
-            if( spinner )
-                desiredSpeed = 0.0005*x*x + 2.8648*x + 68.679;
-            else
-                desiredSpeed = 0.0005*x*x + 2.8648*x + 68.679;
-            break;
-        case 4:
-            if( spinner )
-                desiredSpeed = -0.005*x*x + 5.137*x + 0.188;
-            else
-                desiredSpeed = -0.000*x*x + 3.765*x + 3.212;
-            break;
-        case 5:
-            if( spinner )
-                desiredSpeed = 0.007*x*x + 2.639*x + 19.77;
-            else
-                desiredSpeed = 0.005*x*x + 2.982*x + 20.34;
-            break;
-        case 6:
-            if( spinner )
-                desiredSpeed = -0.001*x*x + 2.944*x + 3.219;
-            else
-                desiredSpeed = 0.002*x*x + 1.27*x + 60.59;
-            break;
-        case 7:
-            if( spinner )
-                desiredSpeed = -0.002*x*x + 4.068*x - 3.794;
-            else
-                desiredSpeed = 0.000*x*x + 2.835*x + 81.43;
-            break;
-        case 8:
-            if( spinner )
-                desiredSpeed = -0.002*x*x + 4.068*x - 3.794; /////////////
-            else
-                desiredSpeed = 0.000*x*x + 2.835*x + 81.43; //////////////
-            break;
-        case 9:
-            if( spinner )
-                desiredSpeed = -0.002*x*x + 4.068*x - 3.794; /////////////
-            else
-                desiredSpeed = 0.000*x*x + 2.835*x + 81.43; ///////////////
-            break;
-        default:
-            desiredSpeed = -0.002*x*x + 4.068*x - 3.794; ///////////////
-            break;
-        }
-        if( desiredSpeed < 0 )
-            return 0;
-        else if( desiredSpeed > 1023 )
-            return 1023;
-        return desiredSpeed;
-    }
+// TODO : Fix it With Profiler
+double Agent::chipDistanceValue(double distance,bool spinner) {
+    return sqrt(distance * Gravity);
 }
 
-int CAgent::kickValueForDistance(double dist, double finalVel)
+int Agent::kickValueForDistance(double dist, double finalVel)
 {
     double a = 0.66;//BallFriction()*Gravity;
     double temp,vel;
@@ -1186,28 +972,29 @@ int CAgent::kickValueForDistance(double dist, double finalVel)
         temp = 0;
     vel = sqrt( temp);
     //	qDebug() << "vel=" << vel;
-    return kickSpeedValue( vel, false);
+    return static_cast<int>(kickSpeedValue(vel, false));
 }
 
 
-Vector2D CAgent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection)
+Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection)
 {
     Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
-                                                                                  pos() - wm->ball->pos, wm->field->oppGoal(), conf()->SkillsParams_KickOneTouch_Landa(), conf()->SkillsParams_KickOneTouch_Gamma()));
+                                                                                  pos() - wm->ball->pos, wm->field->oppGoal(), 1/*conf()->SkillsParams_KickOneTouch_Landa()*/, 1/*conf()->SkillsParams_KickOneTouch_Gamma()*/));
     Vector2D q;
     q.invalidate();
     bool oneTouchKick = false;
     if (wm->ball->vel.length() > 0.1 && (wm->ball->pos - pos()).length() < 1.0) {
         oneTouchKick = true;
     }
-    if (self()->ballComingSpeed() > 0.1)
+    //todo ballComingSpeed
+    if (1/*self()->ballComingSpeed()*/ > 0.1)
     {
         Line2D l(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
         q = l.projection(positioningPos);
-        debug("case",D_ERROR);
+        DBUG("case",D_ERROR);
         if (q.valid() && (q-positioningPos).length() < 1.0 )
         {
-            debug("case2",D_ERROR);
+            DBUG("case2",D_ERROR);
             if ((wm->ball->pos - pos()).length() < 1.0) oneTouchKick = true;
             q -= (self()->centerFromKicker() + CBall::radius) * oneTouchDir;
         }
@@ -1216,39 +1003,24 @@ Vector2D CAgent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirect
     {
         if (fabs(Vector2D::angleBetween(self()->dir, wm->field->oppGoal() - self()->pos).degree()) < 45)
         {
-            debug("case3",D_ERROR);
+            DBUG("case3",D_ERROR);
             setKick(chipDistanceValue(8 , false));
         }
-        debug("case4",D_ERROR);
+        DBUG("case4", D_ERROR);
     }
     *oneTouchDirection = oneTouchDir;
     return q;
 }
 
-void CAgent::getPathPlannerResult(int agentID , vector<Vector2D> _result , Vector2D _averageDir){
-    if( agentID != id() )
-        return;
-    pathPlannerResult.assign(_result.begin() , _result.end());
-    plannerAverageDir = _averageDir.norm();
-}
-//#include <QCoreApplication>
-void CAgent::initPlanner( const int &_id , const Vector2D &_target , const QList<int>& _ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius){
-    //  QTime timer;
-    //  timer.start();
-    emit initPathPlanning(_id,  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-    //  qApp->processEvents();
-    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
-}
-
 //IMPORTANT
 ////CKS
 
-bool CAgent::canOneTouch()
+bool Agent::canOneTouch()
 {
-    draw(QString("%1 , %2").arg(self()->ballComingSpeed()).arg(fabs(Vector2D::angleBetween(wm->ball->vel.norm(),(pos() - wm->ball->pos).norm()).degree())),Vector2D(0,1));
-    draw(Segment2D(Vector2D(0,0) ,(pos() - wm->ball->pos).norm()),"blue");
-    draw(Segment2D(Vector2D(0,0) , wm->ball->vel.norm()),"red");
-    if( self()->ballComingSpeed() > 0.9)
+    drawer->draw(QString("%1 , %2").arg(1/*self()->ballComingSpeed()*/).arg(fabs(Vector2D::angleBetween(wm->ball->vel.norm(),(pos() - wm->ball->pos).norm()).degree())),Vector2D(0,1));
+    drawer->draw(Segment2D(Vector2D(0,0) ,(pos() - wm->ball->pos).norm()),"blue");
+    drawer->draw(Segment2D(Vector2D(0,0) , wm->ball->vel.norm()),"red");
+    if( 1/*self()->ballComingSpeed()*/ > 0.9)
     {
         if( fabs(Vector2D::angleBetween(wm->ball->vel.norm(),(pos() - wm->ball->pos).norm()).degree()) < 21)
             return true;
@@ -1256,7 +1028,7 @@ bool CAgent::canOneTouch()
     return false;
 }
 
-void CAgent::setGyroZero()
+void Agent::setGyroZero()
 {
     //	if ( calibrated < 999)
     //		return;
@@ -1264,5 +1036,74 @@ void CAgent::setGyroZero()
     //    if( id() == 4)
     agentAngelForGyro = self()->dir;
     calibrateGyro = true;
-    //	debug(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
+    	DEBUG(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
+}
+void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+                        const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
+                        const double &_ballObstacleRadius){
+    //  timer.start();
+    planner.initPathPlanner(this->id(),  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+
+    //emit pathPlannerResult(resultModified ,averageDir); get this variables
+    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+}
+void Agent::setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
+
+}
+void Agent::execute() {
+    //planner.generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
+    //planner.runPlanner();
+    //emit pathPlannerResult(resultModified ,averageDir); get this variables
+}
+parsian_msgs::parsian_robot_task Agent::getTask() {
+
+}
+
+parsian_msgs::parsian_robot_command Agent::getCommand() {
+    parsian_msgs::parsian_robot_command command;
+    int counter = 1;
+
+    command.robot_id= static_cast<unsigned char>(id());
+    command.chip= static_cast<unsigned char>(chip);
+    command.packet_id= static_cast<unsigned char>(counter++);
+    command.roller_speed= static_cast<unsigned char>(roller);
+    command.forceKick= static_cast<unsigned char>(forceKick);
+    command.kickSpeed= static_cast<unsigned short>(kickSpeed);
+    command.vel_x = vel().x;
+    command.vel_y = vel().y;
+    command.vel_w = angularVel();
+    command.release = static_cast<unsigned char>(onOffState);
+    return command;
+}
+
+parsian_msgs::grsim_robot_command Agent::getGrSimCommand() {
+    parsian_msgs::grsim_robot_command  grsim_robot_command_msg;
+    grsim_robot_command_msg.id= static_cast<unsigned char>(id());
+
+    double w1 = v1*gain;
+    double w2 = v2*gain;
+    double w3 = v3*gain;
+    double w4 = v4*gain;
+
+    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+
+    grsim_robot_command_msg.wheelsspeed=1;//true
+    grsim_robot_command_msg.wheel1= static_cast<float>(w1);
+    grsim_robot_command_msg.wheel2= static_cast<float>(w2);
+    grsim_robot_command_msg.wheel3= static_cast<float>(w3);
+    grsim_robot_command_msg.wheel4= static_cast<float>(w4);
+
+    grsim_robot_command_msg.velangular=0;
+    grsim_robot_command_msg.velnormal=0;
+    grsim_robot_command_msg.veltangent=0;
+    grsim_robot_command_msg.kickspeedx= static_cast<float>(kickSpeed);
+    if (chip){
+        grsim_robot_command_msg.kickspeedz= static_cast<float>(kickSpeed);
+    }
+    else
+        grsim_robot_command_msg.kickspeedz=0;
+    grsim_robot_command_msg.spinner= static_cast<unsigned char>(false);
+
+    return grsim_robot_command_msg;
+
 }

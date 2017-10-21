@@ -99,10 +99,11 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+ generate_dynamic_reconfigure_options(
+
+    cfg/worldmodel.cfg
+
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -138,6 +139,17 @@ add_library(${PROJECT_NAME}
         src/wm/visionbelief.cpp
         src/wm/movingobject.cpp
         src/wm/rawobject.cpp
+        src/wm/halfworld.cpp
+        src/wm/robot.cpp
+        src/wm/ball.cpp
+        )
+
+add_library(${PROJECT_NAME}_util
+        src/util/robottracker.cpp
+        src/util/kalman.cpp
+        src/util/balltracker.cpp
+        src/util/tracker.cpp
+        src/util/matrix.cpp
         )
 
 ## Add cmake target dependencies of the library
@@ -149,7 +161,8 @@ add_library(${PROJECT_NAME}
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_library(worldmodel_nodelet_lib
-        src/worldmodel_nodelet.cpp)
+        src/worldmodel_nodelet.cpp
+        )
 
 add_executable(worldmodel_node src/worldmodel_node.cpp)
 
@@ -161,22 +174,28 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(${PROJECT_NAME}_util ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
+        ${PROJECT_NAME}_util
+        )
+
+
+target_link_libraries(${PROJECT_NAME}_util
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
         )
 
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
         ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
         )
 
 ## Specify libraries to link a library or executable target against

@@ -1,7 +1,0 @@
-# Grsim Robot Replacement
-
-float64 x
-float64 y
-float64 dir
-uint8 id
-bool yellowteam

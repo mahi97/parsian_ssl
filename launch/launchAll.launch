@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="all_nodelet"  args="manager" output="screen"/>
+	<node pkg="nodelet" type="nodelet" name="wm" args="load parsian_world_model/WMNodelet all_nodelet" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="grsim" args="load parsian_protobuf_wrapper/GrsimNodelet all_nodelet" output="screen"/>
+
+    <node pkg="nodelet" type="nodelet" name="agent0" args="load parsian_agent/AgentNodelet all_nodelet" output="screen">
+	<param name="id" type="int" value="0"/>
+    </node>
+</launch>

@@ -12,7 +12,7 @@ CNewBangBang::CNewBangBang()
     posPid = new _PID(3.5,2,0,0,0);
     angPid = new _PID(3,0,0,0,0);
     thPid = new _PID(1.5,0,0,0,0);
-    smooth = 0;
+    smooth = false;
     for( int i = 0; i < _MAX_NUM_PLAYERS; i++)
     {
         lastV.append(0.f);
@@ -92,7 +92,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
     }
     angPid->error = (dir2.th() -  agentDir.th()).radian();
 
-//    draw(QString("vel2 : %1 , realVel : %2").arg(Vel2).arg(agentVel.length()),Vector2D(2,1.5));
+    drawer->draw(QString("vel2 : %1 , realVel : %2").arg(Vel2).arg(agentVel.length()),Vector2D(2,1.5));
     agentMovementTh = movementTh.th();
 
     if(oneTouch || diveMode)
@@ -122,7 +122,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
     {
 //        posPid->kp = (conf()->BangBang_posKP())*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
         posPid->kp = (1)*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
-//        debug(QString("kp: %1").arg(posPid->kp),D_MHMMD);
+        DEBUG(QString("kp: %1").arg(posPid->kp),D_MHMMD);
 //        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*3);
         posPid->kp = min(posPid->kp,1*3);
 //        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
@@ -136,7 +136,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
         // TODO : Config Server
 //        posPid->kp = (conf()->BangBang_posKP())*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
         posPid->kp = (1)*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
-//        debug(QString("kp: %1").arg(posPid->kp),D_MHMMD);
+        DEBUG(QString("kp: %1").arg(posPid->kp),D_MHMMD);
         posPid->kp = min(posPid->kp,1*2);
 //        posPid->kp = min(posPid->kp,conf()->BangBang_posKP()*2);
 //        posPid->kp = max(posPid->kp,conf()->BangBang_posKP());
@@ -175,11 +175,11 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
     lastPath = agentVel.th();
 
     /////////////////////th pid
-//    debug(QString("vdes : %1").arg(vDes),D_MHMMD);
+    DEBUG(QString("vdes : %1").arg(vDes), D_MHMMD);
     _Vx =  desiredVx;//(vDes)*cos(appliedTh);
     _Vy =  desiredVy;//(vDes)*sin(appliedTh);
     _W = angPid->PID_OUT();
-//    debug(QString("v1: %1 ").arg(_W),D_MHMMD);
+    DEBUG(QString("v1: %1 ").arg(_W), D_MHMMD);
 
     lastVx = _Vx;
     lastVy = _Vy;

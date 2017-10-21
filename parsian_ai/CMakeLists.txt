@@ -105,10 +105,9 @@ find_package(QJSON REQUIRED)
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+   cfg/ai.cfg
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -207,7 +206,9 @@ add_dependencies(ai_node
 add_dependencies(ai_nodelet_lib
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
-		)
+        ${PROJECT_NAME}_gencfg
+
+        )
 
 ## Specify libraries to link a library or executable target against
 
@@ -227,6 +228,7 @@ target_link_libraries(ai_node
 add_dependencies(${PROJECT_NAME}
                 ${${PROJECT_NAME}_EXPORTED_TARGETS}
                 ${catkin_EXPORTED_TARGETS}
+                ${PROJECT_NAME}_gencfg
                 )
 
 target_link_libraries(${PROJECT_NAME}

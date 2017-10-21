@@ -16,6 +16,8 @@
 #include <parsian_world_model/worldmodel_nodelet.h>
 #include <parsian_world_model/wm/worldmodel.h>
 
+#include <dynamic_reconfigure/server.h>
+#include "parsian_world_model/world_modelConfig.h"
 namespace parsian_world_model {
 
     class WMNodelet : public nodelet::Nodelet {
@@ -26,19 +28,27 @@ namespace parsian_world_model {
         // Timer CallBack (to publish)
         //void timerCb(const ros::TimerEvent& event);
 
-        //Subs CallBack
+//        Subs CallBack
         void geomCb(const parsian_msgs::ssl_vision_geometryConstPtr& _geom);
         void detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr& _detection);
 
 
-        CWorldModel wm;
+        CWorldModel* wm;
 
         ros::Publisher wm_pub;
 
         ros::Subscriber vision_detection_sub;
         ros::Subscriber vision_geom_sub;
 
-        ros::Timer timer;
+        boost::shared_ptr<dynamic_reconfigure::Server<world_model_config::world_modelConfig>> server;
+        void ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level);
+        world_model_config::world_modelConfig m_config;
+
+        bool side_left, colour_yellow;
+
+
+
+//        ros::Timer timer;
 
 
 

@@ -15,25 +15,23 @@ CVisionClient::~CVisionClient()
     delete vcTimer;
 }
 
-void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet)
+void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config)
 {
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
 
-
-    // TODO : Config
-//    if(!conf()->BallTracker_cam1on()){
-//        if (packet.detection().camera_id()==0) return;
-//    }
-//    if(!conf()->BallTracker_cam2on()){
-//        if (packet.detection().camera_id()==1) return;
-//    }
-//    if(!conf()->BallTracker_cam3on()){
-//        if (packet.detection().camera_id()==2) return;
-//    }
-//    if(!conf()->BallTracker_cam4on()){
-//        if (packet.detection().camera_id()==3) return;
-//    }
+   if(!config.camera_one_active){
+       if (packet->camera_id==0) return;
+   }
+   if(!config.camera_two_active){
+       if (packet->camera_id==1) return;
+   }
+   if(!config.camera_three_active){
+       if (packet->camera_id==2) return;
+   }
+   if(!config.camera_four_active){
+       if (packet->camera_id==3) return;
+   }
 
 
     frameCnt ++;
@@ -86,7 +84,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
             && packet->balls[i].pos.x != 5000
             && packet->balls[i].pos.y != 5000)
         {
-            CRawObject raw = CRawObject(frameCnt, Vector2D(packet->balls[i].pos.x, packet->balls[i].pos.y)/1000.0f, 0, i
+            CRawObject raw = CRawObject(frameCnt, Vector2D(packet->balls[i].pos.x, packet->balls[i].pos.y), 0, i
                     , packet->balls[i].confidence, nullptr, id);
             for (int k=0;k<v[id].ball.count();k++)
             {
@@ -108,7 +106,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     for (const auto &u : packet->us) {
         int rob_id = u.robot_id;
         if (v[id].ourTeam[rob_id].count() >= MAX_OBJECT) continue;
-        CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x / 1000.0f, u.pos.y / 1000.0f),
+        CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x, u.pos.y),
                                     u.orientation*180.0f/M_PI*90.0
                 ,rob_id ,u.confidence, nullptr, id);
         for (int k=0;k<v[id].ourTeam[rob_id].count();k++)
@@ -126,7 +124,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     for (const auto &i : packet->them) {
         int rob_id = i.robot_id;
         if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) continue;
-        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x / 1000.0f,i.pos.y / 1000.0f),
+        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x, i.pos.y),
                                     i.orientation*180.0f/M_PI*90.0
                 ,rob_id ,i.confidence, nullptr, id);
         for (int k=0;k<v[id].oppTeam[rob_id].count();k++)
@@ -141,9 +139,6 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
         our_insight[rob_id] = true;
     }
 
-    // TODO : FIX MACRO IDIOT
-//    __RECEIVE_ROBOTS_DATA(us, our);
-//    __RECEIVE_ROBOTS_DATA(them, opp);
 
     for (int i=0;i<_MAX_NUM_PLAYERS;i++) {
         if (!our_insight[i]) {
@@ -159,45 +154,6 @@ inline float inSightReduce(float v,int n)
 {
     if (n>0) return v/((float) n*n);
     return v;
-}
-
-void CVisionClient::countActiveCameras()
-{
-
-    // TODO : Config
-//    if(!conf()->BallTracker_cam1on()){
-//        v[0].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam2on()){
-//        v[1].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam3on()){
-//        v[2].updated = false;
-//    }
-//    if(!conf()->BallTracker_cam4on()){
-//        v[3].updated = false;
-//    }
-
-    int now = vcTimer->elapsed();
-    for (auto &i : v) {
-        if (now - i.lastUpdateTime>100){
-            i.updated=false;
-        }
-    }
-    activeCameras = 0;
-    for (auto &i : v) {
-        if (i.updated)
-        {
-            activeCameras ++;
-        }
-    }
-}
-
-
-///////////////////////////////////////////////
-void CVisionClient::newVision()
-{
-
 }
 
 ///////////////////////////////////////////
@@ -315,4 +271,3 @@ void CVisionClient::merge(int camera_count)
     res.visionLatency /= camera_count;
 
 }
-

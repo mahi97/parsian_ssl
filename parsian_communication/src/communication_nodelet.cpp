@@ -26,6 +26,11 @@ void CommunicationNodelet::onInit() {
     while(!communicator.isSerialConnected()){
         communicator.connectSerial("/dev/ttyUSB0");
     }
+
+    server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>);
+    dynamic_reconfigure::Server<communication_config::communicationConfig>::CallbackType f;
+    f = boost::bind(&CommunicationNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
 //    ros::Rate loop_rate(62);
 //
 //    while (ros::ok()) {
@@ -50,5 +55,10 @@ void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
         drawPub.publish(drawer->draws);
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
+}
+
+void CommunicationNodelet::ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level)
+{
+  ROS_INFO_STREAM("callback called! with" << config.test_param);
 }
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);

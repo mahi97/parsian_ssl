@@ -9,6 +9,7 @@
 #include "parsian_util/core/movingobject.h"
 #include "parsian_msgs/parsian_robot.h"
 
+
 class CBall : public CMovingObject {
 public:
     CBall();
@@ -18,7 +19,7 @@ public:
     Vector2D getPosInFuture(double _t) const;
     double getBallAcc() const;
 
-
+    static const double radius;
 private:
 
 

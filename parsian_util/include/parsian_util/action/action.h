@@ -5,16 +5,18 @@
 #ifndef PARSIAN_UTIL_ACTION_H
 #define PARSIAN_UTIL_ACTION_H
 
+#include <QString>
+
 class Action {
 public:
-    Action();
-    virtual ~Action();
-    virtual void getParsianMessage();
+
+    virtual void setMessage(void*) = 0;
+    virtual void* getMessage() = 0;
+    static QString getActionName();
 
 protected:
 private:
 };
-
 
 #define SkillProperty(skill,type,name,local) \
         public: inline type get##name() {return local;} \

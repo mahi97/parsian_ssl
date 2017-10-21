@@ -9,7 +9,6 @@
 #include <QDebug>
 #include <QFile>
 #include <parsian_util/mathtools.h>
-#include <parsian_util/core/agent.h>
 #include <algorithm>
 #include <math.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
@@ -32,7 +31,7 @@ enum gpMode {
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class CSkillGotoPoint : public CSkill, public ActionGotoPoint
+class CSkillGotoPoint : public CSkill, public GotopointAction
 {
 
 
@@ -46,13 +45,13 @@ private:
     _PID *thPid;
     _PID *velPid;
     Vector2D startingPoint;
-     ///////Arash.Z//////////
+    ///////Arash.Z//////////
     //////////if boll dec = true the function return optimal dec and
     //////////otherwise return optimal acc//////////
     double optimalAccOrDec(double agentDirInRadian, bool dec);
 
     ///////////////////////
-     void trajectoryPlanner();
+    void trajectoryPlanner();
     double appliedTh;
     //////////////////////
 
@@ -92,7 +91,7 @@ public:
     double timeRemaining();
     gpMode lastGPmode;
     gpMode currentGPmode;
-    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0),bool dynamicStart = true);
+    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0));
 };
 
 

@@ -2,11 +2,15 @@
 #define CAGENT_H
 
 #include <parsian_util/base.h>
+#include <planner/planner.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
+#include <parsian_msgs/grsim_robot_command.h>
+#include <parsian_msgs/parsian_robot_command.h>
+#include <parsian_msgs/parsian_robot_task.h>
 #include <fstream>
-
+#include <QTime>
 
 using namespace std;
 
@@ -18,9 +22,9 @@ struct Fault {
 };
 
 class CSkill;
-class CAgent : public QObject
+
+class Agent
 {
-    Q_OBJECT
 public:
     class Abilities {
     public:
@@ -54,20 +58,16 @@ public:
 
     } status;
 
+ //   void generateRobotCommand();
+
     bool changeIsNeeded;
 
-    SoccerIntention *intention;
-    IntentionDefense defIntent;
-    IntentionMark markIntent;
-    IntentionPlayMake playMakeIntent;
-    IntentionBlock blockIntent;
-    IntentionPosition positionIntent;
     Vector2D homePos;
     void accelerationLimiter(double vf,bool diveMode = false);
     double goalVisibility;
     QTime agentStopTime;
     bool timerReset;
-    CAgent(short int _ID);
+    Agent(int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;
@@ -76,9 +76,7 @@ public:
     QString skillName;
     int id();
     int commandId();
-    void generateRobotCommand();
     bool trajectory(double& vf,double& vn,double& va,double w1,double w2,double w3,double w4,bool &stop);
-    char* getOutputBuffer();
     void loadProfiles();
     double getVisibility();
     void setVisibility(const double &inSight);
@@ -154,22 +152,33 @@ public:
 
     void setGyroZero();
     void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
-    void initPlanner( const int &_id , const Vector2D &_target , const QList<int> &_ourRelaxList , const QList<int> &_oppRelaxList , const bool &_avoidPenaltyArea , const bool &_avoidCenterCircle , const double &_ballObstacleRadius);
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
 private:
+    CPlanner planner;
     void jacobianInverse(double _v1, double _v2, double _v3, double _v4,double &_vx, double &_vy, double &_w);
     bool calibrateGyro;
     unsigned int packetNum;
     double lastVf,lastVn;
-
-    char outputBuffer[_NEW_PACKET_SIZE];
     short int selfID;
-public slots:
-    void getPathPlannerResult(int id , vector<Vector2D> _result , Vector2D _averageDir);
-signals:
-    void initPathPlanning(int agentId, Vector2D target, QList<int> _ourRelaxList, QList<int> _oppRelaxList ,  bool avoidPenaltyArea, bool avoidCenterCircle, double ballObstacleRadius);
+    const double Gravity= 9.8;
+    double getVar( double data[] );
+    Matrix ANN_forward( Matrix input );
+
+   public:
+    void initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+                            const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
+                            const double &_ballObstacleRadius);
+
+        const double gain = 1.013;
+    void setTask(const parsian_msgs::parsian_robot_taskConstPtr& _task);
+    void execute();
+    parsian_msgs::parsian_robot_command getCommand();
+    parsian_msgs::grsim_robot_command getGrSimCommand();
+    parsian_msgs::parsian_robot_task getTask();
+
+
 };
 
 #endif // CAGENT_H

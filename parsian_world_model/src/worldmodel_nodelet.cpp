@@ -3,6 +3,7 @@
 //
 
 #include <parsian_world_model/worldmodel_nodelet.h>
+
 PLUGINLIB_EXPORT_CLASS(parsian_world_model::WMNodelet, nodelet::Nodelet);
 
 using namespace parsian_world_model;
@@ -11,24 +12,43 @@ void WMNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
-   // timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
-
-    wm_pub = nh_private.advertise<parsian_msgs::parsian_world_model>("wm", 1000);
+    wm = nullptr;
+    wm = new CWorldModel(5);
+//    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
+    wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("wm", 1000);
     vision_detection_sub = nh.subscribe("vision_detection", 10, &WMNodelet::detectionCb, this);
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
+
+    server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>);
+    dynamic_reconfigure::Server<world_model_config::world_modelConfig>::CallbackType f;
+    f = boost::bind(&WMNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
+
 }
 
 //void WMNodelet::geomCb(const parsian_msgs::ssl_vision_geometryConstPtr &_geom) {
 //
 //}
+
 void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_detection) {
-    parsian_msgs::parsian_world_model worldModel;
+//
 
-    wm.updateDetection(_detection);
-    wm.execute();
-    worldModel = wm.getParsianWorldModel();
-    wm_pub.publish(worldModel);
-    ROS_INFO("rec!");
+    wm->updateDetection(_detection);
+    wm->execute(m_config);
 
+
+    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
+    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
+
+    wm_pub.publish(wm->getParsianWorldModel(colour_yellow, side_left));
+//
 }
 
+void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
+{
+  m_config.active_cam_num = config.active_cam_num;
+  m_config.camera_one_active = config.camera_one_active;
+  m_config.camera_two_active = config.camera_two_active;
+  m_config.camera_three_active = config.camera_three_active;
+  m_config.camera_four_active = config.camera_four_active;
+}
