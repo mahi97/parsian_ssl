@@ -96,18 +96,18 @@ void send()
 }
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
-  // Using timers is the preferred 'ROS way' to manual threading
- send();
-  }
+    // Using timers is the preferred 'ROS way' to manual threading
+    send();
+}
 
 GrsimNodelet::GrsimNodelet()
 {
-  ROS_INFO("grsim_nodelet is running");
+    ROS_INFO("grsim_nodelet is running");
 }
 
 GrsimNodelet::~GrsimNodelet()
 {
-  //ROS_INFO("Destructor");
+    //ROS_INFO("Destructor");
 }
 
 void GrsimNodelet::onInit()
