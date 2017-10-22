@@ -41,7 +41,7 @@ public:
 
     boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
     void UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level) ;
-    void send(const std::string&, const int&);
+    void send();
     bool ballReplaceCb(parsian_msgs::grsim_ball_replacementRequest& req,
                        parsian_msgs::grsim_ball_replacementResponse& res);
     bool robotReplaceCb(parsian_msgs::grsim_robot_replacementRequest& req,
@@ -52,6 +52,8 @@ private:
     grSim_Commands* grsimCommand;
     grSim_Replacement* grsimReplacement;
     grSim_Packet packet;
+    UDPSend* udp;
+
 
 
 };

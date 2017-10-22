@@ -11,8 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
 		message_generation
 		std_msgs
 		geometry_msgs
-		#actionlib_msgs
-		#actionlib
 		)
 
 ## System dependencies are found with CMake's conventions
@@ -85,7 +83,6 @@ message(STATUS "All srv files: ${SRVS}")
 generate_messages(
 		DEPENDENCIES
 		std_msgs
-		#		actionlib_msgs
 		geometry_msgs
 )
 

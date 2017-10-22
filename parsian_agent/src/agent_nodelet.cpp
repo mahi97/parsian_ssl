@@ -36,20 +36,22 @@ void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
-    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
-    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
+//    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+//    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& robot_task){
 
-    agent->setTask(robot_task);
-    agent->execute();
+    ROS_INFO("callBack called");
+    agent->execute(robot_task);
     parsian_robot_command_pub.publish(agent->getCommand());
+
     grsim_robot_command_pub.publish(agent->getGrSimCommand());
 
 }
 
 void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
 {
-
+    conf = config;
+    ROS_INFO_STREAM(conf.AccMaxForward);
 }

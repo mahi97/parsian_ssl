@@ -50,19 +50,20 @@ bool GrsimNodelet::ballReplaceCb(parsian_msgs::grsim_ball_replacementRequest &re
 }
 
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
-void GrsimNodelet::send(const std::string & _ip, const int & _port)
+void GrsimNodelet::send()
 {
-    int port{_port};
-    std::string ip{_ip};
+    int port{20011};//{this->port};
+    std::string ip{"224.5.23.2"};//{this->ip};
     std::string color;
     ros::param::get("team_color", color);
     bool col = ! (color == "yellow");          //check if it is true!
     grsimCommand->set_isteamyellow(col);
     grsimCommand->set_timestamp(0.0);                       //should fix this
     std::string buffer;
+    if (packet.commands().robot_commands_size())
+        ROS_INFO_STREAM(packet.commands().robot_commands_size());
     packet.SerializeToString(&buffer);
-    UDPSend udp(ip, port);
-    udp.send(buffer);
+    udp->send(buffer);
 
     packet.clear_commands();
     packet.clear_replacement();
@@ -70,6 +71,7 @@ void GrsimNodelet::send(const std::string & _ip, const int & _port)
 
 void GrsimNodelet::onInit()
 {
+
     NODELET_INFO("grsim_nodelet onInit");
     n = getNodeHandle();
     sub0 = n.subscribe("GrsimBotCmd0", 1000, &GrsimNodelet::robotCommandCb, this);
@@ -89,19 +91,21 @@ void GrsimNodelet::onInit()
     dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
     f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
     server->setCallback(f);
+    udp = new UDPSend(ip, port);
+
 
 
 }
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
     // Using timers is the preferred 'ROS way' to manual threading
-    send(this->ip, this->port);
+    send();
 }
 
 void GrsimNodelet::UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level)
 {
-    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
-    port = config.grsim_send_port;
-    ip = config.grsim_send_ip;
+//    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
+//    port = config.grsim_send_port;
+//    ip = config.grsim_send_ip;
 }
 

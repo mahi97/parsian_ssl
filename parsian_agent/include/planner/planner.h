@@ -67,7 +67,8 @@ public:
     void resetPlanner(Vector2D);
     void pathPlannerResult(vector<Vector2D> _resultModified , Vector2D _averageDir);
     void initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius );
-
+    vector<Vector2D> getResultModified ();
+    Vector2D getAverageDir();
 private:
     vector<Vector2D> result , Rresult , resultModified , RresultModified;
     Vector2D goal , lastGoal , Rgoal , unchangedGoal;

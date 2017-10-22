@@ -13,17 +13,9 @@ UDPSend::UDPSend(std::__cxx11::string address, int _port)// : QObject(parent)
 void UDPSend::send(std::string buf)
 {
 
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    ROS_INFO("sending data over udp");
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    QByteArray datagram(buf.c_str(), buf.length());
-    ROS_INFO("sending byte: %lld", socket->writeDatagram(datagram, host, port));
+    QByteArray datagram(buf.c_str(), static_cast<int>(buf.length()));
+    ROS_INFO_STREAM(socket->writeDatagram(datagram, host, static_cast<quint16>(port)));
 
 }
 
-
-
-UDPSend::~UDPSend()
-{
-
-}
+UDPSend::~UDPSend() = default;

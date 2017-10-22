@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
-void GotopointavoidAction::setMessage(void* _msg) {
+void GotopointavoidAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPointAvoid msg = *((parsian_msgs::parsian_skill_gotoPointAvoid*)_msg);
         avoidPenaltyArea = msg.avoidPenaltyArea;
         keeplooking = msg.keeplooking;

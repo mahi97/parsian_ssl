@@ -2,7 +2,7 @@
 
 #include <parsian_util/action/autogenerate/receivepassaction.h>
 
-void ReceivepassAction::setMessage(void* _msg) {
+void ReceivepassAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_receivePass msg = *((parsian_msgs::parsian_skill_receivePass*)_msg);
         robot_id = msg.robot_id;
         avoidOurPenaltyArea = msg.avoidOurPenaltyArea;
