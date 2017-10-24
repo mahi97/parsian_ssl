@@ -46,23 +46,22 @@ void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config
 }
 
 void VisionNodelet::timerCb(const ros::TimerEvent &event) {
-    parsian_msgs::ssl_vision_detection detection;
-    parsian_msgs::ssl_vision_geometry geometry;
+    parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
+    parsian_msgs::ssl_vision_geometryPtr geometry{new parsian_msgs::ssl_vision_geometry};
+
+
     //ROS_INFO("timer");
     if (vision->receive(vision_packet)) {
-        ROS_INFO("vision recieved");
+        ROS_INFO("vis");
         if (vision_packet.has_detection()) {
-            detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
+            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
+            ssl_detection_pub.publish(detection);
         }
 
         if (vision_packet.has_geometry()) {
-            geometry = pr::convert_geometry_data(vision_packet.geometry());
+            *geometry = pr::convert_geometry_data(vision_packet.geometry());
+            ssl_geometry_pub.publish(geometry);
         }
-    }
-    if (detection.camera_id < 10) {
-        //ROS_INFO("vision send");
-        ssl_geometry_pub.publish(geometry);
-        ssl_detection_pub.publish(detection);
     }
 }
 

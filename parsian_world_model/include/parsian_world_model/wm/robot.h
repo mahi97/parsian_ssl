@@ -25,9 +25,7 @@ private:
     double ANGULAR_DIRECTION;
     long double ADD_TO_ANGULAR_DIRECTION;
 
-    CField field;
-
-    double distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2);
+//    double distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2);
 
 protected:
     double blindness, delayTime;

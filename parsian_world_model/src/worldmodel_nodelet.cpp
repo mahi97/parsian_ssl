@@ -15,7 +15,7 @@ void WMNodelet::onInit() {
     wm = new CWorldModel(5);
 //    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
     wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
-    vision_detection_sub = nh.subscribe("vision_detection", 10, &WMNodelet::detectionCb, this);
+    vision_detection_sub = nh.subscribe("vision_detection", 1000, &WMNodelet::detectionCb, this);
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
 
     server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>);
@@ -36,9 +36,9 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     wm->execute(m_config);
 
 
-    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
-    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
-
+//    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
+//    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
+    NODELET_INFO("wm2");
     wm_pub.publish(wm->getParsianWorldModel(colour_yellow, side_left));
 //
 }

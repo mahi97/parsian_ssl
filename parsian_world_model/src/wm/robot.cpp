@@ -221,10 +221,10 @@ void CRobot::filter(int vanished)
 
 }
 
-double CRobot::distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2)
-{
-    return hypot(((pos1-pos2).length() / hypot(field._FIELD_WIDTH, field._FIELD_HEIGHT)),Vector2D::angleBetween(dir1,dir2).degree()/360.0);
-}
+//double CRobot::distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2)
+//{
+//    return hypot(((pos1-pos2).length() / hypot(field._FIELD_WIDTH, field._FIELD_HEIGHT)),Vector2D::angleBetween(dir1,dir2).degree()/360.0);
+//}
 
 
 
