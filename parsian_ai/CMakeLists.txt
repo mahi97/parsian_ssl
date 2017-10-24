@@ -145,6 +145,7 @@ add_library(${PROJECT_NAME}
 		src/parsian_ai/ai.cpp
 		src/parsian_ai/soccer.cpp
 		src/parsian_ai/gamestate.cpp
+		src/parsian_ai/config.cpp
 #        src/parsian_ai/coach.cpp
 )
 

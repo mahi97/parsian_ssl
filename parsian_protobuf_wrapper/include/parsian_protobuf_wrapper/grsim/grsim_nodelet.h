@@ -36,8 +36,8 @@ public:
     ros::ServiceServer service0;
     ros::ServiceServer service1;
 
-    int port{12340};
-    std::string ip{"127.0.0.1"};
+    int port;
+    std::string ip;
 
     boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
     void UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level) ;
@@ -51,7 +51,7 @@ public:
 private:
     grSim_Commands* grsimCommand;
     grSim_Replacement* grsimReplacement;
-    grSim_Packet packet;
+    grSim_Packet *packet;
     UDPSend* udp;
 
 
