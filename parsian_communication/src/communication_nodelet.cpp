@@ -12,6 +12,7 @@ void CommunicationNodelet::onInit() {
 
 
     ros::NodeHandle& n = getNodeHandle();
+    ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
     timer = n.createTimer(ros::Duration(.062), boost::bind(&CommunicationNodelet::timerCb, this, _1));
 
@@ -26,7 +27,7 @@ void CommunicationNodelet::onInit() {
         communicator.connectSerial("/dev/ttyUSB0");
     }
 
-    server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>);
+    server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
     dynamic_reconfigure::Server<communication_config::communicationConfig>::CallbackType f;
     f = boost::bind(&CommunicationNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);

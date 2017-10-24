@@ -25,7 +25,7 @@ void AgentNodelet::onInit(){
     agent.reset(new Agent(0));
     wm = new CWorldModel;
 
-    server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>);
+    server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>(private_nh));
     dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
     f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
