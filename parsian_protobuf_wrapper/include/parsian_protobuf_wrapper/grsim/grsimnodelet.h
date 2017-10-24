@@ -22,6 +22,27 @@ public:
 
     virtual void onInit();
     void timerCb(const ros::TimerEvent& event);
+    void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
+    void GrsimRobotReplace(const parsian_msgs::grsim_robot_replacement::ConstPtr& msg);
+    void GrsimBallReplace(const parsian_msgs::grsim_ball_replacement::ConstPtr& msg);
+
+
+    bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement_srv::Request& req,
+                             parsian_msgs::grsim_ball_replacement_srv::Response& res);
+    bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement_srv::Request& req,
+                              parsian_msgs::grsim_robot_replacement_srv::Response& res);
+
+    void send();
+    std::string ip;
+    int port;
+
+    grSim_Packet packet;
+    grSim_Commands* GrsimCommand;
+    grSim_Replacement* GrsimReplacement;
+
+    UDPSend* udp;
+
+
     ros::NodeHandle n;
     ros::Timer timer_;
     ros::Subscriber sub0;
