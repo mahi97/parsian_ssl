@@ -29,6 +29,15 @@ void AgentNodelet::onInit(){
     dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
     f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
+
+
+    gotoPoint = new CSkillGotoPoint(agent.get());
+    gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
+    skillKick = new CSkillKick(agent.get());
+    oneTouch = new CSkillKickOneTouch(agent.get());
+    receivePass = new CSkillReceivePass(agent.get());
+
+
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -41,14 +50,54 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
    // if (drawer   != nullptr) draw_pub.publish(drawer->draws);
 }
 
-void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& robot_task){
+void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
 
     ROS_INFO("callBack called");
-    agent->execute(robot_task);
+    agent->skill = getSkill(_robot_task);
+    agent->execute();
     parsian_robot_command_pub.publish(agent->getCommand());
-
     grsim_robot_command_pub.publish(agent->getGrSimCommand());
 
+}
+
+CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_task) {
+    CSkill *skill = nullptr;
+    switch (_task->select){
+        case parsian_msgs::parsian_robot_task::GOTOPOINT: {
+            gotoPoint->setMessage(&_task->gotoPointTask);
+            skill = gotoPoint;
+            ROS_INFO("GOTOPOINT executed!");
+        }
+            break;
+        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
+            gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
+            skill = gotoPointAvoid;
+            ROS_INFO("GOTOPOINTAVOID executed!");
+        }
+            break;
+        case parsian_msgs::parsian_robot_task::KICK: {
+            skillKick->setMessage(&_task->kickTask);
+            skill = skillKick;
+            ROS_INFO("KICK executed!");
+            break;
+        }
+        case parsian_msgs::parsian_robot_task::ONETOUCH: {
+            oneTouch->setMessage(&_task->oneTouchTask);
+            skill = oneTouch;
+            ROS_INFO("ONETOUCH executed!");
+        }
+            break;
+        case parsian_msgs::parsian_robot_task::RECIVEPASS: {
+            receivePass->setMessage(&_task->receivePassTask);
+            skill = receivePass;
+            ROS_INFO("RECIVEPASS executed!");
+        }
+            break;
+
+
+        default:break;
+    }
+    return skill;
 }
 
 void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
