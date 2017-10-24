@@ -49,7 +49,6 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     {
         for (int i=0;i<v[id].ourTeam[t].count();i++)
         {
-            v[0].ball;
             if (frameCnt - v[id].ourTeam[t][i].frameCount > 15)
             {
                 v[id].ourTeam[t].removeAt(i);

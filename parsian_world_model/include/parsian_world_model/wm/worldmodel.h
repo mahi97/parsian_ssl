@@ -34,6 +34,8 @@ public:
 
 private:
     parsian_msgs::parsian_world_model rosWM;
+    parsian_msgs::parsian_robot rosRobots[_MAX_NUM_PLAYERS*2];
+    parsian_msgs::parsian_robot rosBall;
 
     CVisionClient *vc;
     CHalfWorld* hw;
@@ -51,8 +53,8 @@ private:
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
     void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);
 
-    parsian_msgs::parsian_robot toParsianMessage(const CRobot& _robot);
-    parsian_msgs::parsian_robot toParsianMessage(const CBall& _ball);
+    void toParsianMessage(const CRobot* _robot, int id);
+    void toParsianMessage(const CBall* _ball);
 
 
     parsian_msgs::ssl_vision_detectionConstPtr detection;
