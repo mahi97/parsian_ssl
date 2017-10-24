@@ -14,8 +14,9 @@ void VisionNodelet::onInit() {
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
 
+    //ROS_INFO("on init");
     vision = nullptr;
-    visionConfig.vision_multicast_port = 10006;
+    visionConfig.vision_multicast_port = 10020;
     visionConfig.vision_multicast_ip = "224.5.23.2";
     reconnect();
 
@@ -47,7 +48,9 @@ void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config
 void VisionNodelet::timerCb(const ros::TimerEvent &event) {
     parsian_msgs::ssl_vision_detection detection;
     parsian_msgs::ssl_vision_geometry geometry;
+    //ROS_INFO("timer");
     if (vision->receive(vision_packet)) {
+        ROS_INFO("vision recieved");
         if (vision_packet.has_detection()) {
             detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
         }
@@ -57,6 +60,7 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
         }
     }
     if (detection.camera_id < 10) {
+        //ROS_INFO("vision send");
         ssl_geometry_pub.publish(geometry);
         ssl_detection_pub.publish(detection);
     }

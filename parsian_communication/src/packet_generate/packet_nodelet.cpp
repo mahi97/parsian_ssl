@@ -19,9 +19,9 @@ void PacketNodelet::onInit() {
     drawer = new Drawer();
     debugger = new Debugger();
 
-    drawPub    = private_n.advertise<parsian_msgs::parsian_draw>("draws",1000);
-    debugPub   = private_n.advertise<parsian_msgs::parsian_debugs>("debugs",1000);
-    packetPub   = private_n.advertise<parsian_msgs::parsian_packets>("packets",1000);
+    drawPub    = n.advertise<parsian_msgs::parsian_draw>("draws",1000);
+    debugPub   = n.advertise<parsian_msgs::parsian_debugs>("debugs",1000);
+    packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets",1000);
 
     robotPacketSub0   = n.subscribe("robot_command0"  , 1000, &PacketNodelet::callBack, this);
     robotPacketSub1   = n.subscribe("robot_command1"  , 1000, &PacketNodelet::callBack, this);
