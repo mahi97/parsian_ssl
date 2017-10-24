@@ -10,7 +10,6 @@ using namespace parsian_world_model;
 
 void WMNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
-    ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
     wm = nullptr;
     wm = new CWorldModel(5);

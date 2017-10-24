@@ -7,6 +7,7 @@ PLUGINLIB_EXPORT_CLASS(GrsimNodelet, nodelet::Nodelet);
 /*----------filing grSim_Robot_Command with ROS datas for each robots----------*/
 void GrsimNodelet::robotCommandCb(const parsian_msgs::grsim_robot_commandConstPtr &msg){
 
+    ROS_INFO("message recived");
     auto* GrsimRobotCommand = grsimCommand->add_robot_commands();
     GrsimRobotCommand->set_id(msg->id);
     GrsimRobotCommand->set_kickspeedx(msg->kickspeedx);
@@ -50,58 +51,65 @@ bool GrsimNodelet::ballReplaceCb(parsian_msgs::grsim_ball_replacementRequest &re
 }
 
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
-void GrsimNodelet::send(const std::string & _ip, const int & _port)
+void GrsimNodelet::send()
 {
-    int port{_port};
-    std::string ip{_ip};
+
     std::string color;
     ros::param::get("team_color", color);
     bool col = ! (color == "yellow");          //check if it is true!
     grsimCommand->set_isteamyellow(col);
     grsimCommand->set_timestamp(0.0);                       //should fix this
     std::string buffer;
-    packet.SerializeToString(&buffer);
-    UDPSend udp(ip, port);
-    udp.send(buffer);
+    packet->set_allocated_commands(grsimCommand);
+   // packet->set_allocated_replacement(grsimReplacement);
+    if (packet->commands().robot_commands_size()) {
+        ROS_INFO_STREAM("send");
+        packet->SerializeToString(&buffer);
+        udp->send(buffer);
+    }
 
-    packet.clear_commands();
-    packet.clear_replacement();
+    packet->clear_commands();
+    packet->clear_replacement();
 }
 
 void GrsimNodelet::onInit()
 {
+    port = 34567;//{this->port};
+    ip = "127.0.0.1";//{this->ip};
     NODELET_INFO("grsim_nodelet onInit");
     n = getNodeHandle();
-    sub0 = n.subscribe("GrsimBotCmd0", 1000, &GrsimNodelet::robotCommandCb, this);
     sub1 = n.subscribe("GrsimBotCmd1", 1000, &GrsimNodelet::robotCommandCb, this);
     sub2 = n.subscribe("GrsimBotCmd2", 1000, &GrsimNodelet::robotCommandCb, this);
+    sub0 = n.subscribe("GrsimBotCmd0", 1000, &GrsimNodelet::robotCommandCb, this);
     sub3 = n.subscribe("GrsimBotCmd3", 1000, &GrsimNodelet::robotCommandCb, this);
     sub4 = n.subscribe("GrsimBotCmd4", 1000, &GrsimNodelet::robotCommandCb, this);
     sub5 = n.subscribe("GrsimBotCmd5", 1000, &GrsimNodelet::robotCommandCb, this);
     service0 = n.advertiseService("grsim_robot_replace_server", &GrsimNodelet::robotReplaceCb, this);
     service1 = n.advertiseService("grsim_ball_replace_server", &GrsimNodelet::ballReplaceCb, this);
     timer_ = n.createTimer(ros::Duration(0.016), boost::bind(& GrsimNodelet::timerCb, this, _1));
+    packet =new grSim_Packet();
+    grsimCommand = packet->mutable_commands();
+    grsimReplacement = packet->mutable_replacement();
 
-    grsimCommand = packet.mutable_commands();
-    grsimReplacement = packet.mutable_replacement();
+    //server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>);
+    //dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
+    //f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
+    //server->setCallback(f);
+    udp = new UDPSend(ip, port);
 
-    server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>);
-    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
-    f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
-    server->setCallback(f);
 
 
 }
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
     // Using timers is the preferred 'ROS way' to manual threading
-    send(this->ip, this->port);
+    send();
 }
 
 void GrsimNodelet::UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level)
 {
-    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
-    port = config.grsim_send_port;
-    ip = config.grsim_send_ip;
+//    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
+//    port = config.grsim_send_port;
+//    ip = config.grsim_send_ip;
 }
 

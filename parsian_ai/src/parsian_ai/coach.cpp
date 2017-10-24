@@ -7,6 +7,7 @@
 #include <parsian_util/tools/debuger.h>
 #include <parsian_util/base.h>
 #include <parsian_ai/ai.h>
+#include <parsian_ai/config.h>
 
 
 //QMap<QString, EditData*> CCoach::editData;

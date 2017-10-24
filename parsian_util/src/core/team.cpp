@@ -1,14 +1,9 @@
-//
-// Created by parsian-ai on 9/21/17.
-//
-
 #include "parsian_util/core/team.h"
 
 CTeam::CTeam(const bool isYellow, const bool isLeft)
 {
     data = new CTeamData;
     for (auto& member : data->teamMembers) member = new CRobot();
-
     setColor(isYellow);
     setSide(isLeft);
 

@@ -39,7 +39,7 @@ public:
     ~CSoccer();
     void execute();
 
-    void updateTask(GameState _gs);
+    void updateTask();
 
     void setMode(GameMode _mode);
     void setTeamColor(ETeamColorType _color);

@@ -145,6 +145,7 @@ add_library(${PROJECT_NAME}
 		src/parsian_ai/ai.cpp
 		src/parsian_ai/soccer.cpp
 		src/parsian_ai/gamestate.cpp
+		src/parsian_ai/config.cpp
 #        src/parsian_ai/coach.cpp
 )
 
@@ -202,6 +203,8 @@ add_executable(ai_node
 add_dependencies(ai_node
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+
 		)
 add_dependencies(ai_nodelet_lib
 		${${PROJECT_NAME}_EXPORTED_TARGETS}

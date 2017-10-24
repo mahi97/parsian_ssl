@@ -16,20 +16,21 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "parsian_ai/aiConfig.h"
+#include <parsian_ai/config.h>
 
 
 namespace parsian_ai {
     class AINodelet : public nodelet::Nodelet {
 
     private:
-        AI ai;
+        AI *ai;
         ros::Subscriber worldModelSub;
         ros::Subscriber robotStatusSub;
         ros::Subscriber refereeSub;
         ros::Publisher drawPub;
         ros::Publisher debugPub;
 
-        ros::Publisher robTask[_MAX_NUM_PLAYERS];
+        ros::Publisher *robTask;
 
         ros::Timer timer_;
 

@@ -17,7 +17,9 @@
 #include <parsian_agent/agent.h>
 
 #include <dynamic_reconfigure/server.h>
-#include <parsian_agent/agentConfig.h>
+#include "parsian_agent/agentConfig.h"
+#include  <parsian_agent/config.h>
+
 
 namespace parsian_agent {
     class AgentNodelet : public nodelet::Nodelet {

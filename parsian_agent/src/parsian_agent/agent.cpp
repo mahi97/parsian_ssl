@@ -1109,10 +1109,10 @@ parsian_msgs::parsian_robot_command Agent::getCommand() {
     command.chip= static_cast<unsigned char>(chip);
     command.packet_id= static_cast<unsigned char>(counter++);
     command.roller_speed= static_cast<unsigned char>(roller);
-    command.forceKick= static_cast<unsigned char>(forceKick);
+//    command.forceKick= static_cast<unsigned char>(forceKick);
     command.kickSpeed= static_cast<unsigned short>(kickSpeed);
-    command.vel_x = vel().x;
-    command.vel_y = vel().y;
+    command.vel_F = vel().x;
+    command.vel_N = vel().y;
     command.vel_w = angularVel();
     command.release = static_cast<unsigned char>(onOffState);
     return command;

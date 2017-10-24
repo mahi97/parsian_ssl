@@ -126,7 +126,7 @@ void CSoccer::execute()
 //    updateTask();
 }
 
-void CSoccer::updateTask(GameState _gs){
+void CSoccer::updateTask(){
     auto* kick = new KickAction;
     kick->setKickspeed(1023);
     kick->setTarget(wm->field->oppGoal());
@@ -140,7 +140,7 @@ void CSoccer::updateTask(GameState _gs){
     gtp->setTargetpos(vec1.absX() < vec2.absX() ? vec1 : vec2);
 
 
-    if(!_gs.canMove()) {    //HALT
+    if(!gameState->canMove()) {    //HALT
         agents[0]->action = gtp;
     }
     else {
