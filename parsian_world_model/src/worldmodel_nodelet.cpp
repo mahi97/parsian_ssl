@@ -10,6 +10,7 @@ using namespace parsian_world_model;
 
 void WMNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
+    ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
     wm = nullptr;
     wm = new CWorldModel(5);
@@ -18,7 +19,7 @@ void WMNodelet::onInit() {
     vision_detection_sub = nh.subscribe("vision_detection", 1000, &WMNodelet::detectionCb, this);
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
 
-    server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>);
+    server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>(private_nh));
     dynamic_reconfigure::Server<world_model_config::world_modelConfig>::CallbackType f;
     f = boost::bind(&WMNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);

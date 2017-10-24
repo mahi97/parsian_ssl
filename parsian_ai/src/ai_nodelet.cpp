@@ -7,6 +7,7 @@ using namespace parsian_ai;
 void AINodelet::onInit() {
 
     ros::NodeHandle &nh = getNodeHandle();
+    ros::NodeHandle& private_nh = getPrivateNodeHandle();
     ROS_INFO("inited");
     ai=new AI();
     robTask=new ros::Publisher[_MAX_NUM_PLAYERS];
@@ -27,7 +28,7 @@ void AINodelet::onInit() {
     timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
     //config server settings
-    server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>);
+    server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
     f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
