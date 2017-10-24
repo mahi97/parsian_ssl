@@ -1,14 +1,12 @@
-#include "parsian_protobuf_wrapper/grsim/grsim_nodelet.h"
+#include <parsian_protobuf_wrapper/grsim/grsim_nodelet.h>
 #include <pluginlib/class_list_macros.h>
 
 
-PLUGINLIB_EXPORT_CLASS(GrsimNodelet, nodelet::Nodelet);
-
+PLUGINLIB_EXPORT_CLASS(GrsimNodelet,nodelet::Nodelet);
 /*----------filing grSim_Robot_Command with ROS datas for each robots----------*/
-void GrsimNodelet::robotCommandCb(const parsian_msgs::grsim_robot_commandConstPtr &msg){
-
-    ROS_INFO("message recived");
-    auto* GrsimRobotCommand = grsimCommand->add_robot_commands();
+void GrsimNodelet::GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg)
+{
+    grSim_Robot_Command* GrsimRobotCommand = GrsimCommand->add_robot_commands();
     GrsimRobotCommand->set_id(msg->id);
     GrsimRobotCommand->set_kickspeedx(msg->kickspeedx);
     GrsimRobotCommand->set_kickspeedz(msg->kickspeedz);
@@ -26,10 +24,10 @@ void GrsimNodelet::robotCommandCb(const parsian_msgs::grsim_robot_commandConstPt
 
 
 /*----------filing grsim_robot_replacement with ROS datas for each robots ##service##----------*/
-bool GrsimNodelet::robotReplaceCb(parsian_msgs::grsim_robot_replacementRequest &req ,
-                                  parsian_msgs::grsim_robot_replacementResponse &res){
-
-    auto* grsimRReplacement = grsimReplacement->add_robots();
+bool GrsimNodelet::GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
+                                        parsian_msgs::grsim_robot_replacement::Response& res)
+{
+    grSim_RobotReplacement* grsimRReplacement = GrsimReplacement->add_robots();
     grsimRReplacement->set_x(req.x);
     grsimRReplacement->set_y(req.y);
     grsimRReplacement->set_dir(req.dir);
@@ -39,66 +37,36 @@ bool GrsimNodelet::robotReplaceCb(parsian_msgs::grsim_robot_replacementRequest &
 }
 
 
-bool GrsimNodelet::ballReplaceCb(parsian_msgs::grsim_ball_replacementRequest &req ,
-                                 parsian_msgs::grsim_ball_replacementResponse &res) {
-
-    auto * GrsimBReplacement = grsimReplacement->mutable_ball();
+/*----------filing grsim_ball_replacement with ROS datas ##service##----------*/
+bool GrsimNodelet::GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Request& req,
+                                       parsian_msgs::grsim_ball_replacement::Response& res)
+{
+    grSim_BallReplacement* GrsimBReplacement = new grSim_BallReplacement;
     GrsimBReplacement->set_x(req.x);
     GrsimBReplacement->set_y(req.y);
     GrsimBReplacement->set_vx(req.vx);
     GrsimBReplacement->set_vy(req.vy);
+    GrsimReplacement->set_allocated_ball(GrsimBReplacement);
     return true;
 }
 
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
 void GrsimNodelet::send()
 {
-
     std::string color;
     ros::param::get("team_color", color);
     bool col = ! (color == "yellow");          //check if it is true!
-    grsimCommand->set_isteamyellow(col);
-    grsimCommand->set_timestamp(0.0);                       //should fix this
+    GrsimCommand->set_isteamyellow(col);
+    GrsimCommand->set_timestamp(0.0);                       //should fix this
+    packet.set_allocated_commands(GrsimCommand);
+    packet.set_allocated_replacement(GrsimReplacement);
     std::string buffer;
-    packet->set_allocated_commands(grsimCommand);
-   // packet->set_allocated_replacement(grsimReplacement);
-    if (packet->commands().robot_commands_size()) {
-        ROS_INFO_STREAM("send");
-        packet->SerializeToString(&buffer);
-        udp->send(buffer);
-    }
-
-    packet->clear_commands();
-    packet->clear_replacement();
-}
-
-void GrsimNodelet::onInit()
-{
-    port = 34567;//{this->port};
-    ip = "127.0.0.1";//{this->ip};
-    NODELET_INFO("grsim_nodelet onInit");
-    n = getNodeHandle();
-    sub1 = n.subscribe("GrsimBotCmd1", 1000, &GrsimNodelet::robotCommandCb, this);
-    sub2 = n.subscribe("GrsimBotCmd2", 1000, &GrsimNodelet::robotCommandCb, this);
-    sub0 = n.subscribe("GrsimBotCmd0", 1000, &GrsimNodelet::robotCommandCb, this);
-    sub3 = n.subscribe("GrsimBotCmd3", 1000, &GrsimNodelet::robotCommandCb, this);
-    sub4 = n.subscribe("GrsimBotCmd4", 1000, &GrsimNodelet::robotCommandCb, this);
-    sub5 = n.subscribe("GrsimBotCmd5", 1000, &GrsimNodelet::robotCommandCb, this);
-    service0 = n.advertiseService("grsim_robot_replace_server", &GrsimNodelet::robotReplaceCb, this);
-    service1 = n.advertiseService("grsim_ball_replace_server", &GrsimNodelet::ballReplaceCb, this);
-    timer_ = n.createTimer(ros::Duration(0.016), boost::bind(& GrsimNodelet::timerCb, this, _1));
-    packet =new grSim_Packet();
-    grsimCommand = packet->mutable_commands();
-    grsimReplacement = packet->mutable_replacement();
-
-    //server.reset(new dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>);
-    //dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
-    //f = boost::bind(&GrsimNodelet::UpdatePortIp,this, _1, _2);
-    //server->setCallback(f);
-    udp = new UDPSend(ip, port);
-
-
-
+    packet.SerializeToString(&buffer);
+    udp->send(buffer);
+    packet.clear_commands();
+    packet.clear_replacement();
+    GrsimCommand = new grSim_Commands;
+    GrsimReplacement = new grSim_Replacement;
 }
 
 void GrsimNodelet::timerCb(const ros::TimerEvent& event){
@@ -106,10 +74,36 @@ void GrsimNodelet::timerCb(const ros::TimerEvent& event){
     send();
 }
 
-void GrsimNodelet::UpdatePortIp(const protobuf_wrapper_config::grsimConfig &config, uint32_t level)
+
+void GrsimNodelet::onInit()
 {
-//    ROS_INFO_STREAM("the new port is:" << config.grsim_send_port << " and the new ip is" << config.grsim_send_ip);
-//    port = config.grsim_send_port;
-//    ip = config.grsim_send_ip;
+    NODELET_INFO("grsim_nodelet onInit");
+    ip = "127.0.0.1";
+    port = 20011;
+    n = getNodeHandle();
+    sub0 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub1 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd1", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub2 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd2", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub3 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd3", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub4 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd4", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub5 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd5", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+//    sub_0 = n.subscribe<parsian_msgs::grsim_robot_replacement>("GrsimRobotReplace0", 1000, boost::bind(& GrsimNodelet::GrsimRobotReplace, this, _1));
+//    _sub = n.subscribe<parsian_msgs::grsim_ball_replacement>("GrsimBallReplace", 1000, boost::bind(& GrsimNodelet::GrsimBallReplace, this, _1));
+
+    service0 = n.advertiseService<parsian_msgs::grsim_robot_replacement::Request,
+            parsian_msgs::grsim_robot_replacement::Response>
+            ("GrsimRobotReplacesrv", boost::bind(& GrsimNodelet::GrsimRobotReplacesrv, this, _1, _2));
+    service1 = n.advertiseService<parsian_msgs::grsim_ball_replacement::Request,
+            parsian_msgs::grsim_ball_replacement::Response>
+            ("GrsimBallReplacesrv", boost::bind(& GrsimNodelet::GrsimBallReplacesrv, this, _1, _2));
+
+    timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
+
+    GrsimCommand = new grSim_Commands;
+    GrsimReplacement = new grSim_Replacement;
+    udp = new UDPSend(ip, port);
+
 }
 
+
+//PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)
