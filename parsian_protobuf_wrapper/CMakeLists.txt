@@ -377,3 +377,16 @@ install(DIRECTORY ${proto_gen_python_dir}/
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+#  add_rostest_gtest(VisionTest test/VisionTest.test test/VisionTest.cpp)
+  catkin_add_gtest(VisionTest test/VisionTest.cpp)
+  target_link_libraries(VisionTest
+                        ${catkin_LIBRARIES}
+                        vision_convert
+                        )
+endif()
+
