@@ -1,7 +1,6 @@
 #include <parsian_agent/agent.h>
 #include <QDebug>
 #include <QFile>
-//#include <parsian_agent/onetouch.h>
 #include <parsian_agent/skills.h>
 #include <parsian_util/core/worldmodel.h>
 
@@ -455,11 +454,11 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     accCoef = atan(fabs(vforward)/fabs(vnormal))/_PI*2;
     if(diveMode)
     {
-        realAcc = 1.5 * 1/*accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal()*/;
+        realAcc = 1.5 * accCoef*/*conf->BangBang_AccMaxForward()*/4 + (1-accCoef)*3/*conf()->BangBang_AccMaxNormal()*/;
     }
     else
     {
-        realAcc = 1/*accCoef*conf()->BangBang_AccMaxForward() + (1-accCoef)*conf()->BangBang_AccMaxNormal()*/;
+        realAcc = accCoef*4/*conf()->BangBang_AccMaxForward()*/ + (1-accCoef)*3/*conf()->BangBang_AccMaxNormal()*/;
 
     }
 
@@ -479,24 +478,24 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     {
         if(vforward >= 0 )
         {
-            if(vforward > (lastVf + 1/*conf()->BangBang_AccMaxForward()* 0.0166667*/))
+            if(vforward > (lastVf + 4/*conf()->BangBang_AccMaxForward()*/* 0.0166667))
             {
-                vforward = lastVf + 1/*(conf()->BangBang_AccMaxForward()* 0.0166667)*sign(vforward)*/;
+                vforward = lastVf + (4/*conf()->BangBang_AccMaxForward()*/* 0.0166667)*sign(vforward);
             }
-            if(vforward < (lastVf - 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/))
+            if(vforward < (lastVf - decCoef*3.5/*conf()->BangBang_DecMax()*/* 0.0166667))
             {
-                vforward = lastVf - 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
+                vforward = lastVf - (decCoef*3.5/*conf()->BangBang_DecMax()*/* 0.0166667);
             }
         }
         else
         {
-            if(vforward < (lastVf - 1/*conf()->BangBang_AccMaxForward()* 0.0166667*/))
+            if(vforward < (lastVf - 4/*conf()->BangBang_AccMaxForward()*/* 0.0166667))
             {
-                vforward = lastVf - 1/*(conf()->BangBang_AccMaxForward()* 0.0166667)*/;
+                vforward = lastVf - (4/*conf()->BangBang_AccMaxForward()*/* 0.0166667);
             }
-//            if(vforward > (lastVf + decCoef*conf()->BangBang_DecMax()* 0.0166667))
+            if(vforward > (lastVf + decCoef*3.5/*conf()->BangBang_DecMax()*/* 0.0166667))
             {
-                vforward = lastVf + 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
+                vforward = lastVf + (decCoef*3.5/*conf()->BangBang_DecMax()*/* 0.0166667);
             }
         }
     }
@@ -512,15 +511,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal > (lastVn + 1/*conf()->BangBang_AccMaxNormal()* 0.0166667*/))
+            if(vnormal > (lastVn + 3/*conf()->BangBang_AccMaxNormal()*/* 0.0166667))
             {
-                vnormal = lastVn + 1/*(conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal)*/;
+                vnormal = lastVn + (3/*conf()->BangBang_AccMaxNormal()*/* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal < (lastVn - 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/)))
+        if(!diveMode&&(vnormal < (lastVn - 3.5/*decCoef*conf()->BangBang_DecMax()*/* 0.0166667)))
         {
-            vnormal = lastVn - (decCoef*1/*conf()->BangBang_DecMax()* 0.0166667*/);
+            vnormal = lastVn - (decCoef*3.5/*conf()->BangBang_DecMax()*/* 0.0166667);
         }
     }
     else
@@ -534,15 +533,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal < (lastVn - 1/*conf()->BangBang_AccMaxNormal()* 0.0166667*/))
+            if(vnormal < (lastVn - 3/*conf()->BangBang_AccMaxNormal()*/* 0.0166667))
             {
-                vnormal = lastVn + 1/*(conf()->BangBang_AccMaxNormal()* 0.0166667)*sign(vnormal)*/;
+                vnormal = lastVn + (3/*conf()->BangBang_AccMaxNormal()*/* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal > (lastVn + 1/*decCoef*conf()->BangBang_DecMax()* 0.0166667*/)))
+        if(!diveMode&&(vnormal > (lastVn + 3.5/*decCoef*conf()->BangBang_DecMax()*/* 0.0166667)))
         {
-            vnormal = lastVn + 1/*(decCoef*conf()->BangBang_DecMax()* 0.0166667)*/;
+            vnormal = lastVn + (3.5/*decCoef*conf()->BangBang_DecMax()*/* 0.0166667);
         }
     }
 

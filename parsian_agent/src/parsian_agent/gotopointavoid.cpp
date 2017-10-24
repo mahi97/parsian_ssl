@@ -64,7 +64,7 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(1);//conf()->BangBang_DecMax()); // TODO : skill config
+    bangBang->setDecMax(3.5);//conf()->BangBang_DecMax()); // TODO : skill config
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode || slowShot)
@@ -75,7 +75,7 @@ void CSkillGotoPointAvoid::execute()
     else
     {
         bangBang->setSlow(false);
-        bangBang->setVelMax(1);//conf()->BangBang_VelMax()); // TODO : skill Config
+        bangBang->setVelMax(4);//conf()->BangBang_VelMax()); // TODO : skill Config
     }
     if (!Vector2D(targetPos).valid())
     {
@@ -307,8 +307,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc;//conf()->BangBang_AccMaxForward(); // TODO :config
-    double dec = 1;//conf()->BangBang_DecMax();
+    double acc=4;//conf()->BangBang_AccMaxForward(); // TODO :config
+    double dec = 3.5;//conf()->BangBang_DecMax();
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -352,12 +352,12 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 
     if(tAgentVel.length() < 0.2)
     {
-        acc = 1;//(conf()->BangBang_AccMaxForward() + conf()->BangBang_AccMaxNormal())/2; // TODO : Skill Config
+        acc = (/*conf()->BangBang_AccMaxForward()*/4 + /*conf()->BangBang_AccMaxNormal()*/3)/2; // TODO : Skill Config
     }
     else
     {
         // TODO : Skill Config
-        acc = 1;//conf()->BangBang_AccMaxForward()*(fabs(veltan)/tAgentVel.length()) + conf()->BangBang_AccMaxNormal()*(fabs(velnorm)/tAgentVel.length());
+        acc =/*conf()->BangBang_AccMaxForward()*/4*(fabs(veltan)/tAgentVel.length()) + /*conf()->BangBang_AccMaxNormal()*/3*(fabs(velnorm)/tAgentVel.length());
     }
 
 
@@ -366,12 +366,12 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-//    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf()->BangBang_DecMax())) ;
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(1)) ; // TODO : Skill Config
+    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(/*conf()->BangBang_DecMax()*/3.5)) ;
+   // _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(1)) ; // TODO : Skill Config
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-//        return max(0,(tAgentVel.length()/conf()->BangBang_DecMax() - offset) * distEffect);
-        return std::max(0.0, (tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
+        return std::max(0.0,(tAgentVel.length()/ /*conf()->BangBang_DecMax()*/3.5 - offset) * distEffect);
+    //    return std::max(0.0, (tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
