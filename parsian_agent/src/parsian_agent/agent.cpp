@@ -1,8 +1,5 @@
 #include <parsian_agent/agent.h>
-#include <QDebug>
-#include <QFile>
 #include <parsian_agent/skills.h>
-#include <parsian_util/core/worldmodel.h>
 
 //#define debug_train
 //#define skuba_control
@@ -158,12 +155,12 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(int _ID):planner(_ID)
+Agent::Agent(int _ID) : planner(_ID)
 {
-    srand48(time(0));
+    srand48(time(nullptr));
     packetNum = 0;
     stopTrain=false;wh1=wh2=wh3=wh4=0.0;startTrain=false;
-    selfID = _ID;
+    selfID = static_cast<short>(_ID);
     skill= nullptr;
     skillName="";
     onOffState = true;
@@ -192,7 +189,6 @@ Agent::Agent(int _ID):planner(_ID)
     lastEX = lastEY = 0;
     goalVisibility = -1;
     idle = false;
-    ffout.open("send.csv",ios::out);
 
     //Both codes below do the same work!
 
@@ -212,6 +208,7 @@ Agent::Agent(int _ID):planner(_ID)
     agentStopTime.start();
 
     changeIsNeeded = false;
+
 
 }
 
@@ -791,86 +788,14 @@ double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
 
 double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
 {
-    //todo
-    //if (wm->getIsSimulMode())
-    {
-        return speed;
-    }
-    //else
-    {
-        //        int sp = spinner?1:0;
-        //        double mdist = 1e10;
-        //        int    mi    = 0;
-        //        for(int i=0;i<32;i++)
-        //        {
-        //            if(fabs(speed-shotProfile[i][sp]) < mdist)
-        //            {
-        //                mi = i;
-        //                mdist = fabs(speed-shotProfile[i][sp]);
-        //            }
-        //        }
-        //        return mi;
-        double desiredSpeed = getKickValue(false, false, speed);
-        //        qDebug() <<"desired= "<< desiredSpeed;
-        /*
-  double x = speed;
-  double desiredSpeed;
-  switch( self()->id ){
-  case 0:
-   desiredSpeed = 8.472*x*x  + 49.55*x - 203.4;
-   break;
-  case 1:
-   desiredSpeed = 10.68*x*x + 28.84*x + 27.43;
-   break;
-  case 2:
-   desiredSpeed = 11.47*x*x + 9.641*x + 42.55;
-   break;
-  case 3:
-   desiredSpeed = 9.523*x*x + 33.00*x + 8.336;
-   break;
-  case 4:
-   desiredSpeed = 8.778*x*x + 27.99*x + 20.14;
-   break;
-  case 5:
-   desiredSpeed = 8.663*x*x + 35.57*x + 13.89;
-   break;
-  case 6:
-   desiredSpeed = 8.732*x*x + 24.35*x + 39.74;
-   break;
-  case 7:
-   desiredSpeed = 8.732*x*x + 24.35*x + 39.74;/////////////////
-   break;
-  case 8:
-   desiredSpeed = 8.732*x*x + 24.35*x + 39.74;///////////////
-   break;
-  case 9:
-   desiredSpeed = 8.732*x*x + 24.35*x + 39.74;////////////////
-   break;
-  default:
-   desiredSpeed = 8.732*x*x + 24.35*x + 39.74; ///////////////
-   break;
-  }*/
-        if( desiredSpeed < 0 )
-            return 0;
-        else if( desiredSpeed > 1023 )
-            return 1023;
-        return desiredSpeed;
-    }
+    // TODO : Move Profiler Here
+    return speed;
 }
 
 double Agent::chipValueDistance(double value,bool spinner) //for chip recieve
 {
-    //todo
-    //if (wm->getIsSimulMode())
-    {
-        return sqrt(value * value / Gravity);
-    }
-    //else
-    {
-        int v = static_cast<int>(round(value));
-        int sp = spinner?1:0;
-        return chipProfile[v][sp];
-    }
+    // TODO : Move Profiler Here
+    return sqrt(value * value / Gravity);
 }
 
 double Agent::getKickValue(bool chip, bool spin, double v)
@@ -1046,54 +971,9 @@ void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int
     //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 }
 
-void Agent::execute(const parsian_msgs::parsian_robot_taskConstPtr& _task) {
+void Agent::execute() {
 
-    switch (_task->select){
-        case parsian_msgs::parsian_robot_task::GOTOPOINT: {
-            CSkillGotoPoint gotoPoint(this);
-            gotoPoint.setMessage(&_task->gotoPointTask);
-            skill=&gotoPoint;
-            gotoPoint.execute();
-            ROS_INFO("GOTOPOINT executed!");
-        }
-            break;
-        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
-            CSkillGotoPointAvoid gotoPointAvoid(this);
-            gotoPointAvoid.setMessage(&_task->gotoPointAvoidTask);
-            skill=&gotoPointAvoid;
-            gotoPointAvoid.execute();
-            ROS_INFO("GOTOPOINTAVOID executed!");
-        }
-            break;
-        case parsian_msgs::parsian_robot_task::KICK: {
-            CSkillKick skillKick(this);
-            skillKick.setMessage(&_task->kickTask);
-            skill=&skillKick;
-            skillKick.execute();
-
-            ROS_INFO("KICK executed!");
-            break;
-        }
-        case parsian_msgs::parsian_robot_task::ONETOUCH: {
-            CSkillKickOneTouch oneTouch(this);
-            oneTouch.setMessage(&_task->oneTouchTask);
-            skill=&oneTouch;
-            oneTouch.execute();
-            ROS_INFO("ONETOUCH executed!");
-        }
-            break;
-        case parsian_msgs::parsian_robot_task::RECIVEPASS: {
-            CSkillReceivePass receivePass(this);
-            receivePass.setMessage(this);
-            skill=&receivePass;
-            receivePass.execute();
-            ROS_INFO("RECIVEPASS executed!");
-        }
-            break;
-
-
-    }
-
+    skill->execute();
 
     //planner.generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
     //planner.runPlanner();

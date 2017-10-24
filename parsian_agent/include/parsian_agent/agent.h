@@ -9,6 +9,8 @@
 #include <parsian_msgs/grsim_robot_command.h>
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_robot_task.h>
+#include <QDebug>
+#include <QFile>
 #include <fstream>
 #include <QTime>
 
@@ -125,8 +127,6 @@ public:
     int roller;
     double kickSpeed;
 
-    fstream ffout;
-
     int sumEX,sumEY,lastEX,lastEY;
 
     double shotProfile[32][2];
@@ -154,7 +154,7 @@ public:
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
 
-    private:
+private:
     CPlanner planner;
     void jacobianInverse(double _v1, double _v2, double _v3, double _v4,double &_vx, double &_vy, double &_w);
     bool calibrateGyro;
@@ -165,16 +165,17 @@ public:
     double getVar( double data[] );
     Matrix ANN_forward( Matrix input );
 
-    public:
+public:
     void initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
-                            const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
-                            const double &_ballObstacleRadius);
+                     const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
+                     const double &_ballObstacleRadius);
 
     const double gain = 1.013;
-    void execute(const parsian_msgs::parsian_robot_taskConstPtr& _task);
+    void execute();
     parsian_msgs::parsian_robot_command getCommand();
     parsian_msgs::grsim_robot_command getGrSimCommand();
     parsian_msgs::parsian_robot_task getTask();
+
 
 
 };

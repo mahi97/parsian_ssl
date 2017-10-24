@@ -19,6 +19,7 @@
 #include <dynamic_reconfigure/server.h>
 #include "parsian_agent/agentConfig.h"
 #include  <parsian_agent/config.h>
+#include <parsian_agent/skills.h>
 
 
 namespace parsian_agent {
@@ -51,6 +52,14 @@ namespace parsian_agent {
 
         boost::shared_ptr<dynamic_reconfigure::Server<agent_config::agentConfig>> server;
         void ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level) ;
+
+        CSkill* getSkill(const parsian_msgs::parsian_robot_taskConstPtr &);
+
+        CSkillGotoPoint* gotoPoint;
+        CSkillGotoPointAvoid* gotoPointAvoid;
+        CSkillKick* skillKick;
+        CSkillKickOneTouch* oneTouch;
+        CSkillReceivePass* receivePass;
 
 
     };
