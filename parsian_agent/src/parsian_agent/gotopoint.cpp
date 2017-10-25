@@ -173,7 +173,7 @@ void CSkillGotoPoint::trajectoryPlanner()
     //////////////////acc dec
     agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),false);
     agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),true);
-    appliedAcc =1.5* maxAcceleration;
+    appliedAcc =1.5 * maxAcceleration;
 
     if(smooth)
     {
@@ -277,13 +277,8 @@ void CSkillGotoPoint::execute()
 
     diveMode = false;
 
-
-
-    DEBUG(QString("dive %1").arg(diveMode),D_MHMMD);
-
     angPid->kp = 3;
     angPid->kd = 1;
-
 
 
     trajectoryPlanner();
@@ -325,8 +320,8 @@ void CSkillGotoPoint::execute()
 
     }
     else if(currentGPmode == GPDEC1) {
-//        agent->maxAcceleration = 0;
-//        agent->maxDeceleration = 0;
+        agent->_ACC = 0;
+        agent->_DEC = 0;
         agentVDesire = sqrt(fabs(2*maxDeceleration*agentDist*moreDec) + vp *vp) - decOffset;
         _Vx =  agentVDesire*cos(appliedTh) ;
         _Vy =  agentVDesire*sin(appliedTh) ;
@@ -335,20 +330,20 @@ void CSkillGotoPoint::execute()
     else if(currentGPmode == GPACC1) {
         if(agentVc > 0.3)
         {
-//            agent->maxAcceleration = appliedAcc;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = appliedAcc;
+            agent->_DEC = 0;
             agentVDesire = maxVelocity ;
         }
         else if(!slowShot&& !slowMode && !penaltyKick)
         {
-//            agent->maxAcceleration = 0;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = 0;
+            agent->_DEC = 0;
             agentVDesire = 0.7;
         }
         else
         {
-//            agent->maxAcceleration = 0;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = 0;
+            agent->_DEC = 0;
             agentVDesire = 0.5;
         }
         ////////////////

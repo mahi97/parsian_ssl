@@ -54,9 +54,10 @@ bool GrsimNodelet::GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Req
 void GrsimNodelet::send()
 {
     std::string color;
-    ros::param::get("team_color", color);
-    bool col = ! (color == "yellow");          //check if it is true!
-    GrsimCommand->set_isteamyellow(col);
+    // TODO : Fix Color
+//    ros::param::get("/vision_node/is_yellow", color);
+//    bool col = ! (color == "yellow");          //check if it is true!
+    GrsimCommand->set_isteamyellow(false);
     GrsimCommand->set_timestamp(0.0);                       //should fix this
     packet.set_allocated_commands(GrsimCommand);
     packet.set_allocated_replacement(GrsimReplacement);
@@ -69,10 +70,10 @@ void GrsimNodelet::send()
     GrsimReplacement = new grSim_Replacement;
 }
 
-void GrsimNodelet::timerCb(const ros::TimerEvent& event){
-    // Using timers is the preferred 'ROS way' to manual threading
-    send();
-}
+//void GrsimNodelet::timerCb(const ros::TimerEvent& event){
+//    // Using timers is the preferred 'ROS way' to manual threading
+//
+//}
 
 
 void GrsimNodelet::onInit()
@@ -87,9 +88,7 @@ void GrsimNodelet::onInit()
     sub3 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd3", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub4 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd4", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub5 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd5", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub_0 = n.subscribe<parsian_msgs::grsim_robot_replacement>("GrsimRobotReplace0", 1000, boost::bind(& GrsimNodelet::GrsimRobotReplace, this, _1));
-//    _sub = n.subscribe<parsian_msgs::grsim_ball_replacement>("GrsimBallReplace", 1000, boost::bind(& GrsimNodelet::GrsimBallReplace, this, _1));
-
+    vision_sub= n.subscribe<parsian_msgs::ssl_vision_detection>("vision_detection",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
     service0 = n.advertiseService<parsian_msgs::grsim_robot_replacement::Request,
             parsian_msgs::grsim_robot_replacement::Response>
             ("GrsimRobotReplacesrv", boost::bind(& GrsimNodelet::GrsimRobotReplacesrv, this, _1, _2));
@@ -97,7 +96,7 @@ void GrsimNodelet::onInit()
             parsian_msgs::grsim_ball_replacement::Response>
             ("GrsimBallReplacesrv", boost::bind(& GrsimNodelet::GrsimBallReplacesrv, this, _1, _2));
 
-    timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
+   // timer_ = n.createTimer(ros::Duration(0.016), boost::bind(& GrsimNodelet::timerCb, this, _1));
 
     GrsimCommand = new grSim_Commands;
     GrsimReplacement = new grSim_Replacement;
@@ -105,5 +104,8 @@ void GrsimNodelet::onInit()
 
 }
 
+void GrsimNodelet::visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg){
+    send();
+}
 
 //PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)

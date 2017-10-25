@@ -11,18 +11,18 @@ void AgentNodelet::onInit(){
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    timer_ = nh.createTimer(ros::Duration(1.0), &AgentNodelet::timerCb, this);
+    timer_ = nh.createTimer(ros::Duration(0.016), &AgentNodelet::timerCb, this);
 
     world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
 
-    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 10);
-    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
+    debug_pub = private_nh.advertise<parsian_msgs::parsian_debugs>("debugs", 10);
+    draw_pub  = private_nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
 
     parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 10);
     grsim_robot_command_pub   = nh.advertise<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 10);
 
-    agent.reset(new Agent(0));
+    agent.reset(new Agent(1));
     wm = new CWorldModel;
 
     server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>(private_nh));
@@ -41,19 +41,25 @@ void AgentNodelet::onInit(){
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
-    ROS_INFO("agent::wm updated");
+ //   ROS_INFO("agent nodelet::wm updated");
+//    ROS_INFO(QString::number(wm->our[0]->pos.x).toStdString().data());
     wm->update(*_wm);
+//    PDEBUG("wm pos :", wm->our[agent->id()]->pos.x, D_MAHI);
+// ROS_INFO(QString::number(wm->our.active(0)).toStdString().data());
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
-  // if (debugger != nullptr) debug_pub.publish(debugger->debugs);
-   // if (drawer   != nullptr) draw_pub.publish(drawer->draws);
+   if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
 
     ROS_INFO("callBack called");
     agent->skill = getSkill(_robot_task);
+    DEBUG(agent->skill->getName(), D_MAHI);
+    NODELET_INFO("asdf");
+    DEBUG(reinterpret_cast<CSkillGotoPoint*>(agent->skill)->getTargetpos().x, D_MAHI);
     agent->execute();
     parsian_robot_command_pub.publish(agent->getCommand());
     grsim_robot_command_pub.publish(agent->getGrSimCommand());

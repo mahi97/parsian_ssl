@@ -14,7 +14,8 @@
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
 #define EPS 1e-6
-#define DELTA_T 0.060      //wm->commandSampleTime()
+#define DELTA_T 0.060
+ //wm->commandSampleTime()
 //#define DELTA_T wm->commandSampleTime()
 
 //  New Goto Point Class Powered by DON
