@@ -16,8 +16,6 @@ CWorldModel::CWorldModel(int c) {
         us[i] = new CRobot(i, true);
         them[i] = new CRobot(i, false);
     }
-    rosWM.our.reserve(_MAX_NUM_PLAYERS);
-    rosWM.opp.reserve(_MAX_NUM_PLAYERS);
 
     packs = 0;
 
@@ -60,29 +58,31 @@ void CWorldModel::toParsianMessage(const CBall* _ball) {
 
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
+parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
 //    if (this->ball == nullptr) return rosWM;
 
+    parsian_msgs::parsian_world_modelPtr rosWM{new parsian_msgs::parsian_world_model};
+    rosWM->our.reserve(_MAX_NUM_PLAYERS);
+    rosWM->opp.reserve(_MAX_NUM_PLAYERS);
 
     toParsianMessage(ball);
-    rosWM.ball = rosBall;
+    rosWM->ball = rosBall;
 
-    rosWM.our.clear();
-    rosWM.opp.clear();
+
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
         if (us[i]->isActive()) {
             toParsianMessage(us[i], i);
-            rosWM.our.push_back(rosRobots[i]);
+            rosWM->our.push_back(rosRobots[i]);
         }
         if (them[i]->isActive()) {
             toParsianMessage(them[i], i + 12);
-            rosWM.opp.push_back(rosRobots[i+12]);
+            rosWM->opp.push_back(rosRobots[i+12]);
         }
     }
 
     // TODO : get from protobuf_wrapper_params
-    rosWM.isYellow  = static_cast<unsigned char>(colour_yellow);
-    rosWM.isLeft = static_cast<unsigned char>(side_left);
+    rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
+    rosWM->isLeft = static_cast<unsigned char>(side_left);
 
     return rosWM;
 }
@@ -139,75 +139,27 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     }
 }
 
+void CWorldModel::merge(int frame) {
+    packs = 0;
+    if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
+    {
+        vc->merge(4);
+        mergedHalfWorld.currentFrame = frame;
+        mergedHalfWorld.update(&(vc->res));
+        mergedHalfWorld.vanishOutOfSights();
+    }
+
+    // UPDATE WM
+    this->update(&mergedHalfWorld);
+
+}
+
 
 // This Function Run in a Loop
 void CWorldModel::run(world_model_config::world_modelConfig & config)
 {
-    double lastSecond = 0.0, t=0.0;
-    int frame=0;
-    int lastSecondFrames=0;
-    int packmax;
-    double procTime = -1;
-
-    packmax = config.active_cam_num;// TODO : Config conf()->BallTracker_activeCamNum();
     if (vc == nullptr) return;
     vc->parse(detection, config);
-    frame ++;
-    packs ++;
-//    testFunc(detection);
-
-    if ( packs >= packmax ) {
-        packs = 0;
-        if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
-        {
-            vc->merge(packmax);
-            mergedHalfWorld.currentFrame = frame;
-            mergedHalfWorld.update(&(vc->res));
-            mergedHalfWorld.vanishOutOfSights();
-        }
-        if (t - lastSecond > 1.0)
-        {
-            if (lastSecond > 0.0)
-            {
-                visionFPS = frame - lastSecondFrames;
-            }
-            lastSecond = t;
-            lastSecondFrames = frame;
-        }
-        visionLatency  = vc->res.visionLatency;
-        visionTimestep = vc->res.timeStep;
-        if (procTime > 0) visionProcessTime = procTime;
-        ROS_INFO_STREAM(visionLatency << "," << visionProcessTime << "," << visionTimestep);
-
-        // UPDATE WM
-        this->update(&mergedHalfWorld);
-    }
-
-
-
-    // UPDATE OLD KNOWLEDGE
-//    mergedHalfWorld.game_state = knowledge->getGameState();
-//    mergedHalfWorld.game_mode = knowledge->getGameMode();
-//    mergedHalfWorld.closing = doClose;
-//    for (int i=0; i< knowledge->agentCount();i++)
-//    {
-//        mergedHalfWorld.ourRole[i] = knowledge->getAgent(i)->skillName;
-//    }
-//    for (int i=0; i< _MAX_NUM_PLAYERS;i++)
-//    {
-//        mergedHalfWorld.oppRole[i] = wm->opp[i]->role;
-//    }
-//    mergedHalfWorld.gsp = gsp;
-//    mergedHalfWorld.knowledgeVars = knowledge->variables;
-//    for (int i=0;i<_MAX_NUM_PLAYERS;i++)
-//        knowledge->positioningPoints[i] = mergedHalfWorld.positioningPoints[i];
-//    knowledge->positioningPointsCount = mergedHalfWorld.positioningPointsCount;
-//    if (knowledge->getPlayMaker() == NULL)
-//    {
-//        mergedHalfWorld.playmakerID = -1;
-//    }
-//    else mergedHalfWorld.playmakerID = knowledge->getPlayMaker()->id();
-    //////////////////
 
 }
 

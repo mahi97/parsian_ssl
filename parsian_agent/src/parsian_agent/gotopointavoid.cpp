@@ -59,6 +59,7 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element)
 
 void CSkillGotoPointAvoid::execute()
 {
+
     if(agent == nullptr)
         return;
     agentPos = agent->pos();
@@ -94,9 +95,8 @@ void CSkillGotoPointAvoid::execute()
         else
         {
             pathPoints.append(agentPos);
-            for(int i = 0 ; i < pathPoints.size() ; i++)
-            {
-                drawer->draw(Circle2D(pathPoints[i],0.02),QColor(Qt::blue),true);
+            for (auto pathPoint : pathPoints) {
+                drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true);
             }
         }
     }
@@ -106,10 +106,10 @@ void CSkillGotoPointAvoid::execute()
     }
 
     /////////////////
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+//    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+//    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+//    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+//    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
 //    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
@@ -137,10 +137,10 @@ void CSkillGotoPointAvoid::execute()
     //    debug(QString("speed: %1").arg(agentVel.length()),D_MHMMD);
     ///////////
 
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+//    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+//    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+//    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+//    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
 //    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
@@ -170,10 +170,21 @@ void CSkillGotoPointAvoid::execute()
     }
     else
     {
-        agent->initPlanner(agent->id() , targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
+
+        ROS_INFO_STREAM("Target: " << targetPos.x << targetPos.y);
+        ROS_INFO_STREAM("ourRel: " << ourRelaxList.size());
+        ROS_INFO_STREAM("oppRel: " << oppRelaxList.size());
+        ROS_INFO_STREAM("apa: " << avoidPenaltyArea);
+        ROS_INFO_STREAM("acc: " << avoidCenterCircle);
+        ROS_INFO_STREAM("bor: " << ballObstacleRadius);
+        ROS_INFO_STREAM("ff: " << wm->field->_FIELD_WIDTH);
+        ROS_INFO_STREAM("dd: " << wm->field->_FIELD_HEIGHT);
+
+        agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
-        for(unsigned long i=agent->pathPlannerResult.size()-1 ; i>=0 ; i-- )
+        for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )
         {
+            ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
         }
     }
@@ -194,27 +205,27 @@ void CSkillGotoPointAvoid::execute()
 
 
 
-    //    for( int i=1 ; i<result.size() ; i++ ){
-    //        alpha = 0;
-    //        if(fabs(Vector2D::angleBetween(result[i] - result[0] , result[i+1] - result[i]).degree()) > 3 ){
-    //            if( i+1 == result.size() ){
-    //                vf = 0;
-    //                alpha = 0;
-    //            }
-    //            else{
-    //                alpha = fabs(Vector2D::angleBetween(result[i] - result[0] , result[i+1] - result[i]).degree());
-    //                vf = -1.0259280143 * log(alpha) + 4.570475303;
-    //                vf = max(vf , 0.5);
-    //            }
-    //            D = result[i].dist(result[0]);
-    //            lllll = result[i];
-    //            d = dist - D;
-
-
-    //            flag = false;
-    //            break;
-    //        }
-    //    }
+//        for( int i=1 ; i<result.size() ; i++ ){
+//            alpha = 0;
+//            if(fabs(Vector2D::angleBetween(result[i] - result[0] , result[i+1] - result[i]).degree()) > 3 ){
+//                if( i+1 == result.size() ){
+//                    vf = 0;
+//                    alpha = 0;
+//                }
+//                else{
+//                    alpha = fabs(Vector2D::angleBetween(result[i] - result[0] , result[i+1] - result[i]).degree());
+//                    vf = -1.0259280143 * log(alpha) + 4.570475303;
+//                    vf = max(vf , 0.5);
+//                }
+//                D = result[i].dist(result[0]);
+//                lllll = result[i];
+//                d = dist - D;
+//
+//
+//                flag = false;
+//                break;
+//            }
+//        }
 
     if(result.size() >= 3)
     {
@@ -261,7 +272,6 @@ void CSkillGotoPointAvoid::execute()
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
     agent->accelerationLimiter(vf,oneTouchMode);
-
 
 
     counter ++;
@@ -328,7 +338,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     else
     {
 
-        _agentT->initPlanner(_agentT->id(),posT,_ourRelax,_oppRelax,avoidPenalty,false,ballObstacleReduce);
+        _agentT->initPlanner(posT,_ourRelax,_oppRelax,avoidPenalty,false,ballObstacleReduce);
         _result.clear();
         for(unsigned long i = _agentT->pathPlannerResult.size()-1 ; i>=0 ; i-- )
         {

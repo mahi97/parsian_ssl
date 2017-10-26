@@ -61,12 +61,13 @@ class CPlanner
 {
 public:
     ///////////////////////////////////////////////////////////////////
-    CPlanner(int );
+    CPlanner(int _ID);
     ~CPlanner();
     void runPlanner();
     void resetPlanner(Vector2D);
     void pathPlannerResult(vector<Vector2D> _resultModified , Vector2D _averageDir);
-    void initPathPlanner( int _id , Vector2D _goal,QList<int> _ourRelaxList, QList<int> _oppRelaxList , bool _avoidPenaltyArea , bool _avoidCenterArea , double _ballObstacleRadius );
+    void initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
+
     vector<Vector2D> getResultModified ();
     Vector2D getAverageDir();
 private:
@@ -98,7 +99,6 @@ private:
     void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id, Vector2D agentGoal);
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
-    void initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
 
 };
 

@@ -11,7 +11,7 @@ void AgentNodelet::onInit(){
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    timer_ = nh.createTimer(ros::Duration(0.016), &AgentNodelet::timerCb, this);
+    timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
 
     world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
@@ -41,29 +41,29 @@ void AgentNodelet::onInit(){
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
- //   ROS_INFO("agent nodelet::wm updated");
+    ROS_INFO("agent nodelet::updated");
 //    ROS_INFO(QString::number(wm->our[0]->pos.x).toStdString().data());
-    wm->update(*_wm);
-//    PDEBUG("wm pos :", wm->our[agent->id()]->pos.x, D_MAHI);
+    wm->update(_wm);
+    if (agent->skill != nullptr) {
+        agent->execute();
+        parsian_robot_command_pub.publish(agent->getCommand());
+        grsim_robot_command_pub.publish(agent->getGrSimCommand());
+    }
+//    ROS_INFO_STREAM("ADDA : " << _wm);
+//
+//    NODELET_INFO_STREAM("lag : " << ros::Time::now() - _wm->Header.stamp);
 // ROS_INFO(QString::number(wm->our.active(0)).toStdString().data());
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
-   if (debugger != nullptr) debug_pub.publish(debugger->debugs);
-    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
+//   if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+//    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
 
     ROS_INFO("callBack called");
     agent->skill = getSkill(_robot_task);
-    DEBUG(agent->skill->getName(), D_MAHI);
-    NODELET_INFO("asdf");
-    DEBUG(reinterpret_cast<CSkillGotoPoint*>(agent->skill)->getTargetpos().x, D_MAHI);
-    agent->execute();
-    parsian_robot_command_pub.publish(agent->getCommand());
-    grsim_robot_command_pub.publish(agent->getGrSimCommand());
-
 }
 
 CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_task) {
@@ -78,7 +78,7 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
-            ROS_INFO("GOTOPOINTAVOID executed!");
+            ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
         }
             break;
         case parsian_msgs::parsian_robot_task::KICK: {

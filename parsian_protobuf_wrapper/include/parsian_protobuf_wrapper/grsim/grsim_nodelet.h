@@ -15,6 +15,7 @@
 #include <parsian_protobuf_wrapper/common/net/udpsend.h>
 #include <parsian_msgs/grsim_robot_replacement.h>
 #include <parsian_msgs/grsim_ball_replacement.h>
+#include <parsian_msgs/ssl_vision_wrapper.h>
 
 class GrsimNodelet : public nodelet::Nodelet
 {

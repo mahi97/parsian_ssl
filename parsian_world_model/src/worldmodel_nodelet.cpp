@@ -31,17 +31,21 @@ void WMNodelet::onInit() {
 //}
 
 void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_detection) {
-//
 
     wm->updateDetection(_detection);
     wm->execute(m_config);
+    frame ++;
+    packs ++;
 
+    if (packs >= 4) {
+        packs = 0;
+        wm->merge(frame);
+        parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(colour_yellow, side_left);
+        temp->Header.stamp = ros::Time::now();
+        temp->Header.frame_id = std::to_string(_detection->frame_number);
+        wm_pub.publish(temp);
+    }
 
-//    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
-//    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
-    NODELET_INFO("wm2");
-    wm_pub.publish(wm->getParsianWorldModel(colour_yellow, side_left));
-//
 }
 
 void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)

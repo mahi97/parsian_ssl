@@ -45,7 +45,7 @@ namespace parsian_world_model {
         world_model_config::world_modelConfig m_config;
 
         bool side_left, colour_yellow;
-
+        int frame, packs;
 
 
 //        ros::Timer timer;
