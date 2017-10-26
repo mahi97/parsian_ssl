@@ -962,14 +962,25 @@ void Agent::setGyroZero()
     calibrateGyro = true;
     	DEBUG(QString("Calibrated ! ang : %1").arg(agentAngelForGyro.dir().degree()),D_SEPEHR);
 }
-void Agent::initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                         const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                         const double &_ballObstacleRadius){
     //  timer.start();
-    planner.initPathPlanner(this->id(),  _target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
-    this->plannerAverageDir=planner.getAverageDir().norm();
+    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
+    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
+
+//    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
+//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
+//    this->plannerAverageDir=planner.getAverageDir().norm();
+//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
+
     //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+}
+
+void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {
+    pathPlannerResult.assign(_result.begin() , _result.end());
+    plannerAverageDir = _averageDir.norm();
 }
 
 void Agent::execute() {
@@ -1009,9 +1020,7 @@ parsian_msgs::grsim_robot_commandPtr Agent::getGrSimCommand() {
     double w3 = v3*gain;
     double w4 = v4*gain;
 
-//    jacobian(vforward, vnormal, 0, w1, w2, w3, w4);
-    jacobian(vforward, vnormal,0, w1, w2, w3, w4);
-    //jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
     grsim_robot_command_msg->wheelsspeed= static_cast<unsigned char>(true);
     grsim_robot_command_msg->wheel1= static_cast<float>(w1);
     grsim_robot_command_msg->wheel2= static_cast<float>(w2);

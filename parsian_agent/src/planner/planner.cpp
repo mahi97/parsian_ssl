@@ -186,7 +186,7 @@ void C2DTree::drawBranch(state *first , state* second , QColor color){
 //    CPlanner class implementation
 //====================================================================//
 
-CPlanner::CPlanner(int ID)
+CPlanner::CPlanner(int _ID)
 {
     obst.clear();
     threshold = 1;      // TODO  conf()->ERRT_Target_Distance_Threshold();
@@ -197,7 +197,7 @@ CPlanner::CPlanner(int ID)
     counter=0;
     flag = false;
     pointStep = 0.09;
-    this->ID=ID;
+    this->ID = _ID;
     qRegisterMetaType< vector<Vector2D> >("vector<Vector2D>");
     qRegisterMetaType< Vector2D >("Vector2D");
     qRegisterMetaType< QList<int> >("QList<int>");
@@ -217,7 +217,7 @@ Vector2D CPlanner::chooseTarget( Vector2D &GOAL ){
     unsigned long idx;
     if( p<=goalProb )
         return GOAL;
-    else if( result.size() && goalProb < p && p < wayPointProb+goalProb ){
+    else if(! result.empty() && goalProb < p && p < wayPointProb+goalProb ){
         idx = rand() % result.size();
         return result[idx];
     }
@@ -338,8 +338,7 @@ void CPlanner::runPlanner(){
             }
         }
         else{
-            if( newNode )
-                delete newNode;
+            delete newNode;
             nnn++;
         }
 
@@ -376,8 +375,7 @@ void CPlanner::runPlanner(){
                 }
             }
             else{
-                if( newNode )
-                    delete newNode;
+                delete newNode;
                 Rnnn++;
             }
             if( Rnnn == _PLANNER_EXTEND_MAX_ATTEMPT && RmarginFlag ){
@@ -455,7 +453,7 @@ void CPlanner::runPlanner(){
             nearestToGoal = two;
         }
 
-        if( found == false ){
+        if(! found){
             nearestToGoal = copyNearest;
             flag = true;
             /*if( CProfiler::getTime()*1000.0 - drawTimer*1000.0 > 100.0 )
@@ -508,7 +506,7 @@ void CPlanner::runPlanner(){
     //        }
     //    }
 
-    int compNodeNum = temp.size()-1;
+    auto compNodeNum = static_cast<int>(temp.size() - 1);
     for( int i=((int)(temp.size()))-1 ; i>1 ; i-- )
     {
         if(i < compNodeNum)
@@ -594,12 +592,10 @@ void CPlanner::Draw(){
         if( Rnodes.allNodes[i]->parent )
             drawer->draw(Segment2D(Rnodes.allNodes[i]->pos , Rnodes.allNodes[i]->parent->pos) , "gray");
 
-    return;
-
 }
 
 void CPlanner::resetPlanner( Vector2D _goal ){
-    if( result.size() == 0 || lastGoal.dist(_goal) > 0.05 || (result[result.size()-1].dist(lastGoal) > 10*threshold) ){
+    if(result.empty() || lastGoal.dist(_goal) > 0.05 || (result[result.size()-1].dist(lastGoal) > 10*threshold) ){
 
         //		if( result.size() == 0 )
         //			qDebug() << "RESULT.SIZE()";
@@ -628,27 +624,22 @@ void CPlanner::resetPlanner( Vector2D _goal ){
     Rnodes.removeAll();
 }
 
-
 ////////TODO change slot to ...///////
-void CPlanner::initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
-
-        //  QTime timer;
-        //  timer.start();
-        //  QMutexLocker locker(&plannerMutex);
+void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
 
         bool flag = true;
-        int idx;
-        for( int i=0 ; i<wm->our.activeAgentsCount() ; i++ ){
-            if( wm->our[i]->id == ID ){
-                idx = i;
-                flag = false;
-                break;
-            }
-        }
-        if( flag ){
-            DEBUG(QString("Planner ID (%1): RETURNED!").arg(ID) , D_MASOOD);
-            return;
-        }
+        int idx = ID;
+//        for( int i=0 ; i<wm->our.activeAgentsCount() ; i++ ){
+//            if( wm->our.active(i)->id == ID ){
+//                idx = i;
+//                flag = false;
+//                break;
+//            }
+//        }
+//        if( flag ){
+//            DEBUG(QString("Planner ID (%1): RETURNED!").arg(ID) , D_MASOOD);
+//            return;
+//        }
 
         if( wm->our[idx]->pos.dist(_goal) < 0.1 ){
             resultModified.clear();
@@ -656,13 +647,13 @@ void CPlanner::initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _o
             resultModified.push_back(_goal);
             averageDir = _goal - wm->our[idx]->pos;
                //////TODO change signal ///////
-
-            emit pathPlannerResult(resultModified , averageDir);
+            return;
+//            emit pathPlannerResult(resultModified , averageDir);
 
         }
 
         if(! wm->field->marginedField().contains(_goal) ){
-            Vector2D *sol1 = new Vector2D() , *sol2 = new Vector2D();
+            auto *sol1 = new Vector2D() , *sol2 = new Vector2D();
             wm->field->marginedField().intersection(Segment2D(Vector2D(0,0) , _goal) , sol1 , sol2 );
             if( sol1->valid() ){
                 _goal = *sol1;
@@ -679,30 +670,30 @@ void CPlanner::initPathPlanner(/*const*/ Vector2D/*&*/ _goal,const QList<int> _o
         avoidCenterArea = _avoidCenterArea;
 
         ourRelaxList.clear();
-        for(int i=0 ; i<_ourRelaxList.size();i++)
-            ourRelaxList.append(_ourRelaxList.at(i));
+        for (int i : _ourRelaxList)
+            ourRelaxList.append(i);
         ourRelaxList.append(ID);
 
         oppRelaxList.clear();
-        for(int i=0 ; i<_oppRelaxList.size();i++)
-           oppRelaxList.append(_oppRelaxList.at(i));
+        for (int i : _oppRelaxList)
+            oppRelaxList.append(i);
         oppRelaxList.append(ID);
 
         ballObstacleRadius = _ballObstacleRadius;
-        stepSize = 1; //TODO conf()->ERRT_Extend_Step();
-        threshold = 1; //TODO conf()->ERRT_Target_Distance_Threshold();
-        wayPointProb = 1; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
-        if( result.size() )
-            goalProb = 1; // TODO conf()->ERRT_Goal_Probablity();
+        stepSize = 0.1; //TODO conf()->ERRT_Extend_Step();
+        threshold = 0.01; //TODO conf()->ERRT_Target_Distance_Threshold();
+        wayPointProb = 0.6; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
+        if(! result.empty())
+            goalProb = 0.3; // TODO conf()->ERRT_Goal_Probablity();
         else
             goalProb = 0.5;
 
         robotVel = wm->our[idx]->vel;
 
-        nodes.first = new state((wm->our[idx]->pos+wm->our[idx]->vel*0.09) , NULL , result);
+        nodes.first = new state((wm->our[idx]->pos+wm->our[idx]->vel*0.09) , nullptr , result);
         nodes.add(nodes.first);
 
-        Rnodes.first = new state(_goal , NULL , Rresult);
+        Rnodes.first = new state(_goal , nullptr , Rresult);
         Rnodes.add(Rnodes.first);
         counter++;
 
@@ -834,18 +825,19 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
     Vector2D agentVel;
 
-    for(int i = 0; i < wm->our.activeAgentsCount() ; i ++)
-    {
-        if(wm->our[i]->id == id)
-        {
+    // TODO : SELF
+//    for(int i = 0; i < wm->our.activeAgentsCount() ; i ++)
+//    {
+//        if(wm->our[i]->id == id)
+//        {
             isValid = true;
-            agentPos = wm->our[i]->pos;
-            agentVel = wm->our[i]->vel;
-            break;
-        }
-    }
-    if(!isValid)
-        return;
+            agentPos = wm->our[ID]->pos;
+            agentVel = wm->our[ID]->vel;
+//            break;
+//        }
+//    }
+//    if(!isValid)
+//        return;
 
 
 
@@ -855,21 +847,20 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     double rad = 0;
     for (int j=0;j<wm->our.activeAgentsCount();j++)
     {
-        if( ourRelaxList.contains(wm->our[j]->id) == false )
+        if( ourRelaxList.contains(wm->our.active(j)->id) == false )
         {
 
-            createObstacleProb(obs,wm->our[j]->pos,wm->our[j]->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
+            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
 
 
             double obstVelFactor = 0.15;
 
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
 
-            if(1 || Circle2D(wm->our[j]->pos,CRobot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
-            {
-                obs.add_circle(wm->our[j]->pos.x , wm->our[j]->pos.y , 0.2 , 0 , 0);
-
-            }
+//            if(1 || Circle2D(wm->our[j]->pos,CRobot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
+//            {
+                obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.2 , 0 , 0);
+//            }
 
 
 
@@ -878,13 +869,13 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {
-        if( oppRelaxList.contains(wm->opp[j]->id) == false )
+        if( oppRelaxList.contains(wm->opp.active(j)->id) == false )
         {
 
-            createObstacleProb(obs,wm->opp[j]->pos,wm->opp[j]->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
+            createObstacleProb(obs,wm->opp.active(j)->pos,wm->opp.active(j)->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
             double obstVelFactor = 0.15;
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
-            obs.add_circle(wm->opp[j]->pos.x , wm->opp[j]->pos.y , 0.2 , 0 , 0);
+            obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.2 , 0 , 0);
         }
     }
 

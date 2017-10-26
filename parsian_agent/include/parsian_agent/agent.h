@@ -166,9 +166,10 @@ private:
     Matrix ANN_forward( Matrix input );
 
 public:
-    void initPlanner(const int &_id, const Vector2D &_target, const QList<int> &_ourRelaxList,
+    void initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                      const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                      const double &_ballObstacleRadius);
+    void getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir);
 
     const double gain = 1.013;
     void execute();

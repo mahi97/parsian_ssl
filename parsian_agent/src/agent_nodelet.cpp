@@ -78,7 +78,7 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
-            ROS_INFO("GOTOPOINTAVOID executed!");
+            ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
         }
             break;
         case parsian_msgs::parsian_robot_task::KICK: {

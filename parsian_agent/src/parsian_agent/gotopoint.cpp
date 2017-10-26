@@ -219,7 +219,7 @@ void CSkillGotoPoint::trajectoryPlanner()
 void CSkillGotoPoint::execute()
 {
 
-    maxVelocity = 4;
+    maxVelocity = 1;
     if(slowShot|| slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
@@ -229,7 +229,7 @@ void CSkillGotoPoint::execute()
         maxVelocity = 4;
     }
 
-    targetValidate();
+//    targetValidate();
 
     /////////////////decide and exec
 
@@ -356,10 +356,10 @@ void CSkillGotoPoint::execute()
         agent->waitHere();
         velPid->_I = 0;
     }
-    ROS_INFO_STREAM("DIS : " << agentDist);
+    ROS_INFO_STREAM("DI : " << agentDist);
 //    ROS_INFO_STREAM("DIST : " << agentDist);
 
-    agent->setRobotAbsVel(1, 1, 0);
+    agent->setRobotAbsVel(_Vx, _Vy, angPid->PID_OUT());
     angPid->pError = angPid->error;
 
 
