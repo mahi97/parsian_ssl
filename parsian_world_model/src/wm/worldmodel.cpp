@@ -177,7 +177,7 @@ void CWorldModel::run(world_model_config::world_modelConfig & config)
         visionLatency  = vc->res.visionLatency;
         visionTimestep = vc->res.timeStep;
         if (procTime > 0) visionProcessTime = procTime;
-        ROS_INFO_STREAM("mahi" << visionLatency << "," << visionProcessTime << "," << visionTimestep);
+        ROS_INFO_STREAM("mahi" << detection->t_sent - detection->t_capture << " , " << ros::Time::now().nsec - detection->t_sent);
 
         // UPDATE WM
         this->update(&mergedHalfWorld);

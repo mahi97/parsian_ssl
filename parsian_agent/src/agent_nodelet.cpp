@@ -47,6 +47,8 @@ void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
 //    agent->execute();
 //    parsian_robot_command_pub.publish(agent->getCommand());
 //    grsim_robot_command_pub.publish(agent->getGrSimCommand());
+    ROS_INFO_STREAM("ADDA : " << _wm);
+
     NODELET_INFO_STREAM("lag : " << ros::Time::now() - _wm->Header.stamp);
 // ROS_INFO(QString::number(wm->our.active(0)).toStdString().data());
 }
