@@ -26,7 +26,7 @@ CWorldModel::~CWorldModel() {
     vc = nullptr;
 }
 
-void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detection& _detection) {
+void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr& _detection) {
     detection = _detection;
 }
 
@@ -139,74 +139,27 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     }
 }
 
+void CWorldModel::merge(int frame) {
+    packs = 0;
+    if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
+    {
+        vc->merge(4);
+        mergedHalfWorld.currentFrame = frame;
+        mergedHalfWorld.update(&(vc->res));
+        mergedHalfWorld.vanishOutOfSights();
+    }
+
+    // UPDATE WM
+    this->update(&mergedHalfWorld);
+
+}
+
 
 // This Function Run in a Loop
 void CWorldModel::run(world_model_config::world_modelConfig & config)
 {
-    double lastSecond = 0.0, t=0.0;
-    int frame=0;
-    int lastSecondFrames=0;
-    int packmax;
-    double procTime = -1;
-
-    packmax = config.active_cam_num;// TODO : Config conf()->BallTracker_activeCamNum();
     if (vc == nullptr) return;
     vc->parse(detection, config);
-    frame ++;
-    packs ++;
-//    testFunc(detection);
-
-    if ( packs >= packmax ) {
-        packs = 0;
-        if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
-        {
-            vc->merge(packmax);
-            mergedHalfWorld.currentFrame = frame;
-            mergedHalfWorld.update(&(vc->res));
-            mergedHalfWorld.vanishOutOfSights();
-        }
-        if (t - lastSecond > 1.0)
-        {
-            if (lastSecond > 0.0)
-            {
-                visionFPS = frame - lastSecondFrames;
-            }
-            lastSecond = t;
-            lastSecondFrames = frame;
-        }
-        visionLatency  = vc->res.visionLatency;
-        visionTimestep = vc->res.timeStep;
-        if (procTime > 0) visionProcessTime = procTime;
-
-        // UPDATE WM
-        this->update(&mergedHalfWorld);
-    }
-
-
-
-    // UPDATE OLD KNOWLEDGE
-//    mergedHalfWorld.game_state = knowledge->getGameState();
-//    mergedHalfWorld.game_mode = knowledge->getGameMode();
-//    mergedHalfWorld.closing = doClose;
-//    for (int i=0; i< knowledge->agentCount();i++)
-//    {
-//        mergedHalfWorld.ourRole[i] = knowledge->getAgent(i)->skillName;
-//    }
-//    for (int i=0; i< _MAX_NUM_PLAYERS;i++)
-//    {
-//        mergedHalfWorld.oppRole[i] = wm->opp[i]->role;
-//    }
-//    mergedHalfWorld.gsp = gsp;
-//    mergedHalfWorld.knowledgeVars = knowledge->variables;
-//    for (int i=0;i<_MAX_NUM_PLAYERS;i++)
-//        knowledge->positioningPoints[i] = mergedHalfWorld.positioningPoints[i];
-//    knowledge->positioningPointsCount = mergedHalfWorld.positioningPointsCount;
-//    if (knowledge->getPlayMaker() == NULL)
-//    {
-//        mergedHalfWorld.playmakerID = -1;
-//    }
-//    else mergedHalfWorld.playmakerID = knowledge->getPlayMaker()->id();
-    //////////////////
 
 }
 

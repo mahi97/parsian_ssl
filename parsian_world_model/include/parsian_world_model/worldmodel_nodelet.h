@@ -18,9 +18,6 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "parsian_world_model/world_modelConfig.h"
-#include <parsian_msgs/ssl_vision_wrapper.h>
-
-
 namespace parsian_world_model {
 
     class WMNodelet : public nodelet::Nodelet {
@@ -33,7 +30,7 @@ namespace parsian_world_model {
 
 //        Subs CallBack
         void geomCb(const parsian_msgs::ssl_vision_geometryConstPtr& _geom);
-        void detectionCb(const parsian_msgs::ssl_vision_wrapperConstPtr& _detection);
+        void detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr& _detection);
 
 
         CWorldModel* wm;
@@ -48,7 +45,7 @@ namespace parsian_world_model {
         world_model_config::world_modelConfig m_config;
 
         bool side_left, colour_yellow;
-        int packs;
+        int frame, packs;
 
 
 //        ros::Timer timer;

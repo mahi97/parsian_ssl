@@ -26,26 +26,26 @@ public:
     CWorldModel(int c);
     ~CWorldModel();
 
-    void updateDetection(const parsian_msgs::ssl_vision_detection&);
+    void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute(world_model_config::world_modelConfig & config);
+    void merge(int frame);
     void init();
-    parsian_msgs::parsian_world_modelPtr getParsianWorldModel(bool colour_yellow, bool side_left);
 
+    parsian_msgs::parsian_world_modelPtr getParsianWorldModel(bool colour_yellow, bool side_left);
 private:
     parsian_msgs::parsian_robot rosRobots[_MAX_NUM_PLAYERS*2];
-    parsian_msgs::parsian_robot rosBall;
 
+    parsian_msgs::parsian_robot rosBall;
     CVisionClient *vc;
     CHalfWorld* hw;
     CHalfWorld w;
-    CHalfWorld mergedHalfWorld;
 
+    CHalfWorld mergedHalfWorld;
     CBall* ball;
     CRobot* us[_MAX_NUM_PLAYERS];
+
     CRobot* them[_MAX_NUM_PLAYERS];
-
-
     bool simulationMode;
     void run(world_model_config::world_modelConfig & config);
     void update(CHalfWorld*);
@@ -56,7 +56,7 @@ private:
     void toParsianMessage(const CBall* _ball);
 
 
-    parsian_msgs::ssl_vision_detection detection;
+    parsian_msgs::ssl_vision_detectionConstPtr detection;
 
     double visionFPS;
     double visionLatency;

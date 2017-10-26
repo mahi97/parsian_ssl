@@ -40,7 +40,7 @@ public:
     CVisionClient();
     ~CVisionClient();
 
-    void parse(const parsian_msgs::ssl_vision_detection& packet, world_model_config::world_modelConfig & config );
+    void parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config );
 	void merge(int camera_count=CAMERA_NUM);
 };
 

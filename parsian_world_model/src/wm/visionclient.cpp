@@ -15,27 +15,27 @@ CVisionClient::~CVisionClient()
     delete vcTimer;
 }
 
-void CVisionClient::parse(const parsian_msgs::ssl_vision_detection& packet, world_model_config::world_modelConfig & config)
+void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config)
 {
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
 
-   if(!config.camera_one_active){
-       if (packet.camera_id==0) return;
-   }
-   if(!config.camera_two_active){
-       if (packet.camera_id==1) return;
-   }
-   if(!config.camera_three_active){
-       if (packet.camera_id==2) return;
-   }
-   if(!config.camera_four_active){
-       if (packet.camera_id==3) return;
-   }
+//   if(!config.camera_one_active){
+//       if (packet->camera_id==0) return;
+//   }
+//   if(!config.camera_two_active){
+//       if (packet->camera_id==1) return;
+//   }
+//   if(!config.camera_three_active){
+//       if (packet->camera_id==2) return;
+//   }
+//   if(!config.camera_four_active){
+//       if (packet->camera_id==3) return;
+//   }
 
 
     frameCnt ++;
-    int id = packet.camera_id;
+    int id = packet->camera_id;
     lastCamera = id;
     v[id].cam_id = id;
     for (int i=0;i<v[id].ball.count();i++)
@@ -69,22 +69,22 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detection& packet, worl
             v[id].oppTeam[i].clear();
                 }*/
     v[id].lastUpdateTime = vcTimer->elapsed();
-    double t = packet.t_capture;
+    double t = packet->t_capture;
     double dt =  t - v[id].ltcapture;
     if (dt < 0.0) dt = 0.05;
     v[id].time = t;
     v[id].timeStep = dt;
     v[id].ltcapture = t;
-    v[id].visionLatency = (packet.t_sent - packet.t_capture);
+    v[id].visionLatency = (packet->t_sent - packet->t_capture);
     v[id].updated = true;
-    for (int i=0; i < min(MAX_OBJECT, packet.balls.size());i++)
+    for (int i=0; i < min(MAX_OBJECT, packet->balls.size());i++)
     {
-        if (packet.balls[i].confidence != -1
-            && packet.balls[i].pos.x != 5000
-            && packet.balls[i].pos.y != 5000)
+        if (packet->balls[i].confidence != -1
+            && packet->balls[i].pos.x != 5000
+            && packet->balls[i].pos.y != 5000)
         {
-            CRawObject raw = CRawObject(frameCnt, Vector2D(packet.balls[i].pos.x, packet.balls[i].pos.y), 0, i
-                    , packet.balls[i].confidence, nullptr, id);
+            CRawObject raw = CRawObject(frameCnt, Vector2D(packet->balls[i].pos.x, packet->balls[i].pos.y), 0, i
+                    , packet->balls[i].confidence, nullptr, id);
             for (int k=0;k<v[id].ball.count();k++)
             {
                 if ((v[id].ball[k].pos - raw.pos).length() < 0.5)
@@ -95,18 +95,18 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detection& packet, worl
             v[id].ball.append(raw);
         }
     }
-    if(! packet.balls.empty())
+    if(! packet->balls.empty())
         v[id].outofsight_ball=0;
 
     bool our_insight[_MAX_NUM_PLAYERS];
     bool opp_insight[_MAX_NUM_PLAYERS];
     for (int i=0;i<_MAX_NUM_PLAYERS;i++) {our_insight[i]=opp_insight[i]=false;}
 
-    for (const auto &u : packet.us) {
+    for (const auto &u : packet->us) {
         int rob_id = u.robot_id;
         if (v[id].ourTeam[rob_id].count() >= MAX_OBJECT) continue;
         CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x, u.pos.y),
-                                    u.orientation*180.0f/M_PI*90.0
+                                    u.orientation*180.0f/M_PI
                 ,rob_id ,u.confidence, nullptr, id);
         for (int k=0;k<v[id].ourTeam[rob_id].count();k++)
         {
@@ -120,11 +120,11 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detection& packet, worl
         our_insight[rob_id] = true;
     }
 
-    for (const auto &i : packet.them) {
+    for (const auto &i : packet->them) {
         int rob_id = i.robot_id;
         if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) continue;
         CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x, i.pos.y),
-                                    i.orientation*180.0f/M_PI*90.0
+                                    i.orientation*180.0f/M_PI
                 ,rob_id ,i.confidence, nullptr, id);
         for (int k=0;k<v[id].oppTeam[rob_id].count();k++)
         {
