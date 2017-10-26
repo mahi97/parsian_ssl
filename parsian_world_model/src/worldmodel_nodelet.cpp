@@ -39,8 +39,10 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
 
 //    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
 //    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
-    NODELET_INFO("wm2");
-    wm_pub.publish(wm->getParsianWorldModel(colour_yellow, side_left));
+    parsian_msgs::parsian_world_modelPtr&& temp = wm->getParsianWorldModel(colour_yellow, side_left);
+    temp->Header.stamp = ros::Time::now();
+    temp->Header.frame_id = _detection->frame_number;
+    wm_pub.publish(temp);
 //
 }
 

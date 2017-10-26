@@ -18,13 +18,13 @@ opp{!_pwm.isYellow, !_pwm.isLeft, _pwm.opp}
     this->ball = new CBall(_pwm.ball);
 }
 
-void CWorldModel::update(const parsian_msgs::parsian_world_model &_newWM) {
-    this->ball->update(_newWM.ball);
-    this->our.updateRobot(_newWM.our);
-    this->our.setColor(_newWM.isYellow);
-    this->our.setSide(_newWM.isLeft);
+void CWorldModel::update(const parsian_msgs::parsian_world_modelConstPtr& _newWM) {
+    this->ball->update(_newWM->ball);
+    this->our.updateRobot(_newWM->our);
+    this->our.setColor(_newWM->isYellow);
+    this->our.setSide(_newWM->isLeft);
 
-    this->opp.updateRobot(_newWM.opp);
-    this->opp.setColor(!_newWM.isYellow);
-    this->opp.setSide(!_newWM.isLeft);
+    this->opp.updateRobot(_newWM->opp);
+    this->opp.setColor(!_newWM->isYellow);
+    this->opp.setSide(!_newWM->isLeft);
 }

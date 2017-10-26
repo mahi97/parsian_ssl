@@ -16,8 +16,6 @@ CWorldModel::CWorldModel(int c) {
         us[i] = new CRobot(i, true);
         them[i] = new CRobot(i, false);
     }
-    rosWM.our.reserve(_MAX_NUM_PLAYERS);
-    rosWM.opp.reserve(_MAX_NUM_PLAYERS);
 
     packs = 0;
 
@@ -60,29 +58,31 @@ void CWorldModel::toParsianMessage(const CBall* _ball) {
 
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
+parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
 //    if (this->ball == nullptr) return rosWM;
 
+    parsian_msgs::parsian_world_modelPtr rosWM{new parsian_msgs::parsian_world_model};
+    rosWM->our.reserve(_MAX_NUM_PLAYERS);
+    rosWM->opp.reserve(_MAX_NUM_PLAYERS);
 
     toParsianMessage(ball);
-    rosWM.ball = rosBall;
+    rosWM->ball = rosBall;
 
-    rosWM.our.clear();
-    rosWM.opp.clear();
+
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
         if (us[i]->isActive()) {
             toParsianMessage(us[i], i);
-            rosWM.our.push_back(rosRobots[i]);
+            rosWM->our.push_back(rosRobots[i]);
         }
         if (them[i]->isActive()) {
             toParsianMessage(them[i], i + 12);
-            rosWM.opp.push_back(rosRobots[i+12]);
+            rosWM->opp.push_back(rosRobots[i+12]);
         }
     }
 
     // TODO : get from protobuf_wrapper_params
-    rosWM.isYellow  = static_cast<unsigned char>(colour_yellow);
-    rosWM.isLeft = static_cast<unsigned char>(side_left);
+    rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
+    rosWM->isLeft = static_cast<unsigned char>(side_left);
 
     return rosWM;
 }
@@ -177,7 +177,7 @@ void CWorldModel::run(world_model_config::world_modelConfig & config)
         visionLatency  = vc->res.visionLatency;
         visionTimestep = vc->res.timeStep;
         if (procTime > 0) visionProcessTime = procTime;
-        ROS_INFO_STREAM(visionLatency << "," << visionProcessTime << "," << visionTimestep);
+        ROS_INFO_STREAM("mahi" << visionLatency << "," << visionProcessTime << "," << visionTimestep);
 
         // UPDATE WM
         this->update(&mergedHalfWorld);
