@@ -609,6 +609,7 @@ Vector2D Agent::distToBall()
 void Agent::setRobotAbsVel(double _vx, double _vy, double _w)
 {
     double ang = -dir().th().radian();
+    ROS_INFO_STREAM("ANG : " <<  ang);
     setRobotVel((cos(ang) * _vx) - (sin(ang) * _vy), (sin(ang) * _vx) + (cos(ang) * _vy), _w);
 }
 
@@ -619,7 +620,7 @@ void Agent::setRobotVel(double _vtan , double _vnorm , double _w )
     vforward = _vtan ;
     vnormal  = _vnorm ;
     vangular = _w *_RAD2DEG ;
-
+    ROS_INFO_STREAM("ANG :: " << vangular);
     double _v1,_v2,_v3,_v4;
     jacobian( _vtan , _vnorm , _w , _v1 , _v2 , _v3 , _v4);
     v1 = _v1;
@@ -980,28 +981,28 @@ void Agent::execute() {
     //emit pathPlannerResult(resultModified ,averageDir); get this variables
 }
 
-parsian_msgs::parsian_robot_command Agent::getCommand() {
+parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     ROS_INFO("CommunicationCommand_generated");
-    parsian_msgs::parsian_robot_command command;
+    parsian_msgs::parsian_robot_commandPtr command{new parsian_msgs::parsian_robot_command};
     int counter = 1;
 
-    command.robot_id= static_cast<unsigned char>(id());
-    command.chip= static_cast<unsigned char>(chip);
-    command.packet_id= static_cast<unsigned char>(counter++);
-    command.roller_speed= static_cast<unsigned char>(roller);
+    command->robot_id= static_cast<unsigned char>(id());
+    command->chip= static_cast<unsigned char>(chip);
+    command->packet_id= static_cast<unsigned char>(counter++);
+    command->roller_speed= static_cast<unsigned char>(roller);
 //    command.forceKick= static_cast<unsigned char>(forceKick);
-    command.kickSpeed= static_cast<unsigned short>(kickSpeed);
-    command.vel_F = vel().x;
-    command.vel_N = vel().y;
-    command.vel_w = angularVel();
-    command.release = static_cast<unsigned char>(onOffState);
+    command->kickSpeed= static_cast<unsigned short>(kickSpeed);
+    command->vel_F = vel().x;
+    command->vel_N = vel().y;
+    command->vel_w = angularVel();
+    command->release = static_cast<unsigned char>(onOffState);
     return command;
 }
 
-parsian_msgs::grsim_robot_command Agent::getGrSimCommand() {
-    ROS_INFO("grsimCommand_generated");
-    parsian_msgs::grsim_robot_command  grsim_robot_command_msg;
-    grsim_robot_command_msg.id= static_cast<unsigned char>(id());
+parsian_msgs::grsim_robot_commandPtr Agent::getGrSimCommand() {
+    ROS_INFO("grsimCommand_grsimCommand");
+    parsian_msgs::grsim_robot_commandPtr  grsim_robot_command_msg{new parsian_msgs::grsim_robot_command};
+    grsim_robot_command_msg->id= static_cast<unsigned char>(id());
 
     double w1 = v1*gain;
     double w2 = v2*gain;
@@ -1009,24 +1010,24 @@ parsian_msgs::grsim_robot_command Agent::getGrSimCommand() {
     double w4 = v4*gain;
 
 //    jacobian(vforward, vnormal, 0, w1, w2, w3, w4);
-    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+    jacobian(vforward, vnormal,0, w1, w2, w3, w4);
+    //jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+    grsim_robot_command_msg->wheelsspeed= static_cast<unsigned char>(true);
+    grsim_robot_command_msg->wheel1= static_cast<float>(w1);
+    grsim_robot_command_msg->wheel2= static_cast<float>(w2);
+    grsim_robot_command_msg->wheel3= static_cast<float>(w3);
+    grsim_robot_command_msg->wheel4= static_cast<float>(w4);
 
-    grsim_robot_command_msg.wheelsspeed= static_cast<unsigned char>(true);
-    grsim_robot_command_msg.wheel1= static_cast<float>(w1);
-    grsim_robot_command_msg.wheel2= static_cast<float>(w2);
-    grsim_robot_command_msg.wheel3= static_cast<float>(w3);
-    grsim_robot_command_msg.wheel4= static_cast<float>(w4);
-
-    grsim_robot_command_msg.velangular= static_cast<float>(vangular * _DEG2RAD);
-    grsim_robot_command_msg.velnormal= static_cast<float>(vnormal);
-    grsim_robot_command_msg.veltangent= static_cast<float>(vforward);
-    grsim_robot_command_msg.kickspeedx= static_cast<float>(kickSpeed);
+    grsim_robot_command_msg->velangular= 0;
+    grsim_robot_command_msg->velnormal = 0;
+    grsim_robot_command_msg->veltangent= 0;
+    grsim_robot_command_msg->kickspeedx= static_cast<float>(kickSpeed);
     if (chip){
-        grsim_robot_command_msg.kickspeedz= static_cast<float>(kickSpeed);
+        grsim_robot_command_msg->kickspeedz= static_cast<float>(kickSpeed);
     }
     else
-        grsim_robot_command_msg.kickspeedz=0;
-    grsim_robot_command_msg.spinner= static_cast<unsigned char>(false);
+        grsim_robot_command_msg->kickspeedz=0;
+    grsim_robot_command_msg->spinner= static_cast<unsigned char>(false);
 
     return grsim_robot_command_msg;
 

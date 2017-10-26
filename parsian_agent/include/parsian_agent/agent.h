@@ -172,8 +172,8 @@ public:
 
     const double gain = 1.013;
     void execute();
-    parsian_msgs::parsian_robot_command getCommand();
-    parsian_msgs::grsim_robot_command getGrSimCommand();
+    parsian_msgs::parsian_robot_commandPtr getCommand();
+    parsian_msgs::grsim_robot_commandPtr getGrSimCommand();
     parsian_msgs::parsian_robot_task getTask();
 
 

@@ -26,7 +26,7 @@ public:
     CWorldModel(int c);
     ~CWorldModel();
 
-    void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
+    void updateDetection(const parsian_msgs::ssl_vision_detection&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute(world_model_config::world_modelConfig & config);
     void init();
@@ -56,7 +56,7 @@ private:
     void toParsianMessage(const CBall* _ball);
 
 
-    parsian_msgs::ssl_vision_detectionConstPtr detection;
+    parsian_msgs::ssl_vision_detection detection;
 
     double visionFPS;
     double visionLatency;

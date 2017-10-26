@@ -18,6 +18,7 @@
 
 #include <parsian_protobuf_wrapper/messages_robocup_ssl_wrapper.pb.h>
 #include <parsian_protobuf_wrapper/common/net/robocup_ssl_client.h>
+#include <parsian_msgs/ssl_vision_wrapper.h>
 
 #include <parsian_protobuf_wrapper/visionConfig.h>
 
@@ -36,18 +37,22 @@ namespace parsian_protobuf_wrapper {
         void reconnect();
         void configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level);
 
-        ros::Publisher ssl_geometry_pub;
-        ros::Publisher ssl_detection_pub;
+//        ros::Publisher ssl_geometry_pub;
+//        ros::Publisher ssl_detection_pub;
+        ros::Publisher ssl_wrapper_pub;
 
         ros::Timer timer;
 
         boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> > configServer;
+        parsian_msgs::ssl_vision_wrapperPtr wrapper;
 
         bool isOurColorYellow = false;
         RoboCupSSLClient *vision;
         protobuf_wrapper_config::visionConfig visionConfig;
         SSL_WrapperPacket vision_packet;
         std::string teamColor;
+
+        int packs;
 
 
     };

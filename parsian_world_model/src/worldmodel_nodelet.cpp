@@ -16,7 +16,7 @@ void WMNodelet::onInit() {
     wm = new CWorldModel(5);
 //    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
     wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
-    vision_detection_sub = nh.subscribe("vision_detection", 1000, &WMNodelet::detectionCb, this);
+    vision_detection_sub = nh.subscribe("/vision", 1000, &WMNodelet::detectionCb, this);
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
 
     server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>(private_nh));
@@ -30,20 +30,16 @@ void WMNodelet::onInit() {
 //
 //}
 
-void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_detection) {
+void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_wrapperConstPtr &_vision) {
 //
-
-    ros::Time tt = ros::Time::now();
-    wm->updateDetection(_detection);
-    wm->execute(m_config);
-
-
+    for (const auto& detection : _vision->detections) {
+        wm->updateDetection(detection);
+        wm->execute(m_config);
+    }
+    ROS_INFO("WM");
 //    ros::param::get("/parsian_protobuf_wrapper/is_yellow", colour_yellow);
 //    ros::param::get("/parsian_protobuf_wrapper/is_left", side_left);
-    const parsian_msgs::parsian_world_modelConstPtr temp = wm->getParsianWorldModel(colour_yellow, side_left);
-    ROS_INFO_STREAM("ADD : " << temp);
-//    temp->Header.stamp = tt;
-//    temp->Header.frame_id = _detection->frame_number;
+    parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(colour_yellow, side_left);
     wm_pub.publish(temp);
 //
 }

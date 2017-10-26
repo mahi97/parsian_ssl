@@ -41,21 +41,23 @@ void AgentNodelet::onInit(){
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
- //   ROS_INFO("agent nodelet::wm updated");
+    ROS_INFO("agent nodelet::updated");
 //    ROS_INFO(QString::number(wm->our[0]->pos.x).toStdString().data());
-//    wm->update(_wm);
-//    agent->execute();
-//    parsian_robot_command_pub.publish(agent->getCommand());
-//    grsim_robot_command_pub.publish(agent->getGrSimCommand());
-    ROS_INFO_STREAM("ADDA : " << _wm);
-
-    NODELET_INFO_STREAM("lag : " << ros::Time::now() - _wm->Header.stamp);
+    wm->update(_wm);
+    if (agent->skill != nullptr) {
+        agent->execute();
+        parsian_robot_command_pub.publish(agent->getCommand());
+        grsim_robot_command_pub.publish(agent->getGrSimCommand());
+    }
+//    ROS_INFO_STREAM("ADDA : " << _wm);
+//
+//    NODELET_INFO_STREAM("lag : " << ros::Time::now() - _wm->Header.stamp);
 // ROS_INFO(QString::number(wm->our.active(0)).toStdString().data());
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
-   if (debugger != nullptr) debug_pub.publish(debugger->debugs);
-    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
+//   if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+//    if (drawer   != nullptr) draw_pub.publish(drawer->draws);
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){

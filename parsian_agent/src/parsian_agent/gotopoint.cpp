@@ -236,142 +236,134 @@ void CSkillGotoPoint::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     agentDist = agentPos.dist(targetPos);
-
-    if (!agentPos.valid() || !agentVel.valid() || !agent->dir().valid()) return;
-
-    DBUG(QString("target : %1, %2").arg(targetDir.th().degree()), D_MAHI);
-    DBUG(QString("agent : %1, %2").arg(agent->dir().th().degree()), D_MAHI);
-
-//    currentGPmode = decideMode();
+    currentGPmode = decideMode();
     angPid->error = (targetDir.th() - agent->dir().th()).radian();
-
     agentVc = agentVel.length();
-    ////////////// set params
-//    posPid->kd = 3;
-//    if(startingPoint.dist(agentPos) < 0.05)
-//    {
-//        posPid->kp = 4;
-//        posPid->kd = 0;
-//    }
-//    else if(startingPoint.dist(agentPos) < 0.3)
-//    {
-//        posPid->kp = 0.37/agentDist;
-//        if(posPid->kp > 3)
-//            posPid->kp = 3;
-//
-//        posPid->kd = 10;
-//    }
-//    else
-//        posPid->kp = 1.9;
-//
-//
-//    if(slowShot|| slowMode || penaltyKick)
-//    {
-//        posPid->kp = 1.6;
-//    }
-//    if(diveMode)
-//    {
-//        posPid->kp = 1.8/agentDist;
-//        posPid->kd = 10;
-//        if(posPid->kp > 4)
-//            posPid->kp = 4;posPidDist = 1;
-//    }
-//    else
-//    {
-//        posPidDist = 0.5;
-//    }
-//    posPid->kd = 1;
-//
-//    diveMode = false;
-//
+    //////////////// set params
+    posPid->kd = 3;
+    if(startingPoint.dist(agentPos) < 0.05)
+    {
+        posPid->kp = 4;
+        posPid->kd = 0;
+    }
+    else if(startingPoint.dist(agentPos) < 0.3)
+    {
+        posPid->kp = 0.37/agentDist;
+        if(posPid->kp > 3)
+            posPid->kp = 3;
+
+        posPid->kd = 10;
+    }
+    else
+        posPid->kp = 1.9;
+
+
+    if(slowShot|| slowMode || penaltyKick)
+    {
+        posPid->kp = 1.6;
+    }
+    if(diveMode)
+    {
+        posPid->kp = 1.8/agentDist;
+        posPid->kd = 10;
+        if(posPid->kp > 4)
+            posPid->kp = 4;posPidDist = 1;
+    }
+    else
+    {
+        posPidDist = 0.5;
+    }
+    posPid->kd = 1;
+
+    diveMode = false;
+
     angPid->kp = 3;
     angPid->kd = 1;
-//
-//
-//    trajectoryPlanner();
-//
-    ////////////////////// dec calculations
-//    double vp =(posPidDist*posPid->kp);
-//    double moreDec = 0.65;
-//    double decOffset = 0.8;
-//    if(agentVc < 0.2)
-//        startingPoint = agentPos;
 
-    PDEBUG("mode :", currentGPmode, D_MAHI);
-    PDEBUG("dist :", angPid->error, D_MAHI);
-//    PDEBUG("mode :", currentGPmode, D_MAHI);
+
+    trajectoryPlanner();
+
+    //////////////////////// dec calculations
+    double vp =(posPidDist*posPid->kp);
+    double moreDec = 0.65;
+    double decOffset = 0.8;
+    if(agentVc < 0.2)
+        startingPoint = agentPos;
+
 
     ////////////////////////////
-//    if(currentGPmode == GPPOS) {
+    if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-//        agent->_ACC = 0; // TODO : skill config
-//        agent->_DEC = 0; // TODO : skill config
-        //////////////
-//        posPid->error = agentDist;
-//        _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
-//        _Vy = posPid->PID_OUT()*sin(agentMovementTh.radian());
-//        if(agentDist  < 0.015){
-//            _Vx = 0;
-//            _Vy = 0;
-//        }
-        /////////////////////////////////////////////PID Previous error
-//        posPid->pError = agentDist;
-//        velPid->_I = 0;
-//    }
-//    else if(currentGPmode == GPVCONST) {
-//        /////////////////ACC + DEC
-//        agent->_ACC = 0;
-//        agent->_DEC = 0;
-//        agentVDesire = maxVelocity;
-//        velPid->_I = 0;
-        //////////////
-//        _Vx = maxVelocity*cos(appliedTh);
-//        _Vy = maxVelocity*sin(appliedTh);
-//
-//    }
-//    else if(currentGPmode == GPDEC1) {
-//        agent->_ACC = 0;
-//        agent->_DEC = 0;
-//        agentVDesire = sqrt(fabs(2*maxDeceleration*agentDist*moreDec) + vp *vp) - decOffset;
-//        _Vx =  agentVDesire*cos(appliedTh) ;
-//        _Vy =  agentVDesire*sin(appliedTh) ;
-//
-//    }
-//    else if(currentGPmode == GPACC1) {
-//        if(agentVc > 0.3)
-//        {
-//            agent->_ACC = appliedAcc;
-//            agent->_DEC = 0;
-//            agentVDesire = maxVelocity ;
-//        }
-//        else if(!slowShot&& !slowMode && !penaltyKick)
-//        {
-//            agent->_ACC = 0;
-//            agent->_DEC = 0;
-//            agentVDesire = 0.7;
-//        }
-//        else
-//        {
-//            agent->_ACC = 0;
-//            agent->_DEC = 0;
-//            agentVDesire = 0.5;
-//        }
-//        ////////////////
-//        _Vx = agentVDesire*cos(appliedTh);
-//        _Vy = agentVDesire*sin(appliedTh);
-//        ///////////////////////////////////////////////PID Previous error
-//    }
-//    else
-//    {
-//        agent->waitHere();
-//        velPid->_I = 0;
-//    }
+        agent->_ACC = 0; // TODO : skill config
+        agent->_DEC = 0; // TODO : skill config
+        ////////////////
+        posPid->error = agentDist;
+        _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
+        _Vy = posPid->PID_OUT()*sin(agentMovementTh.radian());
+        if(agentDist  < 0.015){
+            _Vx = 0;
+            _Vy = 0;
+        }
+        ///////////////////////////////////////////////PID Previous error
+        posPid->pError = agentDist;
+        velPid->_I = 0;
+    }
+    else if(currentGPmode == GPVCONST) {
+        /////////////////ACC + DEC
+        agent->_ACC = 0;
+        agent->_DEC = 0;
+        agentVDesire = maxVelocity;
+        velPid->_I = 0;
+        ////////////////
+        _Vx = maxVelocity*cos(appliedTh);
+        _Vy = maxVelocity*sin(appliedTh);
 
-    agent->setRobotAbsVel(10, 0, 10);
+    }
+    else if(currentGPmode == GPDEC1) {
+        agent->_ACC = 0;
+        agent->_DEC = 0;
+        agentVDesire = sqrt(fabs(2*maxDeceleration*agentDist*moreDec) + vp *vp) - decOffset;
+        _Vx =  agentVDesire*cos(appliedTh) ;
+        _Vy =  agentVDesire*sin(appliedTh) ;
+
+    }
+    else if(currentGPmode == GPACC1) {
+        if(agentVc > 0.3)
+        {
+            agent->_ACC = appliedAcc;
+            agent->_DEC = 0;
+            agentVDesire = maxVelocity ;
+        }
+        else if(!slowShot&& !slowMode && !penaltyKick)
+        {
+            agent->_ACC = 0;
+            agent->_DEC = 0;
+            agentVDesire = 0.7;
+        }
+        else
+        {
+            agent->_ACC = 0;
+            agent->_DEC = 0;
+            agentVDesire = 0.5;
+        }
+        ////////////////
+        _Vx = agentVDesire*cos(appliedTh);
+        _Vy = agentVDesire*sin(appliedTh);
+        ///////////////////////////////////////////////PID Previous error
+    }
+    else
+    {
+        agent->waitHere();
+        velPid->_I = 0;
+    }
+    ROS_INFO_STREAM("DIS : " << agentDist);
+//    ROS_INFO_STREAM("DIST : " << agentDist);
+
+    agent->setRobotAbsVel(1, 1, 0);
     angPid->pError = angPid->error;
 
 
-//    lastPath = agentVel.th();
+    lastPath = agentVel.th();
 
 }
 

@@ -15,6 +15,7 @@
 #include <parsian_protobuf_wrapper/common/net/udpsend.h>
 #include <parsian_msgs/grsim_robot_replacement.h>
 #include <parsian_msgs/grsim_ball_replacement.h>
+#include <parsian_msgs/ssl_vision_wrapper.h>
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -22,7 +23,7 @@ public:
 
 
     virtual void onInit();
-    void visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg);
+    void visionCB(const parsian_msgs::ssl_vision_wrapperConstPtr & msg);
     void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
 
     bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Request& req,
