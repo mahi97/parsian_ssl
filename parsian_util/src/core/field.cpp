@@ -5,21 +5,19 @@
 
 CField::CField()
 {
-    if(!ros::param::get("/field_width", _FIELD_WIDTH)) _FIELD_WIDTH = 9.0;
-    ros::param::get("/field_width"     , _FIELD_HEIGHT);
-    ros::param::get("/field_height"           , _FIELD_MARGIN_HEIGHT);
-    ros::param::get("/field_margin_height"    , _FIELD_MARGIN_WIDTH);
-    ros::param::get("/field_margin_width"     , _FIELD_PENALTY);
-    ros::param::get("/field_penalty"          , _GOAL_WIDTH);
-    ros::param::get("/goal_width"             , _GOAL_RAD);
-    ros::param::get("/goal_rad"               , _GOAL_DEPTH);
-    ros::param::get("/goal_rad_for_mark"      , _PENALTY_WIDTH);
-    ros::param::get("/goal_rad_for_goalie"    , _CENTER_CIRCLE_RAD);
-    ros::param::get("/goal_depth"             , _PENALTY_AREA_CIRCLE_X);
-    ros::param::get("/penalty_width"          , _PENALTY_AREA_CIRCLE_RAD);
-    ros::param::get("/center_circle_rad"      , _PARSIAN_BOUNDERY);
-    ros::param::get("/penalty_area_circle_x"  , _MIXTEAM_FIELD_WIDTH);
-    ros::param::get("/penalty_area_circle_rad", _MIXTEAM_FIELD_HEIGHT);
+//    if(!ros::param::get("/field_width", _FIELD_WIDTH)) _FIELD_WIDTH = 9.0;
+    ros::param::get("/field_height"            , _FIELD_HEIGHT);
+    ros::param::get("/field_width"           , _FIELD_WIDTH);
+    ros::param::get("/field_margin_height"    , _FIELD_MARGIN_HEIGHT);
+    ros::param::get("/field_margin_width"     , _FIELD_MARGIN_WIDTH);
+    ros::param::get("/field_penalty"          , _FIELD_PENALTY);
+    ros::param::get("/goal_width"             , _GOAL_WIDTH);
+    ros::param::get("/goal_rad"               , _GOAL_RAD);
+    ros::param::get("/goal_depth"      , _GOAL_DEPTH);
+    ros::param::get("/penalty_width"    , _PENALTY_WIDTH);
+    ros::param::get("/center_circle_rad"             , _CENTER_CIRCLE_RAD);
+    ros::param::get("/penalty_area_circle_x"          , _PENALTY_AREA_CIRCLE_X);
+    ros::param::get("/penalty_area_circle_rad"      , _PENALTY_AREA_CIRCLE_RAD);
 
     _MAX_DIST = sqrt(_FIELD_WIDTH * _FIELD_WIDTH + _FIELD_HEIGHT * _FIELD_HEIGHT);
 
