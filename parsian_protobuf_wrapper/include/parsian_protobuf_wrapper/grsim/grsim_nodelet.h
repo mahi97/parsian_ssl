@@ -23,7 +23,7 @@ public:
 
 
     virtual void onInit();
-    void visionCB(const parsian_msgs::ssl_vision_wrapperConstPtr & msg);
+    void visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg);
     void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
 
     bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Request& req,

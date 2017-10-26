@@ -37,9 +37,9 @@ namespace parsian_protobuf_wrapper {
         void reconnect();
         void configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level);
 
-//        ros::Publisher ssl_geometry_pub;
-//        ros::Publisher ssl_detection_pub;
-        ros::Publisher ssl_wrapper_pub;
+        ros::Publisher ssl_geometry_pub;
+        ros::Publisher ssl_detection_pub;
+//        ros::Publisher ssl_wrapper_pub;
 
         ros::Timer timer;
 
