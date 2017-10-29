@@ -94,6 +94,22 @@ void GrsimNodelet::timerCb(const ros::TimerEvent& event){
     send();
 }
 
+/*----------get ip address and port from configue server----------*/
+void GrsimNodelet::callback(protobuf_wrapper_config::visionConfig &config, uint32_t level)
+{
+    if(this->ip != config.vision_multicast_ip)
+    {
+        this->ip = config.vision_multicast_ip;
+        udp->setIP(this->ip);
+    }
+    if(this->port  != config.vision_multicast_port)
+    {
+        this->port  = config.vision_multicast_port;
+        udp->setport(this->port);
+    }
+
+}
+
 GrsimNodelet::GrsimNodelet()
 {
     ROS_INFO("grsim_nodelet is running");
@@ -107,8 +123,7 @@ GrsimNodelet::~GrsimNodelet()
 void GrsimNodelet::onInit()
 {
     NODELET_INFO("grsim_nodelet onInit");
-    ip = "127.0.0.1";
-    port = 12340;
+    udp = new UDPSend(ip, port);
     n = getNodeHandle();
     sub0 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub1 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd1", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
@@ -126,13 +141,17 @@ void GrsimNodelet::onInit()
                                   parsian_msgs::grsim_ball_replacement_srv::Response>
                                   ("GrsimBallReplacesrv", boost::bind(& GrsimNodelet::GrsimBallReplacesrv, this, _1, _2));
 
+    f = boost::bind(& GrsimNodelet::callback, this, _1, _2);
+    server.setCallback(f);
+
     timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
 
     GrsimCommand = new grSim_Commands;
     GrsimReplacement = new grSim_Replacement;
-    udp = new UDPSend(ip, port);
 
 }
+
+
 
 PLUGINLIB_DECLARE_CLASS(parsian_protobuf_wrapper, GrsimNodelet, GrsimNodelet, nodelet::Nodelet);
 //PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)

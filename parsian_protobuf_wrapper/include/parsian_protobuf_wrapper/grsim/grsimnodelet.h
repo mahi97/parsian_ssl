@@ -2,6 +2,8 @@
 #ifndef GRSIMNODELET_H_
 #define GRSIMNODELET_H_
 #include <nodelet/nodelet.h>
+#include <dynamic_reconfigure/server.h>
+#include <parsian_protobuf_wrapper/visionConfig.h>
 #include "ros/ros.h"
 #include <vector>
 #include <string>
@@ -13,6 +15,7 @@
 #include "parsian_protobuf_wrapper/common/net/udpsend.h"
 #include "parsian_msgs/grsim_robot_replacement_srv.h"
 #include "parsian_msgs/grsim_ball_replacement_srv.h"
+
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -31,6 +34,12 @@ public:
                              parsian_msgs::grsim_ball_replacement_srv::Response& res);
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement_srv::Request& req,
                               parsian_msgs::grsim_robot_replacement_srv::Response& res);
+
+    dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> server;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>::CallbackType f;
+    void callback(protobuf_wrapper_config::visionConfig &config, uint32_t level);
+
+
 
     void send();
     std::string ip;
