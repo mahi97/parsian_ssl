@@ -28,7 +28,7 @@ namespace rqt_parsian_gui
         stadiumSize.setWidth((_STADIUM_WIDTH));
         stadiumSize.setHeight((_STADIUM_HEIGHT));
 //        setViewportWidth(conf()->Common_Viewport_Width());
-//        drawerBuffer=new CguiDrawer();
+        drawerBuffer=new CguiDrawer();
     }
     void MonitorWidget::setViewportWidth(int width)
     {

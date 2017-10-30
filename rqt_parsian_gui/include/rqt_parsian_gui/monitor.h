@@ -53,7 +53,7 @@ namespace rqt_parsian_gui
     private:
         QWidget* widget_;
 
-        CWorldModel *wm;
+        parsian_msgs::parsian_world_modelConstPtr mywm;
         MonitorWidget* fieldWidget;
     };
 }  // namespace rqt_example_cpp
