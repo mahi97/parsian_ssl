@@ -73,10 +73,10 @@ bool GrsimNodelet::GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement_srv:
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
 void GrsimNodelet::send()
 {
-    std::string color;
-    ros::param::get("team_color", color);
-    bool col = ! (color == "yellow");          //check if it is true!
-    GrsimCommand->set_isteamyellow(col);
+//    std::string color;
+//    ros::param::get("team_color", color);
+//    bool col = ! (color == "yellow");          //check if it is true!
+    GrsimCommand->set_isteamyellow(color);
     GrsimCommand->set_timestamp(0.0);                       //should fix this
     packet.set_allocated_commands(GrsimCommand);
     packet.set_allocated_replacement(GrsimReplacement);
@@ -89,13 +89,17 @@ void GrsimNodelet::send()
     GrsimReplacement = new grSim_Replacement;
 }
 
-void GrsimNodelet::timerCb(const ros::TimerEvent& event){
-    // Using timers is the preferred 'ROS way' to manual threading
+void GrsimNodelet::visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg){
     send();
 }
 
+//void GrsimNodelet::timerCb(const ros::TimerEvent& event){
+//    // Using timers is the preferred 'ROS way' to manual threading
+//    send();
+//}
+
 /*----------get ip address and port from configue server----------*/
-void GrsimNodelet::callback(protobuf_wrapper_config::visionConfig &config, uint32_t level)
+void GrsimNodelet::conf(protobuf_wrapper_config::visionConfig &config, uint32_t level)
 {
     if(this->ip != config.vision_multicast_ip)
     {
@@ -107,6 +111,8 @@ void GrsimNodelet::callback(protobuf_wrapper_config::visionConfig &config, uint3
         this->port  = config.vision_multicast_port;
         udp->setport(this->port);
     }
+
+    NODELET_INFO("grsim_nodelet binded on %s : %d", this->ip.c_str(), this->port);
 
 }
 
@@ -141,13 +147,18 @@ void GrsimNodelet::onInit()
                                   parsian_msgs::grsim_ball_replacement_srv::Response>
                                   ("GrsimBallReplacesrv", boost::bind(& GrsimNodelet::GrsimBallReplacesrv, this, _1, _2));
 
-    f = boost::bind(& GrsimNodelet::callback, this, _1, _2);
+    f = boost::bind(& GrsimNodelet::conf, this, _1, _2);
     server.setCallback(f);
 
-    timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
+    vision_sub= n.subscribe<parsian_msgs::ssl_vision_detection>("vision_detection",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
+    //timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
 
     GrsimCommand = new grSim_Commands;
     GrsimReplacement = new grSim_Replacement;
+
+    std::string col;
+    ros::param::get("team_color", color);
+    color = ! (col == "yellow");          //check if it is true!
 
 }
 

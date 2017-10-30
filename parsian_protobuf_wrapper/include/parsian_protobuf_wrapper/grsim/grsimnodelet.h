@@ -9,6 +9,7 @@
 #include <string>
 #include "parsian_msgs/grsim_robot_command.h"
 #include "parsian_msgs/grsim_replacement.h"
+#include <parsian_msgs/ssl_vision_detection.h>
 #include "parsian_protobuf_wrapper/grSim_Packet.pb.h"
 #include "parsian_protobuf_wrapper/grSim_Commands.pb.h"
 #include "parsian_protobuf_wrapper/grSim_Replacement.pb.h"
@@ -24,7 +25,8 @@ public:
     ~GrsimNodelet();
 
     virtual void onInit();
-    void timerCb(const ros::TimerEvent& event);
+    void visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg);
+    //void timerCb(const ros::TimerEvent& event);
     void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
     void GrsimRobotReplace(const parsian_msgs::grsim_robot_replacement::ConstPtr& msg);
     void GrsimBallReplace(const parsian_msgs::grsim_ball_replacement::ConstPtr& msg);
@@ -37,13 +39,15 @@ public:
 
     dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> server;
     dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>::CallbackType f;
-    void callback(protobuf_wrapper_config::visionConfig &config, uint32_t level);
+    void conf(protobuf_wrapper_config::visionConfig &config, uint32_t level);
 
 
 
     void send();
     std::string ip;
     int port;
+
+    bool color;
 
     grSim_Packet packet;
     grSim_Commands* GrsimCommand;
@@ -53,7 +57,8 @@ public:
 
 
     ros::NodeHandle n;
-    ros::Timer timer_;
+    ros::Subscriber vision_sub;
+    //ros::Timer timer_;
     ros::Subscriber sub0;
     ros::Subscriber sub1;
     ros::Subscriber sub2;
