@@ -39,7 +39,7 @@ namespace rqt_parsian_gui
 
         ros::Timer timer;
 
-        Vector2D ballpos;
+
         double radius = 0.0215;
 
 

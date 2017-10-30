@@ -50,7 +50,6 @@ namespace rqt_parsian_gui
     void MonitorWidget::paintGL() {
 
 
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearDepth(1.0);
         glEnable(GL_BLEND);
@@ -62,10 +61,8 @@ namespace rqt_parsian_gui
         drawField();
 
 
-
         CGraphicalRobot rob;
-        while (!drawerBuffer->robotBuffer.isEmpty())
-        {
+        while (!drawerBuffer->robotBuffer.isEmpty()) {
             rob = drawerBuffer->robotBuffer.dequeue();
             drawRobot(rob.pos.x,
                       rob.pos.y,
@@ -78,21 +75,97 @@ namespace rqt_parsian_gui
 
         }
 
-//        parsian_msgs::parsian_draw_circle arc;
+        if (drawerBuffer->guiBall.inSight > 0)
+        {
+            drawArc(drawerBuffer->guiBall.pos.x,
+                    drawerBuffer->guiBall.pos.y,
+                    drawerBuffer->guiBall.radius,
+                    0,
+                    360,
+                    QColor("orange"),
+                    true);
+        }
+
+        parsian_msgs::parsian_draw_circle arc;
 ////        CGraphicalArc arc;
-//        while (!drawerBuffer->arcBuffer.isEmpty())
-//        {
-//            arc = drawerBuffer->arcBuffer.dequeue();
-//            QColor col=QColor(arc.color.r,arc.color.g,arc.color.b);
-//
-//            drawArc(arc.circle.center.x,
-//                    arc.circle.center.y,
-//                    arc.circle.radius,
-//                    arc.startAng,
-//                    arc.endAng,
-//                    col,
-//                    arc.filled);
-//        }
+        while (!drawerBuffer->arcBuffer.isEmpty())
+        {
+            arc = drawerBuffer->arcBuffer.dequeue();
+            QColor col=QColor(arc.color.r,arc.color.g,arc.color.b);
+
+            drawArc(arc.circle.center.x,
+                    arc.circle.center.y,
+                    arc.circle.radius,
+                    arc.startAng,
+                    arc.endAng,
+                    col,
+                    arc.filled);
+        }
+
+
+
+        parsian_msgs::parsian_draw_polygon polygon;
+        while (!drawerBuffer->polygonBuffer.isEmpty()) {
+            polygon = drawerBuffer->polygonBuffer.dequeue();
+            glColor4f(polygon.color.r, polygon.color.g, polygon.color.b, polygon.color.a);
+            if (polygon.filled) {
+                glBegin(GL_TRIANGLE_FAN);
+            } else
+                glBegin(GL_LINE_LOOP);
+
+
+            for (unsigned int i = 0; i < polygon.points.size(); i++) {
+                glVertex2f(polygon.points.at(i).x, -polygon.points.at(i).y);
+            }
+            glEnd();
+        }
+
+
+            parsian_msgs::parsian_draw_rect rec;
+            while(!drawerBuffer->rectBuffer.isEmpty())
+            {
+                rec = drawerBuffer->rectBuffer.dequeue();
+
+                QColor col=QColor(rec.color.r,rec.color.g,rec.color.b);
+
+                drawRect(rec.rect.left_x,
+                         rec.rect.top_y,
+                         rec.rect.left_x+rec.rect.width,
+                         rec.rect.top_y+rec.rect.length,
+                         col,
+                         rec.filled);
+            }
+
+            parsian_msgs::parsian_draw_segment seg;
+            while(!drawerBuffer->segBuffer.isEmpty())
+            {
+                seg = drawerBuffer->segBuffer.dequeue();
+
+                QColor col=QColor(seg.color.r,seg.color.g,seg.color.b);
+
+                drawLine(seg.start.x, seg.start.y,
+                         seg.end.x, seg.end.y,
+                         col);
+            }
+
+
+            parsian_msgs::parsian_draw_vector pnt;
+            //int sds=drawerBuffer->pointBuffer.size();
+            while(!drawerBuffer->pointBuffer.isEmpty())
+                //while(sds>0)
+            {
+                pnt = drawerBuffer->pointBuffer.dequeue();
+
+                QColor col=QColor(pnt.color.r,pnt.color.g,pnt.color.b);
+                // pnt = drawerBuffer->pointBuffer[sds-1];
+                drawLine(pnt.vector.x-0.050, pnt.vector.y+0.050,
+                         pnt.vector.x+0.050, pnt.vector.y-0.050,
+                         col);
+                drawLine(pnt.vector.x+0.050, pnt.vector.y+0.050,
+                         pnt.vector.x-0.050, pnt.vector.y-0.050,
+                         col);
+                //sds--;
+            }
     }
     void MonitorWidget::resizeGL(int width, int height)
     {
