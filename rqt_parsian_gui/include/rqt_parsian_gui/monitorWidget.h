@@ -41,8 +41,8 @@ namespace rqt_parsian_gui
         void drawField();
         CguiDrawer *drawerBuffer;
         //TODO: get these values from util CRobot
-        static const double robot_radius_new = 0.0890;
-        static const double robot_radius_old = 0.0900;
+        const double robot_radius_new = 0.0890;
+        const double robot_radius_old = 0.0900;
     protected:
 
 

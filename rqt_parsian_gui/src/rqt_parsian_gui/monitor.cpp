@@ -55,41 +55,40 @@ namespace rqt_parsian_gui
     }
 
     void Monitor::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-//        wm->update(*_wm);
-//
-//
-//
-//        for( int i = 0; i < wm->our.activeAgentsCount(); i++ )
-//        {
-//            QColor col = QColor("yellow");
-//            if (fabs(wm->our.active(i)->inSight-0.5)<0.01)
-//            {
-//                col.setAlpha(150);
-//            }
-//            fieldWidget->drawerBuffer->drawRobot(wm->our.active(i)->pos, wm->our.active(i)->dir,
-//                                    col, wm->our.active(i)->id, i, "" ,false);
-//
-//            //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
-//            //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
-//
-//
-//        }
-//
-//
-//        for( int i = 0; i < wm->opp.activeAgentsCount(); i++ )
-//        {
-//            QColor col = QColor("blue");
-//            if (fabs(wm->opp.active(i)->inSight-0.5)<0.01)
-//            {
-//                col.setAlpha(150);
-//            }
-//
-//
-//            fieldWidget->drawerBuffer->drawRobot(wm->opp.active(i)->pos, wm->opp.active(i)->dir,
-//                                    col, wm->opp.active(i)->id, -1);
-//
-//        }
-//
+
+
+        mywm =_wm;
+        for( int i = 0; i < mywm->our.size(); i++ )
+        {
+            QColor col = QColor("yellow");
+            if (fabs(mywm->our[i].inSight-0.5)<0.01)
+            {
+                col.setAlpha(150);
+            }
+            fieldWidget->drawerBuffer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
+                                    col, mywm->our[i].id, i, "" ,false);
+
+            //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
+            //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
+
+
+        }
+
+
+        for( int i = 0; i < mywm->opp.size(); i++ )
+        {
+            QColor col = QColor("blue");
+            if (fabs(mywm->opp[i].inSight-0.5)<0.01)
+            {
+                col.setAlpha(150);
+            }
+
+
+            fieldWidget->drawerBuffer->drawRobot(mywm->opp[i].pos, mywm->opp[i].dir,
+                                    col, mywm->opp[i].id, -1);
+
+        }
+
 
 
     }
