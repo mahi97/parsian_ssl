@@ -4,6 +4,9 @@ project(parsian_agent)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
+FILE(GLOB_RECURSE LibFiles "include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages

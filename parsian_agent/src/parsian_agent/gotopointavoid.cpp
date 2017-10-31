@@ -3,7 +3,7 @@
 //
 
 #include <parsian_agent/gotopointavoid.h>
-
+#include <parsian_agent/config.h>
 
 
 INIT_SKILL(CSkillGotoPointAvoid, "gotopointavoid");
@@ -65,7 +65,7 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(3.5);//conf()->BangBang_DecMax()); // TODO : skill config
+    bangBang->setDecMax(conf.DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode || slowShot)
@@ -76,7 +76,7 @@ void CSkillGotoPointAvoid::execute()
     else
     {
         bangBang->setSlow(false);
-        bangBang->setVelMax(4);//conf()->BangBang_VelMax()); // TODO : skill Config
+        bangBang->setVelMax(conf.VelMax);
     }
     if (!Vector2D(targetPos).valid())
     {
@@ -106,10 +106,10 @@ void CSkillGotoPointAvoid::execute()
     }
 
     /////////////////
-//    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-//    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-//    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-//    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
 //    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
@@ -317,8 +317,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc=4;//conf()->BangBang_AccMaxForward(); // TODO :config
-    double dec = 3.5;//conf()->BangBang_DecMax();
+    double acc=conf.groups.bang_bang.AccMaxForward;
+    double dec = conf.groups.bang_bang.DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -362,12 +362,12 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 
     if(tAgentVel.length() < 0.2)
     {
-        acc = (/*conf()->BangBang_AccMaxForward()*/4 + /*conf()->BangBang_AccMaxNormal()*/3)/2; // TODO : Skill Config
+        acc = (conf.groups.bang_bang.AccMaxForward + conf.groups.bang_bang.AccMaxNormal)/2;
+
     }
     else
     {
-        // TODO : Skill Config
-        acc =/*conf()->BangBang_AccMaxForward()*/4*(fabs(veltan)/tAgentVel.length()) + /*conf()->BangBang_AccMaxNormal()*/3*(fabs(velnorm)/tAgentVel.length());
+        acc =conf.groups.bang_bang.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.groups.bang_bang.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
 
 
@@ -376,12 +376,10 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(/*conf()->BangBang_DecMax()*/3.5)) ;
-   // _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(1)) ; // TODO : Skill Config
+    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.groups.bang_bang.DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ /*conf()->BangBang_DecMax()*/3.5 - offset) * distEffect);
-    //    return std::max(0.0, (tAgentVel.length()/1 - offset) * distEffect); // TODO : Skill Config
+        return std::max(0.0,(tAgentVel.length()/ conf.groups.bang_bang.DecMax - offset) * distEffect);
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
