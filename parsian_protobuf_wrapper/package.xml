@@ -65,6 +65,5 @@
     <nodelet plugin="${prefix}/vision_nodelet_plugin.xml"/>
     <nodelet plugin="${prefix}/refree_nodelet_plugin.xml"/>
     <nodelet plugin="${prefix}/grsim_nodelet_plugin.xml"/>
-
   </export>
 </package>

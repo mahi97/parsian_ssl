@@ -176,9 +176,6 @@ public:
     parsian_msgs::parsian_robot_commandPtr getCommand();
     parsian_msgs::grsim_robot_commandPtr getGrSimCommand();
     parsian_msgs::parsian_robot_task getTask();
-
-
-
 };
 
 #endif // CAGENT_H

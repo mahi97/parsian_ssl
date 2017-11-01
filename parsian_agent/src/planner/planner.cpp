@@ -386,7 +386,6 @@ void CPlanner::runPlanner(){
         }
     }
 
-
     obst.obsMargin = CRobot::robot_radius_new+0.03;
 
     vector <Vector2D> temp;
@@ -398,7 +397,6 @@ void CPlanner::runPlanner(){
             temp.push_back(nearestToGoal->pos);
             nearestToGoal = nearestToGoal->parent;
         }
-
     }
     else if( RnearestToGoal && RnearestToGoal->pos.dist(Rgoal) + EPSILON < threshold ){
         lll = NULL;
@@ -596,7 +594,6 @@ void CPlanner::Draw(){
 
 void CPlanner::resetPlanner( Vector2D _goal ){
     if(result.empty() || lastGoal.dist(_goal) > 0.05 || (result[result.size()-1].dist(lastGoal) > 10*threshold) ){
-
         //		if( result.size() == 0 )
         //			qDebug() << "RESULT.SIZE()";
         //		else if( lastGoal.dist(_goal) > 0.05 ){
@@ -623,6 +620,7 @@ void CPlanner::resetPlanner( Vector2D _goal ){
     nodes.removeAll();
     Rnodes.removeAll();
 }
+
 
 ////////TODO change slot to ...///////
 void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
@@ -742,21 +740,15 @@ double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vect
 
     if(_pos.dist(posT) < _x3 ) {
         return std::max(0.0,(_vel.length()/ 1 /* TODO conf()->BangBang_DecMax()*/ - offset) );
-    }
-    else if(_vel.length() < (vMax)){
+    } else if(_vel.length() < (vMax)) {
         if(_pos.dist(posT) < xSat)
         {
             return std::max(0.0,(-1*offset + vMax/dec + (vMax-_vel.length())/acc + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+_vel.length())*(vMax-_vel.length())/acc))/2)/vMax) );
-        }
-        else
-        {
+        } else {
             return std::max(0.0,(vMax/dec + (vMax-_vel.length())/acc - offset));
         }
-    }
-    else
-    {
+    } else {
         return std::max(0.0,(vMax/dec + (_pos.dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) );
-
     }
 
 }
@@ -861,9 +853,6 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 //            {
                 obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.2 , 0 , 0);
 //            }
-
-
-
         }
     }
 
@@ -905,13 +894,4 @@ vector<Vector2D> CPlanner::getResultModified (){
 Vector2D CPlanner::getAverageDir(){
     return  averageDir;
 }
-
-
-
-
-
-
-
-
-
 
