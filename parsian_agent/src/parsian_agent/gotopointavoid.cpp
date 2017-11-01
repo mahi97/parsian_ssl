@@ -111,22 +111,6 @@ void CSkillGotoPointAvoid::execute()
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
-//        if(conf()->LocalSettings_OurTeamSide() == "Right")
-//        {
-//            if(targetPos.x < 0.2)
-//            {
-//                targetPos.x = 0.2;
-//            }
-//        }
-//        else
-//        {
-//            if(targetPos.x > 4.3)
-//            {
-//                targetPos.x = 4.3;
-//            }
-//        }
-//    }
 
     if (lookAt.valid())
     {
@@ -317,7 +301,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc=conf.groups.bang_bang.AccMaxForward;
+    double acc = conf.groups.bang_bang.AccMaxForward;
     double dec = conf.groups.bang_bang.DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();

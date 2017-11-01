@@ -88,7 +88,7 @@ void GrsimNodelet::onInit()
     sub3 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd3", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub4 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd4", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub5 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd5", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    vision_sub= n.subscribe<parsian_msgs::ssl_vision_detection>("vision_detection",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
+    vision_sub= n.subscribe<parsian_msgs::parsian_world_model>("world_model",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
     service0 = n.advertiseService<parsian_msgs::grsim_robot_replacement::Request,
             parsian_msgs::grsim_robot_replacement::Response>
             ("GrsimRobotReplacesrv", boost::bind(& GrsimNodelet::GrsimRobotReplacesrv, this, _1, _2));
@@ -104,8 +104,9 @@ void GrsimNodelet::onInit()
 
 }
 
-void GrsimNodelet::visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg){
+void GrsimNodelet::visionCB(const parsian_msgs::parsian_world_modelConstPtr & msg){
     send();
+    ROS_INFO("GRSIM");
 }
 
 //PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)

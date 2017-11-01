@@ -219,7 +219,7 @@ void CSkillGotoPoint::trajectoryPlanner()
 void CSkillGotoPoint::execute()
 {
 
-    maxVelocity = 4;
+//    maxVelocity = 1;
     if(slowShot|| slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
@@ -294,8 +294,8 @@ void CSkillGotoPoint::execute()
     ////////////////////////////
     if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-        agent->_ACC =0;// conf.AccMaxNormal; // TODO : is correct? in ai is zero
-        agent->_DEC =0;// conf.DecMax; // TODO : is correct?
+        agent->_ACC = 0;// conf.AccMaxNormal; // TODO : is correct? in ai is zero
+        agent->_DEC = 0;// conf.DecMax; // TODO : is correct?
         ////////////////
         posPid->error = agentDist;
         _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
