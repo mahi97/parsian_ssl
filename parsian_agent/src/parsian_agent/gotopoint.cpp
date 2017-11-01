@@ -1,5 +1,5 @@
 #include <parsian_agent/gotopoint.h>
-
+#include <parsian_agent/config.h>
 
 
 
@@ -219,7 +219,7 @@ void CSkillGotoPoint::trajectoryPlanner()
 void CSkillGotoPoint::execute()
 {
 
-    maxVelocity = 1;
+    maxVelocity = 4;
     if(slowShot|| slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
@@ -294,8 +294,8 @@ void CSkillGotoPoint::execute()
     ////////////////////////////
     if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-        agent->_ACC = 0; // TODO : skill config
-        agent->_DEC = 0; // TODO : skill config
+        agent->_ACC =0;// conf.AccMaxNormal; // TODO : is correct? in ai is zero
+        agent->_DEC =0;// conf.DecMax; // TODO : is correct?
         ////////////////
         posPid->error = agentDist;
         _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
@@ -357,7 +357,7 @@ void CSkillGotoPoint::execute()
         velPid->_I = 0;
     }
     ROS_INFO_STREAM("DI : " << agentDist);
-//    ROS_INFO_STREAM("DIST : " << agentDist);
+    ROS_INFO_STREAM("DIST : " << agentDist);
 
     agent->setRobotAbsVel(_Vx, _Vy, angPid->PID_OUT());
     angPid->pError = angPid->error;
