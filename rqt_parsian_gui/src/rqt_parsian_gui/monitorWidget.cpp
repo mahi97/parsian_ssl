@@ -74,12 +74,14 @@ namespace rqt_parsian_gui
                       rob.newRobots);
 
         }
+        ROS_INFO("ok");
 
         if (drawerBuffer->guiBall.inSight > 0)
         {
+            ROS_INFO("lll");
             drawArc(drawerBuffer->guiBall.pos.x,
                     drawerBuffer->guiBall.pos.y,
-                    drawerBuffer->guiBall.radius,
+                    0.03,
                     0,
                     360,
                     QColor("orange"),
@@ -166,6 +168,16 @@ namespace rqt_parsian_gui
                          col);
                 //sds--;
             }
+
+
+        parsian_msgs::parsian_draw_text txt;
+        while(!drawerBuffer->textBuffer.isEmpty())
+        {
+            txt = drawerBuffer->textBuffer.dequeue();
+            QString str=QString::fromStdString(txt.value);
+            QColor col=QColor(txt.color.r,txt.color.g,txt.color.b);
+            drawText(txt.position.x, txt.position.y, str , col, txt.size);
+        }
     }
     void MonitorWidget::resizeGL(int width, int height)
     {
@@ -183,25 +195,7 @@ namespace rqt_parsian_gui
         glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
     }
 
-//    void MonitorWidget::renderText(double x, double y, double z, const QString &str, const QFont & font = QFont()) {
-//        // Identify x and y locations to render text within widget
-//        int height = this->height();
-//        GLdouble textPosX = 0, textPosY = 0, textPosZ = 0;
-//        project(x, y, 0f, &textPosX, &textPosY, &textPosZ);
-//        textPosY = height - textPosY; // y is inverted
-//
-//        // Retrieve last OpenGL color to use as a font color
-//        GLdouble glColor[4];
-//        glGetDoublev(GL_CURRENT_COLOR, glColor);
-//        QColor fontColor = QColor(glColor[0], glColor[1], glColor[2], glColor[3]);
-//
-//        // Render text
-//        QPainter painter(this);
-//        painter.setPen(fontColor);
-//        painter.setFont(font);
-//        painter.drawText(textPosX, textPosY, str);
-//        painter.end();
-//    }
+
 
 
     GLuint MonitorWidget::drawArc(double centerX, double centerY, double radius, int start, int end, QColor color, bool fill, bool fullFill)
@@ -306,19 +300,16 @@ namespace rqt_parsian_gui
         glColor3f(color.redF(),color.greenF(),color.blueF());
         QFont font("Times", size);
 
-        //QFontMetrics fm(font);
-        //double pixelsWide = fm.width(text);
+        QFontMetrics fm(font);
+        double pixelsWide = fm.width(text);
 
-//        renderText(((x + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width()))),
-//                   ((-1.0*y + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height()))),
-//                   text, font);
-//        QPainter painter(this);
-//        painter.setPen(color);
-//        painter.setFont(font);
-//        painter.drawText(((x + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width()))),
-//                         ((-1.0*y + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height()))),
-//                         text);
-//        painter.end();
+        QPainter painter(this);
+        painter.setPen(color);
+        painter.setFont(font);
+        painter.drawText(((x + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width()))),
+                         ((-1.0*y + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height()))),
+                         text);
+        painter.end();
     }
 
     void MonitorWidget::drawField()
