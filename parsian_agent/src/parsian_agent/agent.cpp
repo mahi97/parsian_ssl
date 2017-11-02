@@ -1009,6 +1009,30 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     command->vel_N = vel().y;
     command->vel_w = angularVel();
     command->release = false;//static_cast<unsigned char>(onOffState);
+    ///////////////////////////////merge with grsim///////////////////////////////////////////
+
+    double w1 = v1*gain;
+    double w2 = v2*gain;
+    double w3 = v3*gain;
+    double w4 = v4*gain;
+
+    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
+    command->wheelsspeed= static_cast<unsigned char>(true);
+    command->wheel1= static_cast<float>(w1);
+    command->wheel2= static_cast<float>(w2);
+    command->wheel3= static_cast<float>(w3);
+    command->wheel4= static_cast<float>(w4);
+
+    command->velangular= 0;
+    command->velnormal = 0;
+    command->veltangent= 0;
+    if (chip){
+        command->kickspeedz= static_cast<float>(kickSpeed);
+    }
+    else
+        command->kickspeedz=0;
+    command->spinner= static_cast<unsigned char>(false);
+
     return command;
 }
 
