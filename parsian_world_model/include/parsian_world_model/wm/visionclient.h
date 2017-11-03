@@ -50,7 +50,7 @@ for (int i = 0; i < packet->##__COLOR__##.size();i++) { \
     int rob_id = packet->##__COLOR__##[i].robot_id; \
     if (v[id].__TEAM__##Team[rob_id].count() >= MAX_OBJECT) continue; \
     CRawObject raw = CRawObject(frameCnt, Vector2D(packet->##__COLOR__##[i].pos.x / 1000.0f,packet->##__COLOR__##[i].pos.y / 1000.0f), \
-                                packet->##__COLOR__##[i].orientation*180.0f/M_PI*90.0 \
+                                packet->##__COLOR__##[i].orientation*180.0f/M_PI \
                                 ,i ,packet->##__COLOR__##[i].confidence, nullptr, id); \
     for (int k=0;k<v[id].__TEAM__##Team[rob_id].count();k++) \
     { \

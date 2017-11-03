@@ -1005,9 +1005,9 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     command->roller_speed= static_cast<unsigned char>(roller);
 //    command.forceKick= static_cast<unsigned char>(forceKick);
     command->kickSpeed= static_cast<unsigned short>(kickSpeed);
-    command->vel_F = vel().x;
-    command->vel_N = vel().y;
-    command->vel_w = angularVel();
+    command->vel_F = vforward;
+    command->vel_N = vnormal;
+    command->vel_w = vangular;
     command->release = false;//static_cast<unsigned char>(onOffState);
     return command;
 }
