@@ -189,10 +189,10 @@ void C2DTree::drawBranch(state *first , state* second , QColor color){
 CPlanner::CPlanner(int _ID)
 {
     obst.clear();
-    threshold = 1;      // TODO  conf()->ERRT_Target_Distance_Threshold();
-    wayPointProb = 1;   // TODO  conf()->ERRT_Waypoint_Catch_Probablity();
-    goalProb = 1;       // TODO  conf()->ERRT_Goal_Probablity();
-    stepSize = 1;       // TODO  conf()->ERRT_Extend_Step();
+    threshold = 0.01;      // TODO  conf()->ERRT_Target_Distance_Threshold();
+    wayPointProb = 0.6;    // TODO  conf()->ERRT_Waypoint_Catch_Probablity();
+    goalProb = 0.3;        // TODO  conf()->ERRT_Goal_Probablity();
+    stepSize = 0.1;        // TODO  conf()->ERRT_Extend_Step();
     goal.invalidate();
     counter=0;
     flag = false;

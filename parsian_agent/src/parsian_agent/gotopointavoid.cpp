@@ -105,6 +105,7 @@ void CSkillGotoPointAvoid::execute()
         pathPoints.clear();
     }
 
+
     /////////////////
 //    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
 //    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
@@ -148,7 +149,7 @@ void CSkillGotoPointAvoid::execute()
         targetDir = (lookAt - agentPos).norm();
     }
 
-    if(noAvoid)
+    if(noAvoid )
     {
         result.clear();
     }
@@ -170,7 +171,8 @@ void CSkillGotoPointAvoid::execute()
         {
             ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
-        }
+//            drawer->draw(Circle2D(agent->pathPlannerResult[i],0.01),QColor(Qt::red));
+             }
     }
 
 
@@ -256,8 +258,10 @@ void CSkillGotoPointAvoid::execute()
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
-    agent->accelerationLimiter(vf,oneTouchMode);
-
+//    agent->setRobotVel(2,2,10);
+        agent->accelerationLimiter(vf,oneTouchMode);
+    ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
+    ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
 
     counter ++;
 }

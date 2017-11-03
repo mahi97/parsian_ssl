@@ -19,6 +19,7 @@
 //#include "parsian_msgs/pass_plannerResponse.h"
 #include "planner/obstacle.h"
 #include "ros/ros.h"
+#include "parsian_agent/config.h"
 #include "planner/state.h"
 
 #define _PLANNER_EXTEND_POINT_LIMIT 150
