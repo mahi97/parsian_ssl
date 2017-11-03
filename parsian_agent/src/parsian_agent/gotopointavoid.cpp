@@ -65,7 +65,7 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(conf.DecMax);
+    bangBang->setDecMax(conf.groups.bang_bang.DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode || slowShot)
@@ -76,7 +76,7 @@ void CSkillGotoPointAvoid::execute()
     else
     {
         bangBang->setSlow(false);
-        bangBang->setVelMax(conf.VelMax);
+        bangBang->setVelMax(conf.groups.bang_bang.VelMax);
     }
     if (!Vector2D(targetPos).valid())
     {
@@ -105,28 +105,13 @@ void CSkillGotoPointAvoid::execute()
         pathPoints.clear();
     }
 
-    /////////////////
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) { // TODO : Config
-//        if(conf()->LocalSettings_OurTeamSide() == "Right")
-//        {
-//            if(targetPos.x < 0.2)
-//            {
-//                targetPos.x = 0.2;
-//            }
-//        }
-//        else
-//        {
-//            if(targetPos.x > 4.3)
-//            {
-//                targetPos.x = 4.3;
-//            }
-//        }
-//    }
+    /////////////////
+//    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
+//    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
+//    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
+//    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+
 
     if (lookAt.valid())
     {
@@ -164,7 +149,7 @@ void CSkillGotoPointAvoid::execute()
         targetDir = (lookAt - agentPos).norm();
     }
 
-    if(noAvoid)
+    if(noAvoid )
     {
         result.clear();
     }
@@ -186,8 +171,10 @@ void CSkillGotoPointAvoid::execute()
         {
             ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
-        }
+//            drawer->draw(Circle2D(agent->pathPlannerResult[i],0.01),QColor(Qt::red));
+             }
     }
+
 
     double dist = 0.0;
     bool flag = false;
@@ -271,8 +258,10 @@ void CSkillGotoPointAvoid::execute()
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
-    agent->accelerationLimiter(vf,oneTouchMode);
-
+//    agent->setRobotVel(2,2,10);
+        agent->accelerationLimiter(vf,oneTouchMode);
+    ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
+    ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
 
     counter ++;
 }
@@ -317,7 +306,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc=conf.groups.bang_bang.AccMaxForward;
+    double acc = conf.groups.bang_bang.AccMaxForward;
     double dec = conf.groups.bang_bang.DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();

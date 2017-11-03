@@ -10,13 +10,13 @@
 #include "parsian_msgs/parsian_robot_command.h"
 //#include "parsian_msgs/grsim_replacement.h"
 #include <parsian_msgs/ssl_vision_detection.h>
-#include "parsian_protobuf_wrapper/grSim_Packet.pb.h"
-#include "parsian_protobuf_wrapper/grSim_Commands.pb.h"
-#include "parsian_protobuf_wrapper/grSim_Replacement.pb.h"
-#include "parsian_protobuf_wrapper/common/net/udpsend.h"
-#include "parsian_msgs/grsim_robot_replacement.h"
-#include "parsian_msgs/grsim_ball_replacement.h"
-
+#include <parsian_protobuf_wrapper/grSim_Packet.pb.h>
+#include <parsian_protobuf_wrapper/grSim_Commands.pb.h>
+#include <parsian_protobuf_wrapper/grSim_Replacement.pb.h>
+#include <parsian_protobuf_wrapper/common/net/udpsend.h>
+#include <parsian_msgs/grsim_robot_replacement.h>
+#include <parsian_msgs/grsim_ball_replacement.h>
+#include <parsian_msgs/parsian_world_model.h>
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -25,9 +25,8 @@ public:
     ~GrsimNodelet();
 
     virtual void onInit();
-    void visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg);
-    //void timerCb(const ros::TimerEvent& event);
-    void GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstPtr& msg);
+    void visionCB(const parsian_msgs::parsian_world_modelConstPtr & msg);
+    void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
 
     bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Request& req,
                              parsian_msgs::grsim_ball_replacement::Response& res);

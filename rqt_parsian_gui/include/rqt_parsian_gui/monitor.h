@@ -41,6 +41,8 @@ namespace rqt_parsian_gui
 
 
         double radius = 0.0215;
+        QColor ourCol;
+        QColor oppCol;
 
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
