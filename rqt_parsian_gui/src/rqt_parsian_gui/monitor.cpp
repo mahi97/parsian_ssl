@@ -25,7 +25,7 @@ namespace rqt_parsian_gui
 
         wm_sub = n.subscribe("/world_model", 1000, &Monitor::wmCb, this);
         draw_sub = n.subscribe("/draws", 1000, &Monitor::drawCb, this);
-        timer = n.createTimer(ros::Duration(0.060), &Monitor::timerCb, this);
+        timer = n.createTimer(ros::Duration(0.080), &Monitor::timerCb, this);
         // access standalone command line arguments
         QStringList argv = context.argv();
         // create QWidget
@@ -59,6 +59,16 @@ namespace rqt_parsian_gui
 
 
         mywm =_wm;
+        fieldWidget->drawerBuffer->clear();
+
+        if(mywm->isYellow) {
+            ourCol = QColor("yellow");
+            oppCol = QColor("blue");
+        }
+        else{
+            ourCol = QColor("blue");
+            oppCol = QColor("yellow");
+        }
 
 
         fieldWidget->drawerBuffer->guiBall.inSight=mywm->ball.inSight;
@@ -67,13 +77,12 @@ namespace rqt_parsian_gui
         fieldWidget->drawerBuffer->guiBall.radius=mywm->ball.obstacleRadius;
         for( int i = 0; i < mywm->our.size(); i++ )
         {
-            QColor col = QColor("blue");
             if (fabs(mywm->our[i].inSight-0.5)<0.01)
             {
-                col.setAlpha(150);
+                ourCol.setAlpha(150);
             }
             fieldWidget->drawerBuffer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
-                                    col, mywm->our[i].id, i, "" ,false);
+                                                 ourCol, mywm->our[i].id, i, "" ,false);
 
             //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
             //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
@@ -82,19 +91,22 @@ namespace rqt_parsian_gui
         }
 
 
+
         for( int i = 0; i < mywm->opp.size(); i++ )
         {
-            QColor col = QColor("yellow");
+
+
             if (fabs(mywm->opp[i].inSight-0.5)<0.01)
             {
-                col.setAlpha(150);
+                oppCol.setAlpha(150);
             }
 
 
             fieldWidget->drawerBuffer->drawRobot(mywm->opp[i].pos, mywm->opp[i].dir,
-                                    col, mywm->opp[i].id, -1);
+                                    oppCol, mywm->opp[i].id, -1);
 
         }
+
 
 
 
@@ -125,11 +137,13 @@ namespace rqt_parsian_gui
             fieldWidget->drawerBuffer->pointBuffer.append(point);
 
         }
+
     }
 
     void Monitor::timerCb(const ros::TimerEvent &_timer) {
 
 //        fieldWidget->drawerBuffer->draw(Circle2D(ballpos, radius), 0, 360, QColor("orange"), true);
+
         fieldWidget->update();
     }
 

@@ -4,6 +4,7 @@
 #include "rqt_parsian_gui/guiDrawer.h"
 #include <ros/ros.h>
 #include <QWidget>
+#include <QString>
 #include <qcolor.h>
 #include <GL/gl.h>
 #include <qopenglwidget.h>
