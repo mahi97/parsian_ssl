@@ -91,16 +91,16 @@ void GrsimNodelet::visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & m
 //}
 
 /*----------get ip address and port from configue server----------*/
-void GrsimNodelet::conf(protobuf_wrapper_config::visionConfig &config, uint32_t level)
+void GrsimNodelet::conf(protobuf_wrapper_config::grsimConfig &config, uint32_t level)
 {
-    if(this->ip != config.vision_multicast_ip)
+    if(this->ip != config.grsim_send_ip)
     {
-        this->ip = config.vision_multicast_ip;
+        this->ip = config.grsim_send_ip;
         udp->setIP(this->ip);
     }
-    if(this->port  != config.vision_multicast_port)
+    if(this->port  != config.grsim_send_port)
     {
-        this->port  = config.vision_multicast_port;
+        this->port  = config.grsim_send_port;
         udp->setport(this->port);
     }
 

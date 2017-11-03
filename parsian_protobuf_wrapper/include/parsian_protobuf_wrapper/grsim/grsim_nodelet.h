@@ -2,7 +2,7 @@
 #define GRSIMNODELET_H_
 #include <nodelet/nodelet.h>
 #include <dynamic_reconfigure/server.h>
-#include <parsian_protobuf_wrapper/visionConfig.h>
+#include <parsian_protobuf_wrapper/grsimConfig.h>
 #include "ros/ros.h"
 #include <vector>
 #include <string>
@@ -34,9 +34,9 @@ public:
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
                               parsian_msgs::grsim_robot_replacement::Response& res);
 
-    dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> server;
-    dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>::CallbackType f;
-    void conf(protobuf_wrapper_config::visionConfig &config, uint32_t level);
+    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig> server;
+    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
+    void conf(protobuf_wrapper_config::grsimConfig &config, uint32_t level);
 
 
 
