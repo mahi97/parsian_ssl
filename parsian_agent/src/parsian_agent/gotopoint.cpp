@@ -219,7 +219,7 @@ void CSkillGotoPoint::trajectoryPlanner()
 void CSkillGotoPoint::execute()
 {
 
-//    maxVelocity = 1;
+    maxVelocity = 1;
     if(slowShot|| slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
