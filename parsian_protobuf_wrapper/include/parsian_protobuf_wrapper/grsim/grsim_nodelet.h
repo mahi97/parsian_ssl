@@ -10,13 +10,13 @@
 #include "parsian_msgs/parsian_robot_command.h"
 //#include "parsian_msgs/grsim_replacement.h"
 #include <parsian_msgs/ssl_vision_detection.h>
-#include <parsian_protobuf_wrapper/grSim_Packet.pb.h>
-#include <parsian_protobuf_wrapper/grSim_Commands.pb.h>
-#include <parsian_protobuf_wrapper/grSim_Replacement.pb.h>
-#include <parsian_protobuf_wrapper/common/net/udpsend.h>
-#include <parsian_msgs/grsim_robot_replacement.h>
-#include <parsian_msgs/grsim_ball_replacement.h>
-#include <parsian_msgs/parsian_world_model.h>
+#include "parsian_protobuf_wrapper/grSim_Packet.pb.h"
+#include "parsian_protobuf_wrapper/grSim_Commands.pb.h"
+#include "parsian_protobuf_wrapper/grSim_Replacement.pb.h"
+#include "parsian_protobuf_wrapper/common/net/udpsend.h"
+#include "parsian_msgs/grsim_robot_replacement.h"
+#include "parsian_msgs/grsim_ball_replacement.h"
+
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -25,15 +25,16 @@ public:
     ~GrsimNodelet();
 
     virtual void onInit();
-    void visionCB(const parsian_msgs::parsian_world_modelConstPtr & msg);
-    void GrsimBotCmd(const parsian_msgs::grsim_robot_command::ConstPtr& msg);
+    void visionCB(const parsian_msgs::ssl_vision_detectionConstPtr & msg);
+    //void timerCb(const ros::TimerEvent& event);
+    void GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstPtr& msg);
 
     bool GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Request& req,
                              parsian_msgs::grsim_ball_replacement::Response& res);
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
                               parsian_msgs::grsim_robot_replacement::Response& res);
 
-    dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig> server;
+    boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
     dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
     void conf(protobuf_wrapper_config::grsimConfig &config, uint32_t level);
 
@@ -53,6 +54,7 @@ public:
 
 
     ros::NodeHandle n;
+    ros::NodeHandle pn;
     ros::Subscriber vision_sub;
     //ros::Timer timer_;
     ros::Subscriber sub0;

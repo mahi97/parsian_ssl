@@ -8,47 +8,6 @@
 #define errlen 100
 
 
-
-//void Agent::generateRobotCommand()
-//{
-//
-//    //accelerationLimiter();
-//    double veltan= (vel().x)*cos(dir().th().radian()) + (vel().y)*sin(dir().th().radian());
-//    double velnorm= -1*(vel().x)*sin(dir().th().radian()) + (vel().y)*cos(dir().th().radian());
-//    //    debug(QString("vf: %1 , Vn :%2").arg(vforward).arg(vnormal),D_MHMMD);
-//
-//    calibrated++;
-//
-//    if ( isnan(vangular)){
-//        drawer->draw(QString("Vel : %1").arg(vangular),Vector2D(0,0),"brown",18);
-//        vangular = 0.0;
-//    }
-//
-//    int kickNumber = static_cast<int>(round(kickSpeed));//*160.0;
-//
-//    double ang=-dir().th().radian();
-//
-//    int vel_tangent = static_cast<int>(floor(vforward * 487.0));
-//    int vel_normal  = static_cast<int>(floor(vnormal * 487.0));
-//    int vel_angular  = static_cast<int>(((double)vangular) * ((double)256.0 / (double) 360.0));
-//
-//    if (vel_tangent > 2047) vel_tangent = 2047;
-//    if (vel_tangent < -2047) vel_tangent = -2047;
-//
-//    if (vel_normal > 2047) vel_normal = 2047;
-//    if (vel_normal < -2047) vel_normal = -2047;
-//
-//    if (vel_angular > 2047) vel_angular = 2047;
-//    if (vel_angular < -2047) vel_angular = -2047;
-//
-//    int vel_angular_abs = abs(vel_angular_abs);
-//    int vel_tangent_abs = abs(vel_tangent_abs);
-//    int vel_normal_abs  = abs(vel_normal_abs);
-//    requestBit = true; // change to release mode command
-//    unsigned int velTanSend = static_cast<unsigned int>(fabs(veltan) * 100);
-//    unsigned int velNormSend = (static_cast<unsigned int>(fabs(velnorm) * 100));
-//}
-
 double Agent::getVar(double *data) {
     double mean = 0.0;
     for( int i = 0 ; i < errlen ; i++ )
@@ -729,7 +688,7 @@ void Agent::jacobian(double vx, double vy, double w, double &v1, double &v2, dou
     dw2 = (dw2 / (motorMaxRadPerSec)) * _BIT_RESOLUTION;
     dw3 = (dw3 / (motorMaxRadPerSec)) * _BIT_RESOLUTION;
     dw4 = (dw4 / (motorMaxRadPerSec)) * _BIT_RESOLUTION;
-
+    //todo wtp?
     v1 = (char) (round(dw1));
     v2 = (char) (round(dw2));
     v3 = (char) (round(dw3));
@@ -1011,21 +970,15 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     command->release = false;//static_cast<unsigned char>(onOffState);
     ///////////////////////////////merge with grsim///////////////////////////////////////////
 
-    double w1 = v1*gain;
-    double w2 = v2*gain;
-    double w3 = v3*gain;
-    double w4 = v4*gain;
-
+    double w1,w2,w3,w4;
     jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
     command->wheelsspeed= static_cast<unsigned char>(true);
+    // todo wtf?
     command->wheel1= static_cast<float>(w1);
     command->wheel2= static_cast<float>(w2);
     command->wheel3= static_cast<float>(w3);
     command->wheel4= static_cast<float>(w4);
 
-    command->velangular= 0;
-    command->velnormal = 0;
-    command->veltangent= 0;
     if (chip){
         command->kickspeedz= static_cast<float>(kickSpeed);
     }
@@ -1035,35 +988,3 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
 
     return command;
 }
-
-//parsian_msgs::grsim_robot_commandPtr Agent::getGrSimCommand() {
-//    ROS_INFO("grsimCommand_grsimCommand");
-//    parsian_msgs::grsim_robot_commandPtr  grsim_robot_command_msg{new parsian_msgs::grsim_robot_command};
-//    grsim_robot_command_msg->id= static_cast<unsigned char>(id());
-
-//    double w1 = v1*gain;
-//    double w2 = v2*gain;
-//    double w3 = v3*gain;
-//    double w4 = v4*gain;
-
-//    jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
-//    grsim_robot_command_msg->wheelsspeed= static_cast<unsigned char>(true);
-//    grsim_robot_command_msg->wheel1= static_cast<float>(w1);
-//    grsim_robot_command_msg->wheel2= static_cast<float>(w2);
-//    grsim_robot_command_msg->wheel3= static_cast<float>(w3);
-//    grsim_robot_command_msg->wheel4= static_cast<float>(w4);
-
-//    grsim_robot_command_msg->velangular= 0;
-//    grsim_robot_command_msg->velnormal = 0;
-//    grsim_robot_command_msg->veltangent= 0;
-//    grsim_robot_command_msg->kickspeedx= static_cast<float>(kickSpeed);
-//    if (chip){
-//        grsim_robot_command_msg->kickspeedz= static_cast<float>(kickSpeed);
-//    }
-//    else
-//        grsim_robot_command_msg->kickspeedz=0;
-//    grsim_robot_command_msg->spinner= static_cast<unsigned char>(false);
-
-//    return grsim_robot_command_msg;
-
-//}

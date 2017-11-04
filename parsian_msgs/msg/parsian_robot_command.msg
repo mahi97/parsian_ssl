@@ -10,9 +10,6 @@ float64 vel_F
 float64 vel_N
 float64 vel_w
 float32 kickspeedz
-float32 veltangent
-float32 velnormal
-float32 velangular
 bool spinner
 bool wheelsspeed
 float32 wheel1
