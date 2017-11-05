@@ -1,4 +1,6 @@
 <launch>
+	<rosparam command="load" file="$(find parsian_world_model)/param/field.yaml" />
+
 
     <node pkg="nodelet" type="nodelet" name="all_nodelet"  args="manager" output="screen"/>
     <!--<node pkg="nodelet" type="nodelet" name="ai" 	   args="load parsian_ai/AINodelet                 all_nodelet" output="screen"/>-->

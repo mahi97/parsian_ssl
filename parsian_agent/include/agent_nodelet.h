@@ -37,7 +37,6 @@ namespace parsian_agent {
         ros::Publisher debug_pub;
         ros::Publisher draw_pub;
         ros::Publisher parsian_robot_command_pub;
-        ros::Publisher grsim_robot_command_pub;
         ros::Publisher robot_status_pub;
 
         ros::Timer timer_;

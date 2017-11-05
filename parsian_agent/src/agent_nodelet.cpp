@@ -4,23 +4,22 @@ PLUGINLIB_EXPORT_CLASS(parsian_agent::AgentNodelet, nodelet::Nodelet);
 
 using namespace parsian_agent;
 void AgentNodelet::onInit(){
-
+    ROS_INFO("oninit");
 
     debugger = new Debugger;
     drawer   = new Drawer;
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
+
 
     world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 10);
-//    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
+    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
 
     parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 10);
-    grsim_robot_command_pub   = nh.advertise<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 10);
 
     agent.reset(new Agent(1));
     wm = new CWorldModel;
@@ -30,7 +29,7 @@ void AgentNodelet::onInit(){
     f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
 
-
+    timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
     skillKick = new CSkillKick(agent.get());
@@ -47,7 +46,7 @@ void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
     if (agent->skill != nullptr) {
         agent->execute();
         parsian_robot_command_pub.publish(agent->getCommand());
-       // grsim_robot_command_pub.publish(agent->getGrSimCommand());
+
     }
 //    ROS_INFO_STREAM("ADDA : " << _wm);
 //
