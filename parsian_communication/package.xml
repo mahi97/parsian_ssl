@@ -58,5 +58,6 @@
   <export>
     <!-- Other tools can request additional information be placed here -->
 	<nodelet plugin="${prefix}/nodelet_plugin.xml" />
+	<nodelet plugin="${prefix}/packet_nodelet.xml" />
   </export>
 </package>

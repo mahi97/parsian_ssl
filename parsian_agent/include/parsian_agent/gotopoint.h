@@ -9,13 +9,13 @@
 #include <QDebug>
 #include <QFile>
 #include <parsian_util/mathtools.h>
-#include <parsian_util/core/agent.h>
 #include <algorithm>
 #include <math.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
 #define EPS 1e-6
-#define DELTA_T 0.060      //wm->commandSampleTime()
+#define DELTA_T 0.060
+ //wm->commandSampleTime()
 //#define DELTA_T wm->commandSampleTime()
 
 //  New Goto Point Class Powered by DON
@@ -92,7 +92,7 @@ public:
     double timeRemaining();
     gpMode lastGPmode;
     gpMode currentGPmode;
-    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0),bool dynamicStart = true);
+    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0));
 };
 
 

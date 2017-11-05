@@ -4,6 +4,9 @@ project(parsian_agent)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
+FILE(GLOB_RECURSE LibFiles "include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -19,7 +22,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(
+        include
+        ${CMAKE_CURRENT_BINARY_DIR})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
@@ -104,10 +109,9 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+  cfg/agent.cfg
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -119,7 +123,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+   INCLUDE_DIRS
+   include
 #  LIBRARIES parsian_agent
   CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
 #  DEPENDS system_lib
@@ -138,17 +143,42 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_nodelet
-        src/AgentNodelet.cpp)
+        src/agent_nodelet.cpp
+        )
+
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
-       # src/${PROJECT_NAME}/gotopointavoid.cpp
-       # src/${PROJECT_NAME}/kick.cpp
-       # src/${PROJECT_NAME}/newbangbang.cpp
-       # src/${PROJECT_NAME}/onetouch.cpp
-       # src/${PROJECT_NAME}/receivepass.cpp
+        src/${PROJECT_NAME}/gotopointavoid.cpp
+        src/${PROJECT_NAME}/kick.cpp
+        src/${PROJECT_NAME}/newbangbang.cpp
+        src/${PROJECT_NAME}/onetouch.cpp
+        src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
- )
+        src/planner/obstacle.cpp
+        src/planner/planner.cpp
+        src/config.cpp
+        )
+
+add_executable(${PROJECT_NAME}_node
+        src/agent_node.cpp
+        )
+
+add_dependencies(${PROJECT_NAME}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+	    ${PROJECT_NAME}_gencfg
+        )
+
+
+target_link_libraries(${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_node
+        ${catkin_LIBRARIES}
+        )
 
 add_dependencies(${PROJECT_NAME}
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -157,18 +187,15 @@ add_dependencies(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME}_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
-        ${QT_LIBRARIES})
-
-
-target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         )
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure

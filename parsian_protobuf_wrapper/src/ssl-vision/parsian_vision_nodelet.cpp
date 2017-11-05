@@ -9,13 +9,14 @@ void VisionNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
-    timer = nh.createTimer(ros::Duration(.062), boost::bind(&VisionNodelet::timerCb, this, _1));
+    timer = nh.createTimer(ros::Duration(.004), boost::bind(&VisionNodelet::timerCb, this, _1));
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
-
+//    ssl_wrapper_pub = nh.advertise<parsian_msgs::ssl_vision_wrapper>("vision", 1000);
+    //ROS_INFO("on init");
     vision = nullptr;
-    visionConfig.vision_multicast_port = 10006;
+    visionConfig.vision_multicast_port = 10020;
     visionConfig.vision_multicast_ip = "224.5.23.2";
     reconnect();
 
@@ -25,7 +26,7 @@ void VisionNodelet::onInit() {
     configServer->setCallback(f);
     ros::param::get("/team_color", teamColor);
     isOurColorYellow = (teamColor == "yellow");
-
+    packs = 0;
 }
 
 void VisionNodelet::reconnect()
@@ -45,18 +46,25 @@ void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config
 }
 
 void VisionNodelet::timerCb(const ros::TimerEvent &event) {
-    parsian_msgs::ssl_vision_detection detection;
-    parsian_msgs::ssl_vision_geometry geometry;
-    if (vision->receive(vision_packet)) {
+
+    while (vision->receive(vision_packet)) {
+        ROS_INFO("v");
         if (vision_packet.has_detection()) {
-            detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
+            parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
+            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
+//            wrapper->detections.push_back(detection);
+            ssl_detection_pub.publish(detection);
         }
 
         if (vision_packet.has_geometry()) {
-            geometry = pr::convert_geometry_data(vision_packet.geometry());
+            parsian_msgs::ssl_vision_geometryPtr geometry{new parsian_msgs::ssl_vision_geometry};
+            *geometry = pr::convert_geometry_data(vision_packet.geometry());
+//            wrapper->geometry.push_back(geometry);
+            ssl_geometry_pub.publish(geometry);
         }
     }
-    ssl_geometry_pub.publish(geometry);
-    ssl_detection_pub.publish(detection);
+
+
+
 }
 

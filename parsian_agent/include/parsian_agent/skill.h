@@ -8,10 +8,13 @@
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_msgs/parsian_agent.h>
-#include <parsian_util/core/agent.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/geom/geom.h>
 #include <QtCore/QStringList>
+#include <parsian_util/action/action.h>
+#include <parsian_agent/agent.h>
+#include <parsian_util/tools/debuger.h>
+#include <parsian_util/tools/drawer.h>
 
 using namespace rcsc;
 
@@ -23,24 +26,24 @@ protected:
 public:
     QString localAgentName;
     CSkill() {}
-    CSkill(CAgent* _agent);
+    CSkill(Agent* _agent);
     ~CSkill();
-    virtual int level();
+    int level();
     bool done();
     bool failed();
-    void assign(CAgent* _agent);
-    virtual void parse(QStringList params);
-    virtual void generateFromConfig(CAgent* a);
-    virtual CSkill* allocate(CAgent* _agent)=0;
+    void assign(Agent* _agent);
+    void parse(QStringList params);
+    void generateFromConfig(Agent* a);
+    virtual CSkill* allocate(Agent* _agent)=0;
     virtual QString getName()=0;
-    virtual double timeNeeded();  //in seconds
-    virtual double successRate(); //between 0-1    
+    double timeNeeded();  //in seconds
+    double successRate(); //between 0-1
 
     //these functions should be defined in child classes    
     virtual double progress()=0;  //between 0-1 ; less than zero on failure
     virtual void execute()=0;
 
-    Property(CAgent*, Agent, agent);
+    Property(Agent*, Agent, agent);
 friend class CSkills;
 };
 
@@ -50,7 +53,7 @@ public:
     CSkills();
     ~CSkills();
     static bool registerSkill(const char *name, CSkill* Skill);
-    static CSkill* initSkill(const char *name, CAgent* _agent);
+    static CSkill* initSkill(const char *name, Agent* _agent);
     static int skillsCount();
     static CSkill* skill(int i);
     static void* getInfo(const char* name);
@@ -66,37 +69,39 @@ private:
 };
 
 #define DEF_SKILL(skill) \
-    skill(CAgent* _agent); \
-    skill() {skill(nullptr);} \
+    skill(Agent* _agent); \
+    skill() {} \
     ~skill(); \
     static const char *Name;\
-    virtual CSkill* allocate(CAgent* _agent); \
+    virtual CSkill* allocate(Agent* _agent); \
     virtual void execute(); \
     virtual double progress(); \
     virtual QString getName(); \
-    static skill* set(CAgent* a); \
-    static skill* get(CAgent* a)
-#define INIT_SKILL(Skill,name) \
-    bool Skill##_registered \
-            = CSkills::registerSkill(Skill::Name,new Skill(NULL)); \
-    CSkill* Skill::allocate(CAgent* _agent) \
-    {return new Skill(_agent);} \
-    QString Skill::getName() {return QString(Name);} \
-//    Skill* Skill::set(CAgent* a) \
+    static skill* set(Agent* a); \
+    static skill* get(Agent* a)
+
+
+#define INIT_SKILL(_Skill,name) \
+    CSkill* _Skill::allocate(Agent* _agent) \
+    {return new _Skill(_agent);} \
+    QString _Skill::getName() {return QString(Name);} \
+    _Skill* _Skill::set(Agent* a) \
     { \
-        if (QString(Skill::Name)!=a->skillName) \
+        if (QString(_Skill::Name)!=a->skillName) \
         { \
-            if (a->skill!=NULL && a->skillName!="") delete ((Skill*) a->skill); \
-            else a->skill = (CSkill*) (new Skill(a)); \
-            a->skillName = Skill::Name; \
+            if (a->skill!=NULL && a->skillName!="") delete ((_Skill*) a->skill); \
+            else a->skill = (CSkill*) (new _Skill(a)); \
+            a->skillName = _Skill::Name; \
         } \
-        return (Skill*) a->skill; \
+        return (_Skill*) a->skill; \
     } \
-    Skill* Skill::get(CAgent* a) \
+    _Skill* _Skill::get(Agent* a) \
     { \
-        return (Skill*) a->skill; \
+        return (_Skill*) a->skill; \
     } \
-    const char* Skill::Name = name
+        bool _Skill##_registered \
+      = CSkills::registerSkill(_Skill::Name,new _Skill());\
+    const char* _Skill::Name = name
 
 #define SkillState(classname,statenumber) void classname::State##statenumber ()
 #define SkillInitState(statenumber,statename) \
@@ -107,15 +112,5 @@ private:
 #define SkillSwitchState(tostate) sm.setCurrentState(tostate)
 #define SkillBreakState return
 #define SkillRunStates sm.run();return
-
-#define SkillProperty(skill,type,name,local) \
-        public: inline type get##name() {return local;} \
-        public: inline skill* set##name(type val) {local = val;return this;} \
-        protected: type local
-
-#define SkillPropertyNoSet(skill,type,name,local) \
-        public: inline type get##name() {return local;} \
-        public: skill* set##name(type val); \
-        protected: type local
 
 #endif // BASICSKILL_H

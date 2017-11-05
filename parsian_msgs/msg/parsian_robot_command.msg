@@ -1,3 +1,4 @@
+std_msgs/Header Header
 uint8 robot_id
 uint8 packet_id
 uint8 roller_speed
@@ -5,7 +6,13 @@ uint16 kickSpeed
 bool chip
 bool release
 bool debug
-bool forceKick
-float64 vel_x
-float64 vel_y
+float64 vel_F
+float64 vel_N
 float64 vel_w
+float32 kickspeedz
+bool spinner
+bool wheelsspeed
+float32 wheel1
+float32 wheel2
+float32 wheel3
+float32 wheel4

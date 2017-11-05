@@ -1,10 +1,10 @@
 #include <parsian_agent/gotopoint.h>
-
+#include <parsian_agent/config.h>
 
 
 
 INIT_SKILL(CSkillGotoPoint, "gotopoint");
-CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
+CSkillGotoPoint::CSkillGotoPoint(Agent *_agent) : CSkill(_agent)
 {
     lookAt.invalidate();
     agent = _agent;
@@ -19,7 +19,7 @@ CSkillGotoPoint::CSkillGotoPoint(CAgent *_agent) : CSkill(_agent)
 
     maxAcceleration = 4;
     maxDeceleration = 4;
-    
+
 
     lookAt.invalidate();
 
@@ -53,7 +53,7 @@ CSkillGotoPoint::~CSkillGotoPoint()
     //    delete thPid;
 }
 
-void CSkillGotoPoint::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel, bool dynamicStart)
+void CSkillGotoPoint::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel)
 {
     targetPos = target;
     targetDir = _targetDir;
@@ -144,7 +144,7 @@ void CSkillGotoPoint::targetValidate()
     if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
     if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
-    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
+//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
 //        if(conf()->LocalSettings_OurTeamSide() == "Right")
 //        {
 //            if(targetPos.x < 0.2)
@@ -159,21 +159,21 @@ void CSkillGotoPoint::targetValidate()
 //                targetPos.x = 4.3;
 //            }
 //        }
-    }
+//    }
 
-    if (lookAt.valid())
-    {
-        targetDir = (lookAt - agentPos).norm();
-    }
+//    if (lookAt.valid())
+//    {
+//        targetDir = (lookAt - agentPos).norm();
+//    }
 }
 
 void CSkillGotoPoint::trajectoryPlanner()
 {
     agentMovementTh = (targetPos -agentPos ).th();
     //////////////////acc dec
-    agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),false);
-    agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->self.dir).radian(),true);
-    appliedAcc =1.5* maxAcceleration;
+    agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),false);
+    agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),true);
+    appliedAcc =1.5 * maxAcceleration;
 
     if(smooth)
     {
@@ -204,7 +204,7 @@ void CSkillGotoPoint::trajectoryPlanner()
     }
     ///////////////////////////////////////////// th pid
     thPid->kp =0;
-    thPid->error = (agentMovementTh - agent->self.vel.norm().th()).radian();
+    thPid->error = (agentMovementTh - agent->vel().norm().th()).radian();
     if((fabs(thPid->error) > 1)
        || agentVc < 0.5
        || agentDist > 3
@@ -218,7 +218,8 @@ void CSkillGotoPoint::trajectoryPlanner()
 
 void CSkillGotoPoint::execute()
 {
-    maxVelocity = 4;
+
+    maxVelocity = 1;
     if(slowShot|| slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
@@ -227,18 +228,16 @@ void CSkillGotoPoint::execute()
     {
         maxVelocity = 4;
     }
-//    if(wm->getIsSimulMode()) {
-//        maxVelocity = 2;
-//    } //TODO : CHECK
-    targetValidate();
+
+//    targetValidate();
 
     /////////////////decide and exec
 
-    agentPos = agent->self.pos;
-    agentVel = agent->self.vel;
+    agentPos = agent->pos();
+    agentVel = agent->vel();
     agentDist = agentPos.dist(targetPos);
     currentGPmode = decideMode();
-    angPid->error = (targetDir.th() - agent->self.dir.th()).radian();
+    angPid->error = (targetDir.th() - agent->dir().th()).radian();
     agentVc = agentVel.length();
     //////////////// set params
     posPid->kd = 3;
@@ -278,13 +277,8 @@ void CSkillGotoPoint::execute()
 
     diveMode = false;
 
-
-
-    //    debug(QString("dive %1").arg(diveMode),D_MHMMD);
-
     angPid->kp = 3;
     angPid->kd = 1;
-
 
 
     trajectoryPlanner();
@@ -300,8 +294,8 @@ void CSkillGotoPoint::execute()
     ////////////////////////////
     if(currentGPmode == GPPOS) {
         ////////////////ACC + DEC
-//        agent->maxAcceleration = 0; // TODO : skill config
-//        agent->maxDeceleration = 0; // TODO : skill config
+        agent->_ACC = 0;// conf.AccMaxNormal; // TODO : is correct? in ai is zero
+        agent->_DEC = 0;// conf.DecMax; // TODO : is correct?
         ////////////////
         posPid->error = agentDist;
         _Vx = posPid->PID_OUT()*cos(agentMovementTh.radian());
@@ -316,8 +310,8 @@ void CSkillGotoPoint::execute()
     }
     else if(currentGPmode == GPVCONST) {
         /////////////////ACC + DEC
-//        agent->maxAcceleration = 0;
-//        agent->maxDeceleration = 0;
+        agent->_ACC = 0;
+        agent->_DEC = 0;
         agentVDesire = maxVelocity;
         velPid->_I = 0;
         ////////////////
@@ -326,8 +320,8 @@ void CSkillGotoPoint::execute()
 
     }
     else if(currentGPmode == GPDEC1) {
-//        agent->maxAcceleration = 0;
-//        agent->maxDeceleration = 0;
+        agent->_ACC = 0;
+        agent->_DEC = 0;
         agentVDesire = sqrt(fabs(2*maxDeceleration*agentDist*moreDec) + vp *vp) - decOffset;
         _Vx =  agentVDesire*cos(appliedTh) ;
         _Vy =  agentVDesire*sin(appliedTh) ;
@@ -336,20 +330,20 @@ void CSkillGotoPoint::execute()
     else if(currentGPmode == GPACC1) {
         if(agentVc > 0.3)
         {
-//            agent->maxAcceleration = appliedAcc;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = appliedAcc;
+            agent->_DEC = 0;
             agentVDesire = maxVelocity ;
         }
         else if(!slowShot&& !slowMode && !penaltyKick)
         {
-//            agent->maxAcceleration = 0;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = 0;
+            agent->_DEC = 0;
             agentVDesire = 0.7;
         }
         else
         {
-//            agent->maxAcceleration = 0;
-//            agent->maxDeceleration = 0;
+            agent->_ACC = 0;
+            agent->_DEC = 0;
             agentVDesire = 0.5;
         }
         ////////////////
@@ -359,10 +353,13 @@ void CSkillGotoPoint::execute()
     }
     else
     {
-//        agent->waitHere();
+        agent->waitHere();
         velPid->_I = 0;
     }
-//    agent->setRobotAbsVel(_Vx,_Vy,angPid->PID_OUT());
+    ROS_INFO_STREAM("DI : " << agentDist);
+    ROS_INFO_STREAM("DIST : " << agentDist);
+
+    agent->setRobotAbsVel(_Vx, _Vy, angPid->PID_OUT());
     angPid->pError = angPid->error;
 
 

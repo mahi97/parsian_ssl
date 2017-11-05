@@ -16,6 +16,9 @@
 
 #include <parsian_communication/communicator.h>
 
+#include <dynamic_reconfigure/server.h>
+#include "parsian_communication/communicationConfig.h"
+
 
 namespace parsian_communication {
     class CommunicationNodelet : public nodelet::Nodelet {
@@ -24,7 +27,7 @@ namespace parsian_communication {
         void onInit();
 
         CCommunicator communicator;
-
+        ros::Subscriber robotPacketSub;
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
 
@@ -33,6 +36,9 @@ namespace parsian_communication {
         void callBack(const parsian_msgs::parsian_packetsConstPtr& _packet);
         // Timer CallBack (to publish)
         void timerCb(const ros::TimerEvent& event);
+
+        boost::shared_ptr<dynamic_reconfigure::Server<communication_config::communicationConfig>> server;
+        void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level) ;
 
     };
 }

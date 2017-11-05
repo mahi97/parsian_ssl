@@ -2,6 +2,7 @@
 // Created by parsian-ai on 9/19/17.
 //
 
+#include <nodelet/nodelet.h>
 #include "parsian_world_model/wm/worldmodel.h"
 
 
@@ -29,23 +30,59 @@ void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstP
     detection = _detection;
 }
 
-void CWorldModel::execute() {
-    run();
+void CWorldModel::execute(world_model_config::world_modelConfig & config) {
+    run(config);
 }
 
-parsian_msgs::parsian_world_model CWorldModel::getParsianWorldModel() {
+void CWorldModel::toParsianMessage(const CRobot* _robot, int id) {
+    rosRobots[id].camera_id = static_cast<unsigned char>(_robot->cam_id);
+    rosRobots[id].id = static_cast<unsigned char>(_robot->id);
+    rosRobots[id].pos = _robot->pos.toParsianMessage();
+    rosRobots[id].acc = _robot->acc.toParsianMessage();
+    rosRobots[id].vel = _robot->vel.toParsianMessage();
+    rosRobots[id].angularVel = _robot->angularVel;
+    rosRobots[id].dir = _robot->dir.toParsianMessage();
+    rosRobots[id].inSight = _robot->inSight;
+    rosRobots[id].obstacleRadius = _robot->obstacleRadius;
+}
+
+void CWorldModel::toParsianMessage(const CBall* _ball) {
+    rosBall.camera_id = static_cast<unsigned char>(_ball->cam_id);
+    rosBall.pos = _ball->pos.toParsianMessage();
+    rosBall.acc = _ball->acc.toParsianMessage();
+    rosBall.vel = _ball->vel.toParsianMessage();
+    rosBall.angularVel = _ball->angularVel;
+    rosBall.dir = _ball->dir.toParsianMessage();
+    rosBall.inSight = _ball->inSight;
+    rosBall.obstacleRadius = _ball->obstacleRadius;
+
+}
+
+parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
 //    if (this->ball == nullptr) return rosWM;
-    rosWM.ball = toParsianMessage(*ball);
+
+    parsian_msgs::parsian_world_modelPtr rosWM{new parsian_msgs::parsian_world_model};
+    rosWM->our.reserve(_MAX_NUM_PLAYERS);
+    rosWM->opp.reserve(_MAX_NUM_PLAYERS);
+
+    toParsianMessage(ball);
+    rosWM->ball = rosBall;
+
+
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {
         if (us[i]->isActive()) {
-            rosWM.our.push_back(toParsianMessage(*us[i]));
+            toParsianMessage(us[i], i);
+            rosWM->our.push_back(rosRobots[i]);
         }
         if (them[i]->isActive()) {
-            rosWM.opp.push_back(toParsianMessage(*them[i]));
+            toParsianMessage(them[i], i + 12);
+            rosWM->opp.push_back(rosRobots[i+12]);
         }
     }
-    rosWM.isLeft = true; // TODO : fix read from param
-    rosWM.isYellow  = true;
+
+    // TODO : get from protobuf_wrapper_params
+    rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
+    rosWM->isLeft = static_cast<unsigned char>(side_left);
 
     return rosWM;
 }
@@ -102,106 +139,28 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     }
 }
 
-
-// This Function Run in a Loop
-void CWorldModel::run()
-{
-    double lastSecond = 0.0, t=0.0;
-    int frame=0;
-    int lastSecondFrames=0;
-    int packmax;
-    double procTime = -1;
-
-    usleep(1000);
-    packmax = 4;// TODO : Config conf()->BallTracker_activeCamNum();
-    if (vc == nullptr) return;
-    vc->parse(detection);
-    frame ++;
-    packs ++;
-//    testFunc(detection);
-
-    if ( packs >= packmax ) {
-        packs = 0;
-        if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
-        {
-            vc->merge(packmax);
-            mergedHalfWorld.currentFrame = frame;
-            mergedHalfWorld.update(&(vc->res));
-            mergedHalfWorld.vanishOutOfSights();
-        }
-        if (t - lastSecond > 1.0)
-        {
-            if (lastSecond > 0.0)
-            {
-                visionFPS = frame - lastSecondFrames;
-            }
-            lastSecond = t;
-            lastSecondFrames = frame;
-        }
-        visionLatency  = vc->res.visionLatency;
-        visionTimestep = vc->res.timeStep;
-        if (procTime > 0) visionProcessTime = procTime;
-
-
-        // UPDATE WM
-        this->update(&mergedHalfWorld);
+void CWorldModel::merge(int frame) {
+    packs = 0;
+    if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
+    {
+        vc->merge(4);
+        mergedHalfWorld.currentFrame = frame;
+        mergedHalfWorld.update(&(vc->res));
+        mergedHalfWorld.vanishOutOfSights();
     }
 
-
-
-    // UPDATE OLD KNOWLEDGE
-//    mergedHalfWorld.game_state = knowledge->getGameState();
-//    mergedHalfWorld.game_mode = knowledge->getGameMode();
-//    mergedHalfWorld.closing = doClose;
-//    for (int i=0; i< knowledge->agentCount();i++)
-//    {
-//        mergedHalfWorld.ourRole[i] = knowledge->getAgent(i)->skillName;
-//    }
-//    for (int i=0; i< _MAX_NUM_PLAYERS;i++)
-//    {
-//        mergedHalfWorld.oppRole[i] = wm->opp[i]->role;
-//    }
-//    mergedHalfWorld.gsp = gsp;
-//    mergedHalfWorld.knowledgeVars = knowledge->variables;
-//    for (int i=0;i<_MAX_NUM_PLAYERS;i++)
-//        knowledge->positioningPoints[i] = mergedHalfWorld.positioningPoints[i];
-//    knowledge->positioningPointsCount = mergedHalfWorld.positioningPointsCount;
-//    if (knowledge->getPlayMaker() == NULL)
-//    {
-//        mergedHalfWorld.playmakerID = -1;
-//    }
-//    else mergedHalfWorld.playmakerID = knowledge->getPlayMaker()->id();
-    //////////////////
+    // UPDATE WM
+    this->update(&mergedHalfWorld);
 
 }
 
-parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CRobot &_robot) {
-    parsian_msgs::parsian_robot p;
-    p.camera_id = static_cast<unsigned char>(_robot.cam_id);
-    p.id = static_cast<unsigned char>(_robot.id);
-    p.pos = _robot.pos.toParsianMessage();
-    p.acc = _robot.acc.toParsianMessage();
-    p.vel = _robot.vel.toParsianMessage();
-    p.angularVel = _robot.angularVel;
-    p.dir = _robot.dir.toParsianMessage();
-    p.inSight = _robot.inSight;
-    p.obstacleRadius = _robot.obstacleRadius;
 
-    return  p;
-}
+// This Function Run in a Loop
+void CWorldModel::run(world_model_config::world_modelConfig & config)
+{
+    if (vc == nullptr) return;
+    vc->parse(detection, config);
 
-parsian_msgs::parsian_robot CWorldModel::toParsianMessage(const CBall &_ball) {
-    parsian_msgs::parsian_robot p;
-    p.camera_id = static_cast<unsigned char>(_ball.cam_id);
-    p.pos = _ball.pos.toParsianMessage();
-    p.acc = _ball.acc.toParsianMessage();
-    p.vel = _ball.vel.toParsianMessage();
-    p.angularVel = _ball.angularVel;
-    p.dir = _ball.dir.toParsianMessage();
-    p.inSight = _ball.inSight;
-    p.obstacleRadius = _ball.obstacleRadius;
-
-    return p;
 }
 
 void CWorldModel::update(CHalfWorld* w0) {

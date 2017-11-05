@@ -11,6 +11,7 @@
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/knowledge.h>
 #include <parsian_ai/soccer.h>
+#include <parsian_msgs/parsian_robot_task.h>
 
 class AI {
 public:
@@ -28,7 +29,12 @@ public:
     parsian_msgs::parsian_debugs getDebugs() { return debugger->debugs; }
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
+    parsian_msgs::parsian_robot_task getTask(int robotID);
+    
+
+
 private:
+    parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 
     CSoccer*    soccer;
 

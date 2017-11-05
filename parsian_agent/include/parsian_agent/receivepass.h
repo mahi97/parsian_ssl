@@ -8,6 +8,7 @@
 #include <parsian_agent/skill.h>
 #include <parsian_agent/gotopoint.h>
 #include <parsian_agent/kick.h>
+#include <parsian_util/action/autogenerate/receivepassaction.h>
 
 /////////////////////////////////////////////////////////////// receive pass skill created by DON MHMMD SHIRAZI
 enum kkRPMode {
@@ -18,7 +19,7 @@ enum kkRPMode {
     RPNONE = 5
 };
 
-class CSkillReceivePass : public CSkill
+class CSkillReceivePass : public CSkill, public ReceivepassAction
 {
 private:
     CSkillGotoPointAvoid* gotopointavoid;
@@ -38,14 +39,6 @@ public:
     /*void execute();
     void setAgent(CAgent*);*/
     bool isReceived();
-    SkillProperty(CSkillReceivePass, Vector2D, Target, target);
-    SkillProperty(CSkillReceivePass, bool , AvoidOurPenaltyArea, avoidOurPenaltyArea);
-    SkillProperty(CSkillReceivePass, bool , AvoidOppPenaltyArea, avoidOppPenaltyArea);
-    SkillProperty(CSkillReceivePass, bool , Slow, slow);
-    SkillProperty(CSkillReceivePass, float , ReceiveRadius, receiveR);
-    SkillProperty(CSkillReceivePass, bool , IgnoreAngle, ignoreAngle);
-    SkillProperty(CSkillReceivePass, Vector2D, IATargetDir, IATargetDir);
-
 };
 
 

@@ -12,20 +12,25 @@ void CommunicationNodelet::onInit() {
 
 
     ros::NodeHandle& n = getNodeHandle();
-    ros::NodeHandle& private_n = getPrivateNodeHandle();
+    ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
     timer = n.createTimer(ros::Duration(.062), boost::bind(&CommunicationNodelet::timerCb, this, _1));
 
     drawer = new Drawer();
     debugger = new Debugger();
 
-    drawPub    = private_n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
-    debugPub   = private_n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
-    ros::Subscriber robotPacketSub   = n.subscribe("/robot_packets" , 1000, &CommunicationNodelet::callBack, this);
+    drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
+    debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
+    robotPacketSub   = n.subscribe("/packets" , 1000, &CommunicationNodelet::callBack, this);
     /////connect serial
-    if(!communicator.isSerialConnected()){
+    while(!communicator.isSerialConnected()){
         communicator.connectSerial("/dev/ttyUSB0");
     }
+
+    server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
+    dynamic_reconfigure::Server<communication_config::communicationConfig>::CallbackType f;
+    f = boost::bind(&CommunicationNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
 //    ros::Rate loop_rate(62);
 //
 //    while (ros::ok()) {
@@ -40,7 +45,9 @@ void CommunicationNodelet::onInit() {
 }
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
+  //ROS_INFO("salam");
     communicator.packetCallBack(_packet);
+
 }
 
 void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
@@ -48,5 +55,10 @@ void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
         drawPub.publish(drawer->draws);
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
+}
+
+void CommunicationNodelet::ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level)
+{
+  ROS_INFO_STREAM("callback called! with" << config.test_param);
 }
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);

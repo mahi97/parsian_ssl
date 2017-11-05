@@ -17,7 +17,7 @@ public:
     CBall* ball;
     CTeam our, opp;
 
-    void update(const parsian_msgs::parsian_world_model& _newWM);
+    void update(const parsian_msgs::parsian_world_modelConstPtr& _newWM);
 
 private:
 };

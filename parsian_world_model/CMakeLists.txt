@@ -9,13 +9,10 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
-        geometry_msgs
-        nav_msgs
         parsian_msgs
         parsian_util
         roscpp
         rospy
-        tf2
         nodelet
         )
 
@@ -99,10 +96,11 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+ generate_dynamic_reconfigure_options(
+
+    cfg/worldmodel.cfg
+
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -116,7 +114,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 catkin_package(
         #  INCLUDE_DIRS include
         #  LIBRARIES parsian_world_model
-          CATKIN_DEPENDS dynamic_reconfigure geometry_msgs nav_msgs parsian_msgs roscpp rospy tf2 nodelet
+          CATKIN_DEPENDS dynamic_reconfigure parsian_msgs roscpp rospy nodelet
         #  DEPENDS system_lib
 )
 
@@ -173,7 +171,7 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 add_dependencies(${PROJECT_NAME}_util ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 
@@ -191,7 +189,7 @@ target_link_libraries(${PROJECT_NAME}_util
         )
 
 add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(worldmodel_node
         ${catkin_LIBRARIES}

@@ -5,9 +5,10 @@ CSoccer::CSoccer()
 {
 //    wm = new CWorldModel;
     agents = new CAgent*[_MAX_NUM_PLAYERS];
-    for(int i = 0; i < _MAX_NUM_PLAYERS; i++ )
+    for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
-//        agents[i] = new CAgent;
+        agents[i] = new CAgent();
+        agents[i]->self = *wm->our.active(i);
     }
 //    knowledge = new CKnowledge(agents);
 //    coach = new CCoach(agents);
@@ -75,13 +76,11 @@ void CSoccer::primaryDraws(){
 
 void CSoccer::execute()
 {
-
 //    QTime timer;
 //    timer.start();
 
 
-    primaryDraws();
-
+//    primaryDraws();
 
 
     //////////////////set opponents roles more specificly and set priority for each of which////////////////////
@@ -98,13 +97,13 @@ void CSoccer::execute()
         {
 //            agents[i]->waitHere(); TODO : Robot Command
         }
-//        bool custom = false;
+        bool custom = false;
 //        customControl(custom);
-//        if (!custom)
-//        {
+        if (!custom)
+        {
 //            coach->execute();
 
-//        }
+        }
     }
 
     //  debug(QString("%1) MainLoop Time2: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
@@ -124,4 +123,27 @@ void CSoccer::execute()
     //  debug(QString("%1) MainLoop Time3: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 //    timer.restart();
 
+//    updateTask();
+}
+
+void CSoccer::updateTask(){
+    auto* kick = new KickAction;
+    kick->setKickspeed(1023);
+    kick->setTarget(wm->field->oppGoal());
+    kick->setSlow(true);
+    kick->setKkshotempyspot(true);
+
+    auto* gtp = new GotopointavoidAction;
+    Circle2D aroundBall = Circle2D(wm->ball->pos, 0.5);
+    Vector2D vec1, vec2;
+    aroundBall.intersection(Line2D(Vector2D(0,0), wm->ball->pos), &vec1, &vec2);
+    gtp->setTargetpos(vec1.absX() < vec2.absX() ? vec1 : vec2);
+
+
+    if(!gameState->canMove()) {    //HALT
+        agents[0]->action = gtp;
+    }
+    else {
+        agents[0]->action = kick;
+    }
 }

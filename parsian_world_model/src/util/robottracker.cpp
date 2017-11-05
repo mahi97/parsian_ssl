@@ -432,30 +432,33 @@ Matrix& RobotTracker::A(const Matrix &x)
 
 Matrix& RobotTracker::W(const Matrix &x)
 {
-    static Matrix W("[ 0, 0, 0, 0, 0 ; "
-                            "  0, 0, 0, 0, 0 ; "
-                            "  0, 0, 0, 0, 0 ; "
-                            "  1, 0, 0, 0, 0 ; "
-                            "  0, 1, 0, 0, 0 ; "
-                            "  0, 0, 1, 0, 0 ; "
-                            "  0, 0, 0, 1, 0 ; "
-                            "  0, 0, 0, 0, 1 ]");
+    static Matrix W((char *const)(
+                                "[ 0, 0, 0, 0, 0 ; "
+                                "  0, 0, 0, 0, 0 ; "
+                                "  0, 0, 0, 0, 0 ; "
+                                "  1, 0, 0, 0, 0 ; "
+                                "  0, 1, 0, 0, 0 ; "
+                                "  0, 0, 1, 0, 0 ; "
+                                "  0, 0, 0, 1, 0 ; "
+                                "  0, 0, 0, 0, 1 ]"));
     return W;
 }
 
 Matrix& RobotTracker::H(const Matrix &x)
 {
-    static Matrix H("[ 1, 0, 0, 0, 0, 0, 0, 0; "
-                            "  0, 1, 0, 0, 0, 0, 0, 0; "
-                            "  0, 0, 1, 0, 0, 0, 0, 0 ]");
+    static Matrix H((char *const)(
+                                "[ 1, 0, 0, 0, 0, 0, 0, 0; "
+                                "  0, 1, 0, 0, 0, 0, 0, 0; "
+                                "  0, 0, 1, 0, 0, 0, 0, 0 ]"));
     return H;
 }
 
 Matrix& RobotTracker::V(const Matrix &x)
 {
-    static Matrix V("[ 1, 0, 0; "
-                            "  0, 1, 0; "
-                            "  0, 0, 1 ]");
+    static Matrix V((char *const)(
+                                "[ 1, 0, 0; "
+                                "  0, 1, 0; "
+                                "  0, 0, 1 ]"));
     return V;
 }
 

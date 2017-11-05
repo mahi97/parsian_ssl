@@ -1,5 +1,5 @@
 <library path="lib/libparsian_agent_nodelet">
-    <class name="parsian_agent/AgentNodelet" type="AgentNodelet" base_class_type="nodelet::Nodelet">
+    <class name="parsian_agent/AgentNodelet" type="parsian_agent::AgentNodelet" base_class_type="nodelet::Nodelet">
         <description>
             nothing!!!!
         </description>
