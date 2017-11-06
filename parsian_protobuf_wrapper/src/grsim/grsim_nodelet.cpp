@@ -157,8 +157,8 @@ void GrsimNodelet::onInit()
 
     std::string col;
     ros::param::get("team_color", color);
-    color = ! (col == "yellow");          //check if it is true!
-
+    color = (col == "yellow");          //check if it is true!
+//    color = false;
 }
 
 

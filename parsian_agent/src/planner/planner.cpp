@@ -291,7 +291,6 @@ void CPlanner::checkAgent(){
 
 
 void CPlanner::runPlanner(){
-
     checkAgent();
 
     if( nodes.head == NULL ){
@@ -839,7 +838,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     double rad = 0;
     for (int j=0;j<wm->our.activeAgentsCount();j++)
     {
-        if( ourRelaxList.contains(wm->our.active(j)->id) == false )
+        if( (ourRelaxList.contains(wm->our.active(j)->id) == false) && (ID != wm->our.active(j)->id))
         {
 
             createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
@@ -851,20 +850,25 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
 //            if(1 || Circle2D(wm->our[j]->pos,CRobot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
 //            {
+            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
+
                 obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.2 , 0 , 0);
 //            }
         }
     }
+    ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
+    ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {
-        if( oppRelaxList.contains(wm->opp.active(j)->id) == false )
+        if( 1 || oppRelaxList.contains(wm->opp.active(j)->id) == false )
         {
 
             createObstacleProb(obs,wm->opp.active(j)->pos,wm->opp.active(j)->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
             double obstVelFactor = 0.15;
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
             obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.2 , 0 , 0);
+            drawer->draw(Circle2D(wm->opp.active(j)->pos,0.1),QColor(Qt::red),true);
         }
     }
 

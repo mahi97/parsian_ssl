@@ -164,7 +164,6 @@ void CSkillGotoPointAvoid::execute()
         ROS_INFO_STREAM("bor: " << ballObstacleRadius);
         ROS_INFO_STREAM("ff: " << wm->field->_FIELD_WIDTH);
         ROS_INFO_STREAM("dd: " << wm->field->_FIELD_HEIGHT);
-
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
         for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )

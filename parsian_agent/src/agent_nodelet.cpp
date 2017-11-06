@@ -58,11 +58,11 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
     if (drawer   != nullptr) {
 
-       // draw_pub.publish(drawer->draws);
-      //  ROS_INFO("draawwwerrr");
+        drawer->draws.texts.clear();
+        draw_pub.publish(drawer->draws);
 
-        //        drawer->draws.circles.clear();
-//        drawer->draws.texts.clear();
+        drawer->draws.circles.clear();
+        drawer->draws.segments.clear();
 
     }
     // ROS_INFO("draawwwerrr");
