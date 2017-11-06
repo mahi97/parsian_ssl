@@ -1,1 +1,76 @@
-int32 status
+#BangBang
+float64 AccMaxForward
+float64 accmaxnormal
+float64 DecMax
+float64 VelMax
+float64 posKP
+float64 posKI
+float64 posKD
+float64 thKP
+float64 thKI
+float64 thKD
+#Kalman
+bool UseKalman
+int8 Blindness
+float64 Delay_Time
+#ERRT
+bool Draw_Path
+float64 Goal_Probablity
+float64 MWaypoint_Catch_Probablityax
+float64 Extend_Step
+float64 Target_Distance_Threshold
+#PassPositioning
+float64 Big_Step_X
+float64 Big_Step_Y
+float64 Small_Step_X
+float64 Small_Step_Y
+float64 Ball_Decel
+float64 ChipPass_Recv_StayBackFactor
+#Coach
+float64 kickThreshold
+float64 oneTouchKickThreshold
+float64 oneTouchAngleThreshold
+float64 kickClosedAngle
+#MotionProfiler
+bool active
+bool autoreset
+bool drawpath
+bool drawvel
+bool drawdir
+#SkillsParametersBangBangTrajectory
+float64 firstDegThreshold
+float64 firstDegCoeffecient
+float64 secondDegThreshold
+float64 secondDegCoeffecient
+float64 thirdDegThreshold
+float64 thirdDegCoeffecient
+float64 forthDegCoeffecient
+#SkillsParametersBangBangTrajectoryTangent
+float64 firstDistThreshold
+float64 firstDistCoeffecient
+float64 secondDistThreshold
+float64 secondDistCoeffecient
+float64 thirdDistThreshold
+float64 thirdDistCoeffecient
+float64 forthDistThreshold
+float64 forthDistCoeffecient
+float64 fifthDistThreshold
+float64 fifthDistCoeffecient
+#SkillsParametersKickOneTouch
+float64 Landa
+float64 Gamma
+float64 Delay
+float64 TimeFactor
+#SkillsParametersMark
+#SkillsParametersClearBall
+float64 TargetMargin
+float64 PointClearMargin
+float64 DegThreshold
+float64 ClearSuccessDist
+float64 ClearSuccessTargetDist
+float64 FollowBallDist
+#SkillsParametersPush
+float64 PushVel
+float64 DistToMarkedOpp
+float64 RolesGamma
+float64 GoalieID
