@@ -8,7 +8,7 @@
 class CAgent {
 public:
     CAgent(const parsian_msgs::parsian_agent& _agent);
-    CAgent() = default;
+    CAgent(int id);
     Vector2D pos();
     Vector2D vel();
     Vector2D dir();

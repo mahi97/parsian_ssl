@@ -1,5 +1,5 @@
 #include <planner/planner.h>
-
+#include <ros/rate.h>
 ///////////////////////////////
 ////////IMPORTANT TODOs////////
 ///////////////////////////////
@@ -672,8 +672,11 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
         ourRelaxList.append(ID);
 
         oppRelaxList.clear();
-        for (int i : _oppRelaxList)
+        for (int i : _oppRelaxList){
             oppRelaxList.append(i);
+            ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
+        }
+
         oppRelaxList.append(ID);
 
         ballObstacleRadius = _ballObstacleRadius;

@@ -1,9 +1,9 @@
 #include "parsian_util/core/team.h"
-
+#include <ros/ros.h>
 CTeam::CTeam(const bool isYellow, const bool isLeft)
 {
     data = new CTeamData;
-    for (auto& member : data->teamMembers) member = new CRobot();
+    for (int i=0;i< _MAX_NUM_PLAYERS;i++)data->teamMembers[i]=new CRobot(i);
     setColor(isYellow);
     setSide(isLeft);
 
@@ -22,11 +22,17 @@ CTeam::~CTeam()
 }
 
 void CTeam::updateRobot(const std::vector<parsian_msgs::parsian_robot> &_robots) {
-    for (auto& member : data->teamMembers) member->setActive(false);
-
+   for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
+        data->teamMembers[i]->setActive(false);
+    for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
+        if(data->teamMembers[i]->isActive())
+            ROS_INFO("wwwwwwwwwwwwwwwthhhhhhhhhhhhhhhhhhfffffffffffffffffff");
+      ROS_INFO("*************************************************************************************");
+    int k=0;
     for(auto& robot : _robots) {
-        this->data->teamMembers[robot.id]->update(robot);
-        this->data->teamMembers[robot.id]->setActive(true);
+        ROS_INFO_STREAM(static_cast<int>(robot.id));
+        data->teamMembers[static_cast<int>(robot.id)]->update(robot);
+        //data->teamMembers[static_cast<int>(robot.id)]->setActive(true);
     }
     update();
 
@@ -44,6 +50,7 @@ void CTeam::update()
     {
         if( data->teamMembers[i]->isActive() )
             data->activeAgents.push_back(i);
+    ROS_INFO_STREAM("robotactive size : "<<data->activeAgents.size());
     }
 }
 
