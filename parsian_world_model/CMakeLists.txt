@@ -22,7 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS QtCore)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -96,11 +96,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
- generate_dynamic_reconfigure_options(
-
+generate_dynamic_reconfigure_options(
     cfg/worldmodel.cfg
-
- )
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -149,19 +147,13 @@ add_library(${PROJECT_NAME}_util
         src/util/matrix.cpp
         )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-## With catkin_make all packages are built within a single CMake context
-## The recommended prefix ensures that target names across packages don't collide
-add_library(worldmodel_nodelet_lib
+add_library(${PROJECT_NAME}_nodelet
         src/worldmodel_nodelet.cpp
         )
 
-add_executable(worldmodel_node src/worldmodel_node.cpp)
+add_executable(${PROJECT_NAME}_node 
+	src/worldmodel_node.cpp
+	)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -171,8 +163,16 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
-add_dependencies(${PROJECT_NAME}_util ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} 
+	${${PROJECT_NAME}_EXPORTED_TARGETS} 
+	${catkin_EXPORTED_TARGETS} 
+	${PROJECT_NAME}_gencfg
+)
+
+add_dependencies(${PROJECT_NAME}_util 
+	${${PROJECT_NAME}_EXPORTED_TARGETS} 
+	${catkin_EXPORTED_TARGETS}
+)
 ## Specify libraries to link a library or executable target against
 
 
@@ -188,15 +188,23 @@ target_link_libraries(${PROJECT_NAME}_util
         ${QT_LIBRARIES}
         )
 
-add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(${PROJECT_NAME}_node 
+	${${PROJECT_NAME}_EXPORTED_TARGETS} 
+	${catkin_EXPORTED_TARGETS}
+)
+add_dependencies(${PROJECT_NAME}_nodelet 
+	${${PROJECT_NAME}_EXPORTED_TARGETS} 
+	${catkin_EXPORTED_TARGETS} 
+	${PROJECT_NAME}_gencfg
+)
+
 ## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_node
+target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_nodelet_lib
+target_link_libraries(${PROJECT_NAME}_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
         ${PROJECT_NAME}
@@ -218,11 +226,11 @@ target_link_libraries(worldmodel_nodelet_lib
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}_util ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -232,11 +240,10 @@ target_link_libraries(worldmodel_nodelet_lib
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  nodelet.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

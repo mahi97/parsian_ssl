@@ -1,4 +1,4 @@
 string name
-geometry_msgs/Point32 begin
-geometry_msgs/Point32 end
+vector2D begin
+vector2D end
 float32 thickness
