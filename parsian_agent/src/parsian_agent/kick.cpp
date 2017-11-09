@@ -1,5 +1,5 @@
-#include "parsian_agent/kick.h"
-
+#include <parsian_agent/kick.h>
+#include <parsian_agent/config.h>
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //double calcBallTime(Vector2D _pos,double _dec)
@@ -240,8 +240,8 @@ void CSkillKick::waitAndKick()
 
 
 
-//    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf()->SkillsParams_KickOneTouch_Landa(), conf()->SkillsParams_KickOneTouch_Gamma()));
-    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, 1, 1)); // TODO : Skill Config
+    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target,
+                                                              conf.groups.skills_parameters_kick_one_touch.Landa, conf.groups.skills_parameters_kick_one_touch.Gamma));
     Vector2D kickerPoint = agentPos + agentDir.norm()*stopParam;
     Vector2D addVec = (agentPos - target).norm()*stopParam;
     Vector2D intersectPos;
@@ -917,8 +917,7 @@ double CSkillKick::kickTimeEstimation(Agent *_agent, Vector2D _target, const CBa
         {
             ballPosInFuture = _ball.getPosInFuture(i);
             finalPos = ballPosInFuture - (_target-ballPosInFuture).norm()*0.11;
-//            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf()->BangBang_VelMax(),ourRelax,oppRelax,true,0.2,true)<= i+0.1)
-            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,1,ourRelax,oppRelax,true,0.2,true)<= i+0.1) // TODO : Config
+            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf.groups.bang_bang.VelMax,ourRelax,oppRelax,true,0.2,true)<= i+0.1)
             {
                 //draw(finalPos,1,QColor(Qt::blue));
                 return i;
