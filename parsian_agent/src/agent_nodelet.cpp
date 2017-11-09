@@ -8,10 +8,17 @@ void AgentNodelet::onInit(){
 
     debugger = new Debugger;
     drawer   = new Drawer;
+    agent.reset(new Agent(1));
+    wm = new CWorldModel;
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
+    gotoPoint = new CSkillGotoPoint(agent.get());
+    gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
+    skillKick = new CSkillKick(agent.get());
+    oneTouch = new CSkillKickOneTouch(agent.get());
+    receivePass = new CSkillReceivePass(agent.get());
 
     world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
@@ -21,8 +28,7 @@ void AgentNodelet::onInit(){
 
     parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 10);
 
-    agent.reset(new Agent(1));
-    wm = new CWorldModel;
+
 
     server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>(private_nh));
     dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
@@ -30,20 +36,16 @@ void AgentNodelet::onInit(){
     server->setCallback(f);
 
     timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
-    gotoPoint = new CSkillGotoPoint(agent.get());
-    gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
-    skillKick = new CSkillKick(agent.get());
-    oneTouch = new CSkillKickOneTouch(agent.get());
-    receivePass = new CSkillReceivePass(agent.get());
+
 
 
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
     ROS_INFO("agent nodelet::updated");
-//    ROS_INFO(QString::number(wm->our[0]->pos.x).toStdString().data());
     wm->update(_wm);
     if (agent->skill != nullptr) {
+        ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
         agent->execute();
         parsian_robot_command_pub.publish(agent->getCommand());
 

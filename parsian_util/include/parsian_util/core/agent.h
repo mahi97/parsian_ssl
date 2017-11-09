@@ -14,7 +14,7 @@ public:
     Vector2D dir();
     Vector2D acc();
     int       id();
-    bool isVisible() {return self.isActive(); }
+    bool isVisible() {return self.getActive(); }
 
     Action* action;
     CRobot self;

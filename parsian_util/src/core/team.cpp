@@ -22,19 +22,22 @@ CTeam::~CTeam()
 }
 
 void CTeam::updateRobot(const std::vector<parsian_msgs::parsian_robot> &_robots) {
-   for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
+   for( int i = 0; i < _MAX_NUM_PLAYERS; i++ ){
         data->teamMembers[i]->setActive(false);
-    for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
-        if(data->teamMembers[i]->isActive())
-            ROS_INFO("wwwwwwwwwwwwwwwthhhhhhhhhhhhhhhhhhfffffffffffffffffff");
-      ROS_INFO("*************************************************************************************");
-    int k=0;
-    for(auto& robot : _robots) {
-        ROS_INFO_STREAM(static_cast<int>(robot.id));
-        data->teamMembers[static_cast<int>(robot.id)]->update(robot);
-        //data->teamMembers[static_cast<int>(robot.id)]->setActive(true);
-    }
-    update();
+        update();
+//        ROS_INFO_STREAM("aftr falsing "<<i);
+//        for(int j=0;j< _MAX_NUM_PLAYERS; j++ )
+//             ROS_INFO_STREAM(" active "<<j<<" __--->"<< this->data->teamMembers[j]->getActive());
+
+   }
+
+   int k=0;
+   for(auto& robot : _robots) {
+       ROS_INFO_STREAM(static_cast<int>(robot.id));
+       data->teamMembers[robot.id]->update(robot);
+       data->teamMembers[robot.id]->setActive(true);
+   }
+   update();
 
 }
 
@@ -48,9 +51,8 @@ void CTeam::update()
     data->activeAgents.clear();
     for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
     {
-        if( data->teamMembers[i]->isActive() )
+        if( data->teamMembers[i]->getActive() )
             data->activeAgents.push_back(i);
-    ROS_INFO_STREAM("robotactive size : "<<data->activeAgents.size());
     }
 }
 
