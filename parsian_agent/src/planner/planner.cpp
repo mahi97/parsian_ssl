@@ -570,7 +570,7 @@ void CPlanner::runPlanner(){
         //		if( resultModified.size() > 1 )
         //			draw(Circle2D(resultModified[resultModified.size()-1] , 0.05) , "red" , true);  //kian what about draw
         for( int j=1 ; j<resultModified.size() ; j++ ){
-            drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j)));
+//            drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j)));
             //			draw(result[j]);
         }
         //		Draw();
@@ -853,7 +853,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
 //            if(1 || Circle2D(wm->our[j]->pos,CRobot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
 //            {
-            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
+//            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
 
                 obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.2 , 0 , 0);
 //            }
@@ -871,7 +871,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
             double obstVelFactor = 0.15;
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
             obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.2 , 0 , 0);
-            drawer->draw(Circle2D(wm->opp.active(j)->pos,0.1),QColor(Qt::red),true);
+//            drawer->draw(Circle2D(wm->opp.active(j)->pos,0.1),QColor(Qt::red),true);
         }
     }
 

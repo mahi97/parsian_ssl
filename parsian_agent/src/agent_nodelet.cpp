@@ -20,13 +20,13 @@ void AgentNodelet::onInit(){
     oneTouch = new CSkillKickOneTouch(agent.get());
     receivePass = new CSkillReceivePass(agent.get());
 
-    world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
-    robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
+    world_model_sub = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
+    robot_task_sub  = nh.subscribe("robot_task_0", 10000, &AgentNodelet::rtCb, this);
 
-    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 10);
-    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
+    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
+//    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
 
-    parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 10);
+    parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 1000);
 
 
 
@@ -42,10 +42,10 @@ void AgentNodelet::onInit(){
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
-    ROS_INFO("agent nodelet::updated");
+   // ROS_INFO("agent nodelet::updated");
     wm->update(_wm);
     if (agent->skill != nullptr) {
-        ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
+       // ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
         agent->execute();
         parsian_robot_command_pub.publish(agent->getCommand());
 
@@ -59,20 +59,20 @@ void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
     if (drawer   != nullptr) {
-
+        ROS_INFO_STREAM("agent drawer"<<drawer);
         drawer->draws.texts.clear();
-        draw_pub.publish(drawer->draws);
+//        draw_pub.publish(drawer->draws);
 
-        drawer->draws.circles.clear();
+//        drawer->draws.circles.clear();
         drawer->draws.segments.clear();
 
     }
-    // ROS_INFO("draawwwerrr");
+     //ROS_INFO("draawwwerrr");
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
 
-    ROS_INFO("callBack called");
+  //  ROS_INFO("callBack called");
     agent->skill = getSkill(_robot_task);
 }
 

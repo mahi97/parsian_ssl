@@ -60,6 +60,7 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element)
 void CSkillGotoPointAvoid::execute()
 {
 
+    //drawer->draw(Circle2D(Vector2D(1,0),0.1),QColor(Qt::red),true);
     if(agent == nullptr)
         return;
     agentPos = agent->pos();
@@ -96,7 +97,7 @@ void CSkillGotoPointAvoid::execute()
         {
             pathPoints.append(agentPos);
             for (auto pathPoint : pathPoints) {
-                drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true);
+            //    drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true); //todo shoule uncommented
             }
         }
     }
