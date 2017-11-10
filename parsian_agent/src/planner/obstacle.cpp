@@ -85,6 +85,8 @@ bool obstacle::check(state s0,state s1 , double obsMargin)
 
 CObstacles::CObstacles(){
     obs.clear();
+    targetPosition.invalidate();
+    agentPos.invalidate();
     obsMargin = CRobot::robot_radius_new;
 }
 
@@ -95,7 +97,13 @@ void CObstacles::add_rectangle(double cx,double cy,double w,double h)
     temp.pos.assign(cx,cy);
     temp.vel.assign(0,0);
     temp.rad.assign(w/2 , h/2);
-    obs.append(temp);
+    Rect2D testRect(cx- (w/2),cy-(h/2),h,w);// = Rect2D::from_center(cx,cy,w,h);
+    if(!testRect.contains(targetPosition)) {
+        drawer->draw(testRect,QColor(Qt::red));
+
+        //obs.append(temp);
+    }
+
 }
 
 void CObstacles::add_circle(double x,double y,double radius,
@@ -106,7 +114,13 @@ void CObstacles::add_circle(double x,double y,double radius,
     temp.pos.assign(x,y);
     temp.vel.assign(vx,vy);
     temp.rad.assign(radius , radius);
-    obs.append(temp);
+    Circle2D testCircle(Vector2D(x,y),radius);
+
+    if(!testCircle.contains(targetPosition) && !testCircle.contains(agentPos)) {
+        drawer->draw(testCircle,QColor(Qt::red));
+
+        obs.append(temp);
+    }
 }
 
 

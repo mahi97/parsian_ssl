@@ -157,14 +157,6 @@ void CSkillGotoPointAvoid::execute()
     else
     {
 
-        ROS_INFO_STREAM("Target: " << targetPos.x << targetPos.y);
-        ROS_INFO_STREAM("ourRel: " << ourRelaxList.size());
-        ROS_INFO_STREAM("oppRel: " << oppRelaxList.size());
-        ROS_INFO_STREAM("apa: " << avoidPenaltyArea);
-        ROS_INFO_STREAM("acc: " << avoidCenterCircle);
-        ROS_INFO_STREAM("bor: " << ballObstacleRadius);
-        ROS_INFO_STREAM("ff: " << wm->field->_FIELD_WIDTH);
-        ROS_INFO_STREAM("dd: " << wm->field->_FIELD_HEIGHT);
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
         for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )
@@ -219,7 +211,7 @@ void CSkillGotoPointAvoid::execute()
         alpha = fabs(Vector2D::angleBetween(result[1] - result[0] , result[2] - result[1]).degree());
         DEBUG(QString("alpha : %1").arg(alpha),D_MHMMD);
         lllll = result[1];
-        vf = -2 * log(alpha) + 9;
+        vf = -1.7 * log(alpha) + 6;
         vf = max(vf , 0.5);
         vf = min (vf,4);
     }

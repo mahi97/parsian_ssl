@@ -36,7 +36,7 @@ public:
   QList <obstacle> obs;
 public:
   CObstacles();
-
+  Vector2D targetPosition,agentPos;
   void clear() {obs.clear();}
   void add_rectangle(double cx,double cy,double w,double h);        //add rect with given properties to obs
   void add_circle(double x,double y,double radius,                  //add circle with given properties to obs

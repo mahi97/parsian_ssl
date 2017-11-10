@@ -192,11 +192,11 @@ CPlanner::CPlanner(int _ID)
     threshold = 0.01;      // TODO  conf()->ERRT_Target_Distance_Threshold();
     wayPointProb = 0.6;    // TODO  conf()->ERRT_Waypoint_Catch_Probablity();
     goalProb = 0.3;        // TODO  conf()->ERRT_Goal_Probablity();
-    stepSize = 0.1;        // TODO  conf()->ERRT_Extend_Step();
+    stepSize = 0.05;        // TODO  conf()->ERRT_Extend_Step();
     goal.invalidate();
     counter=0;
     flag = false;
-    pointStep = 0.09;
+    pointStep = 0.04;
     this->ID = _ID;
     qRegisterMetaType< vector<Vector2D> >("vector<Vector2D>");
     qRegisterMetaType< Vector2D >("Vector2D");
@@ -570,7 +570,7 @@ void CPlanner::runPlanner(){
         //		if( resultModified.size() > 1 )
         //			draw(Circle2D(resultModified[resultModified.size()-1] , 0.05) , "red" , true);  //kian what about draw
         for( int j=1 ; j<resultModified.size() ; j++ ){
-//            drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j)));
+            drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j),255/(resultModified.size()/(double)j)));
             //			draw(result[j]);
         }
         //		Draw();
@@ -624,8 +624,8 @@ void CPlanner::resetPlanner( Vector2D _goal ){
 ////////TODO change slot to ...///////
 void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea ,const bool& _avoidCenterArea , const double& _ballObstacleRadius ){
 
-        bool flag = true;
-        int idx = ID;
+    bool flag = true;
+    int idx = ID;
 //        for( int i=0 ; i<wm->our.activeAgentsCount() ; i++ ){
 //            if( wm->our.active(i)->id == ID ){
 //                idx = i;
@@ -638,77 +638,77 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
 //            return;
 //        }
 
-        if( wm->our[idx]->pos.dist(_goal) < 0.1 ){
-            resultModified.clear();
-            resultModified.push_back(wm->our[idx]->pos);
-            resultModified.push_back(_goal);
-            averageDir = _goal - wm->our[idx]->pos;
-               //////TODO change signal ///////
-            return;
+    if( wm->our[idx]->pos.dist(_goal) < 0.1 ){
+        resultModified.clear();
+        resultModified.push_back(wm->our[idx]->pos);
+        resultModified.push_back(_goal);
+        averageDir = _goal - wm->our[idx]->pos;
+        //////TODO change signal ///////
+        return;
 //            emit pathPlannerResult(resultModified , averageDir);
 
+    }
+
+    if(! wm->field->marginedField().contains(_goal) ){
+        auto *sol1 = new Vector2D() , *sol2 = new Vector2D();
+        wm->field->marginedField().intersection(Segment2D(Vector2D(0,0) , _goal) , sol1 , sol2 );
+        if( sol1->valid() ){
+            _goal = *sol1;
         }
-
-        if(! wm->field->marginedField().contains(_goal) ){
-            auto *sol1 = new Vector2D() , *sol2 = new Vector2D();
-            wm->field->marginedField().intersection(Segment2D(Vector2D(0,0) , _goal) , sol1 , sol2 );
-            if( sol1->valid() ){
-                _goal = *sol1;
-            }
-            else
-                _goal = Vector2D(0,0);
-        }
-
-        resetPlanner(_goal);
-        lastGoal = goal;
-        goal = _goal;
-        Rgoal = wm->our[idx]->pos;
-        avoidPenaltyArea = _avoidPenaltyArea;
-        avoidCenterArea = _avoidCenterArea;
-
-        ourRelaxList.clear();
-        for (int i : _ourRelaxList)
-            ourRelaxList.append(i);
-        ourRelaxList.append(ID);
-
-        oppRelaxList.clear();
-        for (int i : _oppRelaxList){
-            oppRelaxList.append(i);
-            ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
-        }
-
-        oppRelaxList.append(ID);
-
-        ballObstacleRadius = _ballObstacleRadius;
-        stepSize = 0.1; //TODO conf()->ERRT_Extend_Step();
-        threshold = 0.01; //TODO conf()->ERRT_Target_Distance_Threshold();
-        wayPointProb = 0.6; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
-        if(! result.empty())
-            goalProb = 0.3; // TODO conf()->ERRT_Goal_Probablity();
         else
-            goalProb = 0.5;
+            _goal = Vector2D(0,0);
+    }
 
-        robotVel = wm->our[idx]->vel;
+    resetPlanner(_goal);
+    lastGoal = goal;
+    goal = _goal;
+    Rgoal = wm->our[idx]->pos;
+    avoidPenaltyArea = _avoidPenaltyArea;
+    avoidCenterArea = _avoidCenterArea;
 
-        nodes.first = new state((wm->our[idx]->pos+wm->our[idx]->vel*0.09) , nullptr , result);
-        nodes.add(nodes.first);
+    ourRelaxList.clear();
+    for (int i : _ourRelaxList)
+        ourRelaxList.append(i);
+    ourRelaxList.append(ID);
 
-        Rnodes.first = new state(_goal , nullptr , Rresult);
-        Rnodes.add(Rnodes.first);
-        counter++;
+    oppRelaxList.clear();
+    for (int i : _oppRelaxList){
+        oppRelaxList.append(i);
+        ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
+    }
 
-        // CAUSE DOUBLE DEFENDER!!!
-        //    if( planner.resultModified.size() < 2 ){
-        //      planner.resultModified.clear();
-        //      planner.resultModified.push_back(wm->our[idx].pos);
-        //      planner.resultModified.push_back(_goal);
-        //      planner.averageDir = _goal - wm->our[idx].pos;
-        //    }
+    oppRelaxList.append(ID);
+
+    ballObstacleRadius = _ballObstacleRadius;
+    stepSize = 0.1; //TODO conf()->ERRT_Extend_Step();
+    threshold = 0.01; //TODO conf()->ERRT_Target_Distance_Threshold();
+    wayPointProb = 0.6; //TODO conf()->ERRT_Waypoint_Catch_Probablity();
+    if(! result.empty())
+        goalProb = 0.3; // TODO conf()->ERRT_Goal_Probablity();
+    else
+        goalProb = 0.5;
+
+    robotVel = wm->our[idx]->vel;
+
+    nodes.first = new state((wm->our[idx]->pos+wm->our[idx]->vel*0.09) , nullptr , result);
+    nodes.add(nodes.first);
+
+    Rnodes.first = new state(_goal , nullptr , Rresult);
+    Rnodes.add(Rnodes.first);
+    counter++;
+
+    // CAUSE DOUBLE DEFENDER!!!
+    //    if( planner.resultModified.size() < 2 ){
+    //      planner.resultModified.clear();
+    //      planner.resultModified.push_back(wm->our[idx].pos);
+    //      planner.resultModified.push_back(_goal);
+    //      planner.averageDir = _goal - wm->our[idx].pos;
+    //    }
 
 
-        //    debug(QString("%1) PathPlanner Time2: %2").arg(knowledge->frameCount).arg(((quint64)(CProfiler::getTime()*1000))%1000000) , D_MASOOD);
+    //    debug(QString("%1) PathPlanner Time2: %2").arg(knowledge->frameCount).arg(((quint64)(CProfiler::getTime()*1000))%1000000) , D_MASOOD);
 
-        //    debug(QString("%1) PathPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+    //    debug(QString("%1) PathPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
     generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
     runPlanner();
 }
@@ -812,7 +812,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
 
 void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id,Vector2D agentGoal){
     obs.clear();
-
+    obs.targetPosition = goal;
     bool isValid = false;
 
     Vector2D agentPos;
@@ -824,9 +824,11 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 //    {
 //        if(wm->our[i]->id == id)
 //        {
-            isValid = true;
-            agentPos = wm->our[ID]->pos;
-            agentVel = wm->our[ID]->vel;
+    isValid = true;
+    agentPos = wm->our[ID]->pos;
+    agentVel = wm->our[ID]->vel;
+    obs.agentPos = agentPos;
+
 //            break;
 //        }
 //    }
@@ -844,7 +846,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         if( (ourRelaxList.contains(wm->our.active(j)->id) == false) && (ID != wm->our.active(j)->id))
         {
 
-            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
+//            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
 
 
             double obstVelFactor = 0.15;
@@ -855,7 +857,9 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 //            {
 //            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
 
-                obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.2 , 0 , 0);
+            double obsRad = std::min(wm->our.active(j)->pos.dist(wm->our[ID]->pos)-0.02,0.2);
+            obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.17 , 0 , 0);
+
 //            }
         }
     }
@@ -864,13 +868,15 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {
-        if( 1 || oppRelaxList.contains(wm->opp.active(j)->id) == false )
+        if(  oppRelaxList.contains(wm->opp.active(j)->id) == false )
         {
 
             createObstacleProb(obs,wm->opp.active(j)->pos,wm->opp.active(j)->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
             double obstVelFactor = 0.15;
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
-            obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.2 , 0 , 0);
+            double obsRad = std::min(wm->opp.active(j)->pos.dist(wm->our[ID]->pos)-0.02,0.2);
+            DBUG(QString("obsRad : %1 ID : %2").arg(obsRad).arg(j),D_MHMMD);
+            obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.17 , 0 , 0);
 //            drawer->draw(Circle2D(wm->opp.active(j)->pos,0.1),QColor(Qt::red),true);
         }
     }
@@ -881,18 +887,25 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     if( avoidPenaltyArea ){
         obs.add_circle(-1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
         obs.add_circle(-1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-        obs.add_rectangle(-1*(field._FIELD_WIDTH / 2),0,1,0.5);
+        obs.add_rectangle(-1*(field._FIELD_WIDTH / 2)+0.5,0,1,0.5);
     }
 
     ////////////////////test opPenalty
     obs.add_circle(1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
     obs.add_circle(1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-    obs.add_rectangle(1*(field._FIELD_WIDTH / 2),0,1,0.5);
+    obs.add_rectangle(1*(field._FIELD_WIDTH / 2) - 0.5,0,1,0.5);
 
+
+    obs.add_rectangle(0,0,0.5,0.5);
     if (avoidCenterCircle)
     {
         obs.add_circle(0 , 0 , field._CENTER_CIRCLE_RAD , 0 , 0);
     }
+
+    if(!obs.check(goal))
+        drawer->draw(Vector2D(0, 0));
+
+
 }
 
 vector<Vector2D> CPlanner::getResultModified (){

@@ -66,6 +66,7 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
         drawer->draws.circles.clear();
         drawer->draws.segments.clear();
         drawer->draws.vectors.clear();
+        drawer->draws.rects.clear();
     }
      //ROS_INFO("draawwwerrr");
 }
