@@ -10,10 +10,12 @@ PLUGINLIB_EXPORT_CLASS(parsian_protobuf_wrapper::RefreeNodelet, nodelet::Nodelet
 using namespace parsian_protobuf_wrapper;
 
 void RefreeNodelet::onInit() {
-
-
     ros::NodeHandle &nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
+
+    ros::param::get("/team_color", teamColor);
+    isOurColorYellow = (teamColor == "yellow");
+    timer = nh.createTimer(ros::Duration(.062), boost::bind(&RefreeNodelet::timerCb, this, _1));
 
     ssl_referee_pub  = nh_private.advertise<parsian_msgs::ssl_refree_wrapper>("referee", 1000);
 
@@ -27,9 +29,6 @@ void RefreeNodelet::onInit() {
     dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>::CallbackType f;
     f = boost::bind(&RefreeNodelet::callback,this, _1, _2);
     server->setCallback(f);
-    ros::param::get("/team_color", teamColor);
-    isOurColorYellow = (teamColor == "yellow");
-    timer = nh.createTimer(ros::Duration(.062), boost::bind(&RefreeNodelet::timerCb, this, _1));
 
 
   //  refBox->close();
