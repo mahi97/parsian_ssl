@@ -24,7 +24,7 @@ void AgentNodelet::onInit(){
     robot_task_sub  = nh.subscribe("robot_task_0", 10000, &AgentNodelet::rtCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
-//    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
+    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
 
     parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 1000);
 
@@ -61,11 +61,11 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
     if (drawer   != nullptr) {
         ROS_INFO_STREAM("agent drawer"<<drawer);
         drawer->draws.texts.clear();
-//        draw_pub.publish(drawer->draws);
+       draw_pub.publish(drawer->draws);
 
-//        drawer->draws.circles.clear();
+        drawer->draws.circles.clear();
         drawer->draws.segments.clear();
-
+        drawer->draws.vectors.clear();
     }
      //ROS_INFO("draawwwerrr");
 }
