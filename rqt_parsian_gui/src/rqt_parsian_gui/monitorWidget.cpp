@@ -297,13 +297,15 @@ namespace rqt_parsian_gui
 
     void MonitorWidget::drawText(double x, double y, QString text, QColor color, int size)
     {
+
         glColor3f(color.redF(),color.greenF(),color.blueF());
         QFont font("Times", size);
 
         QFontMetrics fm(font);
         double pixelsWide = fm.width(text);
 
-        QPainter painter(this);
+        painter.begin(this);
+
         painter.setPen(color);
         painter.setFont(font);
         painter.drawText(((x + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width()))),
