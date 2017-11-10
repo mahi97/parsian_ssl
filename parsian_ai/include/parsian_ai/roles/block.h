@@ -1,7 +1,7 @@
 #ifndef Block_H
 #define Block_H
 
-#include <role.h>
+#include <parsian_ai/roles/role.h>
 
 class CRoleBlockInfo : public CRoleInfo
 {

@@ -1,10 +1,9 @@
-#include "block.h"
+#include <parsian_ai/roles/block.h>
 
-INIT_ROLE(CRoleBlock, "block");
 
-CRoleBlock::CRoleBlock(CAgent *_agent) : CRole(_agent)
+CRoleBlock::CRoleBlock(Agent *_agent) : CRole(_agent)
 {
-    gotopoint = new CSkillGotoPointAvoid(_agent);
+    gotopoint = new Goto(_agent);
 }
 
 CRoleBlock::~CRoleBlock()

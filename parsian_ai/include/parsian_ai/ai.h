@@ -12,6 +12,7 @@
 #include <parsian_util/knowledge.h>
 #include <parsian_ai/soccer.h>
 #include <parsian_msgs/parsian_robot_task.h>
+#include <parsian_ai/config.h>
 
 class AI {
 public:
@@ -35,10 +36,6 @@ public:
 
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
-
-    CSoccer*    soccer;
-
-protected:
 
 };
 

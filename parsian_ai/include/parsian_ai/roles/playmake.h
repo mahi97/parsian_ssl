@@ -1,9 +1,11 @@
 #ifndef PlayMake_H
 #define PlayMake_H
 
-#include <role.h>
-#include <behaviours/offensive.h>
+#include <parsian_ai/roles/role.h>
 #include <QMap>
+#include <QtCore/QTextStream>
+#include <QtCore/QFile>
+#include <QtCore/QTime>
 
 #define PASS_BEHAVS 5
 
@@ -23,18 +25,19 @@ public:
 class CRolePlayMake : public CRole
 {
 protected:
+public:
     bool goalKeeperForward=false;
-    Hyst ballTop;
-    Hyst ballLeft;
+//    Hyst ballTop;
+//    Hyst ballLeft;
     int qqHist;
     int rn;
-    CSkillKick* kick;
-    CSkillSpinBack* spin;
-    CSkillGotoBall* gotoball;
-    CSkillKickOneTouch* onetouch;
-    CSkillGotoPointAvoid* gotopoint;
-    CSkillHitTheBall* hitTheBall;
-    CSkillTurn* turn;
+    KickAction* kick;
+//    CSkillSpinBack* spin;
+//    CSkillGotoBall* gotoball;
+    OnetouchAction* onetouch;
+    GotopointavoidAction* gotopoint;
+//    CSkillHitTheBall* hitTheBall;
+//    CSkillTurn* turn;
     int kickDecision;
     int onetouching;
     CAgent* lastAgent;
@@ -69,14 +72,14 @@ protected:
     QList<CAgent*> bestPassSequence;
     int ballavoidanceState;
     //CBehaviourPass* pass;
-    CBehaviourKick* shoot;
-    CBehaviourPass* fixedPass;
-    CBehaviourPass* pass[PASS_BEHAVS];
-    CBehaviourChipPass* chippass[PASS_BEHAVS];
-    CBehaviourSpinPass* spinPass[PASS_BEHAVS];
-    CBehaviourChipToGoal* chipToGoal;
-    CBehaviourKickBetweenTheirDefenders *kickToDefense;
-    CBehaviourKick* clear;
+//    CBehaviourKick* shoot;
+//    CBehaviourPass* fixedPass;
+//    CBehaviourPass* pass[PASS_BEHAVS];
+//    CBehaviourChipPass* chippass[PASS_BEHAVS];
+//    CBehaviourSpinPass* spinPass[PASS_BEHAVS];
+//    CBehaviourChipToGoal* chipToGoal;
+//    CBehaviourKickBetweenTheirDefenders *kickToDefense;
+//    CBehaviourKick* clear;
     double lastDecisionTime;
     int waitBeforePass;
     int orderRushInPlenalty;
@@ -85,7 +88,6 @@ protected:
     bool timerStartFlag;
 
 public:
-    DEF_ROLE(CRolePlayMake)
     void executeOurDirect();
     void executeOurIndirect();
     void executeOurKickOff();
@@ -115,9 +117,6 @@ public:
     QTextStream out;
     QFile lastBounceDataFile;
 
-    virtual void generateFromConfig(CAgent *a);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
-    virtual void parse(QStringList params);
 
     SkillProperty(CRolePlayMake, Vector2D, PointToPass, pointToPass);
     SkillProperty(CRolePlayMake, Vector2D, PointToShoot, pointToShoot);

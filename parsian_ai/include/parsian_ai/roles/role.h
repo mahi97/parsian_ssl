@@ -1,11 +1,16 @@
 #ifndef ROLE_H
 #define ROLE_H
 
-#include <skills.h>
-#include <knowledge.h>
-#include <behaviours/behaviour.h>
-
-namespace roleSkill {
+//#include <skills.h> TODO : Actions
+//#include <knowledge.h>
+//#include <behaviours/behaviour.h>
+#include <QString>
+#include <parsian_util/core/agent.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_util/action/autogenerate/kickaction.h>
+#include <parsian_util/action/autogenerate/onetouchaction.h>
+#include <parsian_util/action/autogenerate/receivepassaction.h>
 
 enum ESkill {
     Gotopoint      = 0,
@@ -18,20 +23,15 @@ enum ESkill {
     Defense        = 7   // After Life (Move back to our field)
 };
 
-}
-
 class CRoleInfo;
 
-class CRole : public CSkill
+class CRole
 {
-protected:
-    virtual int level();    
-    CBehaviour* currentBehaviour;
-    void selectBehaviour();
-public:    
-    QList<CBehaviour*> behaviours;
+public:
     CRole();
-    CRole(CAgent* _agent);        
+    CRole(CAgent* _agent);
+    CAgent* agent;
+    void assign(CAgent* _agent);
     virtual CRoleInfo* generateInfoClass();
     static CRole* fromString(QString roleName);
 };
@@ -42,59 +42,14 @@ protected:
     QString roleName;
 public:        
     bool calculated;
-    CRoleInfo(QString _roleName);    
+    CRoleInfo(QString _roleName);
+
     virtual CAgent* robot(int i);
     virtual int count();
-    virtual int index(CRole* me);    
-    void initBehaviours();
-    QList<CBehaviour*> behaviours;
-    void reset(){}
+    virtual int index(CRole* me);
+
+    virtual void reset(){}
 };
-
-#define DEF_ROLE(role) \
-    role() {} \
-	role(CAgent* _agent); \
-    ~role(); \
-    static const char *Name;\
-    virtual CSkill* allocate(CAgent* _agent); \
-    virtual void execute(); \
-    virtual double progress(); \
-    virtual QString getName(); \
-    static role* set(CAgent* a); \
-    static role* get(CAgent* a); \
-    virtual CRoleInfo* generateInfoClass(); \
-    static role##Info* info();
-
-
-#define INIT_ROLE(Role,name) \
-    bool Role##_registered \
-            = CSkills::registerSkill(Role::Name,new Role(NULL)); \
-    CSkill* Role::allocate(CAgent* _agent) \
-    {return new Role(_agent);} \
-    QString Role::getName() {return QString(Name);} \
-    Role* Role::set(CAgent* a) \
-    { \
-        if (QString(Role::Name)!=a->skillName) \
-        { \
-            if (a->skill!=NULL && a->skillName!="") delete ((Role*) a->skill); \
-            else a->skill = (CSkill*) (new Role(a)); \
-            a->skillName = Role::Name; \
-        } \
-        return (Role*) a->skill; \
-    } \
-    Role* Role::get(CAgent* a) \
-    { \
-        return (Role*) a->skill; \
-    } \
-    Role##Info* Role::info() \
-    { \
-        return (Role##Info*) CSkills::getInfo(name); \
-    } \
-    CRoleInfo* Role::generateInfoClass() \
-    { \
-        return new Role##Info(QString(name)); \
-    } \
-    const char* Role::Name = name
 
 #define ClassProperty(skill,type,name,local,chflag) \
         public: inline type get##name() const {return local;} \
