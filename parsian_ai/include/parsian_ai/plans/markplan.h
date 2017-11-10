@@ -1,9 +1,10 @@
 #ifndef __MIDDLE_PLAN_H_
 #define __MIDDLE_PLAN_H_
 
-#include "plan.h"
+#include <parsian_ai/plans/plan.h>
 #include <vector>
-#include <roles.h>
+#include <parsian_ai/roles/roles.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
 class CMarkPlan : public Plan
 {
@@ -57,7 +58,7 @@ public:
     ~CMarkPlan();
     double segmentpershoot;
     double segmentperpass;
-    CSkillGotoPointAvoid *markGPA[6];
+    GotopointavoidAction *markGPA[6];
     void execute();
     void extractGameSituation();
     Vector2D posvel(CRobot* opp);
@@ -89,6 +90,8 @@ public:
     int oppsInOurOneThirth;
     bool ballCatcherDanger;
     int numberOfMarkers;
+
+    int Matching(const QList <CAgent*> robots, const QList <Vector2D> pointsToMatch, QList <int> &matchPoints);
 
 protected:
     CRoleMark *oldMark[_MAX_NUM_PLAYERS];

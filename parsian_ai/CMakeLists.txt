@@ -177,7 +177,8 @@ add_library(${PROJECT_NAME}
 
 
 add_library(ai_nodelet_lib
-        src/ai_nodelet.cpp)
+        src/ai_nodelet.cpp
+		)
 
 
 ## Add cmake target dependencies of the library

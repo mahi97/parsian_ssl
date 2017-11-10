@@ -2,8 +2,8 @@
 #define PLAN_H
 
 #include <QList>
-#include <agent.h>
-#include <skills.h>
+#include <parsian_util/core/agent.h>
+#include <parsian_util/action/action.h>
 
 class Plan
 {
@@ -14,7 +14,7 @@ public:
     CAgent* agent(int i);
     int count();
     void init(const QList<CAgent*> & _agents);
-    void assignSkill(int i, CSkill* skill);
+    void assignSkill(int i, ACtion * action);
     int agentById(int id);
     QList<int> getAgentIdList();
 	void debugAgents(QString text);

@@ -9,8 +9,8 @@
 
 
 enum States{
-    Halt ,
-    PlayOff ,
+    Halt,
+    PlayOff,
     PlayOn,
 
     HalfTime,
@@ -33,6 +33,8 @@ enum States{
 
 
 };
+
+
 
 using namespace  parsian_msgs;
 

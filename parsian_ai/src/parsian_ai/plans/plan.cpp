@@ -1,6 +1,6 @@
 #include "plan.h"
-#include "mathtools.h"
-#include "exceptions.h"
+#include <parsian_util/mathtools.h>
+//#include "exceptions.h"
 
 Plan::Plan()
 {
@@ -32,11 +32,9 @@ int Plan::count()
  * @param i the number of agent in the local agents list
  * @param skill skill that is going to be assigned
  */
-void Plan::assignSkill(int i, CSkill* skill)
+void Plan::assignSkill(int i, Action * _action)
 {
-    agent(i)->skill = skill;
-    agent(i)->skillName = skill->getName();
-    skill->setAgent(agent(i));
+    agent(i)->action = _action;
 }
 
 int Plan::agentById(int id)

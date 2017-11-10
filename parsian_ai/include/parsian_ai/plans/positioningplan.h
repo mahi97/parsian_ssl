@@ -4,14 +4,14 @@
 #include <plans/plan.h>
 #include "formation/edit_data.h"
 
-enum positioningType{
+enum class positioningType{
     ONETOUCH,
 	TOBALL,
 	TOOPPGOAL,
 	TOOURGOAL
 };
 
-enum edgeMode {
+enum class edgeMode {
     TOP,
     BOT
 };
