@@ -240,8 +240,8 @@ void CSkillKick::waitAndKick()
 
 
 
-    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target,
-                                                              conf.groups.skills_parameters_kick_one_touch.Landa, conf.groups.skills_parameters_kick_one_touch.Gamma));
+    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel,
+                                                              agentPos - ballPos, target,conf.Landa, conf.Gamma));
     Vector2D kickerPoint = agentPos + agentDir.norm()*stopParam;
     Vector2D addVec = (agentPos - target).norm()*stopParam;
     Vector2D intersectPos;
@@ -921,7 +921,7 @@ double CSkillKick::kickTimeEstimation(Agent *_agent, Vector2D _target, const CBa
         {
             ballPosInFuture = _ball.getPosInFuture(i);
             finalPos = ballPosInFuture - (_target-ballPosInFuture).norm()*0.11;
-            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf.groups.bang_bang.VelMax,ourRelax,oppRelax,true,0.2,true)<= i+0.1)
+            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf.VelMax,ourRelax,oppRelax,true,0.2,true)<= i+0.1)
             {
                 //draw(finalPos,1,QColor(Qt::blue));
                 return i;
@@ -932,8 +932,7 @@ double CSkillKick::kickTimeEstimation(Agent *_agent, Vector2D _target, const CBa
 
     finalPos = _ball.pos - (_target - _ball.pos).norm() * 0.11;
 //    draw(finalPos);
-//    return 100 - CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf()->BangBang_VelMax(),ourRelax,oppRelax,true,0.2,false);
-    return 100 - CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,1,ourRelax,oppRelax,true,0.2,false); // TODO : Config
+    return 100 - CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf.VelMax,ourRelax,oppRelax,true,0.2,false);
 
 }
 
@@ -964,8 +963,8 @@ void CSkillKick::findPosToGo()
         {
 
             finalPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
-//            agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos,conf()->BangBang_VelMax(),ourRelax,oppRelax,!goalieMode,0.2,true);
-            agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos,1,ourRelax,oppRelax,!goalieMode,0.2,true); // TODO : Config
+            agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos,conf.VelMax,ourRelax,oppRelax,!goalieMode,0.2,true);
+
             if(agentTime < i )
             {
                 break;
@@ -992,36 +991,35 @@ void CSkillKick::findPosToGo()
     Vector2D oneTouchPos = ballPath.nearestPoint(agentPos);
     Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
     bool canOneTouch = false;
-//    if(robotArea.intersection(ballPath,&sol1,&sol2) > 1 && wm->ball->vel.length() > 0.5 )
-//    {
-//        for(double i = 0 ; i < 5 ; i+=0.1)
-//        {
-//            if(wm->ball->getPosInFuture(i).dist(oneTouchPos) <= 0.2)
-//            {
-////                if(CSkillGotoPointAvoid::timeNeeded(agent,oneTouchPos,conf()->BangBang_VelMax(),ourRelax,oppRelax,!goalieMode,0,true) <= i+0.1)
-//                if(CSkillGotoPointAvoid::timeNeeded(agent,oneTouchPos,1,ourRelax,oppRelax,!goalieMode,0,true) <= i+0.1) // TODO : Config
-//                {
-//                    canOneTouch =true;
-//                    break;
-//                }
-//            }
-//        }
-//
-//        if(agentPos.dist(ballPos) < 0.5)
-//        {
-//            if((canOneTouch || kickerSeg.intersection(ballPath).isValid()) && !sagMode )
-//            {
-////                debug("oneTOUCH",D_MHMMD);
-//                if( ( fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60 ))
-//                    waitAndKick();
-//                else
-//                    kWaitForTurn();
-//
-//
-//                return;
-//            }
-//        }
-//    }
+    if(robotArea.intersection(ballPath,&sol1,&sol2) > 1 && wm->ball->vel.length() > 0.5 )
+    {
+        for(double i = 0 ; i < 5 ; i+=0.1)
+        {
+            if(wm->ball->getPosInFuture(i).dist(oneTouchPos) <= 0.2)
+            {
+                if(CSkillGotoPointAvoid::timeNeeded(agent,oneTouchPos,conf.VelMax,ourRelax,oppRelax,!goalieMode,0,true) <= i+0.1)
+                {
+                    canOneTouch =true;
+                    break;
+                }
+            }
+        }
+
+        if(agentPos.dist(ballPos) < 0.5)
+        {
+            if((canOneTouch || kickerSeg.intersection(ballPath).isValid()) && !sagMode )
+            {
+//                debug("oneTOUCH",D_MHMMD);
+                if( ( fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60 ))
+                    waitAndKick();
+                else
+                    kWaitForTurn();
+
+
+                return;
+            }
+        }
+    }
 
     Circle2D oppPenalty(wm->field->oppGoal() + Vector2D(0.2 , 0),1.4);
     gpa->setOnetouchmode(false);
@@ -1207,10 +1205,7 @@ void CSkillKick::execute()
         kickFinalDir = kickTargetDir;
     }
     finalDirVec = target - ballPos;
-//    oneTouchDir=Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf()->SkillsParams_KickOneTouch_Landa(), conf()->SkillsParams_KickOneTouch_Gamma()));
-    oneTouchDir=Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, 1, 1)); // TODO : Config Server
-
-
+    oneTouchDir=Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf.Landa, conf.Gamma));
 
     gpa->setAgent(agent);
     kickMode = decideMode();

@@ -66,7 +66,7 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(conf.groups.bang_bang.DecMax);
+    bangBang->setDecMax(conf.DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode || slowShot)
@@ -77,7 +77,7 @@ void CSkillGotoPointAvoid::execute()
     else
     {
         bangBang->setSlow(false);
-        bangBang->setVelMax(conf.groups.bang_bang.VelMax);
+        bangBang->setVelMax(conf.VelMax);
     }
     if (!Vector2D(targetPos).valid())
     {
@@ -298,8 +298,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc = conf.groups.bang_bang.AccMaxForward;
-    double dec = conf.groups.bang_bang.DecMax;
+    double acc = conf.AccMaxForward;
+    double dec = conf.DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -343,12 +343,12 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 
     if(tAgentVel.length() < 0.2)
     {
-        acc = (conf.groups.bang_bang.AccMaxForward + conf.groups.bang_bang.AccMaxNormal)/2;
+        acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
 
     }
     else
     {
-        acc =conf.groups.bang_bang.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.groups.bang_bang.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
+        acc =conf.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
 
 
@@ -357,10 +357,10 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.groups.bang_bang.DecMax)) ;
+    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ conf.groups.bang_bang.DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf.DecMax - offset) * distEffect);
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)
