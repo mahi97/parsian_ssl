@@ -173,7 +173,7 @@ add_library(${PROJECT_NAME}_roles
         src/parsian_ai/roles/role.cpp
         src/parsian_ai/roles/block.cpp
         src/parsian_ai/roles/playoffrole.cpp
-        src/parsian_ai/roles/stop.cpp
+#        src/parsian_ai/roles/stop.cpp
         src/parsian_ai/roles/dynamicrole.cpp
         src/parsian_ai/roles/playmake.cpp
         )

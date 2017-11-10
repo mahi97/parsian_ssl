@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <parsian_util/core/worldmodel.h>
-
+#include <parsian_ai/plans/plan.h>
 //#define OLD_FASTEST 1
 
 #define LOOP_TIME_BYKK 0.016

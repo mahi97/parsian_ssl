@@ -3,7 +3,7 @@
 
 #include "plan.h"
 #include <vector>
-#include <roles.h>
+#include <parsian_ai/roles/roles.h>
 
 class CMarkPlan : public Plan
 {
@@ -57,7 +57,7 @@ public:
     ~CMarkPlan();
     double segmentpershoot;
     double segmentperpass;
-    CSkillGotoPointAvoid *markGPA[6];
+    GotopointavoidAction *markGPA[6];
     void execute();
     void extractGameSituation();
     Vector2D posvel(CRobot* opp);
@@ -91,7 +91,7 @@ public:
     int numberOfMarkers;
 
 protected:
-    CRoleMark *oldMark[_MAX_NUM_PLAYERS];
+//    CRoleMark *oldMark[_MAX_NUM_PLAYERS]; // TODO : FIX THIS DASTAN
 };
 
 #endif // __MIDDLE_PLAN_H_
