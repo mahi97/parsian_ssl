@@ -60,12 +60,13 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element)
 void CSkillGotoPointAvoid::execute()
 {
 
+    //drawer->draw(Circle2D(Vector2D(1,0),0.1),QColor(Qt::red),true);
     if(agent == nullptr)
         return;
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(conf.groups.bang_bang.DecMax);
+    bangBang->setDecMax(conf.DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode || slowShot)
@@ -76,7 +77,7 @@ void CSkillGotoPointAvoid::execute()
     else
     {
         bangBang->setSlow(false);
-        bangBang->setVelMax(conf.groups.bang_bang.VelMax);
+        bangBang->setVelMax(conf.VelMax);
     }
     if (!Vector2D(targetPos).valid())
     {
@@ -96,7 +97,7 @@ void CSkillGotoPointAvoid::execute()
         {
             pathPoints.append(agentPos);
             for (auto pathPoint : pathPoints) {
-                drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true);
+            //    drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true); //todo shoule uncommented
             }
         }
     }
@@ -156,15 +157,6 @@ void CSkillGotoPointAvoid::execute()
     else
     {
 
-        ROS_INFO_STREAM("Target: " << targetPos.x << targetPos.y);
-        ROS_INFO_STREAM("ourRel: " << ourRelaxList.size());
-        ROS_INFO_STREAM("oppRel: " << oppRelaxList.size());
-        ROS_INFO_STREAM("apa: " << avoidPenaltyArea);
-        ROS_INFO_STREAM("acc: " << avoidCenterCircle);
-        ROS_INFO_STREAM("bor: " << ballObstacleRadius);
-        ROS_INFO_STREAM("ff: " << wm->field->_FIELD_WIDTH);
-        ROS_INFO_STREAM("dd: " << wm->field->_FIELD_HEIGHT);
-
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
         for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )
@@ -219,7 +211,7 @@ void CSkillGotoPointAvoid::execute()
         alpha = fabs(Vector2D::angleBetween(result[1] - result[0] , result[2] - result[1]).degree());
         DEBUG(QString("alpha : %1").arg(alpha),D_MHMMD);
         lllll = result[1];
-        vf = -2 * log(alpha) + 9;
+        vf = -1.7 * log(alpha) + 6;
         vf = max(vf , 0.5);
         vf = min (vf,4);
     }
@@ -306,8 +298,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc = conf.groups.bang_bang.AccMaxForward;
-    double dec = conf.groups.bang_bang.DecMax;
+    double acc = conf.AccMaxForward;
+    double dec = conf.DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -351,12 +343,12 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 
     if(tAgentVel.length() < 0.2)
     {
-        acc = (conf.groups.bang_bang.AccMaxForward + conf.groups.bang_bang.AccMaxNormal)/2;
+        acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
 
     }
     else
     {
-        acc =conf.groups.bang_bang.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.groups.bang_bang.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
+        acc =conf.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
 
 
@@ -365,10 +357,10 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.groups.bang_bang.DecMax)) ;
+    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ conf.groups.bang_bang.DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf.DecMax - offset) * distEffect);
     }
     if(tAgentVel.length() < (vMax)){
         if(_agentT->pos().dist(posT) > xSat)

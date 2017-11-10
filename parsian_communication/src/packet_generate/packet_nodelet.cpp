@@ -3,7 +3,7 @@
 //
 
 #include <parsian_communication/packet_generate/packet_nodelet.h>
-
+#include <parsian_msgs/parsian_world_model.h>
 PLUGINLIB_EXPORT_CLASS(parsian_packet::PacketNodelet, nodelet::Nodelet)
 
 using namespace parsian_packet;
@@ -23,21 +23,21 @@ void PacketNodelet::onInit() {
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("debugs",1000);
     packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets",1000);
 
-    robotPacketSub0   = n.subscribe("robot_command0"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub1   = n.subscribe("robot_command1"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub2   = n.subscribe("robot_command2"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub3   = n.subscribe("robot_command3"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub4   = n.subscribe("robot_command4"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub5   = n.subscribe("robot_command5"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub6   = n.subscribe("robot_command6"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub7   = n.subscribe("robot_command7"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub8   = n.subscribe("robot_command8"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub9   = n.subscribe("robot_command9"  , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub10  = n.subscribe("robot_command10" , 1000, &PacketNodelet::callBack, this);
-    robotPacketSub11  = n.subscribe("robot_command11" , 1000, &PacketNodelet::callBack, this);
+    robotPacketSub0   = n.subscribe("robot_command0"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub1   = n.subscribe("robot_command1"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub2   = n.subscribe("robot_command2"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub3   = n.subscribe("robot_command3"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub4   = n.subscribe("robot_command4"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub5   = n.subscribe("robot_command5"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub6   = n.subscribe("robot_command6"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub7   = n.subscribe("robot_command7"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub8   = n.subscribe("robot_command8"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub9   = n.subscribe("robot_command9"  , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub10  = n.subscribe("robot_command10" , 10000, &PacketNodelet::callBack, this);
+    robotPacketSub11  = n.subscribe("robot_command11" , 10000, &PacketNodelet::callBack, this);
 
 
-    visinSub  = n.subscribe("vision_detection" , 1000, &PacketNodelet::syncData, this);
+    visinSub  = n.subscribe("world_model" , 1000, &PacketNodelet::syncData, this);
 
     for(int i = 0 ; i < _MAX_ROBOT_NUM ; i ++ )
     {
@@ -115,7 +115,7 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
 
 }
 
-void PacketNodelet::syncData(const parsian_msgs::ssl_vision_detectionConstPtr &_packet) {
+void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_packet) {
 
     if(visionCounter < 8 )
     {
@@ -151,8 +151,10 @@ void PacketNodelet::syncData(const parsian_msgs::ssl_vision_detectionConstPtr &_
 }
 
 void PacketNodelet::timerCb(const ros::TimerEvent &event) {
-    if (drawer != nullptr)
+    if (drawer != nullptr){
         drawPub.publish(drawer->draws);
+        ROS_INFO_STREAM("paket draw "<<drawer);
+    }
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
 

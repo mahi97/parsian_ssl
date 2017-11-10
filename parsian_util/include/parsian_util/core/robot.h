@@ -8,7 +8,7 @@
 #include "parsian_util/geom/geom.h"
 #include "parsian_msgs/parsian_robot.h"
 #include "parsian_util/core/movingobject.h"
-
+#include "parsian_util/base.h"
 
 class CRobot : public CMovingObject {
 public:
@@ -25,12 +25,11 @@ public:
     static constexpr double wheel_rad_old = 0.035;
 //static const double CRobot::wheel_rad_new = 0.03;
     static constexpr double wheel_rad_new = 0.027;
-    CRobot();
-
-
+    CRobot(int id);
     CRobot(const parsian_msgs::parsian_robot& _robot);
-    bool isActive();
-    void setActive(bool _active);
+
+//    bool isActive();
+//    void setActive(bool _active);
     int id;
 
 
@@ -68,8 +67,9 @@ public:
 
 private:
 
+    Property(bool,Active,active);
     bool newRobot;
-    bool active;
+//    bool active;
 
 };
 

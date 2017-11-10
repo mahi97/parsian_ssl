@@ -410,11 +410,11 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     accCoef = atan(fabs(vforward)/fabs(vnormal))/_PI*2;
     if(diveMode)
     {
-        realAcc = 1.5 * accCoef*conf.groups.bang_bang.AccMaxForward + (1-accCoef)*conf.groups.bang_bang.AccMaxNormal;
+        realAcc = 1.5 * accCoef*conf.AccMaxForward + (1-accCoef)*conf.AccMaxNormal;
     }
     else
     {
-        realAcc = accCoef*conf.groups.bang_bang.AccMaxForward + (1-accCoef)*conf.groups.bang_bang.AccMaxNormal;
+        realAcc = accCoef*conf.AccMaxForward + (1-accCoef)*conf.AccMaxNormal;
 
     }
 
@@ -434,22 +434,22 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     {
         if(vforward >= 0 )
         {
-            if(vforward > (lastVf + conf.groups.bang_bang.AccMaxForward* 0.0166667))
+            if(vforward > (lastVf + conf.AccMaxForward* 0.0166667))
             {
-                vforward = lastVf + (conf.groups.bang_bang.AccMaxForward* 0.0166667)*sign(vforward);
+                vforward = lastVf + (conf.AccMaxForward* 0.0166667)*sign(vforward);
             }
-            if(vforward < (lastVf - decCoef*conf.groups.bang_bang.DecMax* 0.0166667))
+            if(vforward < (lastVf - decCoef*conf.DecMax* 0.0166667))
             {
-                vforward = lastVf - (decCoef*conf.groups.bang_bang.DecMax * 0.0166667);
+                vforward = lastVf - (decCoef*conf.DecMax * 0.0166667);
             }
         }
         else
         {
-            if(vforward < (lastVf - conf.groups.bang_bang.AccMaxForward* 0.0166667))
+            if(vforward < (lastVf - conf.AccMaxForward* 0.0166667))
             {
-                vforward = lastVf - (conf.groups.bang_bang.AccMaxForward* 0.0166667);
+                vforward = lastVf - (conf.AccMaxForward* 0.0166667);
             }
-            if(vforward > (lastVf + decCoef*conf.groups.bang_bang.DecMax* 0.0166667))
+            if(vforward > (lastVf + decCoef*conf.DecMax* 0.0166667))
             {
                 vforward = lastVf + (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
             }
@@ -467,15 +467,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal > (lastVn + conf.groups.bang_bang.AccMaxNormal* 0.0166667))
+            if(vnormal > (lastVn + conf.AccMaxNormal* 0.0166667))
             {
-                vnormal = lastVn + (conf.groups.bang_bang.AccMaxNormal* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + (conf.AccMaxNormal* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal < (lastVn - decCoef*conf.groups.bang_bang.DecMax* 0.0166667)))
+        if(!diveMode&&(vnormal < (lastVn - decCoef*conf.DecMax* 0.0166667)))
         {
-            vnormal = lastVn - (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+            vnormal = lastVn - (decCoef*conf.DecMax* 0.0166667);
         }
     }
     else
@@ -489,15 +489,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal < (lastVn - conf.groups.bang_bang.AccMaxNormal* 0.0166667))
+            if(vnormal < (lastVn - conf.AccMaxNormal* 0.0166667))
             {
-                vnormal = lastVn + (conf.groups.bang_bang.AccMaxNormal* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + (conf.AccMaxNormal* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal > (lastVn + decCoef*conf.groups.bang_bang.DecMax* 0.0166667)))
+        if(!diveMode&&(vnormal > (lastVn + decCoef*conf.DecMax* 0.0166667)))
         {
-            vnormal = lastVn + (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+            vnormal = lastVn + (decCoef*conf.DecMax* 0.0166667);
         }
     }
 
@@ -863,8 +863,8 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
 {
     Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
                                                                                   pos() - wm->ball->pos, wm->field->oppGoal(),
-                                                                                  conf.groups.skills_parameters_kick_one_touch.Landa,
-                                                                                  conf.groups.skills_parameters_kick_one_touch.Gamma));
+                                                                                  conf.Landa,
+                                                                                  conf.Gamma));
     Vector2D q;
     q.invalidate();
     bool oneTouchKick = false;
