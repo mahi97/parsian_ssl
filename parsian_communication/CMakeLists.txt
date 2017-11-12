@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
 )
 
-FILE(GLOB_RECURSE HEADER_FILES include *.h)
+file(GLOB_RECURSE HEADER_FILES include *.h)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -25,11 +25,11 @@ find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
-QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
-
+# TODO : fix THIS BY FIND LIB or PACK
 link_directories(/usr/include/qt4/QtExtSerialPort)
 ##QT5 :D
 
@@ -120,7 +120,7 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES parsian_communication
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
 #  DEPENDS system_lib
 )
@@ -172,7 +172,8 @@ add_library(${PROJECT_NAME}_packet_nodelet
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME com PREFIX "")
+set_target_properties(${PROJECT_NAME}_packet_node PROPERTIES OUTPUT_NAME packet PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -186,11 +187,11 @@ add_dependencies(${PROJECT_NAME}_packet_nodelet ${${PROJECT_NAME}_EXPORTED_TARGE
 
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(${PROJECT_NAME}_node
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
    ${PROJECT_NAME}
- )
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_nodelet
@@ -201,10 +202,10 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(${PROJECT_NAME}_packet_node
+target_link_libraries(${PROJECT_NAME}_packet_node
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES}
- )
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_packet_nodelet
@@ -217,10 +218,10 @@ target_link_libraries(${PROJECT_NAME}_packet_nodelet
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES} -lqextserialport
- )
+)
 #############
 ## Install ##
 #############
@@ -230,31 +231,31 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(PROGRAMS
+  script/install_dep.sh
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node ${PROJECT_NAME}_packet_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
-# )
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  nodelet_plugin.xml
+  packet_nodelet.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

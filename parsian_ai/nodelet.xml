@@ -1,4 +1,4 @@
-<library path="lib/libai_nodelet_lib">
+<library path="lib/libparsian_ai_nodelet">
     <class name="parsian_ai/AINodelet" type="parsian_ai::AINodelet" base_class_type="nodelet::Nodelet">
         <description>
             nothing!!!!

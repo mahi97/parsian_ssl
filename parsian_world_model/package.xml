@@ -2,18 +2,20 @@
 <package>
   <name>parsian_world_model</name>
   <version>0.0.0</version>
-  <description>The parsian_world_model package</description>
+  <description>
+  	Read Vision Data and run filter and merge algorithem on data to send complete worldmodel
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="parsian-ai@todo.todo">parsian-ai</maintainer>
+  <maintainer email="mohammadmahdi76@gmail.com">Mohammad Mahdi Rahimi</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>LGPLv3</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
@@ -41,7 +43,6 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>geometry_msgs</build_depend>
   <build_depend>parsian_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
@@ -49,7 +50,6 @@
   <build_depend>parsian_util</build_depend>
   <run_depend>parsian_util</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>geometry_msgs</run_depend>
   <run_depend>parsian_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>

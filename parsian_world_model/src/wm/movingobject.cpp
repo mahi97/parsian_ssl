@@ -55,13 +55,7 @@ void CMovingObject::update(CRawObject raw)
 {
     cam_id = raw.cam_id;
     *observation = raw;
-
-
-    //pos = observation.pos;
-    //vanishedCounter = 0;
-    //inSight = 1.0;
     kalmanFilter();
-//    findModel(dt);
 }
 
 void CMovingObject::updateDelayTime(double newDelayTime)
@@ -106,6 +100,11 @@ void CMovingObject::filter(int vanished)
 void CMovingObject::kalmanFilter()
 {
     //Kalman Watchdog
+    if (std::isnan(vel.x) || std::isnan(vel.y)) /////WHAT THE HELL!!!!!!
+    {
+        resetKalman();
+    }
+
     if (vel.length() < 0.01)
     {
         if (frameCounter - lastFrameKalmanReset > 30)
@@ -125,7 +124,7 @@ void CMovingObject::kalmanFilter()
 
     if (lastSpeeds.count() >= 10)
     {
-        Vector2D mr(0,0);
+        Vector2D mr{0, 0};
         for (int i=0;i<lastSpeeds.count();i++)
         {
             mr.x += lastSpeeds[i].x;
@@ -163,9 +162,6 @@ void CMovingObject::kalmanFilter()
         }
     }
 
-//	debug(QString("ass hole=%1").arg(lastSpeeds.count()), D_ERROR);
-
-    //
     frameCounter ++;
     try {
         inSight = observation->confidence;
@@ -183,7 +179,7 @@ void CMovingObject::kalmanFilter()
     }
     catch (...)
     {
-        qDebug()<<"Warning: Kalman library throwed an exception.";
+        qDebug()<<"Warning: Kalman library threw an exception.";
     }
 }
 

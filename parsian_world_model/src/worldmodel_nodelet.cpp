@@ -36,7 +36,6 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     wm->execute(m_config);
     frame ++;
     packs ++;
-
     if (packs >= 4) {
         packs = 0;
         wm->merge(frame);
