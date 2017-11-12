@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QString>
 #include <qcolor.h>
+#include <QMouseEvent>
 #include <GL/gl.h>
 #include <qopenglwidget.h>
 #include <QGridLayout>
@@ -44,6 +45,7 @@ namespace rqt_parsian_gui
         //TODO: get these values from util CRobot
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
+        Vector2D mousePressPos;
     protected:
 
 
@@ -52,6 +54,7 @@ namespace rqt_parsian_gui
         void paintGL();
         void resizeGL(int width, int height);
         QPainter painter;
+        void mousePressEvent(QMouseEvent *event);
 
 
     private:

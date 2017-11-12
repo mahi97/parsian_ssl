@@ -7,6 +7,9 @@ CguiDrawer::CguiDrawer()
 {
 
 }
+CguiDrawer::~CguiDrawer() {
+
+}
 
 
 
@@ -23,7 +26,7 @@ void CguiDrawer::clear(){
     segBuffer.clear();
     pointBuffer.clear();
     textBuffer.clear();
-//    robotBuffer.clear();
+    robotBuffer.clear();
 }
 
 
