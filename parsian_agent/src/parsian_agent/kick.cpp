@@ -170,8 +170,8 @@ kckMode CSkillKick::decideMode()
     {
         return KDONTKICK;
     }
-    return KDIRECT;
 
+    return KDIRECT;
 // TODO : WHY ?
     gpa->setDivemode(false);
 
@@ -660,10 +660,10 @@ void CSkillKick::jTurn()
     //        {
 
     dirReduce = (fabs(movementDir)/70)*(fabs(movementDir)/70);
-//    if(wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm()*0.15) && agentPos.dist(ballPos)<0.25)
-//    {
-//        dirReduce -= 2;
-//    }
+    if(wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm()*0.15) && agentPos.dist(ballPos)<0.25)
+    {
+        dirReduce -= 2;
+    }
     // TODO : Game State Message
 //    if(knowledge->isOurNonPlayOnKick())
 //    {
@@ -692,8 +692,8 @@ void CSkillKick::jTurn()
     double vx= movementThSpeed.x * speedPid->PID_OUT() + movementThPos.x * posPid->PID_OUT();
     double vy = movementThSpeed.y * speedPid->PID_OUT()+ movementThPos.y * posPid->PID_OUT();
     angPid->error = (kickFinalDir - agentDir.th()).radian();
-    agent->setRobotAbsVel( vx
-            , vy
+    agent->setRobotAbsVel( vx + wm->ball->vel.x
+            , vy + wm->ball->vel.y
             ,angPid->PID_OUT());
     // TODO : Command
     speedPid->pError = speedPid->error;
@@ -985,9 +985,6 @@ void CSkillKick::findPosToGo()
         finalPos = ballPos - (target-finalPos).norm() * 0.15;
         finalDir = Vector2D(cos(kickFinalDir.radian()),sin(kickFinalDir.radian()));
     }
-///////////for test
-    finalPos = ballPos - (target-ballPos).norm() * 0.1;
-    /////
     Vector2D oneTouchPos = ballPath.nearestPoint(agentPos);
     Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
     bool canOneTouch = false;
@@ -1028,10 +1025,10 @@ void CSkillKick::findPosToGo()
     {
         finalPos = finalPos - (target-finalPos).norm() * 0.15;
     }
-//    if(finalPos.x > wm->field->_FIELD_WIDTH)
-//    {
-//        //finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
-//    }
+    if(finalPos.x > wm->field->_FIELD_WIDTH)
+    {
+        finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
+    }
 
     if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
     {
@@ -1070,14 +1067,14 @@ void CSkillKick::findPosToGo()
     else
         gpa->setBallobstacleradius(0);
     if(((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60) && (agentPos.dist(ballPos) < 1) && (wm->ball->vel.length() > 0.2)) || (agentPos.dist(ballPos) < 0.4)) {
-//        if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && dribblerArea.contains(ballPos))
-//        {
-//            turnForKick();
-//        }
-//        else
-//        {
+        if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && dribblerArea.contains(ballPos))
+        {
+            turnForKick();
+        }
+        else
+        {
             jTurn();
-//        }
+        }
         return;
     }
 
@@ -1280,8 +1277,6 @@ void CSkillKick::execute()
 
     if(kkShotEmpySpot)
         target = findMostPossible();
-    direct();
-    return;
     switch(kickMode)
     {
         case KDIRECT:

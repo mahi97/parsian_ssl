@@ -211,7 +211,8 @@ void CSkillGotoPointAvoid::execute()
         alpha = fabs(Vector2D::angleBetween(result[1] - result[0] , result[2] - result[1]).degree());
         DEBUG(QString("alpha : %1").arg(alpha),D_MHMMD);
         lllll = result[1];
-        vf = -1.8 * log(alpha) + 7.5;
+
+        vf = -1.8 * log(alpha) + 11.5 - (agentVel.length())*1;
         vf = max(vf , 0.5);
         vf = min (vf,4);
     }
@@ -220,7 +221,7 @@ void CSkillGotoPointAvoid::execute()
         vf = 0;
         lllll = targetPos;
     }
-
+//    drawer->draw(QString("vf : %1").arg(vf),Vector2D(1,0));
     ////////////////////// avoid goal posts
     Segment2D goalPostL,goalPostR;
     goalPostL.assign(wm->field->ourGoalL() - Vector2D(0.2,0),wm->field->ourGoalL() + Vector2D(0.1,0));
