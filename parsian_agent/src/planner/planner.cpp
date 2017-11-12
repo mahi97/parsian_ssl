@@ -762,7 +762,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
     double timeForObs = 0;
     ///TODO: should read from vartypes
     double maxA = 4;
-    double maxObstRad = 1.5;
+    double maxObstRad = 1;
     double maxTime = 0.5;
     if(_vel.length() < 0.2)
     {
@@ -781,12 +781,12 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
             timeForObs *= agentPos.dist(intersectPoint)/agentPos.dist(agentGoal);
             timeForObs *=1;
             timeForObs = min(maxTime,timeForObs);
-            for(double i = -0.2;i< 0.3 ; i+=0.05)
+            for(double i = 0;i< maxTime ; i+=0.05)
             {
 
                 timeForObs +=i;
                 _center= _pos + _vel*timeForObs;
-                _rad = 0.7*maxA*timeForObs*timeForObs ;
+                _rad = maxA*timeForObs*timeForObs ;
 
                 _rad = min(maxObstRad,_rad);
                 _rad = min(agentPos.dist(_center) - 0.3,_rad);
