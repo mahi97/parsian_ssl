@@ -3,9 +3,8 @@
 //
 #include "parsian_util/core/agent.h"
 
-CAgent::CAgent(const parsian_msgs::parsian_agent &_agent)  : self(_agent.self) {
-
-}
+CAgent::CAgent(const parsian_msgs::parsian_agent &_agent)  : self(_agent.self){}
+CAgent::CAgent(int id):self(id){}
 
 Vector2D CAgent::pos() { return self.pos; }
 

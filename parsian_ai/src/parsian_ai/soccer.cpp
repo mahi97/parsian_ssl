@@ -8,7 +8,7 @@ CSoccer::CSoccer()
     agents = new CAgent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
-        agents[i] = new CAgent();
+        agents[i] = new CAgent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
         agents[i]->self = *wm->our.active(i);
     }
 

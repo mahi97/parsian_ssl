@@ -3,14 +3,14 @@
 
 #include <parsian_ai/plans/plan.h>
 
-enum positioningType{
+enum class positioningType{
     ONETOUCH,
 	TOBALL,
 	TOOPPGOAL,
 	TOOURGOAL
 };
 
-enum edgeMode {
+enum class edgeMode {
     TOP,
     BOT
 };
