@@ -11,7 +11,6 @@
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/grsim_robot_command.h>
 #include <parsian_msgs/parsian_ai_status.h>
-#include <parsian_msgs/parsian_robot_status.h>
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_agent/agent.h>
@@ -20,6 +19,7 @@
 #include "parsian_agent/agentConfig.h"
 #include  <parsian_agent/config.h>
 #include <parsian_agent/skills.h>
+#include <parsian_msgs/parsian_robot_common_status.h>
 
 
 namespace parsian_agent {
@@ -30,16 +30,22 @@ namespace parsian_agent {
 
         void timerCb(const ros::TimerEvent &event);
 
+        ros::NodeHandle nh;
+        ros::NodeHandle private_nh;
+
         ros::Subscriber world_model_sub;
         ros::Subscriber ai_sub;
         ros::Subscriber robot_task_sub;
+        ros::Subscriber robot_status_sub;
+        ros::Subscriber common_stat_sub;
 
         ros::Publisher debug_pub;
         ros::Publisher draw_pub;
         ros::Publisher parsian_robot_command_pub;
-        ros::Publisher robot_status_pub;
 
         ros::Timer timer_;
+
+        void commonstatCb(const parsian_msgs::parsian_robot_common_statusConstPtr &);
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 

@@ -4,17 +4,21 @@ PLUGINLIB_EXPORT_CLASS(parsian_agent::AgentNodelet, nodelet::Nodelet);
 
 using namespace parsian_agent;
 void AgentNodelet::onInit(){
-    ROS_INFO("oninit");
+    ROS_INFO("%s oninit", getName().c_str());
 
     debugger = new Debugger;
     drawer   = new Drawer;
 
-    ros::NodeHandle& nh = getNodeHandle();
-    ros::NodeHandle& private_nh = getPrivateNodeHandle();
+//    ros::NodeHandle& nh = getNodeHandle();
+//    ros::NodeHandle& private_nh = getPrivateNodeHandle();
+
+    nh = getNodeHandle();
+    private_nh = getPrivateNodeHandle();
 
 
     world_model_sub = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe("robot_task_0", 10, &AgentNodelet::rtCb, this);
+    common_stat_sub = nh.subscribe("common_status", 10, &AgentNodelet::commonstatCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 10);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 10);
@@ -25,6 +29,7 @@ void AgentNodelet::onInit(){
     wm = new CWorldModel;
 
     server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>(private_nh));
+
     dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
     f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
@@ -37,6 +42,14 @@ void AgentNodelet::onInit(){
     receivePass = new CSkillReceivePass(agent.get());
 
 
+
+}
+
+void AgentNodelet::commonstatCb(const parsian_msgs::parsian_robot_common_statusConstPtr &msg)
+{
+    //use common robot status for all robot here
+
+       //ROS_INFO("common AccMaxForward: %f", msg->AccMaxForward);
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -73,6 +86,7 @@ void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_t
     ROS_INFO("callBack called");
     agent->skill = getSkill(_robot_task);
 }
+
 
 CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_task) {
     CSkill *skill = nullptr;
@@ -116,6 +130,10 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
 
 void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
 {
-    conf = config;
-    ROS_INFO_STREAM(conf.AccMaxForward);
+    //config server callback for private agent status
+
+    //TODO create a .msg file from private config and a publisher to publish data for ai
+
+
 }
+
