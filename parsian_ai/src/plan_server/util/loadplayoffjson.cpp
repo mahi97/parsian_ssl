@@ -1,4 +1,4 @@
-#include <PlanServer/util/loadplayoffjson.h>
+#include <plan_server/util/loadplayoffjson.h>
 
 CLoadPlayOffJson::CLoadPlayOffJson(QObject* parent) : CPlanLoader(parent) {
 }
@@ -76,10 +76,10 @@ bool CLoadPlayOffJson::readPlan(const QVariantMap &_map, const QString& _file) {
 
         QVariantMap planMap = plan.toMap();
         QFileInfo fileInfo(_file);
-        fillCommon(tempCommon, planMap, parsedOk);
-        fillMatching(tempMatching, planMap, parsedOk);
-        fillExecution(tempExecution, planMap, parsedOk);
-        fillGUI(tempGui, fileInfo, parsedOk);
+        fillCommon(tempCommon, planMap, std::move(parsedOk));
+        fillMatching(tempMatching, planMap, std::move(parsedOk));
+        fillExecution(tempExecution, planMap, std::move(parsedOk));
+        fillGUI(tempGui, fileInfo, std::move(parsedOk));
 
 
         tempMatching.shotPos = findShotPos(tempPlan);
@@ -88,7 +88,7 @@ bool CLoadPlayOffJson::readPlan(const QVariantMap &_map, const QString& _file) {
     }
 }
 
-void CLoadPlayOffJson::fillCommon(NGameOff::SCommon& _common, const QVariantMap& _plan, bool& _parsedOk) {
+void CLoadPlayOffJson::fillCommon(NGameOff::SCommon& _common, const QVariantMap& _plan, bool&& _parsedOk) {
 
     _common.tags       = _plan.value("tags").toStringList();
     _common.chance     = _plan.value("chance").toDouble(&_parsedOk);
@@ -102,7 +102,7 @@ void CLoadPlayOffJson::fillCommon(NGameOff::SCommon& _common, const QVariantMap&
     else if (planMode == "INDIRECT") _common.planMode = INDIRECT;
 }
 
-void CLoadPlayOffJson::fillMatching(NGameOff::SMatching& _matching, const QVariantMap& _plan, bool& _parsedOk) {
+void CLoadPlayOffJson::fillMatching(NGameOff::SMatching& _matching, const QVariantMap& _plan, bool&& _parsedOk) {
 
     _matching.initPos.ball = Vector2D(_plan.value("ballInitPos").toMap().value("x").toDouble(&_parsedOk),
                                       _plan.value("ballInitPos").toMap().value("y").toDouble(&_parsedOk));
@@ -123,7 +123,7 @@ void CLoadPlayOffJson::fillMatching(NGameOff::SMatching& _matching, const QVaria
     }
 }
 
-void CLoadPlayOffJson::fillExecution(NGameOff::SExecution &_execution, const QVariantMap &_plan, bool& _parsedOk) {
+void CLoadPlayOffJson::fillExecution(NGameOff::SExecution &_execution, const QVariantMap &_plan, bool&& _parsedOk) {
 
     qDebug() << "PLAN" << _plan.value("agents").toList().size();
     Q_FOREACH(QVariant agent, _plan.value("agents").toList()) {
@@ -163,7 +163,7 @@ void CLoadPlayOffJson::fillExecution(NGameOff::SExecution &_execution, const QVa
     }
 }
 
-void CLoadPlayOffJson::fillGUI(NGameOff::SGUI &_gui, const QFileInfo& _fileInfo, bool& _parsedOk) {
+void CLoadPlayOffJson::fillGUI(NGameOff::SGUI &_gui, const QFileInfo& _fileInfo, bool&& _parsedOk) {
     _gui.master = false;
     _gui.active = true;
     _gui.planFile = _fileInfo.baseName();

@@ -2,9 +2,11 @@
 // Created by fateme on 11/10/17.
 //
 
+
 #ifndef PARSIAN_AI_PLANSTRUCT_H
 #define PARSIAN_AI_PLANSTRUCT_H
 
+#include <parsian_util/geom/geom.h>
 
 enum POffSkills {
     NoSkill = 0,
@@ -141,5 +143,6 @@ namespace NGameOff {
 
 }
 
+typedef QPair<NGameOff::AgentPoint, NGameOff::AgentPoint> AgentPair;
 
 #endif //PARSIAN_AI_PLANSTRUCT_H

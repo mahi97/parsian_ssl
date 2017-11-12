@@ -147,7 +147,10 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
 	#       src/${PROJECT_NAME}/coach.cpp
-)
+
+        src/plan_server/planselector.cpp
+        src/planmessagehandler.cpp
+		)
 
 #add_library(${PROJECT_NAME}_plays
 #		src/parsian_ai/plays/dynamicattack.cpp
@@ -171,16 +174,18 @@ add_library(${PROJECT_NAME}
 #		)
 
 add_library(${PROJECT_NAME}_util
-        src/PlanServer/util/planloader.cpp
-#		src/PlanServer/loadplayoffjson.cpp
+		src/plan_server/util/planloader.cpp
+		src/plan_server/util/loadplayoffjson.cpp
 		)
 
 
 add_library(${PROJECT_NAME}_nodelet
-        src/parsian_ai/ai_nodelet.cpp)
+        src/parsian_ai/ai_nodelet.cpp
+		)
 
 add_library(${PROJECT_NAME}_plan_server_nodelet
-		src/PlanServer/plan_server_nodelet.cpp)
+		src/plan_server/plan_server_nodelet.cpp
+		)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -192,7 +197,7 @@ add_library(${PROJECT_NAME}_plan_server_nodelet
 ## The recommended prefix ensures that target names across packages don't collide
 
 add_executable(${PROJECT_NAME}_plan_server_node
-		src/PlanServer/plan_server_node.cpp
+		src/plan_server/plan_server_node.cpp
 		)
 
 add_executable(${PROJECT_NAME}_node
@@ -239,6 +244,11 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 		${PROJECT_NAME}
 		${QT_LIBRARIES})
 
+target_link_libraries(${PROJECT_NAME}_plan_server_nodelet
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}
+		${QT_LIBRARIES})
+
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
@@ -246,6 +256,12 @@ target_link_libraries(${PROJECT_NAME}_node
 #		${PROJECT_NAME}_plays
 #		${PROJECT_NAME}_plans
         )
+
+target_link_libraries(${PROJECT_NAME}_plan_server_node
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}
+		${QT_LIBRARIES}
+		)
 
 add_dependencies(${PROJECT_NAME}
                 ${${PROJECT_NAME}_EXPORTED_TARGETS}

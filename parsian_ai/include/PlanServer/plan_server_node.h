@@ -1,8 +1,0 @@
-//
-// Created by fateme on 11/12/17.
-//
-
-#ifndef PARSIAN_AI_PLAN_SERVER_NODE_H
-#define PARSIAN_AI_PLAN_SERVER_NODE_H
-
-#endif //PARSIAN_AI_PLAN_SERVER_NODE_H
