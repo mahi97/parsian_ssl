@@ -59,5 +59,6 @@
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <nodelet plugin="${prefix}/nodelet.xml"/>
+    <nodelet plugin="${prefix}/common.xml"/>
   </export>
 </package>

@@ -111,6 +111,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
   cfg/agent.cfg
+  cfg/commonstat.cfg
  )
 
 ###################################
@@ -144,6 +145,10 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_nodelet
         src/agent_nodelet.cpp
+        )
+
+add_library(commonstatus_nodelet
+        src/common_status_nodelet.cpp
         )
 
 add_library(${PROJECT_NAME}
@@ -191,6 +196,17 @@ add_dependencies(${PROJECT_NAME}_nodelet
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        )
+add_dependencies(commonstatus_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+target_link_libraries(commonstatus_nodelet
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
