@@ -1,5 +1,4 @@
-#include "plays/playoff.h"
-
+#include <parsian_ai/plays/playoff.h>
 
 CPlayOff::CPlayOff()
 {

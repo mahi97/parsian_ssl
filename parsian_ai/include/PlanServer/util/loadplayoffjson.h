@@ -4,9 +4,10 @@
 
 #include <QVariant>
 
-#include <parsian_ai/util/planloader.h>
+#include <PlanServer/util/planloader.h>
 #include <parsian_util/tools/debuger.h>
-#include <parsian_ai/plays/playoff.h>
+//#include <parsian_ai/plays/playoff.h>
+#include <PlanServer/util/PlanStruct.h>
 #include <parsian_util/geom/geom.h>
 #include <qjson/parser.h>
 

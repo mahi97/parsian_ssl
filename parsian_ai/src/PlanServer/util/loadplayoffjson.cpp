@@ -1,4 +1,4 @@
-#include <parsian_ai/util/loadplayoffjson.h>
+#include <PlanServer/util/loadplayoffjson.h>
 
 CLoadPlayOffJson::CLoadPlayOffJson(QObject* parent) : CPlanLoader(parent) {
 }
@@ -6,7 +6,7 @@ CLoadPlayOffJson::CLoadPlayOffJson(QObject* parent) : CPlanLoader(parent) {
 CLoadPlayOffJson::CLoadPlayOffJson(const QString &_folderDirectory, QObject *parent)
     : CPlanLoader(_folderDirectory, parent) {
 
-    qDebug() << "Plan Loader -> PlayOff Json ";
+    DEBUG("Plan Loader -> PlayOff Json ", D_DEBUG);
 
     Q_FOREACH(QString dir, m_dirList) {
         load(dir);
@@ -181,7 +181,7 @@ QString CLoadPlayOffJson::getPackageName(QString _path) {
     return packageName;
 }
 
-Vector2D CLoadPlayOffJson::findShotPos(SPlan *&_plan) {
+Vector2D CLoadPlayOffJson::findShotPos(NGameOff::SPlan *&_plan) {
     QList<POffSkills> finisher;
     finisher.append(ShotToGoalSkill);
     finisher.append(ChipToGoalSkill);

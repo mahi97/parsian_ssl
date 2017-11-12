@@ -147,7 +147,7 @@ add_library(${PROJECT_NAME}
 		src/parsian_ai/gamestate.cpp
 		src/parsian_ai/config.cpp
 #        src/parsian_ai/coach.cpp
-)
+		)
 
 #add_library(${PROJECT_NAME}_plays
 #		src/parsian_ai/plays/dynamicattack.cpp
@@ -170,14 +170,14 @@ add_library(${PROJECT_NAME}
 #		src/parsian_ai/plans/positioningplan.cpp
 #		)
 
-#add_library(${PROJECT_NAME}_util
-#		src/parsian_ai/util/planloader.cpp
-#		src/parsian_ai/util/loadplayoffjson.cpp
-#		)
+add_library(${PROJECT_NAME}_util
+        src/PlanServer/util/planloader.cpp
+#		src/PlanServer/loadplayoffjson.cpp
+		)
 
 
 add_library(ai_nodelet_lib
-        src/ai_nodelet.cpp)
+		src/parsian_ai/ai_nodelet.cpp)
 
 
 ## Add cmake target dependencies of the library
@@ -189,7 +189,15 @@ add_library(ai_nodelet_lib
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(ai_node
-		src/ai_node.cpp
+		src/parsian_ai/ai_node.cpp
+		)
+
+add_library(plan_server_nodelet_lib
+		src/PlanServer/plan_server_nodelet.cpp
+		)
+
+add_executable(plan_server_node
+		src/PlanServer/plan_server_node.cpp
 		)
 
 ## Rename C++ executable without prefix
@@ -243,7 +251,7 @@ target_link_libraries(${PROJECT_NAME}
 #		${QT_LIBRARIES}
 #		${catkin_LIBRARIES}
 #		)
-#
+
 #target_link_libraries(${PROJECT_NAME}_plans
 #		${QT_LIBRARIES}
 #		${catkin_LIBRARIES}
