@@ -61,7 +61,7 @@ namespace rqt_parsian_gui
         mywm =_wm;
 
 
-        fieldWidget->drawerBuffer->robotBuffer.clear();
+        //fieldWidget->drawerBuffer->robotBuffer.clear();
         if(mywm->isYellow) {
             ourCol = QColor("yellow");
             oppCol = QColor("blue");
@@ -115,7 +115,7 @@ namespace rqt_parsian_gui
 
     void Monitor::drawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
 
-        fieldWidget->drawerBuffer->clear();
+        //fieldWidget->drawerBuffer->clear();
         for (parsian_msgs::parsian_draw_circle cir: _draw->circles) {
             fieldWidget->drawerBuffer->arcBuffer.append(cir);
 
