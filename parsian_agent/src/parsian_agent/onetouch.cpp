@@ -170,6 +170,7 @@ void CSkillKickOneTouch::execute()
             waitPos = agentPos;
         gotopointavoid->init(waitPos,oneTouchDir);
         gotopointavoid->execute();
+        agent->setRoller(0);
     }
     else if((oneTouchArea.intersection(ballPath,&sol1,&sol2) != 0) && wm->ball->vel.length() > 0.1)
     {
