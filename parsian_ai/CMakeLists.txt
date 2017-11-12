@@ -22,12 +22,12 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS})
 
 
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
-QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
@@ -119,10 +119,10 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-          INCLUDE_DIRS include
-		#  LIBRARIES ai_nodelet
-		  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
-		#  DEPENDS system_lib
+	INCLUDE_DIRS include
+	LIBRARIES ai_nodelet
+	CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
+	#  DEPENDS system_lib
 )
 
 ###########
@@ -142,12 +142,12 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-		src/parsian_ai/ai.cpp
-		src/parsian_ai/soccer.cpp
-		src/parsian_ai/gamestate.cpp
-		src/parsian_ai/config.cpp
-#        src/parsian_ai/coach.cpp
-		)
+		src/${PROJECT_NAME}/ai.cpp
+		src/${PROJECT_NAME}/soccer.cpp
+		src/${PROJECT_NAME}/gamestate.cpp
+		src/${PROJECT_NAME}/config.cpp
+	#       src/${PROJECT_NAME}/coach.cpp
+)
 
 #add_library(${PROJECT_NAME}_plays
 #		src/parsian_ai/plays/dynamicattack.cpp
@@ -176,9 +176,11 @@ add_library(${PROJECT_NAME}_util
 		)
 
 
-add_library(ai_nodelet_lib
-		src/parsian_ai/ai_nodelet.cpp)
+add_library(${PROJECT_NAME}_nodelet
+        src/parsian_ai/ai_nodelet.cpp)
 
+add_library(${PROJECT_NAME}_plan_server_nodelet
+		src/PlanServer/plan_server_nodelet.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -188,16 +190,13 @@ add_library(ai_nodelet_lib
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(ai_node
-		src/parsian_ai/ai_node.cpp
-		)
 
-add_library(plan_server_nodelet_lib
-		src/PlanServer/plan_server_nodelet.cpp
-		)
-
-add_executable(plan_server_node
+add_executable(${PROJECT_NAME}_plan_server_node
 		src/PlanServer/plan_server_node.cpp
+		)
+
+add_executable(${PROJECT_NAME}_node
+		src/parsian_ai/ai_node.cpp
 		)
 
 ## Rename C++ executable without prefix
@@ -208,27 +207,39 @@ add_executable(plan_server_node
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(ai_node
+add_dependencies(${PROJECT_NAME}_node
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
 		${PROJECT_NAME}_gencfg
 
 		)
-add_dependencies(ai_nodelet_lib
+add_dependencies(${PROJECT_NAME}_nodelet
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_gencfg
 
         )
 
+add_dependencies(${PROJECT_NAME}_plan_server_node
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+
+		)
+add_dependencies(${PROJECT_NAME}_plan_server_nodelet
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+
+		)
 ## Specify libraries to link a library or executable target against
 
-target_link_libraries(ai_nodelet_lib
+target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
 		${QT_LIBRARIES})
 
-target_link_libraries(ai_node
+target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
@@ -279,25 +290,24 @@ target_link_libraries(${PROJECT_NAME}
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
-# )
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  nodelet.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

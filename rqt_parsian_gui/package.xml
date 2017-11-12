@@ -2,7 +2,9 @@
 <package>
   <name>rqt_parsian_gui</name>
   <version>0.0.0</version>
-  <description>The rqt_parsian_gui package</description>
+  <description>
+	GUI and Monitor for Parsian SSL
+  </description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
