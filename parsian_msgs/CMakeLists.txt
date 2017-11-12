@@ -10,7 +10,6 @@ project(parsian_msgs)
 find_package(catkin REQUIRED COMPONENTS
 		message_generation
 		std_msgs
-		geometry_msgs
 		)
 
 ## System dependencies are found with CMake's conventions
@@ -52,7 +51,7 @@ file(GLOB MSGS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/msg msg/*.msg)
 message(STATUS "All msg files: ${MSGS}")
 
 # Generate messages in the 'msg' folder
-add_message_files(
+add_message_files (
 		DIRECTORY
 		msg
 		FILES
@@ -64,11 +63,11 @@ file(GLOB SRVS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/srv srv/*.srv)
 message(STATUS "All srv files: ${SRVS}")
 
 ## Generate services in the 'srv' folder
- add_service_files(
+add_service_files (
   DIRECTORY srv
   FILES
   ${SRVS}
- )
+)
 
 #file(GLOB ACTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/action action/*.action)
 #message(STATUS "All action files: ${ACTS}")
@@ -83,7 +82,6 @@ message(STATUS "All srv files: ${SRVS}")
 generate_messages(
 		DEPENDENCIES
 		std_msgs
-		geometry_msgs
 )
 
 ################################################
@@ -118,7 +116,7 @@ generate_messages(
 catkin_package(
 		#  INCLUDE_DIRS include
 		#  LIBRARIES parsian_msgs
-		CATKIN_DEPENDS message_runtime
+		CATKIN_DEPENDS message_runtime std_msgs
 		#  DEPENDS system_lib
 )
 
@@ -172,10 +170,12 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(PROGRAMS
+  scripts/meta/install.sh
+  scripts/meta/install_deps.sh
+  scripts/meta/autogenerate.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node

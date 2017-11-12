@@ -121,26 +121,26 @@ catkin_package(
 )
 
 
-set (rqt_parsian_gui_SRCS
-  src/rqt_parsian_gui/monitor.cpp
-  src/rqt_parsian_gui/robotstatus.cpp
-  src/rqt_parsian_gui/monitorWidget.cpp
-  src/rqt_parsian_gui/guiDrawer.cpp
-        )
+set (${PROJECT_NAME}_SRCS
+  src/${PROJECT_NAME}/monitor.cpp
+  src/${PROJECT_NAME}/robotstatus.cpp
+  src/${PROJECT_NAME}/monitorWidget.cpp
+  src/${PROJECT_NAME}/guiDrawer.cpp
+)
 
-set(rqt_parsian_gui_HDRS
-  include/rqt_parsian_gui/monitor.h
-  include/rqt_parsian_gui/robotstatus.h
-  include/rqt_parsian_gui/robotstatus_widget.h
-  include/rqt_parsian_gui/monitorWidget.h
-  include/rqt_parsian_gui/guiDrawer.h
+set(${PROJECT_NAME}_HDRS
+  include/${PROJECT_NAME}/monitor.h
+  include/${PROJECT_NAME}/robotstatus.h
+  include/${PROJECT_NAME}/robotstatus_widget.h
+  include/${PROJECT_NAME}/monitorWidget.h
+  include/${PROJECT_NAME}/guiDrawer.h
 )
 
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  qt5_wrap_cpp(rqt_parsian_gui_MOCS ${rqt_parsian_gui_HDRS})
+  qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 else()
-  qt4_wrap_cpp(rqt_parsian_gui_MOCS ${rqt_parsian_gui_HDRS})
+  qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 endif()
 
 ###########
@@ -157,8 +157,8 @@ include_directories(
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
-    ${rqt_parsian_gui_SRCS}
-    ${rqt_parsian_gui_MOCS}
+    ${${PROJECT_NAME}_SRCS}
+    ${${PROJECT_NAME}_MOCS}
     )
 
 ## Declare a C++ executable
@@ -194,25 +194,25 @@ endif()
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS rqt_example_cpp rqt_example_cpp_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
-# )
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  plugin1.xml
+  plugin2.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
