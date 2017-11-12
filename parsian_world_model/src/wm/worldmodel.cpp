@@ -65,8 +65,10 @@ parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colo
     rosWM->our.reserve(_MAX_NUM_PLAYERS);
     rosWM->opp.reserve(_MAX_NUM_PLAYERS);
 
-    toParsianMessage(ball);
-    rosWM->ball = rosBall;
+    if (ball->inSight > 0) {
+        toParsianMessage(ball);
+        rosWM->ball = rosBall;
+    }
 
 
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++ i) {

@@ -201,6 +201,7 @@ add_dependencies(${PROJECT_NAME}_nodelet
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
+		${PROJECT_NAME}_nodelet
         )
 
 ## Specify libraries to link a library or executable target against

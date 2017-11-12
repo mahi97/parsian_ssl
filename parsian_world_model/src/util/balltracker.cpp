@@ -2,12 +2,10 @@
 #include <math.h>
 #include <cstdlib>
 #include <QDebug>
+#include "parsian_world_model/util/balltracker.h"
 
 using namespace std;
 
-#include "parsian_world_model/util/balltracker.h"
-#include <parsian_world_model/util/tracker.h>
-#include <parsian_world_model/util/matrix.h>
 
 const double Ball_Position_Variance = 0.005;//0.005
 const double Ball_Velocity_Variance = 0.05;//0.05
@@ -302,7 +300,8 @@ Vector2D BallTracker::velocity(double time)
 
 //  qDebug()<<"Ball Prediction";
     Matrix x = predict(time);
-    return Vector2D(x.e(2,0), x.e(3,0));
+    return Vector2D{x.e(2,0), x.e(3,0)};
+
 }
 
 Vector2D BallTracker::acceleration(double time)
@@ -389,15 +388,8 @@ Matrix& BallTracker::f(const Matrix &x, Matrix &I)
     Vector2D cv, cp;
     int team = 0 , robot = 0;
 
-    if (walls == 0.0) {
-        _vx = cv.x; _vy = cv.y;
-        I = Matrix(2, 1);
-        I.e(0, 0) = team;
-        I.e(1, 0) = robot;
-    } else {
-        _vx += _ax * stepsize;
-        _vy += _ay * stepsize;
-    }
+    _vx += _ax * stepsize;
+    _vy += _ay * stepsize;
 
     return f;
 }
