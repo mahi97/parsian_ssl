@@ -451,11 +451,11 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
             }
             if(vforward > (lastVf + decCoef*conf.DecMax* 0.0166667))
             {
-                vforward = lastVf + (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+                vforward = lastVf + (decCoef*conf.DecMax* 0.0166667);
             }
         }
     }
-//    debug(QString("vn: %1 , lVn :%2").arg(vnormal).arg(lastVn),D_MHMMD);
+////    debug(QString("vn: %1 , lVn :%2").arg(vnormal).arg(lastVn),D_MHMMD);
     if(vnormal >= 0)
     {
         if(diveMode)

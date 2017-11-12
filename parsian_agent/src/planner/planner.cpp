@@ -813,6 +813,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
 void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id,Vector2D agentGoal){
     obs.clear();
     obs.targetPosition = goal;
+    
     bool isValid = false;
 
     Vector2D agentPos;
@@ -846,7 +847,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         if( (ourRelaxList.contains(wm->our.active(j)->id) == false) && (ID != wm->our.active(j)->id))
         {
 
-//            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
+            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
 
 
             double obstVelFactor = 0.15;
