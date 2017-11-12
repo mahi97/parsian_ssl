@@ -51,6 +51,7 @@ namespace rqt_parsian_gui
         void initializeGL();
         void paintGL();
         void resizeGL(int width, int height);
+        QPainter painter;
 
 
     private:
