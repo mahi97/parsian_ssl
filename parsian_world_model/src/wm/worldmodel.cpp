@@ -120,7 +120,6 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     for (int i = 0; i < balls_n; i++) {
         parsian_msgs::ssl_vision_detection_ball ball = detection->balls[i];
         printf("-Ball (%2d/%2d): CONF=%4.2f POS=<%9.2f,%9.2f> ", i+1, balls_n, ball.confidence, ball.pos.x, ball.pos.y);
-        printf("Z=%7.2f ",ball.pos.z);
         printf("RAW=<%8.2f,%8.2f>\n",ball.pixel_pos.x, ball.pixel_pos.y);
     }
 
