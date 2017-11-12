@@ -1,6 +1,4 @@
 #include <parsian_ai/plans/markplan.h>
-//#include <cassert>
-//#include <WMatching.h>
 #include <parsian_util/core/robot.h>
 #include <algorithm>
 #include <parsian_util/core/worldmodel.h>
@@ -36,18 +34,15 @@ CMarkPlan::CMarkPlan()
 
     for(int i = 0; i< 6 ; i++)
     {
-        markGPA[i] = new GotopointavoidAction(NULL);
+        markGPA[i] = new GotopointavoidAction;
     }
     /////////////////////
 
-    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ )
-        oldMark[i] = new CRoleMark(NULL);
 }
 
 CMarkPlan::~CMarkPlan()
 {
-    for (int i=_MAX_NUM_PLAYERS-1 ; i>=0 ; i--)
-        delete oldMark[i];
+
 }
 
 #define Ball_Ours_History 25
@@ -59,7 +54,7 @@ bool CMarkPlan::isInIndirectArea(Vector2D aPoint){
     //// check that a point is in the circle around the ball
     //// with 50cm radius or not.
 
-    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint) ?   1 : 0;
+    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);
     return localFlag;
 }
 
@@ -109,9 +104,9 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
     markRoles.clear();
     /////////////////// Intelligent mark plan ///////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    debug(QString("Mark Agents Count : %1").arg(ourMarkAgentsSize) , D_SEPEHR , QColor(Qt::red));
+    DBUG(QString("Mark Agents Count : %1").arg(ourMarkAgentsSize) , D_SEPEHR , QColor(Qt::red));
     ///////// Make Cirlcles around opponent agents /////////////////////////////
-    debug(QString("Opponent Agents to be mark count : %1").arg(opponentAgentsToBeMarkPossition.size()) , D_SEPEHR , QColor(Qt::green));
+    DBUG(QString("Opponent Agents to be mark count : %1").arg(opponentAgentsToBeMarkPossition.size()) , D_SEPEHR , QColor(Qt::green));
     for(int i = 0 ; i < opponentAgentsToBeMarkPossition.size() ; i++){
         if(!isInIndirectArea(opponentAgentsToBeMarkPossition.at(i))){
             tempOpponentAgentsToBeMarkedPosition.append(opponentAgentsToBeMarkPossition.at(i));
@@ -123,7 +118,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
         opponentAgentsToBeMarkCircle.append(Circle2D(opponentAgentsToBeMarkPossition.at(i) , opponentAgentsCircleR));
         draw(opponentAgentsToBeMarkCircle.at(i) , "Cyan");
     }
-    debug(QString("Opponent Agents to be mark count : %1").arg(opponentAgentsToBeMarkPossition.size()) , D_SEPEHR , QColor(Qt::red));
+    DBUG(QString("Opponent Agents to be mark count : %1").arg(opponentAgentsToBeMarkPossition.size()) , D_SEPEHR);
     ///////////////// Block Pass Plan ////////////////////////////////////
     if(opponentAgentsToBeMarkPossition.size() == ourMarkAgentsSize){
         for(i = 0 ; i < ourMarkAgentsSize ; i++){
@@ -151,7 +146,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                            Segment2D(sol3 , opponentAgentsToBeMarkPossition.at(i)).length() < Segment2D(sol4 , opponentAgentsToBeMarkPossition.at(i)).length() ? sol3 : sol4) , QColor(Qt::red));
             draw(Circle2D(wm->ball->pos , ballCircleR),QColor(Qt::black));
             draw(goalCircle,QColor(Qt::black));
-            debug(QString("Man To Man Mark In PlayOff Mode / BlockPass / our = opp") , D_SEPEHR);
+            DBUG(QString("Man To Man Mark In PlayOff Mode / BlockPass / our = opp") , D_SEPEHR);
         }
     }
     else if(opponentAgentsToBeMarkPossition.size() < ourMarkAgentsSize){
@@ -219,8 +214,8 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                     markRoles.append(QString("shotBlocker"));
                 }
             }
-            debug(QString("mark pos : %1").arg(markPoses.size()) , D_AHZ);
-            debug(QString("our mark : %1").arg(ourMarkAgentsSize) , D_AHZ);
+            DBUG(QString("mark pos : %1").arg(markPoses.size()) , D_AHZ);
+            DBUG(QString("our mark : %1").arg(ourMarkAgentsSize) , D_AHZ);
         }
         else{
             for(i = 0 ; i < opponentAgentsToBeMarkPossition.size() ; i++){
@@ -246,7 +241,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                 markAngs.append(wm->ball->pos - markPoses.at(i));
                 draw(Segment2D(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2,Segment2D(sol3 , opponentAgentsToBeMarkPossition.at(i)).length() < Segment2D(sol4 , opponentAgentsToBeMarkPossition.at(i)).length() ? sol3 : sol4), QColor(Qt::red));
                 draw(Circle2D(wm->ball->pos , ballCircleR),QColor(Qt::black));
-                debug(QString("Man To Man Mark In PlayOn Mode / BlockPass / opp < our") , D_SEPEHR);
+                DBUG(QString("Man To Man Mark In PlayOn Mode / BlockPass / opp < our") , D_SEPEHR);
             }
             ////////////// With Extra mark agents ch ghalati bokonim ? :) //////////
             if(ourMarkAgentsSize - markPoses.size() == opponentAgentsToBeMarkPossition.size()){
@@ -394,12 +389,12 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                            Segment2D(sol3 , sortDangerAgentsToBeMarkBlockPassPlayOff.at(i).first).length() < Segment2D(sol4 , sortDangerAgentsToBeMarkBlockPassPlayOff.at(i).first).length() ? sol3 : sol4)
                  , QColor(Qt::red));
             draw(Circle2D(wm->ball->pos , ballCircleR),QColor(Qt::black));
-            debug(QString("Man To Man Mark In PlayOn Mode / BlockPass / opp > our") , D_SEPEHR);
+            DBUG(QString("Man To Man Mark In PlayOn Mode / BlockPass / opp > our") , D_SEPEHR);
         }
     }
     //////////////// Draw Possition of Mark Agents //////////////////////////
     for(i = 0 ; i < markPoses.size() ; i++){
-        debug(QString("x : %1").arg(markPoses.at(i).x) , D_AHZ);
+        DBUG(QString("x : %1").arg(markPoses.at(i).x) , D_AHZ);
         draw(markPoses.at(i) ,1, "white");
         draw(markRoles.at(i) , markPoses.at(i) - Vector2D(0,0.4) , "white");
     }
@@ -1518,7 +1513,7 @@ void CMarkPlan::findOppAgentsToMark()
 
         if(policy()->Mark_OmmitNearestToBallPlayon())
         {
-            debug(QString("Ommit nearest to ball"),D_MAHI);
+            DBUG(QString("Ommit nearest to ball"),D_MAHI);
             int nearestToBall = -1;
             double nearestToBallDist = 100000;
 
@@ -1528,7 +1523,7 @@ void CMarkPlan::findOppAgentsToMark()
                 {
                     nearestToBall = i;
                     nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
-                    debug(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id),D_MAHI);
+                    DBUG(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id),D_MAHI);
                     draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
                 }
             }
@@ -1548,7 +1543,7 @@ void CMarkPlan::findOppAgentsToMark()
         }
 
         //ommiting nearest to ball
-        debug(QString("Ommit nearest to ball kick off"),D_MAHI);
+        DBUG(QString("Ommit nearest to ball kick off"),D_MAHI);
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
 
@@ -1558,7 +1553,7 @@ void CMarkPlan::findOppAgentsToMark()
             {
                 nearestToBall = i;
                 nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
-                debug(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id),D_MAHI);
+                DBUG(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id),D_MAHI);
                 draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
             }
         }
@@ -1759,14 +1754,14 @@ QList<Vector2D> CMarkPlan::PassBlockRatio(double ratio, Vector2D opp){
 
 
         draw(tempSeg, "red");
-        debug(QString("this is in the penalty area, Block pass Mode"), D_HAMED);
+        DBUG(QString("this is in the penalty area, Block pass Mode"), D_HAMED);
     }
     else
     {
         tempQlist.clear();
         tempQlist.append(pos);
         tempQlist.append( wm->ball->pos - opp);
-        debug(QString("sag"), D_HAMED);
+        DBUG(QString("sag"), D_HAMED);
         draw(tempSeg, "blue");
     }
     return tempQlist;
@@ -1776,7 +1771,7 @@ QList<Vector2D> CMarkPlan::PassBlockRatio(double ratio, Vector2D opp){
 
 void CMarkPlan::execute()
 {
-    debug(QString(" Mark play on Execute is runninng "), D_MAHI);
+    DBUG(QString(" Mark play on Execute is runninng "), D_MAHI);
     findOppAgentsToMark();
     //sortdangerpass(oppAgentsToMarkPos);
 
@@ -1818,7 +1813,7 @@ void CMarkPlan::execute()
                     markPoses.append(ShootBlockRatio(segmentpershoot, tempQlistQpair[i].first).first());
                     markAngs.append(ShootBlockRatio(segmentpershoot, tempQlistQpair[i].first).last());
                 }
-                debug(QString("size of temp qlist pair %1").arg(tempQlistQpair.size()), D_HAMED);
+                DBUG(QString("size of temp qlist pair %1").arg(tempQlistQpair.size()), D_HAMED);
             }
 
             else if(agents.count() > oppAgentsToMarkPos.count())
@@ -1837,7 +1832,7 @@ void CMarkPlan::execute()
                     markPoses.append(PassBlockRatio(segmentperpass, tempQlistQpair[i].first).first());
                     markAngs.append(PassBlockRatio(segmentperpass, tempQlistQpair[i].first).last());
 
-                    debug(QString("size of temp qlist pair %1").arg(tempQlistQpair.size()), D_HAMED);
+                    DBUG(QString("size of temp qlist pair %1").arg(tempQlistQpair.size()), D_HAMED);
 
                     /*markPoses.append(Vector2D(-1,-1));
                     markAngs.append(Vector2D(0,1));
@@ -1859,7 +1854,7 @@ void CMarkPlan::execute()
             {
             if(markPoses.size() < agents.count())
             {
-                debug("EXTRA PLAY ON", D_HAMED);
+                DBUG("EXTRA PLAY ON", D_HAMED);
                     markPoses.append(Vector2D(0,count));
                     markAngs.append(Vector2D(1,0));
                     count ++;
@@ -1880,9 +1875,9 @@ void CMarkPlan::execute()
         Matching(agents,markPoses,matchPoints);
         if(agents.count() == markPoses.count())
         {
-            debug(QString("agnet count %1").arg(agents.count()) , D_AHZ , "red");
-            debug(QString("markpos %1").arg(markPoses.count()) , D_AHZ , "red");
-            debug(QString("match point %1").arg(matchPoints.size()) , D_AHZ , "red");
+            DBUG(QString("agnet count %1").arg(agents.count()) , D_AHZ , "red");
+            DBUG(QString("markpos %1").arg(markPoses.count()) , D_AHZ , "red");
+            DBUG(QString("match point %1").arg(matchPoints.size()) , D_AHZ , "red");
             for(int i =0; i< markPoses.count(); i++){
                 if(i < matchPoints.size()){
                     markGPA[i]->setAgent(agents[i]);
@@ -1904,7 +1899,7 @@ void CMarkPlan::execute()
         segmentpershoot = 0.3;
         markPoses.clear();
         markAngs.clear();
-        debug(QString("Its TheirKickoff"),D_MAHI);
+        DBUG(QString("Its TheirKickoff"),D_MAHI);
         findOppAgentsToMark();
         Segment2D tempsegLine, tempsegLine2, tempsegopp;
         tempsegLine.assign(Vector2D(-2, _FIELD_HEIGHT / 2), Vector2D(-2, -1.0 * _FIELD_HEIGHT / 2 ));

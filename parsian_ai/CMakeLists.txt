@@ -163,8 +163,8 @@ add_library(${PROJECT_NAME}_plays
 		)
 #
 add_library(${PROJECT_NAME}_plans
-#		src/parsian_ai/plans/defenseplan.cpp
-#		src/parsian_ai/plans/markplan.cpp
+		src/parsian_ai/plans/defenseplan.cpp
+		src/parsian_ai/plans/markplan.cpp
 		src/parsian_ai/plans/plan.cpp
 #		src/parsian_ai/plans/positioningplan.cpp
 		)
@@ -178,10 +178,11 @@ add_library(${PROJECT_NAME}_roles
         src/parsian_ai/roles/playmake.cpp
         )
 
-#add_library(${PROJECT_NAME}_util
-#		src/parsian_ai/util/planloader.cpp
+add_library(${PROJECT_NAME}_util
+		src/parsian_ai/util/defpos.cpp
+		#		src/parsian_ai/util/planloader.cpp
 #		src/parsian_ai/util/loadplayoffjson.cpp
-#		)
+		)
 
 
 add_library(${PROJECT_NAME}_nodelet

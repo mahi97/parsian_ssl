@@ -3,6 +3,7 @@
 
 #include <parsian_ai/plans/plan.h>
 #include <vector>
+#include <QList>
 #include <parsian_ai/roles/roles.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 

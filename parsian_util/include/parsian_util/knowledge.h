@@ -18,8 +18,8 @@ struct NewFastestToBall
 {
     double catch_time;
     bool isFastestOurs;
-    QList< pair<double , int> > ourF;
-    QList< pair<double , int> > oppF;
+    QList< std::pair<double , int> > ourF;
+    QList< std::pair<double , int> > oppF;
     NewFastestToBall(){
         catch_time = 10000;
         isFastestOurs = false;
@@ -129,7 +129,7 @@ public:
     ~CKnowledge();
     
     NewFastestToBall newFastestToBall(double timeStep = 0.1, QList<int> ourList=wm->our.data->activeAgents, QList<int> oppList=wm->opp.data->activeAgents);
-	FastestToBall findFastestToBall(QList<int> ourList, QList<int> oppList)
+	FastestToBall findFastestToBall(QList<int> ourList, QList<int> oppList);
 
 
 

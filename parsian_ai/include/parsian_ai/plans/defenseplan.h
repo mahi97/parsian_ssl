@@ -4,14 +4,20 @@
 #include <cmath>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_ai/plans/plan.h>
+#include <parsian_util/knowledge.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_util/action/autogenerate/kickaction.h>
+#include <parsian_ai/util/defpos.h>
+#include <QList>
 //#define OLD_FASTEST 1
 
 #define LOOP_TIME_BYKK 0.016
 #define AGENT_SPEED_BYKK 1.5
-//struct velAndAccByKK {
-//  double vel;
-//  double acc;
-//};
+struct velAndAccByKK {
+  double vel;
+  double acc;
+};
 
 enum { OneTouchState , ClearState , NoState };
 
@@ -37,10 +43,10 @@ protected:
     bool isItPossibleToClear;
     int upper_player;
     double catch_time;    
-    CSkillGotoPoint* gps[_MAX_NUM_PLAYERS];
-    CSkillGotoPointAvoid *gpa[_MAX_NUM_PLAYERS];
-    CSkillKick* kickSkill;    
-    CSkill* AHZSkills;
+    GotopointAction* gps[_MAX_NUM_PLAYERS];
+    GotopointavoidAction *gpa[_MAX_NUM_PLAYERS];
+    KickAction* kickSkill;
+    Action* AHZSkills;
     CDefPos defPos;
     Vector2D pointForKick, oneToucherDir;
     Vector2D topGoal, downGoal, midGoal, ballVel;
@@ -125,7 +131,7 @@ protected:
     QList <Vector2D> lastBallPos;
     int penaltyShootoutMode=beforeTouch;
     void penaltyShootOutMode();
-    CSkillGotoPointAvoid* striker_Robot;
+    GotopointavoidAction* striker_Robot;
     void penaltyMode();
     bool isStopped();
     bool isTheirNonPlayKick();
@@ -201,7 +207,7 @@ private:
     rcsc::Vector2D* getIntersectWithDefenseArea(const Segment2D& segment, const Vector2D& blockPoint);
     rcsc::Vector2D* getIntersectWithDefenseArea(const Circle2D& circle, bool upperPoint);
     rcsc::Vector2D getIntersexWithGoalieEllipse(rcsc::Segment2D seg1, rcsc::Segment2D seg2, bool isDefenseUpperThanGoalieAngle);
-    void assignSkill(CAgent *_agent , CSkill *_skill);
+    void assignSkill(CAgent *_agent , Action *_skill);
     bool isValidPoint(const Vector2D& point);
     void initVars(float goalCircleRad = 0.9); // default is 0.8
     void preCalculate();
