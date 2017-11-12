@@ -26,4 +26,4 @@ ssl_refree_teaminfo us
 ssl_refree_teaminfo them
 
 
-geometry_msgs/Point32 designated_position
+vector2D designated_position

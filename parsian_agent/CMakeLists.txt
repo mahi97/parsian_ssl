@@ -4,7 +4,7 @@ project(parsian_agent)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-FILE(GLOB_RECURSE LibFiles "include/*.h")
+file(GLOB_RECURSE LibFiles "include/*.h")
 add_custom_target(headers SOURCES ${LibFiles})
 
 ## Find catkin macros and libraries
@@ -25,12 +25,12 @@ include(${QT_USE_FILE})
 include_directories(
         include
         ${CMAKE_CURRENT_BINARY_DIR})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS})
 
 
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
-QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
+qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
@@ -123,11 +123,11 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS
-   include
-#  LIBRARIES parsian_agent
+  INCLUDE_DIRS
+  include
+  LIBRARIES ${PROJECT_NAME}_nodelet
   CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
-#  DEPENDS system_lib
+#  DEPENDS 
 )
 
 ###########
@@ -183,6 +183,7 @@ target_link_libraries(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
         )
 add_dependencies(${PROJECT_NAME}_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -236,25 +237,24 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+#  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  nodelet.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

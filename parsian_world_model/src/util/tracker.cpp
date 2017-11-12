@@ -6,6 +6,8 @@ double LatencyDelay = 0.04;
 Tracker::Tracker(int state_n, int obs_n, double _stepsize)
     : Kalman(state_n, obs_n, _stepsize)
 {
+    setFramePeriod(1.0/65.0);
+    setLatencyDelay(0.08);
 }
 
 
