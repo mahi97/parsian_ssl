@@ -36,8 +36,10 @@ void CBaseCommunicator::readData()
 {
 
     QByteArray dataFlow;
-    if(p->serial_port->bytesAvailable())
+    if(p->serial_port->bytesAvailable()) {
         dataFlow = p->serial_port->read(p->serial_port->bytesAvailable());
+//        drawer->draw(Vector2D(1,0));
+    }
     p->serial_port->flush();
     recDataFlow.append(dataFlow);
     if(recDataFlow.size() > 100)
@@ -127,10 +129,7 @@ void CBaseCommunicator::readData()
 //        tempAgent->status.boardID         = robotPacket[i][3] & 0b00011111;
 //    }
 
-    if(robotPacket[0][1] & 0x01)
-    {
-        drawer->draw(Vector2D(0,0));
-    }
+    
 }
 
 CBaseCommunicator::~CBaseCommunicator()
