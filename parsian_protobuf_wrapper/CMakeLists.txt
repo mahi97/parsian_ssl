@@ -226,7 +226,9 @@ add_executable(${PROJECT_NAME}_grsim_node
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+set_target_properties(${PROJECT_NAME}_vision_node PROPERTIES OUTPUT_NAME vision PREFIX "")
+set_target_properties(${PROJECT_NAME}_refbox_node PROPERTIES OUTPUT_NAME refbox PREFIX "")
+set_target_properties(${PROJECT_NAME}_grsim_node PROPERTIES OUTPUT_NAME grsim PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
