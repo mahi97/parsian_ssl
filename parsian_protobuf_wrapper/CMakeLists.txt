@@ -12,9 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
         parsian_msgs
         roscpp
         rospy
-	nodelet
-	rostest
-        )
+		nodelet
+		)
 
 ## System dependencies are found with CMake's conventions
 
@@ -30,7 +29,6 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Protobuf
 find_package(Protobuf REQUIRED)
-
 
  ## Set Parameter For Generate Protobuf Files
 
@@ -77,8 +75,8 @@ catkin_package(
         INCLUDE_DIRS
         include
         ${protogen_include_dirs}
-        LIBRARIES ${PROJECT_NAME}_proto
-        CATKIN_DEPENDS rostest nodelet dynamic_reconfigure parsian_msgs
+        LIBRARIES pthread
+        CATKIN_DEPENDS nodelet dynamic_reconfigure parsian_msgs
         DEPENDS PROTOBUF
 )
 
@@ -383,13 +381,13 @@ install(FILES
 # catkin_add_nosetests(test)
 
 
-if(CATKIN_ENABLE_TESTING)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO : FIX THIS
+#if(CATKIN_ENABLE_TESTING)
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # TODO : FIX THIS
 #  add_rostest_gtest(VisionTest test/VisionTest.test test/VisionTest.cpp)
-  catkin_add_gtest(VisionTest test/VisionTest.cpp)
-  target_link_libraries(VisionTest
-                        ${catkin_LIBRARIES}
-                        vision_convert
-                        )
-endif()
+#  catkin_add_gtest(VisionTest test/VisionTest.cpp)
+#  target_link_libraries(VisionTest
+#                        ${catkin_LIBRARIES}
+#                        vision_convert
+#                        )
+#endif()
 

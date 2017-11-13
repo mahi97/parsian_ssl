@@ -42,7 +42,7 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
 
     // ai->execute();
 
-    if (drawer != nullptr)drawPub.publish(drawer->draws);
+    if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
 }
 
