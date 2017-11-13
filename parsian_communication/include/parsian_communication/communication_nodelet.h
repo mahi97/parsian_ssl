@@ -26,16 +26,19 @@ namespace parsian_communication {
     private:
         void onInit();
 
-        CCommunicator communicator;
+        boost::shared_ptr<CCommunicator> communicator;
         ros::Subscriber robotPacketSub;
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
 
         ros::Timer      timer;
+        ros::Timer      recTimer;
 
         void callBack(const parsian_msgs::parsian_packetsConstPtr& _packet);
         // Timer CallBack (to publish)
         void timerCb(const ros::TimerEvent& event);
+
+        void recTimerCb(const ros::TimerEvent& event);
 
         boost::shared_ptr<dynamic_reconfigure::Server<communication_config::communicationConfig>> server;
         void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level) ;
