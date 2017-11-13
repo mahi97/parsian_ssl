@@ -11,14 +11,14 @@ add_custom_target(headers SOURCES ${LibFiles})
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  nodelet
-  parsian_msgs
-  parsian_util
-  roscpp
-  rospy
-  std_msgs
-)
+        dynamic_reconfigure
+        nodelet
+        parsian_msgs
+        parsian_util
+        roscpp
+        rospy
+        std_msgs
+        )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -110,8 +110,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/agent.cfg
- )
+        cfg/agent.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -123,11 +123,11 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS
-  include
-  LIBRARIES ${PROJECT_NAME}_nodelet
-  CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
-#  DEPENDS 
+        INCLUDE_DIRS
+        include
+        LIBRARIES ${PROJECT_NAME}_nodelet
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
+        #  DEPENDS
 )
 
 ###########
@@ -137,8 +137,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -167,7 +167,7 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
-	    ${PROJECT_NAME}_gencfg
+        ${PROJECT_NAME}_gencfg
         )
 
 
@@ -178,6 +178,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_nodelet
         )
 
 add_dependencies(${PROJECT_NAME}
@@ -238,23 +239,23 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#  PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        #  PATTERN ".svn" EXCLUDE
+        )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+        nodelet.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 #############
 ## Testing ##

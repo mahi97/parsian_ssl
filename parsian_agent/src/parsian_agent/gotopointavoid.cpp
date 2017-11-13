@@ -13,21 +13,13 @@ CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkill(_agent)
 {
     counter = 0;
     avoidPenaltyArea = static_cast<unsigned char>(true);
-    inited = false;
-    keeplooking = static_cast<unsigned char>(false);
-    extendStep = static_cast<float>(-1.0);
     gotopoint = new CSkillGotoPoint(_agent);
     bangBang = new CNewBangBang();
     dynamicStart = static_cast<unsigned char>(true);
-    plan2 = static_cast<unsigned char>(false);
     noAvoid = false;
     avoidCenterCircle = false;
-    avoidGoalPosts = true;
-    stucked = -1;
-    counting = 0; // SGP
     averageDir.assign(0, 0);
     addVel.assign(0, 0);
-    nextPos.invalidate();
     diveMode = false;
     oneTouchMode = false;
     drawPath = false;
@@ -69,40 +61,32 @@ void CSkillGotoPointAvoid::execute()
     bangBang->setDecMax(conf.DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
-    if(slowMode || slowShot)
-    {
+    if(slowMode) {
         bangBang->setVelMax(1.4);
         bangBang->setSlow(true);
-    }
-    else
-    {
+    } else {
         bangBang->setSlow(false);
         bangBang->setVelMax(conf.VelMax);
     }
-    if (!Vector2D(targetPos).valid())
-    {
+
+    if (!Vector2D(targetPos).valid()) {
         agent->waitHere();
         return;
     }
+
     if (!targetVel.valid())
         targetVel.assign(0,0);
 
-    if(drawPath)
-    {
-        if(agentVel.length() < 0.1)
-        {
+    if(drawPath) {
+        if(agentVel.length() < 0.1) {
             pathPoints.clear();
-        }
-        else
-        {
+        } else {
             pathPoints.append(agentPos);
             for (auto pathPoint : pathPoints) {
-            //    drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true); //todo shoule uncommented
+                //    drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true); // TODO : should uncommented
             }
         }
-    }
-    else
-    {
+    } else {
         pathPoints.clear();
     }
 
@@ -114,8 +98,7 @@ void CSkillGotoPointAvoid::execute()
 //    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
 
-    if (lookAt.valid())
-    {
+    if (lookAt.valid()) {
         targetDir = (lookAt - agentPos).norm();
     }
 
@@ -164,7 +147,7 @@ void CSkillGotoPointAvoid::execute()
             ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
 //            drawer->draw(Circle2D(agent->pathPlannerResult[i],0.01),QColor(Qt::red));
-             }
+        }
     }
 
 
@@ -226,19 +209,14 @@ void CSkillGotoPointAvoid::execute()
     Segment2D goalPostL,goalPostR;
     goalPostL.assign(wm->field->ourGoalL() - Vector2D(0.2,0),wm->field->ourGoalL() + Vector2D(0.1,0));
     goalPostR.assign(wm->field->ourGoalR() - Vector2D(0.2,0),wm->field->ourGoalR() + Vector2D(0.1,0));
-    avoidGoalPosts = true;
     Segment2D agenPath(agent->pos(),lllll);
-    if(avoidGoalPosts)
+    if(agenPath.intersection(goalPostL).isValid())
     {
-        if(agenPath.intersection(goalPostL).isValid())
-        {
-            lllll = wm->field->ourGoalL() + Vector2D(0.12,0);
-        }
-        else if(agenPath.intersection(goalPostR).isValid())
-        {
-            lllll = wm->field->ourGoalR() + Vector2D(0.12,0);
-        }
-
+        lllll = wm->field->ourGoalL() + Vector2D(0.12,0);
+    }
+    else if(agenPath.intersection(goalPostR).isValid())
+    {
+        lllll = wm->field->ourGoalR() + Vector2D(0.12,0);
     }
     /////////////////////
 
@@ -251,8 +229,8 @@ void CSkillGotoPointAvoid::execute()
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
-//    agent->setRobotVel(2,2,10);
-        agent->accelerationLimiter(vf,oneTouchMode);
+    agent->setRobotVel(2,2,10);
+    agent->accelerationLimiter(vf,oneTouchMode);
     ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
     ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
 
@@ -274,7 +252,6 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTargetLook(Vector2D finalPos, Vec
     setTargetdir(Vector2D{1.0, 0.0});
     setTargetvel(Vector2D(0.0, 0.0));
     setLookat(lookAtPoint);
-    setKeeplooking(true);
     return this;
 }
 
@@ -284,7 +261,6 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2
     setTargetdir(finalDir);
     setTargetvel(Vector2D(0.0, 0.0));
     setLookat(Vector2D::INVALIDATED);
-    setKeeplooking(false);
     return this;
 }
 
@@ -342,37 +318,30 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         distEffect = std::max(1.0, distEffect);
     }
 
-    if(tAgentVel.length() < 0.2)
-    {
+    if(tAgentVel.length() < 0.2) {
         acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
 
-    }
-    else
-    {
+    } else {
         acc =conf.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
-
-
 
     double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length()*tAgentVel.length()/2*acc))*2*acc*dec)/(acc+dec));
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.DecMax)) ;
+    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
         return std::max(0.0,(tAgentVel.length()/ conf.DecMax - offset) * distEffect);
     }
-    if(tAgentVel.length() < (vMax)){
-        if(_agentT->pos().dist(posT) > xSat)
-        {
+
+    if(tAgentVel.length() < (vMax)) {
+        if(_agentT->pos().dist(posT) > xSat) {
             return std::max(0.0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
         }
         return std::max(0.0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
 
-    }
-    else
-    {
+    } else {
         return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
     }
 

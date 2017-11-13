@@ -7,11 +7,7 @@ CSkillReceivePass::CSkillReceivePass(Agent *_agent)
     agent = _agent;
     gotopointavoid = new CSkillGotoPointAvoid(_agent);
     slow = true;
-    avoidOurPenaltyArea = true;
-    avoidOppPenaltyArea = true;
     receiveRadius = 1.0;
-    received = false;
-    velThresh = 0;
     cirThresh = 0;
     kickCirThresh = 0;
     ignoreAngle = true;
@@ -39,7 +35,6 @@ kkRPMode CSkillReceivePass::decideMode()
         if(tempCircle2.intersection(tempBallPath, &sol1, &sol2)  )
         {
             kickCirThresh = 0;
-            velThresh = 0;
             return RPINTERSECT;
         }
 
@@ -54,8 +49,6 @@ void CSkillReceivePass::execute()
     gotopointavoid->setAgent(agent);
     gotopointavoid->setNoavoid(false);
     gotopointavoid->setBallobstacleradius(0.4);
-    gotopointavoid->setAvoidball(true);
-
     kkBallPos = wm->ball->pos;
     kkAgentPos = agent->pos();
     receivePassMode = decideMode();

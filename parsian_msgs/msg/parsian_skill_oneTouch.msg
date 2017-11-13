@@ -3,9 +3,4 @@ bool chip
 int32 kickSpeed
 vector2D waitPos
 vector2D target
-float64 distToBallLine
-float64 velocityToBallLine
-bool receiveChip
-bool avoidPenaltyArea
-bool moveTowardTheBall
 bool shotToEmptySpot

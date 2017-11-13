@@ -1,7 +1,5 @@
 uint8 robot_id
 vector2D target
-bool avoidOurPenaltyArea
-bool avoidOppPenaltyArea
 bool slow
 float64 receiveRadius
 bool ignoreAngle
