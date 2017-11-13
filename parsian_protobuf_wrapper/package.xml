@@ -53,9 +53,9 @@
   <run_depend>nodelet</run_depend>
   <build_depend>nodelet</build_depend>
 
-  <build_depend>rostest</build_depend>
-  <run_depend>rostest</run_depend>
-  <test_depend>rosunit</test_depend>
+  <!--<build_depend>rostest</build_depend>-->
+  <!--<run_depend>rostest</run_depend>-->
+  <!--<test_depend>rosunit</test_depend>-->
 
 
   <!-- The export tag contains other, unspecified, tags -->

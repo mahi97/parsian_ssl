@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(parsian_ai)
+project(parsian_sandbox)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -8,18 +8,24 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-		dynamic_reconfigure
-		parsian_msgs
-		parsian_util
-		roscpp
-		rospy
-		nodelet
-		)
+        dynamic_reconfigure
+        nodelet
+        parsian_agent
+        parsian_ai
+        parsian_communication
+        parsian_msgs
+        #        parsian_protobuf_wrapper
+        parsian_util
+        parsian_world_model
+        roscpp
+        rospy
+        )
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
+find_package(Protobuf REQUIRED)
+find_package(QJSON REQUIRED)
+
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${QT_DEFINITIONS})
@@ -30,8 +36,6 @@ file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.
 qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
-
-find_package(QJSON REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -105,24 +109,25 @@ find_package(QJSON REQUIRED)
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-generate_dynamic_reconfigure_options(
-   cfg/ai.cfg
- )
+# generate_dynamic_reconfigure_options(
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
+# )
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include
-	LIBRARIES ${PROJECT_NAME}_nodelet ${PROJECT_NAME}
-	CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
-	#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES parsian_sandbox
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_agent parsian_ai parsian_communication parsian_msgs parsian_util parsian_world_model roscpp rospy
+        #          DEPENDS system_lib
 )
 
 ###########
@@ -132,129 +137,57 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-		include
-		${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
-## show include dir in qt
-#FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
-#add_custom_target(headers SOURCES ${LibFiles})
+
+add_library(${PROJECT_NAME}
+        src/parsian_sandbox/sandbox.cpp
+        src/parsian_sandbox/sandbox_mahi.cpp)
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}
-		src/${PROJECT_NAME}/ai.cpp
-		src/${PROJECT_NAME}/soccer.cpp
-		src/${PROJECT_NAME}/gamestate.cpp
-		src/${PROJECT_NAME}/config.cpp
-	#       src/${PROJECT_NAME}/coach.cpp
-)
-
-#add_library(${PROJECT_NAME}_plays
-#		src/parsian_ai/plays/dynamicattack.cpp
-#		src/parsian_ai/plays/masterplay.cpp
-#		src/parsian_ai/plays/ourballplacement.cpp
-#		src/parsian_ai/plays/playoff.cpp
-#		src/parsian_ai/plays/ourpenalty.cpp
-#		src/parsian_ai/plays/theirpenalty.cpp
-#		src/parsian_ai/plays/theirkickoff.cpp
-#		src/parsian_ai/plays/theirindirect.cpp
-#		src/parsian_ai/plays/theirdirect.cpp
-#		src/parsian_ai/plays/theirballplacement.cpp
-#		src/parsian_ai/plays/stopplay.cpp
-#		)
-#
-#add_library(${PROJECT_NAME}_plans
-#		src/parsian_ai/plans/defenseplan.cpp
-#		src/parsian_ai/plans/markplan.cpp
-#		src/parsian_ai/plans/plan.cpp
-#		src/parsian_ai/plans/positioningplan.cpp
-#		)
-
-#add_library(${PROJECT_NAME}_util
-#		src/parsian_ai/util/planloader.cpp
-#		src/parsian_ai/util/loadplayoffjson.cpp
-#		)
-
-
 add_library(${PROJECT_NAME}_nodelet
-        src/ai_nodelet.cpp)
-
+        src/sandbox_nodelet.cpp
+        )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node
-		src/ai_node.cpp
-		)
+add_executable(${PROJECT_NAME}_node src/sandbox_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME sandbox PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_node
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-		${PROJECT_NAME}_gencfg
-
-		)
-add_dependencies(${PROJECT_NAME}_nodelet
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-
-        )
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-
-target_link_libraries(${PROJECT_NAME}_nodelet
-		${catkin_LIBRARIES}
-		${PROJECT_NAME}
-		${QT_LIBRARIES})
-
 target_link_libraries(${PROJECT_NAME}_node
-		${catkin_LIBRARIES}
-        ${PROJECT_NAME}
-        ${QT_LIBRARIES}
-#		${PROJECT_NAME}_plays
-#		${PROJECT_NAME}_plans
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_nodelet
         )
 
-add_dependencies(${PROJECT_NAME}
-                ${${PROJECT_NAME}_EXPORTED_TARGETS}
-                ${catkin_EXPORTED_TARGETS}
-                ${PROJECT_NAME}_gencfg
-                )
+target_link_libraries(${PROJECT_NAME}_nodelet
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        )
 
 target_link_libraries(${PROJECT_NAME}
-		${catkin_LIBRARIES}
-		${QT_LIBRARIES}
-		)
-
-#target_link_libraries(${PROJECT_NAME}_plays
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
-#
-#target_link_libraries(${PROJECT_NAME}_plans
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
-#target_link_libraries(${PROJECT_NAME}_util
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		${QJSON_LIBRARIES}
-#		)
-
-
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
 
 #############
 ## Install ##
@@ -271,31 +204,32 @@ target_link_libraries(${PROJECT_NAME}
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        #   PATTERN ".svn" EXCLUDE
+        )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES
-  nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_ai.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_parsian_sandbox.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
