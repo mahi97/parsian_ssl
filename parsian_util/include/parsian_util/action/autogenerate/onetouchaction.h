@@ -23,11 +23,6 @@ public:
     SkillProperty(OnetouchAction, quint8, Robot_Id, robot_id);
     SkillProperty(OnetouchAction, bool, Chip, chip);
     SkillProperty(OnetouchAction, qint32, Kickspeed, kickSpeed);
-    SkillProperty(OnetouchAction, double, Disttoballline, distToBallLine);
-    SkillProperty(OnetouchAction, double, Velocitytoballline, velocityToBallLine);
-    SkillProperty(OnetouchAction, bool, Receivechip, receiveChip);
-    SkillProperty(OnetouchAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
-    SkillProperty(OnetouchAction, bool, Movetowardtheball, moveTowardTheBall);
     SkillProperty(OnetouchAction, bool, Shottoemptyspot, shotToEmptySpot);
     SkillProperty(OnetouchAction, Vector2D, Waitpos, waitPos);
     SkillProperty(OnetouchAction, Vector2D, Target, target);

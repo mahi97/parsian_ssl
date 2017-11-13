@@ -13,14 +13,6 @@
 #include <math.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
-#define EPS 1e-6
-#define DELTA_T 0.060
- //wm->commandSampleTime()
-//#define DELTA_T wm->commandSampleTime()
-
-//  New Goto Point Class Powered by DON
-//  start 12/4/2015
-
 enum gpMode {
     GPACC1 = 0,
     GPACC2 = 1,
@@ -46,11 +38,6 @@ private:
     _PID *thPid;
     _PID *velPid;
     Vector2D startingPoint;
-    ///////Arash.Z//////////
-    //////////if boll dec = true the function return optimal dec and
-    //////////otherwise return optimal acc//////////
-    double optimalAccOrDec(double agentDirInRadian, bool dec);
-
     ///////////////////////
     void trajectoryPlanner();
     double appliedTh;
@@ -59,40 +46,27 @@ private:
 
 protected:
 
-    Vector2D targetVel;
     Vector2D agentPos;
     Vector2D agentVel;
-    double agentBestAcc;
-    double agentBestDec;
     double agentDist;
     double agentVc;
     double _Vx, _Vy;
-    double agentVm;
-    double realAcc, realDec;
-    double appliedAcc,appliedDec;
+    double appliedAcc;
     double posPidDist;
     double agentVDesire;
     double decThr;
     double posThr;
-    double vConstThr;
-    double angleOfMovement;
 
-    double agentX1, agentX2, agentX3;
+    double agentX3;
 
     gpMode decideMode();
     AngleDeg agentMovementTh;
     AngleDeg lastPath;
 
 public:
-    void targetValidate();
-
     virtual double timeNeeded();
-    int counting;
     DEF_SKILL(CSkillGotoPoint);
-    double timeRemaining();
-    gpMode lastGPmode;
     gpMode currentGPmode;
-    void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0));
 };
 
 

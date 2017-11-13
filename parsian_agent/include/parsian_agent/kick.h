@@ -10,7 +10,6 @@
 
 #define vRobotTemp 1
 
-#define penaltyAreaAvoidanceRadius (0.9)
 
 enum kckMode {
     KDIRECT = 0,
@@ -31,7 +30,6 @@ enum kckMode {
 class CSkillKick : public CSkill, public KickAction
 {
 private:
-    double kkRadLimit;
     kckMode decideMode();
     kckMode kickMode;
     _PID *angPid;

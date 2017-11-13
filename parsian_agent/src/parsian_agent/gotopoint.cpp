@@ -1,7 +1,4 @@
 #include <parsian_agent/gotopoint.h>
-#include <parsian_agent/config.h>
-
-
 
 INIT_SKILL(CSkillGotoPoint, "gotopoint");
 CSkillGotoPoint::CSkillGotoPoint(Agent *_agent) : CSkill(_agent)
@@ -23,20 +20,16 @@ CSkillGotoPoint::CSkillGotoPoint(Agent *_agent) : CSkill(_agent)
 
     lookAt.invalidate();
 
-    lastGPmode = GPACC1;
     posPidDist = 0.5;
 
     decThr = 0.2;
     posThr = 0;
-    vConstThr = 0;
 
     maxVelocity = 5;
 
     agentVDesire = 0;
     ////modes
-    slowShot= false;
     slowMode = false;
-    verySlow = false;
     diveMode = false;
     penaltyKick = false;
     smooth = false;
@@ -51,13 +44,6 @@ CSkillGotoPoint::~CSkillGotoPoint()
     //    delete posXpid;
     //    delete posYpid;
     //    delete thPid;
-}
-
-void CSkillGotoPoint::init(Vector2D target, Vector2D _targetDir, Vector2D _targetVel)
-{
-    targetPos = target;
-    targetDir = _targetDir;
-    targetVel = _targetVel;
 }
 
 double CSkillGotoPoint::timeNeeded()
@@ -96,83 +82,11 @@ gpMode CSkillGotoPoint::decideMode()
     }
 
 }
-double CSkillGotoPoint::optimalAccOrDec(double agentDir, bool dec)
-{
-    double Vx = cos(agentDir);
-    double Vy = sin(agentDir);
-    double fWheels[4];
-    double biggest = 0.0;
-    double optimalAcc , optimalDec;
-    double Ff , Fn;
-    //////////////Calculate Jacobian Matrix//////////
-    fWheels[0] = -(Vx * 0.8660) + (Vy * 0.5);
-    fWheels[1] = -(Vx * 0.7071) - (Vy * 0.7071);
-    fWheels[2] =  (Vx * 0.7071) - (Vy * 0.7071);
-    fWheels[3] =  (Vx * 0.8660) + (Vy * 0.5);
-    ////////////////////////////////////////////////
-    ///////////find biggest value in Jacob//////////
-    for (double fWheel : fWheels) {
-        if( fabs(fWheel) > biggest ) {
-            biggest = fabs(fWheel);
-        }
-    }
-    /////////////////////////////////////////////////
-    //////////normalize Jacob's Value////////////////
-    for (double &fWheel : fWheels) {
-        fWheel = fWheel /biggest;
-    }
-    /////////////////////////////////////////////////
-    ///////////calculate forward force vector and normal force vector////////////////////
-    Ff = ((fWheels[3]-fWheels[0])*(sqrt(3)/2)) + ((fWheels[2] - fWheels[1])*(sqrt(2)/2));
-    Fn = ((fWheels[3]+fWheels[0])*0.5) + (-1*(fWheels[2] + fWheels[1])*(sqrt(2)/2));
-    ////////////////////////////////////////////////////////////////////////////////////
-    /////////////////2.8868 is max of sum Ff and Fn and this derivation is for nomalization of Max Acc = maxAcceleration/////////
-    optimalAcc = maxAcceleration * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
-    optimalDec = maxDeceleration * sqrt((Ff*Ff) + (Fn*Fn))/2.8868;
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////if boll dec = true the function return optimal dec///////////
-    if(dec) {
-        return optimalDec;
-    }
-    //////////otherwise return optimal acc//////////
-    return optimalAcc;
-}
-void CSkillGotoPoint::targetValidate()
-{
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
-
-//    if (false) { //conf()->LocalSettings_ParsianWorkShop()) {
-//        if(conf()->LocalSettings_OurTeamSide() == "Right")
-//        {
-//            if(targetPos.x < 0.2)
-//            {
-//                targetPos.x = 0.2;
-//            }
-//        }
-//        else
-//        {
-//            if(targetPos.x > 4.3)
-//            {
-//                targetPos.x = 4.3;
-//            }
-//        }
-//    }
-
-//    if (lookAt.valid())
-//    {
-//        targetDir = (lookAt - agentPos).norm();
-//    }
-}
 
 void CSkillGotoPoint::trajectoryPlanner()
 {
     agentMovementTh = (targetPos -agentPos ).th();
     //////////////////acc dec
-    agentBestAcc = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),false);
-    agentBestDec = optimalAccOrDec(Vector2D::angleBetween(targetPos-agentPos,agent->dir()).radian(),true);
     appliedAcc =1.5 * maxAcceleration;
 
     if(smooth)
@@ -220,7 +134,7 @@ void CSkillGotoPoint::execute()
 {
 
     maxVelocity = 1;
-    if(slowShot|| slowMode || penaltyKick)
+    if(slowMode || penaltyKick)
     {
         maxVelocity = 1.5;
     }
@@ -258,7 +172,7 @@ void CSkillGotoPoint::execute()
         posPid->kp = 1.9;
 
 
-    if(slowShot|| slowMode || penaltyKick)
+    if(slowMode || penaltyKick)
     {
         posPid->kp = 1.6;
     }
@@ -334,7 +248,7 @@ void CSkillGotoPoint::execute()
             agent->_DEC = 0;
             agentVDesire = maxVelocity ;
         }
-        else if(!slowShot&& !slowMode && !penaltyKick)
+        else if(!slowMode && !penaltyKick)
         {
             agent->_ACC = 0;
             agent->_DEC = 0;

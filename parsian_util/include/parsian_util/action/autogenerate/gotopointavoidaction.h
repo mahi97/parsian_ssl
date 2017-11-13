@@ -21,17 +21,12 @@ public:
 
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
-    SkillProperty(GotopointavoidAction, bool, Keeplooking, keeplooking);
-    SkillProperty(GotopointavoidAction, float, Extendstep, extendStep);
-    SkillProperty(GotopointavoidAction, bool, Plan2, plan2);
     SkillProperty(GotopointavoidAction, bool, Noavoid, noAvoid);
     SkillProperty(GotopointavoidAction, bool, Avoidcentercircle, avoidCenterCircle);
     SkillProperty(GotopointavoidAction, float, Ballobstacleradius, ballObstacleRadius);
-    SkillProperty(GotopointavoidAction, bool, Avoidball, avoidBall);
-    SkillProperty(GotopointavoidAction, bool, Avoidgoalposts, avoidGoalPosts);
     SkillProperty(GotopointavoidAction, bool, Drawpath, drawPath);
+    SkillProperty(GotopointavoidAction, bool, Divemode, diveMode);
     SkillProperty(GotopointavoidAction, Vector2D, Addvel, addVel);
-    SkillProperty(GotopointavoidAction, Vector2D, Nextpos, nextPos);
 
 };
 
