@@ -6,9 +6,14 @@
 
 CPlanSelector::CPlanSelector() {
     planLoader = new CLoadPlayOffJson(QDir::currentPath() + QString("/playoff"));
-    havePassInPlan = false;
-}
 
+    havePassInPlan = false;
+
+    shuffleSize = 0;
+    shuffleIndexing.clear();
+    shuffled = false;
+    shuffleCounter = 0;
+}
 
 void CPlanSelector::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 
@@ -29,8 +34,10 @@ void CPlanSelector::initStaticPlay(const POMODE _mode, const QList<int>& _ourpla
     /** NEW PLAN SELECTOR **/
     /** PLAN SELECTION BASED ON HISTORY **/
     /** LFU SELECTION **/
-    /** SHUFFLE PLAN SELECTION **/
     /** COUNTER PLAN SELECTION **/
+
+    /** SHUFFLE PLAN SELECTION: **/
+    thePlan = validPlans[PlayoffShufflePolicy(prevValidPlans, validPlans)];
 
 
     matchPlan(thePlan, _ourplayers); //Match The Plan
@@ -43,9 +50,122 @@ void CPlanSelector::initStaticPlay(const POMODE _mode, const QList<int>& _ourpla
 }
 
 QList<NGameOff::SPlan *> CPlanSelector::getValidPlans(const POMODE _mode, const QList<int> &_ourPlayers) {
-    QList<NGameOff::SPlan*> plans;
 
-    plans = planLoader->getPlans();
+    NGameOff::SPlan* nearestPlan = NULL;
+    double minDist = wm->field->_MAX_DIST;
+    QList<NGameOff::SPlan*> allPlans = planLoader->getPlans(); // Get All of The Plans
+
+    QList<NGameOff::SPlan*> activePlans;
+    QList<NGameOff::SPlan*> masterPlans;
+
+    //TODO: check gui for active and master plans and update lists
+
+    int symmetry = 1;
+    QList<NGameOff::SPlan*> validPlans;
+    Q_FOREACH(NGameOff::SPlan* plan, activePlans) { //Find Valid Plans
+            NGameOff::SMatching& matching = plan->matching;
+
+            if (matching.common->planMode  >= _mode
+                && matching.common->agentSize >= _ourPlayers.size()
+                && matching.common->chance > 0
+                && matching.common->lastDist >= 0) {
+
+                //check Ball matchig with symmetry
+                plan->common.currentSize = _ourPlayers.size();
+                Vector2D symBall = Vector2D(matching.initPos.ball.x,
+                                            (-1) * matching.initPos.ball.y);
+
+                double tempDist    = wm->ball->pos.dist(matching.initPos.ball);
+                double tempSymDist = wm->ball->pos.dist(symBall);
+
+                if (tempDist < minDist) {
+                    minDist  = tempDist;
+                    symmetry = 1;
+                    nearestPlan = plan;
+                }
+
+                if (tempSymDist < minDist) {
+                    minDist  = tempSymDist;
+                    symmetry = -1;
+                    nearestPlan = plan;
+                }
+
+                if (isRegionMatched(matching.initPos.ball)) {
+                    plan->execution.symmetry = 1;
+                } else if (isRegionMatched(symBall)) {
+                    plan->execution.symmetry = -1;
+                } else {
+                    continue;
+                }
+
+                validPlans.append(plan);
+            }
+        }
+
+    DEBUG(QString("playoff -> there's %1 valid Plan").arg(validPlans.size()), D_DEBUG);
+    if (validPlans.isEmpty()) {
+        DEBUG("[Warning] playoff -> there's no valid Plan", D_ERROR);
+        DEBUG("[Warning] playoff -> matching nearset plan", D_ERROR);
+        if (nearestPlan != NULL) {
+            nearestPlan->execution.symmetry = symmetry;
+            validPlans.append(nearestPlan);
+            DEBUG("[Warning] playoff -> nearset plan matched", D_ERROR);
+        }
+    }
+
+    return validPlans;
+}
+
+bool CPlanSelector::isRegionMatched(const Vector2D &_ball, const double&& regionRadius) const{
+    return (wm->ball->pos.dist(_ball) < regionRadius);
+}
+
+int CPlanSelector::PlayoffShufflePolicy(QList<NGameOff::SPlan*> prevValidPlans, QList<NGameOff::SPlan*> validPlans) {
+    bool equal = true;
+    // check if prevValidPlans is equal to validPlans
+    if(prevValidPlans.size() == validPlans.size()){
+                foreach (NGameOff::SPlan* p, validPlans) {
+                if(!prevValidPlans.contains(p)){
+                    equal = false;
+                    break;
+                }
+            }
+    } else {
+        equal = false;
+    }
+
+    if(!shuffled || !equal){
+        ShufflePlanIndexing(validPlans);
+        equal = true;
+    }
+
+    if (shuffleCounter >= shuffleSize) {
+        shuffleCounter = 0;
+        shuffled = false;
+    }
+
+    DEBUG(QString("chosen plan : %1").arg(shuffleIndexing.at(shuffleCounter)) , D_FATEME);
+
+    shuffleCounter++;
+
+    return shuffleIndexing.at(shuffleCounter-1);
+}
+
+void CPlanSelector::ShufflePlanIndexing(QList<NGameOff::SPlan*> Plans) {
+    shuffleSize = 0;
+    shuffleIndexing.clear();
+
+    for(int i=0; i<Plans.size(); i++){
+        DEBUG(QString("plan%1 chance : %2").arg(i).arg(Plans.at(i)->common.chance) , D_FATEME);
+        shuffleSize += (int)Plans.at(i)->common.chance;
+        for(int j=0; j<(int)Plans.at(i)->common.chance; j++){
+            shuffleIndexing.append(i);
+        }
+    }
+
+    std::random_shuffle(shuffleIndexing.begin(), shuffleIndexing.end());
+    std::random_shuffle(shuffleIndexing.begin(), shuffleIndexing.end());
+    shuffled = true;
 }
 
 void CPlanSelector::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
@@ -71,7 +191,6 @@ void CPlanSelector::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplay
     }
     qDebug() << "[Coach] mathched by" << _plan->common.matchedID;
 }
-
 
 QPair<int, int> CPlanSelector::findTheLastShoot(const NGameOff::SExecution &_plan) {
     QPair<int, int> last;
@@ -102,9 +221,7 @@ QPair<int, int> CPlanSelector::findTheLastShoot(const NGameOff::SExecution &_pla
     return last;
 }
 
-
-void CPlanSelector::analyseShoot(NGameOff::SPlan* thePlan)
-{
+void CPlanSelector::analyseShoot(NGameOff::SPlan* thePlan) {
     if (thePlan != NULL) {
         QPair<int, int> last;
         last = findTheLastShoot(thePlan->execution);
@@ -136,8 +253,7 @@ void CPlanSelector::analysePass(NGameOff::SPlan* thePlan) {
     qDebug() << "RS : " << thePlan->execution.reciver.state;
 }
 
-void CPlanSelector::findThePasserAndReceiver(const NGameOff::SExecution &_plan,
-                                             QList<AgentPair> &_pairList) {
+void CPlanSelector::findThePasserAndReceiver(const NGameOff::SExecution &_plan, QList<AgentPair> &_pairList) {
 
     QList<NGameOff::AgentPoint> passer;
 
@@ -170,6 +286,5 @@ void CPlanSelector::findThePasserAndReceiver(const NGameOff::SExecution &_plan,
         ap.first  = passer[i];
         ap.second = tempReciver;
         _pairList.append(ap);
-
     }
 }
