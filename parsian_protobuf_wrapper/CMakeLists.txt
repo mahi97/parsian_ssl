@@ -8,10 +8,10 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        dynamic_reconfigure
-        parsian_msgs
-        roscpp
-        rospy
+		dynamic_reconfigure
+		parsian_msgs
+		roscpp
+		rospy
 		nodelet
 		)
 
@@ -30,8 +30,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Protobuf
 find_package(Protobuf REQUIRED)
 
- ## Set Parameter For Generate Protobuf Files
-
+## Set Parameter For Generate Protobuf Files
 set(proto_dir ${PROJECT_SOURCE_DIR}/proto)
 file(GLOB proto_files "${proto_dir}/*.proto")
 message(STATUS "Proto Source Dir: ${proto_dir}")
@@ -57,9 +56,9 @@ set(proto_gen_python_files "")
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-        cfg/vision.cfg
-        cfg/referee.cfg
-	cfg/grsim.cfg
+		cfg/vision.cfg
+		cfg/referee.cfg
+		cfg/grsim.cfg
 )
 
 ###################################
@@ -72,12 +71,12 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        INCLUDE_DIRS
-        include
-        ${protogen_include_dirs}
-        LIBRARIES pthread
-        CATKIN_DEPENDS nodelet dynamic_reconfigure parsian_msgs
-        DEPENDS PROTOBUF
+		INCLUDE_DIRS
+		include
+		${protogen_include_dirs}
+		LIBRARIES pthread
+		CATKIN_DEPENDS nodelet dynamic_reconfigure parsian_msgs
+		DEPENDS PROTOBUF
 )
 
 ###########
@@ -87,28 +86,28 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_BINARY_DIR} ##dont know if its important-kian-
-        ${PROTOBUF_INCLUDE_DIR}
-        ${PROTOBUF_INCLUDE_DIR}/../../
+		include
+		${catkin_INCLUDE_DIRS}
+		${CMAKE_CURRENT_BINARY_DIR} ##dont know if its important-kian-
+		${PROTOBUF_INCLUDE_DIR}
+		${PROTOBUF_INCLUDE_DIR}/../../
 )
 
 ### Compile Protobuf files
 
 foreach(proto_file ${proto_files})
-    get_filename_component(proto_name ${proto_file} NAME_WE)
-    list(APPEND proto_gen_cpp_files ${proto_gen_cpp_dir}/${proto_name}.pb.h ${proto_gen_cpp_dir}/${proto_name}.pb.cc)
-    list(APPEND proto_gen_python_files ${proto_gen_python_dir}/${proto_name}_pb2.py)
+	get_filename_component(proto_name ${proto_file} NAME_WE)
+	list(APPEND proto_gen_cpp_files ${proto_gen_cpp_dir}/${proto_name}.pb.h ${proto_gen_cpp_dir}/${proto_name}.pb.cc)
+	list(APPEND proto_gen_python_files ${proto_gen_python_dir}/${proto_name}_pb2.py)
 endforeach()
 
 # Run protoc and generate language-specific headers.
 add_custom_command(
-        OUTPUT ${proto_gen_cpp_files} ${proto_gen_python_files}
-        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --proto_path=${proto_dir} --cpp_out=${proto_gen_cpp_dir} --python_out=${proto_gen_python_dir} ${proto_files}
+		OUTPUT ${proto_gen_cpp_files} ${proto_gen_python_files}
+		COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} --proto_path=${proto_dir} --cpp_out=${proto_gen_cpp_dir} --python_out=${proto_gen_python_dir} ${proto_files}
 
-        DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${proto_files}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${proto_files}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 set_source_files_properties(${proto_gen_cpp_files} PROPERTIES GENERATED TRUE)
@@ -118,94 +117,94 @@ set_source_files_properties(${proto_gen_python_files} PROPERTIES GENERATED TRUE)
 file(APPEND ${proto_gen_python_dir}/__init__.py "")
 
 add_custom_target(${PROJECT_NAME}_generate_headers
-        DEPENDS ${proto_gen_cpp_files} ${proto_gen_python_files}
-        )
+		DEPENDS ${proto_gen_cpp_files} ${proto_gen_python_files}
+		)
 
 
 
 ## Declare a C++ library
 
 add_library(${PROJECT_NAME}_proto
-        ${proto_gen_cpp_files}
-        )
+		${proto_gen_cpp_files}
+		)
 
 add_library(${PROJECT_NAME}_network
-        src/common/net/netraw.cpp
-        src/common/net/robocup_ssl_client.cpp
-        src/common/net/udpsend.cpp
-)
+		src/common/net/netraw.cpp
+		src/common/net/robocup_ssl_client.cpp
+		src/common/net/udpsend.cpp
+		)
 
 add_library(${PROJECT_NAME}_vision_convert
-        src/ssl-vision/convert/convert_geometry.cpp
-        src/ssl-vision/convert/convert_units.cpp
-        src/ssl-vision/convert/convert_detection.cpp)
+		src/ssl-vision/convert/convert_geometry.cpp
+		src/ssl-vision/convert/convert_units.cpp
+		src/ssl-vision/convert/convert_detection.cpp)
 
 add_library(${PROJECT_NAME}_refbox_convert
-        src/ssl-refbox/convert/convert_referee.cpp)
+		src/ssl-refbox/convert/convert_referee.cpp)
 
 
 add_library(${PROJECT_NAME}_grsim_nodelet
-        src/grsim/grsim_nodelet.cpp
-       )
+		src/grsim/grsim_nodelet.cpp
+		)
 
 add_library(${PROJECT_NAME}_vision_nodelet
-        src/ssl-vision/parsian_vision_nodelet.cpp
-        )
+		src/ssl-vision/parsian_vision_nodelet.cpp
+		)
 
 add_library(${PROJECT_NAME}_refbox_nodelet
-        src/ssl-refbox/parsian_referee_nodelet.cpp
-        )
+		src/ssl-refbox/parsian_referee_nodelet.cpp
+		)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 add_dependencies(
-	${PROJECT_NAME}_proto
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_generate_headers)
+		${PROJECT_NAME}_proto
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_generate_headers)
 
 add_dependencies(
-	${PROJECT_NAME}_network
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        )
+		${PROJECT_NAME}_network
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+)
 
 add_dependencies(
-        ${PROJECT_NAME}_vision_convert
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_proto
+		${PROJECT_NAME}_vision_convert
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_proto
 )
 
 
 add_dependencies(
-        ${PROJECT_NAME}_refbox_convert
-        ${PROJECT_NAME}_vision_convert
-	${PROJECT_NAME}_gencfg
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_proto
+		${PROJECT_NAME}_refbox_convert
+		${PROJECT_NAME}_vision_convert
+		${PROJECT_NAME}_gencfg
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_proto
 )
 
 add_dependencies(${PROJECT_NAME}_vision_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 
 add_dependencies(${PROJECT_NAME}_refbox_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 add_dependencies(${PROJECT_NAME}_grsim_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 
 ## Declare a C++ executable
@@ -213,15 +212,15 @@ add_dependencies(${PROJECT_NAME}_grsim_nodelet
 ## The recommended prefix ensures that target names across packages don't collide
 
 add_executable(${PROJECT_NAME}_vision_node
-        src/ssl-vision/parsian_vision_node.cpp)
+		src/ssl-vision/parsian_vision_node.cpp)
 
 add_executable(${PROJECT_NAME}_refbox_node
-        src/ssl-refbox/parsian_referee_node.cpp
-        )
+		src/ssl-refbox/parsian_referee_node.cpp
+		)
 
 add_executable(${PROJECT_NAME}_grsim_node
-        src/grsim/grsim_node.cpp
-       )
+		src/grsim/grsim_node.cpp
+		)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -232,86 +231,86 @@ add_executable(${PROJECT_NAME}_grsim_node
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME}_vision_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 add_dependencies(${PROJECT_NAME}_refbox_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 
 add_dependencies(${PROJECT_NAME}_grsim_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_proto
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        )
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		)
 
 
 target_link_libraries(${PROJECT_NAME}_network
-        ${PROJECT_NAME}_proto
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${QT_LIBRARIES}
-)
+		${PROJECT_NAME}_proto
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		${QT_LIBRARIES}
+		)
 
 target_link_libraries(${PROJECT_NAME}_vision_convert
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${PROJECT_NAME}_proto
-        )
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		${PROJECT_NAME}_proto
+		)
 
 target_link_libraries(${PROJECT_NAME}_refbox_convert
-        ${PROJECT_NAME}_vision_convert
-        ${catkin_LIBRARIES}
-        )
+		${PROJECT_NAME}_vision_convert
+		${catkin_LIBRARIES}
+		)
 
 target_link_libraries(${PROJECT_NAME}_vision_node
-        ${catkin_LIBRARIES}
-        )
+		${catkin_LIBRARIES}
+		)
 
 target_link_libraries(${PROJECT_NAME}_vision_nodelet
-        ${PROJECT_NAME}_vision_convert
-        ${PROJECT_NAME}_network
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${PROJECT_NAME}_proto
-        )
+		${PROJECT_NAME}_vision_convert
+		${PROJECT_NAME}_network
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		${PROJECT_NAME}_proto
+		)
 
 target_link_libraries(${PROJECT_NAME}_refbox_node
-        ${catkin_LIBRARIES}
+		${catkin_LIBRARIES}
 
-        )
+		)
 
 target_link_libraries(${PROJECT_NAME}_refbox_nodelet
-        ${PROJECT_NAME}_refbox_convert
-        ${PROJECT_NAME}_network
-        ${PROJECT_NAME}_vision_convert
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        ${PROJECT_NAME}_proto
-        )
+		${PROJECT_NAME}_refbox_convert
+		${PROJECT_NAME}_network
+		${PROJECT_NAME}_vision_convert
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		${PROJECT_NAME}_proto
+		)
 
 target_link_libraries(${PROJECT_NAME}_grsim_nodelet
-        ${PROJECT_NAME}_proto
-        ${PROJECT_NAME}_network
-        ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
-        )
+		${PROJECT_NAME}_proto
+		${PROJECT_NAME}_network
+		${catkin_LIBRARIES}
+		${PROTOBUF_LIBRARIES}
+		)
 
 target_link_libraries(${PROJECT_NAME}_grsim_node
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME}_grsim_nodelet
-        )
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}_grsim_nodelet
+		)
 #############
 ## Install ##
 #############
@@ -332,15 +331,15 @@ target_link_libraries(${PROJECT_NAME}_grsim_node
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS 
+install(TARGETS
 		${PROJECT_NAME}_proto ${PROJECT_NAME}_network
 		${PROJECT_NAME}_grsim_nodelet ${PROJECT_NAME}_grsim_node
 		${PROJECT_NAME}_vision_convert ${PROJECT_NAME}_vision_nodelet ${PROJECT_NAME}_vision_node
 		${PROJECT_NAME}_refbox_convert ${PROJECT_NAME}_refbox_nodelet ${PROJECT_NAME}_refbox_node
-        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        )
+		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+		)
 
 
 ## Mark cpp header files for installation
@@ -350,22 +349,22 @@ install(TARGETS
 #   PATTERN ".svn" EXCLUDE
 # )
 install(DIRECTORY ${proto_gen_cpp_dir}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.h"
-        )
+		DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+		FILES_MATCHING PATTERN "*.h"
+		)
 
 install(DIRECTORY ${proto_gen_python_dir}/
-        DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
-        FILES_MATCHING PATTERN "*.py"
-        )
+		DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+		FILES_MATCHING PATTERN "*.py"
+		)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  vision_nodelet_plugin.xml
-  refree_nodelet_plugin.xml
-  grsim_nodelet_plugin.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+		vision_nodelet_plugin.xml
+		refree_nodelet_plugin.xml
+		grsim_nodelet_plugin.xml
+		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+		)
 
 #############
 ## Testing ##
