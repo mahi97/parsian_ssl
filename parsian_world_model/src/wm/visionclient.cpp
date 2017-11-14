@@ -15,7 +15,7 @@ CVisionClient::~CVisionClient()
     delete vcTimer;
 }
 
-void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config)
+void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet)
 {
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
