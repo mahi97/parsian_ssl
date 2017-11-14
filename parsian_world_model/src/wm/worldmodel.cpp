@@ -1,9 +1,6 @@
-//
-// Created by parsian-ai on 9/19/17.
-//
-
-#include <nodelet/nodelet.h>
 #include "parsian_world_model/wm/worldmodel.h"
+
+
 
 
 CWorldModel::CWorldModel(int c) {
@@ -30,8 +27,8 @@ void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstP
     detection = _detection;
 }
 
-void CWorldModel::execute(world_model_config::world_modelConfig & config) {
-    run(config);
+void CWorldModel::execute() {
+    run();
 }
 
 void CWorldModel::toParsianMessage(const CRobot* _robot, int id) {
@@ -157,10 +154,10 @@ void CWorldModel::merge(int frame) {
 
 
 // This Function Run in a Loop
-void CWorldModel::run(world_model_config::world_modelConfig & config)
+void CWorldModel::run()
 {
     if (vc == nullptr) return;
-    vc->parse(detection, config);
+    vc->parse(detection);
 
 }
 
