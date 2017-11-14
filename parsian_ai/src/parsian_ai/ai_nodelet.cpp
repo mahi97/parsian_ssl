@@ -35,6 +35,8 @@ void AINodelet::onInit() {
 
 
 
+    planReqPub = nh.advertise<parsian_msgs::parsian_ai_plan_request>("/ai_plan_request", 1000);
+    planSub = nh.subscribe("/playoff_plan", 1000, &AINodelet::playoffPlanCallBack , this);
 
 }
 
@@ -46,18 +48,17 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
 }
 
-
-
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ROS_INFO("wm updated");
     ai->updateWM(_wm);
     ai->execute();
 
-    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
+//    for(int i=0; i<wm->our.activeAgentsCount(); i++) {
     robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
-    }
+//    }
 
 }
+
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     ai->updateReferee(_ref);
 }
@@ -66,8 +67,14 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
     ai->updateRobotStatus(_rs);
 }
 
-void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
-{
+void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
     conf = config;
 }
 
+void AINodelet::playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg) {
+
+//    parsian_msgs::parsian_ai_plan_request reqMsg;
+//    reqMsg.ourPlayers = ai->getPlayersList();
+//    reqMsg.ourPlayers;
+
+}

@@ -26,17 +26,23 @@ public:
 
     void publish(std::vector<ros::Publisher*> publishers);
 
+    void planRequest();
+    int getGameMode(){return gameMode;}
+    QList<int> getPlayersList(){return ourPlayers;}
+
     parsian_msgs::parsian_debugs getDebugs() { return debugger->debugs; }
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
     
 
-
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 
     CSoccer*    soccer;
+
+    QList<int> ourPlayers;
+    int gameMode;
 
 protected:
 

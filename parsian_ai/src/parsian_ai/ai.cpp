@@ -92,3 +92,10 @@ void AI::publish(std::vector<ros::Publisher*> publishers) {
 //            publishers.at(i)->getTopic();
 //        }
 }
+
+void AI::planRequest() {
+//    ourPlayers = wm->our.data->activeAgents;
+//    if(gameState->ourKickoff() || gameState->theirKickoff()){
+//        gameMode;
+//    }
+}
