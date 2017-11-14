@@ -9,7 +9,6 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_robot_command.h>
-#include <parsian_msgs/grsim_robot_command.h>
 #include <parsian_msgs/parsian_ai_status.h>
 #include <parsian_msgs/parsian_robot_status.h>
 #include <parsian_msgs/parsian_debugs.h>
