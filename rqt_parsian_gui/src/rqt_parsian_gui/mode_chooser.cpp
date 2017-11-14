@@ -23,7 +23,7 @@ namespace rqt_parsian_gui
         // create QWidget
         widget_ = new QWidget();
         widget_->setWindowTitle("noOne");
-        fieldWidget=new ModeChooserWidget();
+        fieldWidget=new ModeChooserWidget(n);
         context.addWidget(fieldWidget);
     }
 }
