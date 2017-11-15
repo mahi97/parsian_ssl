@@ -2,26 +2,29 @@
 // Created by noOne on 11/14/2017.
 //
 #include <rqt_parsian_gui/modeChooserWidget.h>
-
+#include <QFile>
+#include <QTextStream>
 namespace rqt_parsian_gui
 {
 ModeChooserWidget::ModeChooserWidget(ros::NodeHandle & n)
     :QWidget()
 {
-    color =yellow;
-    side =left;
-    mode =simulation;
+    color =YELLOW;
+    side =LEFT;
+    mode =SIMULATION;
+
+    loadTeamConfig();
 
     team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("team_config",1000);
 
-    colorStr[yellow]="YELLOW";
-    colorStr[!yellow]="BLUE";
+    colorStr[YELLOW]="YELLOW";
+    colorStr[!YELLOW]="BLUE";
 
-    sideStr[left]="LEFT";
-    sideStr[!left]="RIGHT";
+    sideStr[LEFT]="LEFT";
+    sideStr[!LEFT]="RIGHT";
 
-    modeStr[simulation]="SIMULATION";
-    modeStr[!simulation]="REAL";
+    modeStr[SIMULATION]="SIMULATION";
+    modeStr[!SIMULATION]="REAL";
 
     this->setFixedSize(75,100);
 
@@ -52,6 +55,11 @@ ModeChooserWidget::ModeChooserWidget(ros::NodeHandle & n)
 
 
 
+}
+
+ModeChooserWidget::~ModeChooserWidget()
+{
+    saveTeamConfig();
 }
 
 void ModeChooserWidget::toggleMode()
@@ -87,6 +95,36 @@ void ModeChooserWidget::sendTeamConfig()
     team_config->mode =mode;
     team_config->side =side;
     team_config_pub.publish(team_config);
+}
+
+void ModeChooserWidget::saveTeamConfig()
+{
+    QFile myFile(FILE_PATH);
+    if(!myFile.open(QFile::WriteOnly |QFile::Text)){
+        ROS_INFO("saving team config failed");
+        return;
+    }
+    QTextStream out(&myFile);
+    out<<color<<side<<mode;
+    out.flush();
+    myFile.close();
+}
+
+void ModeChooserWidget::loadTeamConfig()
+{
+    QFile myFile(FILE_PATH);
+    if(!myFile.open(QFile::ReadOnly |QFile::Text)){
+        ROS_INFO("loading team config failed");
+        return;
+    }
+
+    QByteArray data=myFile.readAll();
+
+    color=static_cast<bool>(data[0]-'0');
+    side=static_cast<bool>(data[1]-'0');
+    mode=static_cast<bool>(data[2]-'0');
+
+    myFile.close();
 }
 }
 

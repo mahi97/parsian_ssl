@@ -15,15 +15,19 @@
 #include <QKeySequence>
 #include <parsian_msgs/parsian_team_config.h>
 
+#define YELLOW 1
+#define LEFT 1
+#define SIMULATION 1
+#define FILE_PATH "rqt_parsian_gui/config/team_config.txt"
 namespace rqt_parsian_gui
-#define yellow 1
-#define left 1
-#define simulation 1
 {
+
+
     class ModeChooserWidget:public QWidget {
         Q_OBJECT
     public:
         ModeChooserWidget(ros::NodeHandle & n);
+        ~ModeChooserWidget();
     public slots:
         void toggleMode();
         void toggleColor();
@@ -32,6 +36,8 @@ namespace rqt_parsian_gui
 
     private:
         void sendTeamConfig();
+        void saveTeamConfig();
+        void loadTeamConfig();
 
         QAction * modeAct;
         QGridLayout *mainLayout;
