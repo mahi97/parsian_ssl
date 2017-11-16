@@ -32,10 +32,6 @@ void AINodelet::onInit() {
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
     f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
-
-
-
-
 }
 
 void AINodelet::timerCb(const ros::TimerEvent& event) {
