@@ -10,7 +10,7 @@
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_ai_status.h>
-#include <parsian_msgs/parsian_robot_status.h>
+//#include <parsian_msgs/parsian_robot_status.h>
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <dynamic_reconfigure/server.h>

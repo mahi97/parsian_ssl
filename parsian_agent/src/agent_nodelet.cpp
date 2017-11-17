@@ -19,8 +19,8 @@ void AgentNodelet::onInit(){
 
 
     agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size()-2)).toInt()));
- 
-    common_stat_sub = nh.subscribe("common_status", 10, &AgentNodelet::commonstatCb, this);
+
+    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonconfigCb, this);
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -55,9 +55,9 @@ void AgentNodelet::onInit(){
 
 }
 
-void AgentNodelet::commonstatCb(const parsian_msgs::parsian_robot_common_statusConstPtr &msg)
+void AgentNodelet::commonconfigCb(const parsian_msgs::parsian_robot_common_configConstPtr &msg)
 {
-    //use common robot status for all robot here
+    //use common robot configs for all robot here
 
        //ROS_INFO("common AccMaxForward: %f", msg->AccMaxForward);
 }
@@ -141,7 +141,7 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
 
 void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
 {
-    //config server callback for private agent status
+    //config server callback for private agent config
 
     //TODO create a .msg file from private config and a publisher to publish data for ai
 
