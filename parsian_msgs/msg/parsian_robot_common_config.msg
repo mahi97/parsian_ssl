@@ -12,7 +12,7 @@ float64 thKD
 #ERRT
 bool Draw_Path
 float64 Goal_Probablity
-float64 MWaypoint_Catch_Probablityax
+float64 Waypoint_Catch_Probablity
 float64 Extend_Step
 float64 Target_Distance_Threshold
 #SkillsParametersKickOneTouch

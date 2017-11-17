@@ -18,7 +18,7 @@
 #include "parsian_agent/agentConfig.h"
 #include  <parsian_agent/config.h>
 #include <parsian_agent/skills.h>
-#include <parsian_msgs/parsian_robot_common_status.h>
+#include <parsian_msgs/parsian_robot_common_config.h>
 
 
 namespace parsian_agent {
@@ -36,7 +36,7 @@ namespace parsian_agent {
         ros::Subscriber ai_sub;
         ros::Subscriber robot_task_sub;
         ros::Subscriber robot_status_sub;
-        ros::Subscriber common_stat_sub;
+        ros::Subscriber common_config_sub;
 
         ros::Publisher debug_pub;
         ros::Publisher draw_pub;
@@ -44,7 +44,7 @@ namespace parsian_agent {
 
         ros::Timer timer_;
 
-        void commonstatCb(const parsian_msgs::parsian_robot_common_statusConstPtr &);
+        void commonconfigCb(const parsian_msgs::parsian_robot_common_configConstPtr &);
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 
