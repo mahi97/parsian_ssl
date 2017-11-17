@@ -1323,7 +1323,9 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         }
     }
     ////////////////////////////////////////////////////////////////////////////
+
     know->Matching(ourAgents,matchPoints,matchResult); // TODO : move to knowledge
+
     DBUG(QString("defenseAHZ : %1 ").arg(defenseAgents.size()) , D_AHZ);
     for(int i = 0 ; i < defenseCount && i < matchPoints.size(); i++){
         defensePoints[i] = matchPoints[i];
@@ -3457,7 +3459,9 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos){
                 }
                 else{
                     if(defenseCount == 2){
+
                         if(know->getEmptyAngle(ballPos, wm->field->ourGoalL(), wm->field->ourGoalR(), defs, AZDangerPercent, AZBisecOpenAngle, AZBigestOpenAngle,true) > 10 + threshOld){
+
                             tempSol.append(wm->field->AHZOurPAreaIntersectForGoalKeeper(Segment2D(wm->field->ourGoal() , wm->ball->pos))); //todo : add to field
                             if(tempSol.size() == 1){
                                 target = tempSol.at(0);
@@ -3469,7 +3473,9 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos){
                         }
                         else{
                             threshOld = 5;
+
                             target = know->getPointInDirection(wm->field->ourGoal() , wm->ball->pos , 0.1); // move to knowledge
+
                         }
                     }
                     else if(defenseCount == 1){
