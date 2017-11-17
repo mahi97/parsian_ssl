@@ -30,9 +30,10 @@ namespace parsian_communication {
         ros::Subscriber robotPacketSub;
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
-
+        ros::Publisher  statusPub;
         ros::Timer      timer;
         ros::Timer      recTimer;
+
 
         void callBack(const parsian_msgs::parsian_packetsConstPtr& _packet);
         // Timer CallBack (to publish)

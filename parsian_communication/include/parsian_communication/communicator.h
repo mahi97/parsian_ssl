@@ -8,6 +8,8 @@
 #include <string>
 #include <ros/ros.h>
 #include "parsian_util/base.h"
+#include <parsian_msgs/parsian_robots_status.h>
+#include "parsian_msgs/parsian_robot_status.h"
 /*************************************** CMySerialPort Class ******************************************/
 
 class CMySerialPort
@@ -115,6 +117,7 @@ private:
     bool serial_open;
 public :
     void readData();
+    parsian_msgs::parsian_robots_statusPtr robotsStat;
 private:
     char a;
     QTimer *recTime;
@@ -122,6 +125,7 @@ private:
     QByteArray recDataFlow;
     unsigned char rPack[13];
     unsigned char robotPacket[16][13];
+    parsian_msgs::parsian_robot_status robotStat[_MAX_NUM_PLAYERS];
 
 
 };
