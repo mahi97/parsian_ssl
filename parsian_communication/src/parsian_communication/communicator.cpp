@@ -85,6 +85,8 @@ void CBaseCommunicator::readData()
         }
     }
 
+
+
 //    knowledge->onlineRobots.clear();
 //    for(int i = 0 ; i < 12 ; i++)
 //    {
@@ -97,40 +99,34 @@ void CBaseCommunicator::readData()
 
 //    debug(QString("id : %1").arg((int)robotPacket[4][1]), D_MHMMD);
 //
-//    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
-//        CAgent* tempAgent = knowledge->getAgent(i);
-//        tempAgent->setShootSensor(robotPacket[i][1] & 0x01);
-//
-//        tempAgent->changeIsNeeded         = robotPacket[i][4] & 0b11000000;
-//
-//        tempAgent->status.battery         = robotPacket[i][1] & 0b11111100;
-//        tempAgent->status.capCharge       = robotPacket[i][2] & 0b00111111;
-//        tempAgent->status.dataLost        = robotPacket[i][4] & 0b00001111;
-//        tempAgent->status.spin            = robotPacket[i][1] & 0b00000010;
-//        tempAgent->status.shotSensor      = robotPacket[i][1] & 0b00000001;
-//        tempAgent->status.fault           = robotPacket[i][4] & 0b10000000;
-//        tempAgent->status.faild           = robotPacket[i][4] & 0b01000000;
-//        tempAgent->status.halt            = robotPacket[i][4] & 0b00100000;
-//        tempAgent->status.shotBoard       = robotPacket[i][5] & 0b01000000;
-//        tempAgent->status.kickFault       = robotPacket[i][5] & 0b00100000;
-//        tempAgent->status.chipFault       = robotPacket[i][5] & 0b00010000;
-//        tempAgent->status.encoderFault[0] = robotPacket[i][5] & 0b00001000;
-//        tempAgent->status.encoderFault[1] = robotPacket[i][5] & 0b00000100;
-//        tempAgent->status.encoderFault[2] = robotPacket[i][5] & 0b00000010;
-//        tempAgent->status.encoderFault[3] = robotPacket[i][5] & 0b00000001;
-//        tempAgent->status.motorFault[0]   = robotPacket[i][6] & 0b00000001;
-//        tempAgent->status.motorFault[1]   = robotPacket[i][6] & 0b00000010;
-//        tempAgent->status.motorFault[2]   = robotPacket[i][6] & 0b00000100;
-//        tempAgent->status.motorFault[3]   = robotPacket[i][6] & 0b00001000;
-//        tempAgent->status.motorFault[4]   = robotPacket[i][6] & 0b00010000;
-//        tempAgent->status.beep            = robotPacket[i][6] & 0b00100000;
-//        tempAgent->status.shotSensorFault = robotPacket[i][6] & 0b01000000;
-//
-//        tempAgent->status.boardID         = robotPacket[i][3] & 0b00011111;
-//    }
-
-    
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        robotStat[i].id = i;
+        robotStat[i].shootSensor           = static_cast<unsigned char>(robotPacket[i][1] & 0x01);
+        robotStat[i].battery               = static_cast<unsigned char>((robotPacket[i][1] & 0b11111100) >> 2);
+        robotStat[i].capCharge             = static_cast<unsigned char>(robotPacket[i][2] & 0b00111111);
+        robotStat[i].dataLoss              = static_cast<unsigned char>(robotPacket[i][4] & 0b00001111);
+        robotStat[i].spinCatchBall         = static_cast<unsigned char>((robotPacket[i][1] & 0b00000010) >> 1);
+        robotStat[i].shootBoardFault       = static_cast<unsigned char>((robotPacket[i][5] & 0b01000000) >> 6);
+        robotStat[i].kickFault             = static_cast<unsigned char>((robotPacket[i][5] & 0b00100000) >> 5);
+        robotStat[i].chipFault             = static_cast<unsigned char>((robotPacket[i][5] & 0b00010000) >> 4);
+        robotStat[i].En1Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00001000) >> 3);
+        robotStat[i].En2Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00000100) >> 2);
+        robotStat[i].En3Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00000010) >> 1);
+        robotStat[i].En4Fault              = static_cast<unsigned char>(robotPacket[i][5] & 0b00000001);
+        robotStat[i].m1Fault               = static_cast<unsigned char>(robotPacket[i][6] & 0b00000001);
+        robotStat[i].m2Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00000010) >> 1);
+        robotStat[i].m3Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00000100) >> 2);
+        robotStat[i].m4Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00001000) >> 3);
+//        robotStat[i].motorFault[4]   = robotPacket[i][6] & 0b00010000;
+        robotStat[i].boardId               = static_cast<unsigned char>(robotPacket[i][3] & 0b00011111);
+    }
+    robotsStat.reset(new parsian_msgs::parsian_robots_status);
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        robotsStat->status.push_back(robotStat[i]);
+    }
 }
+
+
 
 CBaseCommunicator::~CBaseCommunicator()
 {
