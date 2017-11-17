@@ -1571,7 +1571,10 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                 for(int i =0; i<markPoses.count(); i++)
                 {
                     if(i < matchPoints.size()) {
-                        markGPA[i]->init(markPoses[matchPoints[i]],markAngs[matchPoints[i]]);
+
+                        markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
+                        markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
+                        //markGPA[i]->init(markPoses[matchPoints[i]],markAngs[matchPoints[i]]);
                         markGPA[i]->setAvoidpenaltyarea(1);
                         markGPA[i]->setAvoidcentercircle(1);
                         agents[i]->action = markGPA[i];
