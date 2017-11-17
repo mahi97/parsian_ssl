@@ -2163,7 +2163,7 @@ bool DefensePlan::isValidPoint(const Vector2D& point){
 }
 
 void DefensePlan::initVars(float goalCircleRad){
-    fastestToBall = knowledge->newFastestToBall(0.016 , wm->our.data->activeAgents , wm->opp.data->activeAgents);
+    fastestToBall = know->newFastestToBall(0.016 , wm->our.data->activeAgents , wm->opp.data->activeAgents);
     int ourFastest = fastestToBall.ourFastest();
     catch_time = fastestToBall.catch_time;
     isDefenseFastest = false;
@@ -2296,7 +2296,7 @@ bool DefensePlan::defenseOneTouchOrNot(){
     Segment2D goalLine(wm->field->ourGoal()+Vector2D(0,0.8) , wm->field->ourGoal()+Vector2D(0,-0.8));
     Vector2D goalLineIntersect = goalLine.intersection(ballLine);
     bool ballDistVelFlag = defenseCheckBallDangerForOneTouch();
-    bool isItClearInFrontOfBall = knowledge->isPointClear(pointForKick , wm->ball->pos , 0.025);//todo : move to knowledge
+    bool isItClearInFrontOfBall = know->isPointClear(pointForKick , wm->ball->pos , 0.025);//todo : move to knowledge
     if(ballDistVelFlag && isItClearInFrontOfBall){
         if(goalLineIntersect.valid()){
             oneTouchFlag = true;

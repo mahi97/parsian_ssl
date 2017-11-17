@@ -6,6 +6,7 @@
 #include <QList>
 #include <parsian_ai/roles/roles.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_ai/config.h>
 
 class CMarkPlan : public Plan
 {
@@ -21,8 +22,9 @@ public:
     double ballCircleR = 0.5;
     ///////////////////////////////////////////////////
     ////Filtered Variables
-    bool weOwnBall;
-    int ourBallOwner, oppBallOwner;    //Agent Id
+    //bool weOwnBall; del
+    //bool stopMode; del
+    int ourBallOwner, oppBallOwner;    //Agent Id del
     CAgent* supporter;
     int lastFrameInSupportMode;
     int lastFrameInClearingMode;

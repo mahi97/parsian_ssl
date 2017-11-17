@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_ai/gamestate.h>
-#include <parsian_util/knowledge.h>
+#include <parsian_ai/util/knowledge.h>
 #include <parsian_ai/config.h>
 
 using namespace std;
@@ -94,7 +94,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
     Circle2D goalCircle(ourCenterOfGoalPossition , 1.43);
     Circle2D penaltyArea(wm->field->ourGoal(),1.28);
     //////////////////// Clear QLists for update the states ////////////////////
-    stopMode = gameState->isPlayOff();
+    //stopMode = gameState->isPlayOff();
     ourMarkAgentsPossition.clear();
     tempOpponentAgentsToBeMarkedPosition.clear();
     markPoses.clear();
@@ -1389,8 +1389,8 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
         markPoses.clear();
         drawer->draw(MarkArea,QColor(Qt::blue));
         markAngs.clear();
-        segmentpershoot = policy()->Mark_ShootRatioBlock() / 100;
-        segmentperpass = (100 - policy()->Mark_PassRatioBlock()) / 100;
+        segmentpershoot = conf.ShootRatioBlock / 100;
+        segmentperpass = (100 - conf.PassRatioBlock) / 100;
         QList<int> matchPoints;
 
         //////----------HMD Play on Mark-------------////
@@ -1481,7 +1481,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
             matchPoints.append(2);
             matchPoints.append(3);
 
-            Matching(agents,markPoses,matchPoints); // todo : knowledge
+            know->Matching(agents,markPoses,matchPoints); // todo : knowledge
             if(agents.count() == markPoses.count())
             {
                 DBUG(QString("agnet count %1").arg(agents.count()) , D_AHZ);
@@ -1565,7 +1565,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
             matchPoints.append(2);
             matchPoints.append(3);
 
-            Matching(agents, markPoses, matchPoints);
+            know->Matching(agents, markPoses, matchPoints);
             if(agents.count() == markPoses.count())
             {
                 for(int i =0; i<markPoses.count(); i++)
@@ -1588,35 +1588,3 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
         return;
     }
 
-    int CMarkPlan::Matching(const QList <CAgent*> robots, const QList <Vector2D> pointsToMatch, QList <int> &matchPoints)
-    {
-        QList <int> tempForMatch;
-        tempForMatch.clear();
-        for(int i = 0 ; i< robots.count() ; i++){
-            tempForMatch.append(i);
-        }
-        double D = 100000000000;
-        double tempD = 0;
-        QList<QList <int> > combo = generateCombinations(tempForMatch);
-        matchPoints.clear();
-        if(robots.count() == pointsToMatch.count()){
-            for(int i = 0 ; i < factorial(robots.count()) ; i++){ //todo : functional
-                tempD=0;
-                for(int j=0 ; j < robots.count() ; j++)
-                {
-                    tempD += pointsToMatch[combo[i][j]].dist(robots[j]->pos());
-                }
-                if(tempD < D)
-                {
-                    D = tempD;
-                    matchPoints.clear();
-                    matchPoints.append( combo[i] );
-                }
-            }
-            return 1;
-        }
-        else{
-            return -1;
-        }
-
-    }
