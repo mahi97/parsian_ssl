@@ -1,6 +1,4 @@
-#include "plan.h"
-#include "mathtools.h"
-#include "exceptions.h"
+#include <parsian_ai/plans/plan.h>
 
 Plan::Plan()
 {
@@ -15,10 +13,6 @@ void Plan::init(const QList<CAgent*> & _agents)
 
 CAgent* Plan::agent(int i)
 {
-    if (i<0 || i>=agents.length())
-    {
-        throw new EOutOfBound(i, 0, agents.length()-1, "Plan::agent");
-    }
     return agents[i];
 }
 
@@ -32,11 +26,10 @@ int Plan::count()
  * @param i the number of agent in the local agents list
  * @param skill skill that is going to be assigned
  */
-void Plan::assignSkill(int i, CSkill* skill)
+void Plan::assignSkill(int i, Action* _action)
 {
-    agent(i)->skill = skill;
-    agent(i)->skillName = skill->getName();
-    skill->setAgent(agent(i));
+    agent(i)->action = _action;
+//    agent(i)->actionName = _action->getActionName(); // TODO : Add Action Name to Agent
 }
 
 int Plan::agentById(int id)
@@ -62,5 +55,5 @@ void Plan::debugAgents(QString text){
 	QString str;
 	for( int i=0 ; i<agents.size() ; i++ )
 		str += QString(" %1").arg(agents.at(i)->id());
-	debug(QString("%1: Size: %2 --> (%3)").arg(text).arg(agents.size()).arg(str) , D_ERROR , "blue");
+	DBUG(QString("%1: Size: %2 --> (%3)").arg(text).arg(agents.size()).arg(str) , D_ERROR);
 }

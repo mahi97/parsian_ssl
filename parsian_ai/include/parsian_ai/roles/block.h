@@ -1,7 +1,7 @@
 #ifndef Block_H
 #define Block_H
 
-#include <role.h>
+#include <parsian_ai/roles/role.h>
 
 class CRoleBlockInfo : public CRoleInfo
 {
@@ -15,11 +15,8 @@ public:
 class CRoleBlock : public CRole
 {
 protected:
-    CSkillGotoPointAvoid* gotopoint;
+    GotopointavoidAction* gotopoint;
 public:
-    DEF_ROLE(CRoleBlock);
-    virtual void generateFromConfig(CAgent *a);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
 	virtual void parse(QStringList params = QStringList());
     SkillProperty(CRoleBlock, bool, BlockGoal, blockGoal);
     SkillProperty(CRoleBlock, bool, Stop, stop);

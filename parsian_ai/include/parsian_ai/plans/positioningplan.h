@@ -1,17 +1,16 @@
 #ifndef POSITIONINGPLAN_H
 #define POSITIONINGPLAN_H
 
-#include <plans/plan.h>
-#include "formation/edit_data.h"
+#include <parsian_ai/plans/plan.h>
 
-enum positioningType{
+enum class positioningType{
     ONETOUCH,
 	TOBALL,
 	TOOPPGOAL,
 	TOOURGOAL
 };
 
-enum edgeMode {
+enum class edgeMode {
     TOP,
     BOT
 };
@@ -56,14 +55,13 @@ class PositioningPlan : public Plan
 private:
 	QList< holdingPoints > positionStaticPoints;
 
-    CSkillGotoPoint* gps[_MAX_NUM_PLAYERS];
-    CSkillGotoPointAvoid *gpa[_MAX_NUM_PLAYERS];
+    GotopointAction* gps[_MAX_NUM_PLAYERS];
+    GotopointavoidAction *gpa[_MAX_NUM_PLAYERS];
     Vector2D positioningTargets[_MAX_NUM_PLAYERS];
 	Vector2D staticPositioningTargets[_MAX_NUM_PLAYERS];
 	Vector2D staticPositioningTargetsInput[_MAX_NUM_PLAYERS];
 	Vector2D staticPositioningFacePoints[_MAX_NUM_PLAYERS];
     Vector2D lastStaticPositioningTargets[_MAX_NUM_PLAYERS];
-	EditData *editData;
 	int posCount;
 	double staticEscapeRadius[_MAX_NUM_PLAYERS];
 	int executedCycles[_MAX_NUM_PLAYERS];
@@ -86,7 +84,6 @@ private:
 
 public:
     PositioningPlan();
-	void init(const QList<CAgent *> &_agents , EditData *_editData , QString playMode );
 	void staticInit( QList< holdingPoints > &_staticPoints );
 	void staticExec();
 	void execute();

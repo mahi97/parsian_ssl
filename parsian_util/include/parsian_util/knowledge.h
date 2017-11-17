@@ -9,7 +9,62 @@
 #include "parsian_util/core/field.h"
 #include <parsian_util/core/team.h>
 
+#include <ros/ros.h>
+
 #include <QList>
+
+
+struct NewFastestToBall
+{
+    double catch_time;
+    bool isFastestOurs;
+    QList< std::pair<double , int> > ourF;
+    QList< std::pair<double , int> > oppF;
+    NewFastestToBall(){
+        catch_time = 10000;
+        isFastestOurs = false;
+        ourF.clear();
+        oppF.clear();
+    }
+    int ourFastest(){
+        if(ourF.size())
+            return ourF.first().second;
+        return -1;
+    }
+    double ourFastestTime(){
+        if(ourF.size()){
+            return ourF.first().first;
+        }
+        return -1;
+    }
+    int oppFastest(){
+        if( oppF.size() )
+            return oppF.first().second;
+        return -1;
+    }
+    double oppFastestTime(){
+        if(oppF.size())
+            return oppF.first().first;
+        return -1;
+    }
+};
+
+struct FastestToBall
+{
+    double catch_time;
+    int ourFastest;
+    double ourFastestTime;
+    int oppFastest;
+    double oppFastestTime;
+    FastestToBall(){
+        catch_time = 1000;
+        ourFastest = -1;
+        ourFastestTime = -1;
+        oppFastest = -1;
+        oppFastestTime = -1;
+    }
+};
+
 
 struct range {
     double a,b;
@@ -72,6 +127,12 @@ class CKnowledge {
 public:
     CKnowledge();
     ~CKnowledge();
+    
+    NewFastestToBall newFastestToBall(double timeStep = 0.1, QList<int> ourList=wm->our.data->activeAgents, QList<int> oppList=wm->opp.data->activeAgents);
+	FastestToBall findFastestToBall(QList<int> ourList, QList<int> oppList);
+
+
+
 
     static double getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circle2D> obs, double& percent, double &mostOpenAngle, double& biggestAngle, bool oppGoal = true, bool _draw = false);
     static Vector2D getReflectPos(Vector2D goal, double dist, Vector2D _ballpos);

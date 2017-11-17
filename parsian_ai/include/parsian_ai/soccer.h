@@ -76,5 +76,7 @@ private:
 
 };
 
+extern CSoccer* soccer;
+
 
 #endif //PARSIAN_AI_SOCCER_H

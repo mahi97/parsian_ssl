@@ -1,8 +1,10 @@
 #ifndef PLAYOFFROLE_H
 #define PLAYOFFROLE_H
 
-#include "role.h"
+#include "parsian_ai/roles/role.h"
+
 #include <QTime>
+
 class CRolePlayOff{
 private:
     void update();
@@ -19,14 +21,14 @@ public:
     int resetTime();
     int getElapsed() const;
     bool deleted;
-    CSkillKick *kickSkill;
-    CSkillReceivePass *receivePassSkill;
-    CSkillKickOneTouch *oneTouchSkill;
-    CSkillGotoPointAvoid *gotoPointAvoidSkill;
+    KickAction *kickSkill;
+    ReceivepassAction *receivePassSkill;
+    OnetouchAction *oneTouchSkill;
+    GotopointavoidAction *gotoPointAvoidSkill;
 
     ClassProperty(CRolePlayOff, int, AgentID, agentID, updated);
     ClassProperty(CRolePlayOff, CAgent*, Agent, agent, updated);
-    ClassProperty(CRolePlayOff, roleSkill::ESkill, SelectedSkill, selectedSkill, updated);
+    ClassProperty(CRolePlayOff, ESkill, SelectedSkill, selectedSkill, updated);
     ClassProperty(CRolePlayOff, Vector2D, Target, target, updated);
     ClassProperty(CRolePlayOff, Vector2D, TargetDir, targetDir, updated);
     ClassProperty(CRolePlayOff, Vector2D, TargetVel, targetVel, updated);
@@ -38,7 +40,7 @@ public:
     ClassProperty(CRolePlayOff, bool, Slow, slow, updated);
     ClassProperty(CRolePlayOff, float, ReceiveRadius, receiveRadius, updated);
     ClassProperty(CRolePlayOff, Vector2D, WaitPos, waitPos, updated);
-    ClassProperty(CRolePlayOff, double, MaxVelocity, maxVelocity, updated);
+    ClassProperty(CRolePlayOff, float, MaxVelocity, maxVelocity, updated);
     ClassProperty(CRolePlayOff, bool, Intercept, intercept, updated);
     ClassProperty(CRolePlayOff, bool, AvoidBall,avoidBall, updated);
     ClassProperty(CRolePlayOff, bool, IgnoreAngle, ignoreAngle, updated);
@@ -64,8 +66,8 @@ public:
     inline bool getRoleUpdate () {return roleUpdate;}
 
     CRolePlayOff* setKickRealSpeed(double val) {
-        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
-        debug(QString("[playoffrole] setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
+        //kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false); TODO : NEW PROFILE
+        DBUG(QString("[playoffrole] setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
         updated = true;
         return this;
     }

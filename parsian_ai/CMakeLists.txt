@@ -85,9 +85,8 @@ include_directories(
 		${catkin_INCLUDE_DIRS}
 )
 
-## show include dir in qt
-#FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
-#add_custom_target(headers SOURCES ${LibFiles})
+file(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
@@ -95,12 +94,12 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/soccer.cpp
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
-	#       src/${PROJECT_NAME}/coach.cpp
+        src/${PROJECT_NAME}/coach.cpp
 )
 
-#add_library(${PROJECT_NAME}_plays
+add_library(${PROJECT_NAME}_plays
 #		src/parsian_ai/plays/dynamicattack.cpp
-#		src/parsian_ai/plays/masterplay.cpp
+		src/parsian_ai/plays/masterplay.cpp
 #		src/parsian_ai/plays/ourballplacement.cpp
 #		src/parsian_ai/plays/playoff.cpp
 #		src/parsian_ai/plays/ourpenalty.cpp
@@ -110,29 +109,34 @@ add_library(${PROJECT_NAME}
 #		src/parsian_ai/plays/theirdirect.cpp
 #		src/parsian_ai/plays/theirballplacement.cpp
 #		src/parsian_ai/plays/stopplay.cpp
-#		)
+		)
 #
-#add_library(${PROJECT_NAME}_plans
-#		src/parsian_ai/plans/defenseplan.cpp
-#		src/parsian_ai/plans/markplan.cpp
-#		src/parsian_ai/plans/plan.cpp
+add_library(${PROJECT_NAME}_plans
+		src/parsian_ai/plans/defenseplan.cpp
+		src/parsian_ai/plans/markplan.cpp
+		src/parsian_ai/plans/plan.cpp
 #		src/parsian_ai/plans/positioningplan.cpp
-#		)
+		)
 
-#add_library(${PROJECT_NAME}_util
-#		src/parsian_ai/util/planloader.cpp
+add_library(${PROJECT_NAME}_roles
+        src/parsian_ai/roles/role.cpp
+        src/parsian_ai/roles/block.cpp
+        src/parsian_ai/roles/playoffrole.cpp
+#        src/parsian_ai/roles/stop.cpp
+        src/parsian_ai/roles/dynamicrole.cpp
+        src/parsian_ai/roles/playmake.cpp
+        )
+
+add_library(${PROJECT_NAME}_util
+		src/parsian_ai/util/defpos.cpp
+		#		src/parsian_ai/util/planloader.cpp
 #		src/parsian_ai/util/loadplayoffjson.cpp
-#		)
+		)
 
 
 add_library(${PROJECT_NAME}_nodelet
-        src/ai_nodelet.cpp)
-
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+        src/ai_nodelet.cpp
+        )
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -153,13 +157,12 @@ add_dependencies(${PROJECT_NAME}_node
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
 		${PROJECT_NAME}_gencfg
-
 		)
+
 add_dependencies(${PROJECT_NAME}_nodelet
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_gencfg
-
         )
 
 ## Specify libraries to link a library or executable target against
@@ -167,14 +170,15 @@ add_dependencies(${PROJECT_NAME}_nodelet
 target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
-		${QT_LIBRARIES})
+		${QT_LIBRARIES}
+        )
 
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
-#		${PROJECT_NAME}_plays
-#		${PROJECT_NAME}_plans
+		${PROJECT_NAME}_plays
+		${PROJECT_NAME}_plans
         )
 
 add_dependencies(${PROJECT_NAME}
@@ -188,15 +192,16 @@ target_link_libraries(${PROJECT_NAME}
 		${QT_LIBRARIES}
 		)
 
-#target_link_libraries(${PROJECT_NAME}_plays
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
-#
-#target_link_libraries(${PROJECT_NAME}_plans
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
+target_link_libraries(${PROJECT_NAME}_plays
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
+
+target_link_libraries(${PROJECT_NAME}_plans
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
+
 #target_link_libraries(${PROJECT_NAME}_util
 #		${QT_LIBRARIES}
 #		${catkin_LIBRARIES}

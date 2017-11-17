@@ -1,6 +1,7 @@
 #ifndef DYNAMICROLE_H
 #define DYNAMICROLE_H
 
+#include <parsian_util/base.h>
 #include "role.h"
 
 class CRoleDynamic
@@ -16,13 +17,10 @@ public:
     void execute();
 
 private:
-    CSkillKick           *shotSkill;
-    CSkillDribble        *dribbleSkill;
-    CSkillKeep           *keepSkill;
-    CSkillNewPass        *passSkill;
-    CSkillReceivePass    *receiveSkill;
-    CSkillGotoPointAvoid *moveSkill;
-    CSkillKickOneTouch   *oneTouchSkill;
+    KickAction           *shotSkill;
+    ReceivepassAction    *receiveSkill;
+    GotopointavoidAction *moveSkill;
+    OnetouchAction       *oneTouchSkill;
     // CSKill "KEEP"
 
     void update();
@@ -45,15 +43,15 @@ private:
 
 public:
     CRoleDynamic* setKickRealSpeed(double val) {
-        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
-        debug(QString("setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
+//        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
+        DBUG(QString("setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
         updated = true;
         return this;
     }
 
 
     CRoleDynamic* setAddKickRealSpeed(double val) {
-        kickSpeed = knowledge -> getProfile(agent->id(), agent->pos().dist(target) + val, !chip, false);
+//        kickSpeed = knowledge -> getProfile(agent->id(), agent->pos().dist(target) + val, !chip, false);
         updated = true;
         return this;
     }

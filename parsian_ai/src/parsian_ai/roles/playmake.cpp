@@ -1,13 +1,8 @@
-#include "playmake.h"
-#include <varswidget.h>
-#include "conditions.h"
-#include "position.h"
-#include <passevaluation.h>
+#include "parsian_ai/roles/playmake.h"
 #include <QDebug>
 #include <ctime>
 using namespace std;
 
-INIT_ROLE(CRolePlayMake, "playmake");
 
 CRolePlayMake::CRolePlayMake(CAgent *_agent) : CRole(_agent)
 {
@@ -77,372 +72,6 @@ CRolePlayMake::CRolePlayMake(CAgent *_agent) : CRole(_agent)
 
 CRolePlayMake::~CRolePlayMake()
 {
-}
-
-bool CRolePlayMake::spinBack()
-{
-    return false;
-    bool pushIt = false;
-    if ((stopped)
-            || (kickoff)
-            || (!agent->abilities.canSpin)
-            || wm->ball->pos.dist(wm->field->oppCornerL() )< 0.9
-            || wm->ball->pos.dist(wm->field->oppCornerR() )< 0.9)
-        return false;
-    if (knowledge->frameCount - lastFrameCrowded > 9)
-    {
-        bool flag = knowledge->isCrowdedInFrontOfAgent(agent->id(), CRobot::robot_radius_old*6);
-        int ownersCount = 0;
-        for (int i=0;i<wm->opp.activeAgentsCount();i++)
-        {
-            if ( wm->opp.active(i)->isBallOwner(0.21,CRobot::robot_radius_old))
-                ownersCount++;
-        }
-        if( ownersCount == 0)
-            flag = false;
-        if (!flag) return false;
-        else {
-            lastFrameCrowded = knowledge->frameCount;
-        }
-    }
-    forceRedecide = true;
-    if( !initialPoint.isValid())
-        initialPoint = agent->pos();
-    Vector2D kickTar;
-    double kickW;
-    QList<int> ourRelId,oppRelId;
-    oppRelId.clear();
-    ourRelId.clear();
-    ourRelId.append( agent->id());
-    agent->setRoller(3);
-    kickTar = knowledge->getEmptyPosOnGoal( agent->self()->getKickerPos(), kickW, true, ourRelId, oppRelId, 0.9);
-    if (manualPassReceive) return false;
-    if (indirect) return false;
-
-    if( kickW > 0.3)
-    {
-        debug(QString("kicking ! w = %1").arg(kickW),D_SEPEHR);
-        kick->setAgent(agent);
-        kick->setChip(false);
-        kick->setSlow(false);
-        kick->setInterceptMode(true);
-        kick->setKickSpeed(kick->getAgent()->kickSpeedValue(7.8 , false));
-        kick->setDontKick(false);
-        kick->setTarget(kickTar);
-        kick->execute();
-        return true;
-    }
-    else if( wm->ball->pos.dist( wm->field->oppGoal()) < 0.9)
-    {
-        bool hum = true;
-        for(int i=0;i<knowledge->oppBlockers.count();i++)
-        {
-            if(wm->opp[knowledge->oppBlockers[i]]->isBallOwner(0.6,CRobot::robot_radius_old))
-                hum = false;
-        }
-        if( !hum && wm->our[agent->id()]->isBallOwner(0.01))
-        {
-            agent->addRobotVel(2.1,0,0);
-        }
-        debug(QString("na kicke inja").arg(kickW),D_SEPEHR);
-        kick->setAgent(agent);
-        kick->setChip(false);
-        kick->setSlow(false);
-        kick->setInterceptMode(true);
-        kick->setKickSpeed(kick->getAgent()->kickSpeedValue(7.8 , false));
-        kick->setDontKick(true);
-        kick->setTarget((wm->ball->pos - agent->pos()).norm());
-        kick->execute();
-        kick->setDontKick(false);
-    }
-    int oppBallOwner=-1;
-    for(int i=0;i<knowledge->oppBlockers.count();i++)
-    {
-        if(wm->opp[knowledge->oppBlockers[i]]->isBallOwner(0.09))
-            oppBallOwner = knowledge->oppBlockers[i];
-    }
-    bool rightSupporterExist, leftSupporterExist, frontSupportExist;
-    rightSupporterExist = false;
-    leftSupporterExist = false;
-    frontSupportExist = false;
-    Rect2D leftRect(Vector2D( agent->pos().x-0.3, agent->pos().y+0.36), Vector2D(agent->pos().x, agent->pos().y));
-    Rect2D rightRect(Vector2D( agent->pos().x-0.3, agent->pos().y), Vector2D(agent->pos().x, agent->pos().y-0.36));
-    Rect2D frontRect(Vector2D( agent->pos().x+0.27, agent->pos().y+0.21), Vector2D(agent->pos().x+0.75, agent->pos().y-0.21));
-    draw(leftRect,"pink");
-    draw(rightRect,"blue");
-    draw(frontRect,"orange");
-    for ( int i = 0; i < wm->our.activeAgentsCount(); i++)
-    {
-        if ( wm->our.active(i)->id == agent->self()->id)
-            continue;
-        if ( rightRect.contains(wm->our.active(i)->pos))
-            rightSupporterExist = true;
-        if ( leftRect.contains(wm->our.active(i)->pos))
-            leftSupporterExist = true;
-        if( frontRect.contains(wm->our.active(i)->pos))
-            frontSupportExist = true;
-    }
-    if(wm->our[agent->id()]->isBallOwner(0.03))
-    {
-
-        //        if( wm->ball->pos.dist( wm->field->oppGoal()) < 1.2)
-        //        {
-        //             debug("side walking", D_SEPEHR, "darkcyan");
-        //            knowledge->setSupporPlaymaker(CKnowledge::Back);
-        //            agent->setRoller( 5);
-        //            gotopoint->setAgent(agent);
-        //            gotopoint->setNoAvoid(true);
-        //            if ( spinside)
-        //            {
-        //                debug("right", D_SEPEHR, "orange");
-        //                gotopoint->setTarget( Vector2D(agent->pos().x, agent->pos().y+0.3), Vector2D(1,0.4).norm());
-        //                if ( wm->ball->pos.y > 0.6)
-        //                    spinside = false;
-        //            }
-        //            else
-        //            {
-        //                debug("left", D_SEPEHR, "orange");
-        //                gotopoint->setTarget( Vector2D(agent->pos().x, agent->pos().y-0.3), Vector2D(1,-0.4).norm());
-        //                if ( wm->ball->pos.y < -0.6)
-        //                    spinside = true;
-        //            }
-        //            gotopoint->execute();
-        //            return true;
-        //        }
-        spin->setAgent(agent);
-        spin->setTarget(2*agent->pos()-wm->field->oppGoal());// test it !
-        if( oppBallOwner!=-1 && wm->ball->pos.dist( wm->field->ourGoal()) >= 1.8)
-        {
-            spin->setTarget(2*agent->pos()-wm->opp[oppBallOwner]->pos); // test it !
-        }
-        else
-        {
-            bool hey=false;
-            for(int i=0;i<knowledge->oppBlockers.count();i++)
-            {
-                if(wm->opp[knowledge->oppBlockers[i]]->isBallOwner(0.15,CRobot::robot_radius_old))
-                    hey = true;
-            }
-            if(hey)
-            {
-                debug(QString("na kicke hey").arg(kickW),D_SEPEHR);
-                kick->setAgent(agent);
-                kick->setChip(false);
-                kick->setSlow(false);
-                kick->setInterceptMode(true);
-                kick->setKickSpeed(kick->getAgent()->kickSpeedValue(7.8 , false));
-                kick->setDontKick(true);
-                kick->setTarget((wm->ball->pos - agent->pos()).norm());
-                kick->setDontKick(false);
-                kick->execute();
-                /*
-    if(hey && wm->our[agent->id()]->isBallOwner(0.01))
-    {
-     agent->addRobotVel(2.1,0,0);
-    }*/
-            }
-            else
-            {
-                debug("chip", D_SEPEHR, "darkcyan");
-                kick->setAgent(agent);
-                kick->setChip(true);
-                kick->setSlow(false);
-                kick->setKickSpeed(kick->getAgent()->chipDistanceValue(wm->ball->pos.dist(wm->field->oppGoal())-0.6 , false));
-                kick->setTolerance(0.9);
-                kick->setAutoChipSpeed(false);
-                kick->setTarget(wm->field->oppGoal());
-                kick->setChip(false);
-                kick->setKickSpeed(agent->kickSpeedValue(7.2,0));
-                kick->execute();
-            }
-        }
-        /*
-  //Pushing :
-
-  if ( agent->self()->isBallOwner(0.03) )
-  {
-   gotoball->setAgent(agent);
-   gotoball->setStruggle(true);
-   gotoball->execute();
-  }
-  */
-        spin->setWaitFrames(9);
-        spin->setTakeBack(true);
-        spin->setAnglularVelocity(0);
-        spin->setCorrectAngleTowardTarget(false);
-        spin->setLinearVelocity(0.0);
-        spin->setLinearAcceleration(2.7);
-        spin->execute();
-        draw("Spin 1",Vector2D(0,0),"pink",50);
-        knowledge->setSupporPlaymaker(CKnowledge::Back);
-        bool notBlockChipIt = true , leftClean = true, rightClean = true, backClean = true;
-        if( knowledge->oppBlockers.count() > 1 )
-            backClean = false;
-        for (int i = 0; i < wm->opp.activeAgentsCount(); i++)
-        {
-            Vector2D checkDir = wm->field->oppGoal() - wm->ball->pos;
-            if(wm->opp.active(i)->pos.dist(wm->ball->pos) < 1.0)
-            {
-                Vector2D agentDir = wm->opp.active(i)->pos - wm->ball->pos;
-                if( Vector2D::angleBetween( checkDir , agentDir).degree() > 60 && Vector2D::angleBetween( checkDir , agentDir).degree() < 130)
-                {
-                    if( checkDir.th().degree() - agentDir.th().degree() < 0)
-                        leftClean = false;
-                    else
-                        rightClean = false;
-                }
-            }
-        }
-
-        for(int i=0;i< wm->opp.activeAgentsCount();i++)
-        {
-            if(wm->opp.active(i)->isBallOwner(0.12,CRobot::robot_radius_old*2))
-                notBlockChipIt = false;
-        }
-        if(notBlockChipIt && backClean)
-        {
-            debug("notblockchip", D_SEPEHR, "cyan");
-            kick->setAgent(agent);
-            kick->setChip(true);
-            if( frontSupportExist)
-                kick->setKickSpeed(kick->getAgent()->chipDistanceValue(1.05 , true));
-            else
-                kick->setKickSpeed(kick->getAgent()->chipDistanceValue(0.75 , true));
-            kick->setAutoChipSpeed(false);
-            kick->setTolerance(1.0);
-            kick->setDontKick(false);
-            kick->execute();
-            kick->setChip(false);
-            return true;
-        }
-        else if( oppBallOwner != -1)
-        {
-            debug("ballOwner",D_SEPEHR);
-            //            if( wm->ball->pos.dist( wm->field->ourGoal()) < 2.1)
-            //            {
-            if(wm->opp[oppBallOwner]->isBallOwner(0.18))
-            {
-                knowledge->setSupporPlaymaker(CKnowledge::Back);
-                if( agent->pos().dist(initialPoint) < 0.6 && wm->ball->pos.x > -1.2 )
-                {
-                    debug("front",D_SEPEHR,"blue");
-                    knowledge->setSupporPlaymaker(CKnowledge::Front);
-                }
-                else if( wm->ball->pos.y > 0 && wm->opp[oppBallOwner]->isBallOwner(0.045))
-                {
-                    debug("right",D_SEPEHR,"green");
-                    knowledge->setSupporPlaymaker(CKnowledge::Right);
-                }
-                else if( wm->ball->pos.y < 0 && wm->opp[oppBallOwner]->isBallOwner(0.045))
-                {
-                    debug("left",D_SEPEHR,"pink" );
-                    knowledge->setSupporPlaymaker(CKnowledge::Left);
-                }
-                debug(QString("right : %1 letf : %2").arg(rightSupporterExist).arg(leftSupporterExist),D_SEPEHR);
-
-                if( agent->self()->isBallOwner(0.009) && rightSupporterExist && wm->ball->pos.y > 0)
-                {
-                    debug("right micharkham :D",D_SEPEHR,"green");
-                    //                    turn->setAgent(agent);
-                    //					turn->setDynamic(90,0,0);
-                    //					turn->setTurnMode(CSkillTurn::Dynamic);
-                    //                    turn->setDirection(agent->dir().rotatedVector(-170));
-                    //                    turn->execute();
-                    agent->setRobotVel(0,0,-90);
-                    return true;
-                }
-                else if( agent->self()->isBallOwner(0.009) && leftSupporterExist && wm->ball->pos.y < 0 )
-                {
-                    debug("left micharkham :D",D_SEPEHR,"green");
-                    //                    turn->setAgent(agent);
-                    //					turn->setDynamic(900,0,0);
-                    //					turn->setTurnMode(CSkillTurn::Dynamic);
-                    //                    turn->setDirection(agent->dir().rotatedVector(170));
-                    //                    turn->execute();
-                    agent->setRobotVel(0,0,90);
-                    return true;
-                }
-                //              else
-                //				{
-                //					//Pushing :
-                //					debug("PUSHING",D_ERROR,"purple");
-                //					if ( agent->self()->isBallOwner(0.03))
-                //					{
-                //						gotoball->setAgent(agent);
-                //						gotoball->setStruggle(true);
-                //						gotoball->execute();
-                //					}
-                //				}
-            }
-            if( wm->ball->pos.dist( wm->field->ourGoal()) < 1.8)
-                knowledge->setSupporPlaymaker(CKnowledge::Front);
-            //			//            }
-            //			else{
-            //				//Pushing :
-
-            //				debug("pushing ?!",D_ERROR,"red");
-
-            //				if ( agent->self()->isBallOwner(0.03))
-            //				{
-            //					gotoball->setAgent(agent);
-            //					gotoball->setStruggle(true);
-            //					gotoball->execute();
-            //				}
-
-
-            //				//                if( wm->ball->pos.y > 0 )
-            //				//                {
-            //				//                    debug("right",D_SEPEHR,"green");
-            //				//                    knowledge->setSupporPlaymaker(CKnowledge::Right);
-            //				//                    agent->addRobotVel(0.0, 0.0, 90.0 );
-            //				//                }
-            //				//                else if( wm->ball->pos.y < 0 )
-            //				//                {
-            //				//                    debug("left",D_SEPEHR,"pink");
-            //				//                    knowledge->setSupporPlaymaker(CKnowledge::Left);
-            //				//                    agent->addRobotVel(0.0, 0.0, -90.0 );
-            //				//                }
-            //			}
-        }
-    }
-    else
-    {
-        draw("Spin 2",Vector2D(0,0),"pink",50);
-        //        gotoball->setAgent(agent);
-        //        gotoball->setSpin(true);
-        //        gotoball->setSlow(false);
-        //        gotoball->setStruggle(true);
-        //        gotoball->setGoal(wm->field->oppGoal());// kick->getTarget());
-        //        if(oppBallOwner!=-1)
-        //        {
-        //            gotoball->setGoal(wm->opp[oppBallOwner]->pos);
-        //        }
-        //        gotoball->execute();
-        kick->setAgent(agent);
-        kick->setDontKick(true);
-        double w1;
-        QList<int> rel;
-        rel.append(agent->id());
-        kick->setTarget(knowledge->getEmptyPosOnGoal(wm->ball->pos, w1, true, rel, rel, 0.6));
-        draw(Circle2D(kick->getTarget(), 0.3),0,190, "purple", true);
-        kick->setSlow(false);
-        kick->setInterceptMode(true);
-        kick->setSagMode(false);
-        kick->setChip(false);
-        kick->setKickSpeed(agent->kickSpeedValue(7.2,0));
-        kick->execute();
-        kick->setDontKick(false);
-
-        //Pushing :
-
-        //		if ( agent->self()->isBallOwner(0.03))
-        //		{
-        //			gotoball->setAgent(agent);
-        //			gotoball->setStruggle(false);
-        //			gotoball->execute();
-        //		}
-    }
-    return true;
 }
 
 void CRolePlayMake::passShootNew()
@@ -629,7 +258,7 @@ void CRolePlayMake::passShootNew()
                 spinPass[i]->agents.append(agent);
             }
             passreceivers.clear();
-            passreceivers.append(knowledge->roleAssignments["position"]);
+            passreceivers.append(knowledge->roleAssignments["positioningPlan"]);
             //			for (int i=0;i<passreceivers.count();i++)
             //                if ( passreceivers.at(i)->vel().length() > 1.2)
             //				{
@@ -671,7 +300,7 @@ void CRolePlayMake::passShootNew()
                 behaviours.append(pass[i]);
                 //            behaviours.append(chippass[i]);
             }
-            if ((knowledge->roleAssignments["position"].count() == 0) && (knowledge->getGameMode()==CKnowledge::OurIndirectKick))
+            if ((knowledge->roleAssignments["positioningPlan"].count() == 0) && (knowledge->getGameMode()==CKnowledge::OurIndirectKick))
             {
                 if (!noKick) behaviours.append(chipToGoal);
             }
@@ -1581,12 +1210,12 @@ CAgent* CRolePlayMakeInfo::bestPassReceiver(bool indirect)
     {
         if ((knowledge->getAgent(i)->isVisible()) && (knowledge->getAgent(i)->skillName != CRolePlayMake::Name)
                 //&& ((knowledge->getAgent(i)->canRecvPass || indirect))
-                && (knowledge->getAgent(i)->skillName=="position"))
+                && (knowledge->getAgent(i)->skillName=="positioningPlan"))
         {
             double ang = 0, coming = 0;
             knowledge->onetouchablity(knowledge->getAgent(i)->id(), w, ang, coming);
             //            knowledge->goalVisiblity(knowledge->getAgent(i)->id(), w, policy()->PlayMaker_UnderEstimateTheirGoalie());
-            if ((knowledge->getAgent(i)->skillName=="position") && (knowledge->getAgent(i)->skill!=NULL))
+            if ((knowledge->getAgent(i)->skillName=="positioningPlan") && (knowledge->getAgent(i)->skill!=NULL))
             {
                 if (static_cast<CRolePosition*> (knowledge->getAgent(i)->skill)->getPenalty())
                 {
@@ -1728,7 +1357,7 @@ void CRolePlayMake::executeOurIndirect()
         {
             if (knowledge->getAgent(i)->skill != NULL)
             {
-                if (knowledge->getAgent(i)->skill->getName() == "position")
+                if (knowledge->getAgent(i)->skill->getName() == "positioningPlan")
                 {
                     if( static_cast<CRolePosition*>( knowledge->getAgent(i)->skill)->getIndirectTiny())
                         kick->setTarget(knowledge->getAgent(i)->self()->getKickerPos(0.01));

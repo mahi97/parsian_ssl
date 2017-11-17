@@ -1,5 +1,6 @@
 #include <parsian_ai/soccer.h>
 
+CSoccer* soccer;
 
 CSoccer::CSoccer()
 {
@@ -10,6 +11,7 @@ CSoccer::CSoccer()
         agents[i] = new CAgent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
         agents[i]->self = *wm->our.active(i);
     }
+
 //    knowledge = new CKnowledge(agents);
 //    coach = new CCoach(agents);
 

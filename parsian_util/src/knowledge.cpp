@@ -315,3 +315,190 @@ int CKnowledge::getNearestRobotToPoint(CTeam _team, Vector2D _point) {
     }
     return nearest;
 }
+
+NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList){
+    ////
+    ////Code By Sepehr
+    ////
+
+    // reset everything
+    NewFastestToBall result;
+    if(!wm->field->fieldRect().contains(wm->ball->pos))
+        return result;
+
+    double t = 0;
+    Vector2D ballPredict;
+
+    bool ourCalced[_MAX_NUM_PLAYERS];
+    bool oppCalced[_MAX_NUM_PLAYERS];
+    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
+        ourCalced[i] = false;
+        oppCalced[i] = false;
+    }
+
+    // use the correct Robot acceleration and maximum Velocity below :
+    double robotMaxVel;
+    ros::param::get("agent_node/VelMax", robotMaxVel); 
+    double robotMAxAcc;
+    ros::param::get("agent_node/AccMaxForward", robotMAxAcc);
+
+    while ( t < 20 && (result.ourF.size() < ourList.size() || result.oppF.size() < oppList.size()) )
+    {
+        ballPredict = wm->ball->predict(t);
+
+        double tToVMax;
+        Vector2D center;
+        double radius;
+        for ( int i = 0; i < ourList.count(); i++ )
+        {
+            if ( ourCalced[i] )
+                continue;
+            center = wm->our[ourList[i]]->pos + wm->our[ourList[i]]->vel * t;
+            tToVMax = ( robotMaxVel - wm->our[ourList[i]]->vel.length()) / robotMAxAcc;
+            radius = 0;
+            if ( tToVMax > t)
+                radius = 0.5*robotMAxAcc*t*t + wm->our[ourList[i]]->vel.length() * t;
+            else if ( tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel)
+            {
+                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->our[ourList[i]]->vel.length()*tToVMax;
+                radius += ( t - tToVMax ) * robotMaxVel;
+            }
+            else
+                radius = t * wm->our[ourList[i]]->vel.length();
+            radius += CRobot::robot_radius_old;
+            Circle2D cir = Circle2D( center, radius);
+            Vector2D s0,s2;
+            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
+            {
+                result.ourF.append(pair<double,int>(t , ourList[i]));
+                ourCalced[i] = true;
+                if( result.catch_time > t ){
+                    result.catch_time = t;
+                    result.isFastestOurs = true;
+                }
+            }
+            //            draw( cir, 0 , 360, "red");
+        }
+        for ( int i = 0; i < oppList.count(); i++ )
+        {
+            if ( oppCalced[i] )
+                continue;
+            center = wm->opp[oppList[i]]->pos + wm->opp[oppList[i]]->vel * t;
+            tToVMax = ( robotMaxVel - wm->opp[oppList[i]]->vel.length()) / robotMAxAcc;
+            radius = 0;
+            if ( tToVMax > t)
+                radius = 0.5*robotMAxAcc*t*t + wm->opp[oppList[i]]->vel.length() * t;
+            else if ( tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel)
+            {
+                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->opp[oppList[i]]->vel.length()*tToVMax;
+                radius += ( t - tToVMax ) * robotMaxVel;
+            }
+            else
+                radius = t * wm->opp[oppList[i]]->vel.length();
+            radius += CRobot::robot_radius_old;
+            Circle2D cir = Circle2D( center, radius) ;
+            Vector2D s0,s2;
+            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))
+            {
+                result.oppF.append(pair<double,int>(t , oppList[i]));
+                oppCalced[i] = true;
+                if( result.catch_time > t ){
+                    result.catch_time = t;
+                    result.isFastestOurs = false;
+                }
+            }
+            //            draw( cir, 0 , 360, "blue");
+        }
+        t += timeStep;
+    }
+    qSort(result.ourF.begin() , result.ourF.end());
+    qSort(result.oppF.begin() , result.oppF.end());
+    if( result.catch_time > 10 )
+        result.catch_time = 0;
+    return result;
+}
+
+FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppList)
+{
+    /////Extracted from DefensePlan
+    /////By Pooria
+    /////
+    FastestToBall f;
+    double time = 0.f;
+    f.catch_time = 1000;
+    while (true) {
+        Vector2D ballPos = wm->ball->predict(min(time, f.catch_time));
+        //            draw(ballPos, 1, "red");
+        if (wm->ball->vel.length() < 0.05)
+            ballPos = wm->ball->pos;
+        double rad = time * 0.6 + 0.2;
+        if (f.ourFastest == -1)
+            for (int i = 0; i < ourList.count(); i++) {
+                Vector2D playerPos = wm->our[ourList[i]]->pos;
+                if (playerPos.dist(ballPos) < rad) {
+                    f.ourFastest = ourList[i];
+                    f.ourFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                    break;
+                }
+            }
+
+        if (f.oppFastest == -1)
+            for (int i = 0; i < oppList.count(); i++) {
+                Vector2D playerPos = wm->opp[oppList[i]]->pos;
+                if (playerPos.dist(ballPos) < rad) {
+                    f.oppFastest = oppList[i];
+                    f.oppFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                    break;
+                }
+            }
+
+        if ((f.ourFastest > -1 || ourList.count() == 0) && (f.oppFastest > -1 || oppList.count() == 0)) {
+            //				LOG("FFFF: ", f.ourFastest);
+            break;
+        }
+        time += 0.1;
+        if (time > 20) {
+            if (wm->ball->vel.length() > 0.2) {
+                Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
+                if (f.ourFastest == -1 and ourList.count() > 0) {
+                    float min = 99999;
+                    for (int i = 0; i < ourList.count(); i++) {
+                        Vector2D playerPos = wm->our[ourList[i]]->pos;
+                        float dist = line.dist(playerPos);
+                        if (dist < min) {
+                            f.ourFastest = ourList[i];
+                            min = dist;
+                        }
+                    }
+                    f.ourFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                }
+                if (f.oppFastest == -1 and oppList.count() > 0) {
+                    float min = 99999;
+                    for (int i = 0; i < oppList.count(); i++) {
+                        Vector2D playerPos = wm->opp[oppList[i]]->pos;
+                        float dist = line.dist(playerPos);
+                        if (dist < min) {
+                            f.oppFastest = oppList[i];
+                            min = dist;
+                        }
+                    }
+                    f.oppFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                }
+            }
+            break;
+        }
+    }
+    f.catch_time = min(time, f.catch_time);
+    return f;
+}
+
+
+

@@ -1,10 +1,9 @@
+#include <parsian_ai/plays/masterplay.h>
 
-#include "masterplay.h"
-
-PositioningPlan CMasterPlay::position;
-CRolePlayMake CMasterPlay::playMakeRole(NULL);
+PositioningPlan CMasterPlay::positioningPlan;
+CRolePlayMake CMasterPlay::playMakeRole;
 CMarkPlan CMasterPlay::markPlan;
-CRoleBlock CMasterPlay::blockRole(NULL);
+CRoleBlock CMasterPlay::blockRole;
 
 CMasterPlay::CMasterPlay(){
     executedCycles = 0;
@@ -20,7 +19,7 @@ void CMasterPlay::initMaster(){
     blockAgent = NULL;
     playMakeAgent = NULL;
     positionAgents.clear();
-    if(knowledge->getGameState() != CKnowledge::Start)
+    if(gameState->isPlayOn())
         markAgents.clear();
     stopAgents.clear();
     masterStaticPoints.clear();
@@ -40,14 +39,6 @@ bool CMasterPlay::canScore(){
     return 	getOpenness(wm->ball->pos,wm->field->oppGoalL(),wm->field->oppGoalR(),ourRelaxed,theirRelaxed) > .2;
 }
 
-int CMasterPlay::getDefenseNum()
-{
-    return policy()->Formation_Defense();
-}
-
-void CMasterPlay::setEditData(QMap<QString, EditData *> *_editData){
-    editData = _editData;
-}
 
 void CMasterPlay::setAgentsID(QList<int> _agentsID){
     agentsID.clear();
@@ -64,12 +55,11 @@ void CMasterPlay::setStaticPoints(QList< holdingPoints > _staticPoints){
 }
 
 void CMasterPlay::resetPositioning(){
-    position.reset();
+    positioningPlan.reset();
 }
 
 void CMasterPlay::resetPlayMaker(){
     playMakeRole.resetPlayMake();
-    playMakeRole.parse(QStringList());
 }
 
 
@@ -84,26 +74,26 @@ void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
     }
 
     if( blockAgent ){
-        remainings.removeOne(blockAgent->self()->id);
+        remainings.removeOne(blockAgent->id());
     }
     if( playMakeAgent ){
-        remainings.removeOne(playMakeAgent->self()->id);
+        remainings.removeOne(playMakeAgent->id());
     }
 
     if( markAgents.size() ){
         for( int i=0 ; i<markAgents.size() ; i++ ){
-            remainings.removeOne(markAgents.at(i)->self()->id);
+            remainings.removeOne(markAgents.at(i)->id());
         }
     }
 
     if( positionAgents.size() ){
         for( int i=0 ; i<positionAgents.size() ; i++ ){
-            remainings.removeOne(positionAgents.at(i)->self()->id);
+            remainings.removeOne(positionAgents.at(i)->id());
         }
     }
 
     for( int i=0 ; i<remainings.size() ; i++ ){
-        _list.append(knowledge->getAgent(remainings.at(i)));
+        _list.append(soccer->agents[remainings.at(i)]);
     }
 }
 
@@ -112,29 +102,29 @@ void CMasterPlay::choosePlayMaker(){
     QList <CAgent *> playAgents;
     playAgents.clear();
     for( int i=0 ; i < agentsID.size() ; i++ ){
-        playAgents.append(knowledge->getAgent(agentsID.at(i)));
+        playAgents.append(soccer->agents[agentsID.at(i)]);
     }
 
 
-    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
-        int id = knowledge->agentsWithIntention.at(i);
-        if( agentsID.contains(id) ){
-            CAgent *agnt = knowledge->getAgent(id);
-            if( agnt->intention->M_type == "playmake" ){
-                playMakeID = id;
-            }
-        }
-    }
+//    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
+//        int id = knowledge->agentsWithIntention.at(i);
+//        if( agentsID.contains(id) ){
+//            CAgent *agnt = knowledge->getAgent(id);
+//            if( agnt->intention->M_type == "playmake" ){
+//                playMakeID = id;
+//            }
+//        }
+//    }
 
     if( playMakeID == -1 ){
-        playMakeID = knowledge->newFastestSelector(playAgents);
-        if( playMakeID != -1 ){
-            CAgent *agnt = knowledge->getAgent(playMakeID);
-            if( agnt != NULL ){
-                agnt->playMakeIntent.assign(playMakeID , knowledge->frameCount);
-                agnt->intention = &agnt->playMakeIntent;
-            }
-        }
+//        playMakeID = knowledge->newFastestSelector(playAgents);
+//        if( playMakeID != -1 ){
+//            CAgent *agnt = knowledge->getAgent(playMakeID);
+//            if( agnt != NULL ){
+//                agnt->playMakeIntent.assign(playMakeID , knowledge->frameCount);
+//                agnt->intention = &agnt->playMakeIntent;
+//            }
+//        }
     }
 
     ///////////////////////////////////////
@@ -142,7 +132,7 @@ void CMasterPlay::choosePlayMaker(){
     ///////////////////////////////////////
 
     if( playMakeID != -1 ){
-        playMakeAgent = knowledge->getAgent(playMakeID);
+        playMakeAgent = soccer->agents[playMakeID];
     }
 }
 
@@ -152,30 +142,30 @@ void CMasterPlay::chooseBlocker(){
     QList <CAgent *> playAgents;
     playAgents.clear();
     for( int i=0 ; i<agentsID.size() ; i++ ){
-        playAgents.append(knowledge->getAgent(agentsID.at(i)));
+        playAgents.append(soccer->agents[agentsID.at(i)]);
     }
 
-    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
-        int id = knowledge->agentsWithIntention.at(i);
-        if( agentsID.contains(id) ){
-            CAgent *agnt = knowledge->getAgent(id);
-            if( agnt->intention->M_type == "block" ){
-                blockID = id;
-            }
-        }
-    }
+//    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
+//        int id = knowledge->agentsWithIntention.at(i);
+//        if( agentsID.contains(id) ){
+//            CAgent *agnt = knowledge->getAgent(id);
+//            if( agnt->intention->M_type == "block" ){
+//                blockID = id;
+//            }
+//        }
+//    }
 
     if( blockID == -1 ){
-        blockID = knowledge->newFastestSelector(playAgents);
-        if( blockID != -1 ){
-            CAgent *agnt = knowledge->getAgent(blockID);
-            agnt->blockIntent.assign(blockID , knowledge->frameCount);
-            agnt->intention = &agnt->blockIntent;
-        }
+//        blockID = knowledge->newFastestSelector(playAgents);
+//        if( blockID != -1 ){
+//            CAgent *agnt = knowledge->getAgent(blockID);
+//            agnt->blockIntent.assign(blockID , knowledge->frameCount);
+//            agnt->intention = &agnt->blockIntent;
+//        }
     }
 
     if( blockID != -1 ){
-        blockAgent = knowledge->getAgent(blockID);
+        blockAgent = soccer->agents[blockID];
     }
 }
 
@@ -183,7 +173,7 @@ void CMasterPlay::chooseBlocker(){
 bool CMasterPlay::canOneTouch(QList<CAgent *> posAgents, CAgent *playMake){
     for( int i=0 ; i<posAgents.size() ; i++ ){
         QList<int> ourRelaxIDS,oppRelaxIDS;
-        int positioner = posAgents.at(i)->self()->id;
+        int positioner = posAgents.at(i)->id();
         ourRelaxIDS.push_back(positioner);
         Vector2D pos = posAgents.at(i)->pos() + posAgents.at(i)->dir().setLengthVector(CRobot::center_from_kicker_new);
         if( getOpenness( pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS ) > 0.8 )
@@ -194,12 +184,12 @@ bool CMasterPlay::canOneTouch(QList<CAgent *> posAgents, CAgent *playMake){
 
 double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs)
 {
-    std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar > blockedLines;
+    std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar > blockedLines;
     double least = ( p1 - from ).th().degree();
     double most  = ( p2 - from ).th().degree();
     if( least > most )
     {
-        swap(least,most);
+        std::swap(least,most);
     }
 
     for (int i=0;i<wm->our.activeAgentsCount();i++)
@@ -252,7 +242,7 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
     return 1.0 - coveredArea( blockedLines ) / ( most - least );
 }
 
-double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar >& obstacles )
+double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles )
 {
     if( obstacles.size() <= 1 )
         return 0.0;
@@ -299,7 +289,7 @@ void CMasterPlay::execute() {
         execute_6();
         break;
     default:
-        debug(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
+        DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
     }
     execPlay();
 }
@@ -313,15 +303,9 @@ void CMasterPlay::execPlay(){
     }
 
     if( playMakeAgent ){
-        if(knowledge-> getGameState() != CKnowledge::OurDirectKick && knowledge-> getGameState() != CKnowledge::OurIndirectKick  )
+        if( ! gameState->ourDirectKick() && ! gameState->ourIndirectKick() )
         {
-            knowledge->setPlayMaker(playMakeAgent);
             playMakeRole.assign(playMakeAgent);
-        }
-        else
-        {
-            knowledge->setPlayMaker(playMakeAgent);
-
         }
     }
 
@@ -331,20 +315,21 @@ void CMasterPlay::execPlay(){
         markPlan.execute();
     }
 
-    if( knowledge->getGameState() != CKnowledge::Start )
+    if( gameState->isPlayOff() )
     {
         if( positionAgents.size() ){
             ///////// added to prevent Segmentatino fault! //////////
-            if( editData->count(formationName) == 0 ){
-                debug(QString("Invalid Formation Name: %1").arg(formationName) , D_ERROR);
-                formationName = "Stop6";
-            }
+            DBUG(QString("Invalid Formation Name: %1").arg(formationName) , D_ERROR);
+            formationName = "Stop6";
             /////////////////////////////////////////////////////////
-            position.init(positionAgents , (*editData)[formationName],formationName);
             if( staticInited ){
-                position.staticInit(masterStaticPoints);
+                positioningPlan.staticInit(masterStaticPoints);
             }
-            position.execute();
+            positioningPlan.execute();
         }
     }
+}
+
+int CMasterPlay::getDefenseNum() {
+    return 0;
 }
