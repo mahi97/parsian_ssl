@@ -615,7 +615,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize){
         }
     }
     else if(_markAgentSize < oppAgentsToMarkPos.count()){
-        if(playOff || know->variables[Def_Var]["transientFlag"].toBool() || gameState->isPlayOff()){ //todo: knowledge vars
+        if(playOff || know->variables["transientFlag"].toBool() || gameState->isPlayOff()){ //todo: knowledge vars
             QList<QPair<Vector2D, double> > tempsorted = sortdangerpassplayoff(oppAgentsToMarkPos);
             for(int i = 0; i<_markAgentSize; i++){
                 markRoles.append(QString("shotBlocker"));
@@ -844,7 +844,7 @@ void DefensePlan::setGoalKeeperTargetPoint(){
             }
             return;
         }
-        else if(know->variables[Def_Var]["transientFlag"].toBool()){
+        else if(know->variables["transientFlag"].toBool()){
             lastStateForGoalKeeper = QString("no");
             dangerForGoalKeeperClear = false;
             DBUG(QString("TS Mode") , D_AHZ);
@@ -1176,12 +1176,12 @@ DefensePlan::DefensePlan()
     xLimitForblockingPass = 0;
     manToManMarkBlockPassFlag = conf.PlayOffManToMan;
     if(manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass){
-        know->variables[Def_Var]["lastStateForMark"] = QString("BlockPass");
-        know->variables[Def_Var]["stateForMark"] = QString("BlockPass");
+        know->variables["lastStateForMark"] = QString("BlockPass");
+        know->variables["stateForMark"] = QString("BlockPass");
     }
     else{
-        know->variables[Def_Var]["lastStateForMark"] = QString("BlockShot");
-        know->variables[Def_Var]["stateForMark"] = QString("BlockShot");
+        know->variables["lastStateForMark"] = QString("BlockShot");
+        know->variables["stateForMark"] = QString("BlockShot");
     }
     ////////////////////////////////
 
@@ -1402,8 +1402,8 @@ void DefensePlan::execute(){
     }
     //////////////////////////////////////
     playOnMode = gameState->isPlayOn(); // knowledge->isStart();
-    DBUG(QString("defense oneTouch mode : %1").arg(know->variables[Def_Var]["defenseOneTouchMode"].toBool()) , D_AHZ); //todo : knowledge vars
-    DBUG(QString("defense clear mode : %1").arg(know->variables[Def_Var]["defenseClearMode"].toBool()) , D_AHZ);
+    DBUG(QString("defense oneTouch mode : %1").arg(know->variables["defenseOneTouchMode"].toBool()) , D_AHZ); //todo : knowledge vars
+    DBUG(QString("defense clear mode : %1").arg(know->variables["defenseClearMode"].toBool()) , D_AHZ);
     if(gameState->theirPenaltyKick() && !gameState->penaltyShootout()){
         if(goalKeeperAgent != NULL ){
             drawer->draw(QString("Penalty") , Vector2D(1,2) , "white");
@@ -1434,7 +1434,7 @@ void DefensePlan::execute(){
             if(wm->our.activeAgentsCount() < 7){
                 if(playOnMode){
                     checkDefenseExeptions();
-                    if(defExceptions.active && !know->variables[Def_Var]["transientFlag"].toBool()){
+                    if(defExceptions.active && !know->variables["transientFlag"].toBool()){
                         runDefenseExeptions();
                         defenseCount = defenseAgents.size() - 1;
                     }
@@ -1442,13 +1442,13 @@ void DefensePlan::execute(){
                         defExceptions.exepAgentId = -1;
                         defExceptions.exeptionMode = NoneExep;
                         defenseCount = defenseAgents.size();
-                        know->variables[Def_Var]["defenseClearMode"] = false;
-                        know->variables[Def_Var]["defenseOneTouchMode"] = false;
+                        know->variables["defenseClearMode"] = false;
+                        know->variables["defenseOneTouchMode"] = false;
                     }
                 }
                 else{
-                    know->variables[Def_Var]["defenseClearMode"] = false;
-                    know->variables[Def_Var]["defenseOneTouchMode"] = false;
+                    know->variables["defenseClearMode"] = false;
+                    know->variables["defenseOneTouchMode"] = false;
                     defenseCount = defenseAgents.size();
                     DBUG(QString("defense count : %1").arg(defenseCount) , D_AHZ);
                 }
@@ -1875,11 +1875,11 @@ void DefensePlan::executeGoalKeeper(){
     QList<Vector2D> tempSol;
     tempSol.clear();
     if(goalKeeperAgent != NULL){
-        DBUG(QString("goalKeeper clear mode : %1").arg(know->variables[Def_Var]["goalKeeperClearMode"].toBool()) , D_AHZ); //TODO: knowledge
-        DBUG(QString("goalKeeper oneTouch mode : %1").arg(know->variables[Def_Var]["goalKeeperOneTouchMode"].toBool()) , D_AHZ); //TODO: knowledge
+        DBUG(QString("goalKeeper clear mode : %1").arg(know->variables["goalKeeperClearMode"].toBool()) , D_AHZ); //TODO: knowledge
+        DBUG(QString("goalKeeper oneTouch mode : %1").arg(know->variables["goalKeeperOneTouchMode"].toBool()) , D_AHZ); //TODO: knowledge
         if(playOffMode){
-            know->variables[Def_Var]["goalKeeperClearMode"] = false;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+            know->variables["goalKeeperClearMode"] = false;
+            know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()]; //TODO: knowledge->goalie->id()
             DBUG("Their Indirect" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -1896,9 +1896,9 @@ void DefensePlan::executeGoalKeeper(){
 
 
         }
-        else if(know->variables[Def_Var]["transientFlag"].toBool()){
-            know->variables[Def_Var]["goalKeeperClearMode"] = false;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+        else if(know->variables["transientFlag"].toBool()){
+            know->variables["goalKeeperClearMode"] = false;
+            know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
             DBUG("TS Mode" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(true);
@@ -1924,8 +1924,8 @@ void DefensePlan::executeGoalKeeper(){
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(stopMode){
-            know->variables[Def_Var]["goalKeeperClearMode"] = false;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+            know->variables["goalKeeperClearMode"] = false;
+            know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
             DBUG("Stop Mode" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -1942,8 +1942,8 @@ void DefensePlan::executeGoalKeeper(){
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(ballIsOutOfField){
-            know->variables[Def_Var]["goalKeeperClearMode"] = false;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+            know->variables["goalKeeperClearMode"] = false;
+            know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
             DBUG("Ball is out of field" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -1957,8 +1957,8 @@ void DefensePlan::executeGoalKeeper(){
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(ballIsBesidePoles){
-            know->variables[Def_Var]["goalKeeperClearMode"] = false;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+            know->variables["goalKeeperClearMode"] = false;
+            know->variables["goalKeeperOneTouchMode"] = false;
             //            if(isPermissionToKick){
             //                DBUG("Ball is beside the poles" , D_AHZ);
             //                AHZSkills = kickSkill;
@@ -1989,8 +1989,8 @@ void DefensePlan::executeGoalKeeper(){
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(goalKeeperClearMode && !dangerForGoalKeeperClear){
-            know->variables[Def_Var]["goalKeeperClearMode"] = true;
-            know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+            know->variables["goalKeeperClearMode"] = true;
+            know->variables["goalKeeperOneTouchMode"] = false;
             if(wm->ball->vel.length() > 0.4 && wm->ball->vel.length() < 1.3){
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("Clear slow ball" , D_AHZ);
@@ -2027,8 +2027,8 @@ void DefensePlan::executeGoalKeeper(){
         }
         else{
             if(goalKeeperOneTouch){
-                know->variables[Def_Var]["goalKeeperClearMode"] = false;
-                know->variables[Def_Var]["goalKeeperOneTouchMode"] = true;
+                know->variables["goalKeeperClearMode"] = false;
+                know->variables["goalKeeperOneTouchMode"] = true;
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("One touch Mode" , D_AHZ);
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
@@ -2045,8 +2045,8 @@ void DefensePlan::executeGoalKeeper(){
             }
             else if(dangerForGoalKeeperClear){
                 if(dangerForInsideOfThePenaltyArea){
-                    know->variables[Def_Var]["goalKeeperClearMode"] = true;
-                    know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+                    know->variables["goalKeeperClearMode"] = true;
+                    know->variables["goalKeeperOneTouchMode"] = false;
                     DBUG("Danger Mode" , D_AHZ);
                     AHZSkills = kickSkill;
                     kickSkill->setTolerance(10);
@@ -2066,8 +2066,8 @@ void DefensePlan::executeGoalKeeper(){
                     kickSkill->setKickspeed(512);
                 }
                 else{
-                    know->variables[Def_Var]["goalKeeperClearMode"] = false;
-                    know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+                    know->variables["goalKeeperClearMode"] = false;
+                    know->variables["goalKeeperOneTouchMode"] = false;
                     AHZSkills = gpa[goalKeeperAgent->id()];
                     gpa[goalKeeperAgent->id()]->setSlowmode(false);
                     gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -2088,8 +2088,8 @@ void DefensePlan::executeGoalKeeper(){
             }
             else{
                 //// strict follow
-                know->variables[Def_Var]["goalKeeperClearMode"] = false;
-                know->variables[Def_Var]["goalKeeperOneTouchMode"] = false;
+                know->variables["goalKeeperClearMode"] = false;
+                know->variables["goalKeeperOneTouchMode"] = false;
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
                 gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -2130,10 +2130,10 @@ void DefensePlan::executeGoalKeeper(){
 
 void DefensePlan::announceClearing(bool state){
     if(state){
-        know->variables[Def_Var]["clearing"] = "true";//todo: knowledge
+        know->variables["clearing"] = "true";//todo: knowledge
     }
     else{
-        know->variables[Def_Var]["clearing"] = "false";
+        know->variables["clearing"] = "false";
     }
 }
 
@@ -2183,7 +2183,8 @@ void DefensePlan::initVars(float goalCircleRad){
     midGoal = (topGoal + downGoal) / 2.0;
     ourAgentsRad = 0.09;
     ourGoalAreaCircleRad = goalCircleRad + ourAgentsRad * 1.5 + 0.3;
-    know->variables[Def_Var]["defenseClearer"] = -1; //todo: knowledge
+    know->variables["defenseClearer"] = -1;
+
     Vector2D upperGoalForCircle = topGoal - Vector2D(0,0.25); //// ahsani
     upperGoalForCircle.y = (wm->field->_GOAL_WIDTH / 2.0) / 2.f;
     Vector2D bottomGoalForCircle = downGoal + Vector2D(0,0.25);//// ahsani
@@ -2296,7 +2297,7 @@ bool DefensePlan::defenseOneTouchOrNot(){
     Segment2D goalLine(wm->field->ourGoal()+Vector2D(0,0.8) , wm->field->ourGoal()+Vector2D(0,-0.8));
     Vector2D goalLineIntersect = goalLine.intersection(ballLine);
     bool ballDistVelFlag = defenseCheckBallDangerForOneTouch();
-    bool isItClearInFrontOfBall = know->isPointClear(pointForKick , wm->ball->pos , 0.025);//todo : move to knowledge
+    bool isItClearInFrontOfBall = know->isPointClear(pointForKick , wm->ball->pos , 0.025);
     if(ballDistVelFlag && isItClearInFrontOfBall){
         if(goalLineIntersect.valid()){
             oneTouchFlag = true;
@@ -2726,7 +2727,7 @@ void DefensePlan::runDefenseExeptions(){
     if(defenseAgents.size() > 0){
         Vector2D agentTarget;
         if(defExceptions.exeptionMode == defOneTouch){
-            know->variables[Def_Var]["defenseOneTouchMode"] = true; //todo: knowledge/defense variable
+            know->variables["defenseOneTouchMode"] = true; //todo: knowledge/defense variable
             agentTarget = runDefenseOneTouch();
             drawer->draw(QString("Defense OneTouch"), Vector2D(0,2), "red");
             if(agentTarget.x != -100){
@@ -2744,7 +2745,7 @@ void DefensePlan::runDefenseExeptions(){
             }
         }
         else if(defExceptions.exeptionMode == defClear){
-            know->variables[Def_Var]["defenseClearMode"] = true;
+            know->variables["defenseClearMode"] = true;
             drawer->draw(QString("Defense Clear"), Vector2D(0,2), "red");
             if(defenseClearIndex != -1){
                 if(defExceptions.exepAgentId == -1){
@@ -2760,8 +2761,8 @@ void DefensePlan::runDefenseExeptions(){
             runClear();
         }
         else{
-            know->variables[Def_Var]["defenseOneTouchMode"] = false;
-            know->variables[Def_Var]["defenseClearMode"] = false;
+            know->variables["defenseOneTouchMode"] = false;
+            know->variables["defenseClearMode"] = false;
         }
     }
 }
@@ -2788,7 +2789,7 @@ int DefensePlan::decideNumOfMarks(){
         if(playOffMode){
             return decideNumOfMarksInPlayOff(defenseCount);
         }
-        else if(know->variables[Def_Var]["transientFlag"].toBool()){
+        else if(know->variables["transientFlag"].toBool()){
             return defenseCount;//TO DO:
         }
         else if(playOnMode){
@@ -2917,7 +2918,7 @@ void DefensePlan::findOppAgentsToMark(){
             }
         }
     }
-    else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isPlayOff() || know->variables[Def_Var]["transientFlag"].toBool()){ // todo : knowledge/defense vars
+    else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isPlayOff() || know->variables["transientFlag"].toBool()){ // todo : knowledge/defense vars
         for(int i = 0; i < oppAgentsToMark.count(); i++){
             if(oppAgentsToMark[i]->pos.x > conf.OppOmitLimitPlayoff){
                 oppAgentsToMark.removeOne(oppAgentsToMark[i]);
@@ -2981,10 +2982,10 @@ void DefensePlan::findPos(int _markAgentSize){
     markPoses.clear();
     markAngs.clear();
     ///////////////// Man To Man AllTransiant Mode for Mark ////////////////////
-    DBUG(know->variables[Def_Var]["lastStateForMark"].toString() , D_AHZ);
-    DBUG(know->variables[Def_Var]["stateForMark"].toString() , D_AHZ);
+    DBUG(know->variables["lastStateForMark"].toString() , D_AHZ);
+    DBUG(know->variables["stateForMark"].toString() , D_AHZ);
     if(MantoManAllTransientFlag){
-        if(know->variables[Def_Var]["transientFlag"].toBool()){
+        if(know->variables["transientFlag"].toBool()){
             segmentpershoot = 0.1;
         }
         else{
@@ -2999,17 +3000,17 @@ void DefensePlan::findPos(int _markAgentSize){
     //////////////// Determine the plan of mark from GUI ////////////////////
     if(manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass){
         if(playOff || stopMode){
-            know->variables[Def_Var]["stateForMark"] = QString("BlockPass");
+            know->variables["stateForMark"] = QString("BlockPass");
             manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos,_markAgentSize , conf.PassRatioBlock / 100);
         }
-        else if(/*knowledge->transientFlag*/ know->variables[Def_Var]["transientFlag"].toBool()){
-            if(/*knowledge->lastStateForMark*/  know->variables[Def_Var]["lastStateForMark"] == QString("BlockPass")){
-                know->variables[Def_Var]["stateForMark"] = QString("BlockPass");
+        else if(/*knowledge->transientFlag*/ know->variables["transientFlag"].toBool()){
+            if(/*knowledge->lastStateForMark*/  know->variables["lastStateForMark"] == QString("BlockPass")){
+                know->variables["stateForMark"] = QString("BlockPass");
                 //knowledge->stateForMark = QString("BlockPass");
                 manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos,_markAgentSize , conf.PassRatioBlock / 100);
             }
             else{
-                know->variables[Def_Var]["stateForMark"] = QString("BlockShot");
+                know->variables["stateForMark"] = QString("BlockShot");
                 //knowledge->stateForMark = QString("BlockShot");
                 manToManMarkBlockShotInPlayOff(_markAgentSize);
             }
@@ -3018,24 +3019,24 @@ void DefensePlan::findPos(int _markAgentSize){
     else{
         if(playOff || stopMode){
             //knowledge->stateForMark = QString("BlockShot");
-            know->variables[Def_Var]["stateForMark"] = QString("BlockShot");;
+            know->variables["stateForMark"] = QString("BlockShot");;
             manToManMarkBlockShotInPlayOff(_markAgentSize);
         }
         else{
-            if(/*knowledge->lastStateForMark*/ know->variables[Def_Var]["lastStateForMark"].toString() == QString("BlockShot")){
-                know->variables[Def_Var]["stateForMark"] = QString("BlockShot");;
+            if(/*knowledge->lastStateForMark*/ know->variables["lastStateForMark"].toString() == QString("BlockShot")){
+                know->variables["stateForMark"] = QString("BlockShot");;
                 //knowledge->stateForMark = QString("BlockShot");
                 manToManMarkBlockShotInPlayOff(_markAgentSize);
             }
             else{
                 //knowledge->stateForMark = QString("BlockPass");
-                know->variables[Def_Var]["stateForMark"] = QString("BlockPass");
+                know->variables["stateForMark"] = QString("BlockPass");
                 manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos,_markAgentSize , conf.PassRatioBlock / 100);
             }
         }
     }
     //knowledge->lastStateForMark = knowledge->stateForMark;
-    know->variables[Def_Var]["lastStateForMark"] = know->variables[Def_Var]["stateForMark"];
+    know->variables["lastStateForMark"] = know->variables["stateForMark"];
 }
 
 QList<Vector2D> DefensePlan::ShootBlockRatio(double ratio, Vector2D opp){
@@ -3067,7 +3068,7 @@ bool DefensePlan::isInTheIndirectAreaShoot(Vector2D opp){
     //// is in the ball circle or not.
 
     Circle2D indirectAvoidCircle(wm->ball->pos, 0.5 + 0.2);
-    if(indirectAvoidCircle.contains(ShootBlockRatio(segmentpershoot, opp).first()) && !know->variables[Def_Var]["transientFlag"].toBool()){
+    if(indirectAvoidCircle.contains(ShootBlockRatio(segmentpershoot, opp).first()) && !know->variables["transientFlag"].toBool()){
         return 1;
     }
     else{
@@ -3105,7 +3106,7 @@ bool DefensePlan::isInTheIndirectAreaPass(Vector2D opp){
     DBUG(QString("IndirectAreaPass"),D_HAMED);
     double indirectAvoidRadius = 0.5 + 0.2;
     Circle2D indirectAvoidCircle(wm->ball->pos, indirectAvoidRadius);
-    if (indirectAvoidCircle.contains(PassBlockRatio(segmentperpass, opp).first()) && !know->variables[Def_Var]["transientFlag"].toBool())
+    if (indirectAvoidCircle.contains(PassBlockRatio(segmentperpass, opp).first()) && !know->variables["transientFlag"].toBool())
         return 1;
     else{
         return 0;
@@ -3645,7 +3646,7 @@ void DefensePlan::runClear(){
     kickSkill->setSpin(false);
     kickSkill->setChip(false);
     kickSkill->setAvoidpenaltyarea(true);
-    know->variables[Def_Var]["defenseClearer"] = defenseAgents.at(defenseClearIndex)->id();
+    know->variables["defenseClearer"] = defenseAgents.at(defenseClearIndex)->id();
     if(!isPathToOppGoalieClear() || savedClearDist > 0.05){ /////  must be refine
         kickSkill->setChip(true);
     }
@@ -3909,10 +3910,10 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D
         }
     }
 
-    for(int i=0; i<output.count(); i++)
-    {
+    //for(int i=0; i<output.count(); i++)
+    //{
         //drawer->draw(QString("HMD Danger New%1" ).arg(output[i].second),output[i].first + Vector2D(0,.2),QColor(Qt::red));
-    }
+    //}
 
     return output;
 }

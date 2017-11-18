@@ -5,7 +5,8 @@
 #ifndef PARSIAN_AI_AI_H
 #define PARSIAN_AI_AI_H
 
-#include <parsian_msgs/parsian_world_model.h>
+//#include <parsian_msgs/parsian_world_model.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_util/core/worldmodel.h>
