@@ -1,4 +1,5 @@
-#include "positioningplan.h"
+//#include <unordered_set>		//kian:: is it necessary?
+#include "parsian_ai/plans/positioningplan.h"
 
 #define INF 1000000000
 
@@ -6,22 +7,18 @@ PositioningPlan::PositioningPlan()
 {
 	for (int i = 0; i < _MAX_NUM_PLAYERS ; i++)
 	{
-		gpa[i] = new CSkillGotoPointAvoid(NULL);
-		gpa[i]->setNoAvoid(false);
-		gpa[i]->setOneTouchMode(true);
-		gpa[i]->setAvoidPenaltyArea(true);
+		gpa[i] = new GotopointavoidAction;
+		gpa[i]->setNoavoid(false);
+		gpa[i]->setOnetouchmode(true);
+		gpa[i]->setAvoidpenaltyarea(true);
 
-		gps[i] = new CSkillGotoPoint(NULL);
-		gps[i]->setBallMode(false);
-		gps[i]->setSlowMode(false);
-		gps[i]->setSlowShot(false);
-		gps[i]->setTurningDist( 0.1);
+		gps[i] = new GotopointAction;
+		gps[i]->setSlowmode(false);
 	}
 }
 
 void PositioningPlan::init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode )
 {
-
 	dynamicPositioners.clear();
 	staticPositioners.clear();
 	agents.clear();
@@ -190,15 +187,15 @@ Vector2D PositioningPlan::findFacePoint(positioningType type)
 {
 	switch( type )
 	{
-		case ONETOUCH://TODO it's pedar darar
+		case positioningType::ONETOUCH://TODO it's pedar darar
 			break;
-		case TOBALL:
+		case positioningType::TOBALL:
 			return wm->ball->pos;
 			break;
-		case TOOPPGOAL:
+		case positioningType::TOOPPGOAL:
 			return wm->field->oppGoal();
 			break;
-		case TOOURGOAL:
+		case positioningType::TOOURGOAL:
 			return wm->field->ourGoal();
 			break;
 	}
@@ -285,19 +282,19 @@ void PositioningPlan::execute()
 		}
 		if( positioningTargets[i].isValid() )
 		{
-      assignSkill(dynamicPositioners.at(i), gpa[dynamicPositioners.at(i)]);
-			gpa[dynamicPositioners.at(i)]->init(positioningTargets[i], wm->ball->pos-positioningTargets[i]);
-
+      		assignSkill(dynamicPositioners.at(i), gpa[dynamicPositioners.at(i)]);
+			gpa[dynamicPositioners.at(i)]->setTargetpos(positioningTargets[i]);
+			gpa[dynamicPositioners.at(i)]->setTargetdir(wm->ball->pos-positioningTargets[i]);
 			if( knowledge->getGameState() == CKnowledge::OurKickOff || knowledge->getGameMode() == CKnowledge::OurKickOff ){
-				gpa[dynamicPositioners.at(i)]->setAvoidCenterCircle(true);
+				gpa[dynamicPositioners.at(i)]->setAvoidcentercircle(true);
 			}
 			else{
-				gpa[dynamicPositioners.at(i)]->setAvoidCenterCircle(false);
+				gpa[dynamicPositioners.at(i)]->setAvoidcentercircle(false);
 			}
 			if( knowledge->getGameMode() == CKnowledge::Stop )
-				gpa[dynamicPositioners.at(i)]->setBallObstacleRadius(.1);
+				gpa[dynamicPositioners.at(i)]->setBallobstacleradius(.1);
 			else
-				gpa[dynamicPositioners.at(i)]->setBallObstacleRadius(0);
+				gpa[dynamicPositioners.at(i)]->setBallobstacleradius(0);
 		}
 	}
 
@@ -345,18 +342,18 @@ void PositioningPlan::execute()
 		if( staticPositioningTargets[curID].isValid() )
 		{
 			assignSkill(idx, gpa[curID]);
-			gpa[curID]->init(staticPositioningTargets[curID], staticPositioningFacePoints[curID]-staticPositioningTargets[curID]);
-
+			gpa[curID]->setTargetpos(staticPositioningTargets[curID]);
+			gpa[curID]->setTargetdir(staticPositioningFacePoints[curID]-staticPositioningTargets[curID]);
 			if( knowledge->getGameState() == CKnowledge::OurKickOff || knowledge->getGameMode() == CKnowledge::OurKickOff ){
-				gpa[curID]->setAvoidCenterCircle(true);
+				gpa[curID]->setAvoidcentercircle(true);
 			}
 			else{
-				gpa[curID]->setAvoidCenterCircle(false);
+				gpa[curID]->setAvoidcentercircle(false);
 			}
 			if( knowledge->getGameMode() == CKnowledge::Stop )
-				gpa[curID]->setBallObstacleRadius(.1);
+				gpa[curID]->setBallobstacleradius(.1);
 			else
-				gpa[curID]->setBallObstacleRadius(0);
+				gpa[curID]->setBallobstacleradius(0);
 		}
 	}
 }
@@ -384,10 +381,10 @@ bool PositioningPlan::isValidPoint( Vector2D target , bool callFromStaticPositio
 			( target.x > -CRobot::robot_radius_new || target.length() < 0.6 ) )
 		return false;
 
-	if( target.absX() > _FIELD_WIDTH*0.5 -CRobot::robot_radius_new )
+	if( target.absX() > wm->field->_FIELD_WIDTH*0.5 -CRobot::robot_radius_new )
 		return false;
 
-	if( target.absY() > _FIELD_HEIGHT*0.5 -CRobot::robot_radius_new )
+	if( target.absY() > wm->field->_FIELD_WIDTH*0.5 -CRobot::robot_radius_new )
 		return false;
 
 	Vector2D closerTarget = target + (wm->field->ourGoal() - target).norm()*0.2;
@@ -626,12 +623,12 @@ double PositioningPlan::PositioningObject::target_to_last_target()
 
 double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs)
 {
-	std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar > blockedLines;
+	std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar > blockedLines;
 	double least = ( p1 - from ).th().degree();
 	double most  = ( p2 - from ).th().degree();
 	if( least > most )
 	{
-		swap(least,most);
+		qSwap(least, most); 		//kian: change swap(least,most); to this
 	}
 
 	for (int i=0;i<wm->our.activeAgentsCount();i++)
@@ -653,8 +650,8 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
 			if( lowerbound < least )
 				lowerbound = least;
 
-			blockedLines.push( qMakePair(TOP,upperbound) );
-			blockedLines.push( qMakePair(BOT,lowerbound) );
+			blockedLines.push( qMakePair(edgeMode::TOP,upperbound) );
+			blockedLines.push( qMakePair(edgeMode::BOT,lowerbound) );
 		}
 	}
 	for (int i=0;i<wm->opp.activeAgentsCount();i++)
@@ -676,15 +673,15 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
 			if( lowerbound < least )
 				lowerbound = least;
 
-			blockedLines.push( qMakePair(TOP,upperbound) );
-			blockedLines.push( qMakePair(BOT,lowerbound) );
+			blockedLines.push( qMakePair(edgeMode::TOP,upperbound) );
+			blockedLines.push( qMakePair(edgeMode::BOT,lowerbound) );
 		}
 	}
 
 	return 1.0 - coveredArea( blockedLines ) / ( most - least );
 }
 
-double PositioningPlan::PositioningObject::coveredArea( std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar >& obstacles )
+double PositioningPlan::PositioningObject::coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles )
 {
 	if( obstacles.size() <= 1 )
 		return 0.0;
@@ -693,13 +690,13 @@ double PositioningPlan::PositioningObject::coveredArea( std::priority_queue < QP
 	obstacles.pop();
 	QPair< edgeMode , double > second_lastest = obstacles.top();
 
-	if( lastest.first == TOP && second_lastest.first == TOP )
+	if( lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP )
 		return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
-	else if( lastest.first == BOT && second_lastest.first == BOT )
+	else if( lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT )
 		return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
-	else if( lastest.first == TOP && second_lastest.first == BOT )
+	else if( lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT )
 		return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
 	else

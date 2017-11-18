@@ -115,7 +115,7 @@ add_library(${PROJECT_NAME}_plans
 		src/parsian_ai/plans/defenseplan.cpp
 		src/parsian_ai/plans/markplan.cpp
 		src/parsian_ai/plans/plan.cpp
-#		src/parsian_ai/plans/positioningplan.cpp
+                src/parsian_ai/plans/positioningplan.cpp
 		)
 
 add_library(${PROJECT_NAME}_roles
