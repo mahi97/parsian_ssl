@@ -128,6 +128,8 @@ set (${PROJECT_NAME}_SRCS
   src/${PROJECT_NAME}/guiDrawer.cpp
   src/${PROJECT_NAME}/mode_chooser.cpp
   src/${PROJECT_NAME}/modeChooserWidget.cpp
+  src/${PROJECT_NAME}/handycontroller.cpp
+
 )
 
 set(${PROJECT_NAME}_HDRS
@@ -138,13 +140,21 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/guiDrawer.h
   include/${PROJECT_NAME}/mode_chooser.h
   include/${PROJECT_NAME}/modeChooserWidget.h
+  include/${PROJECT_NAME}/handycontroller.h
+
+)
+
+set(${PROJECT_NAME}_UIS
+  resource/handycontroller.ui
 )
 
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
   qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 else()
   qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt4_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 endif()
 
 ###########
@@ -163,6 +173,7 @@ include_directories(
 add_library(${PROJECT_NAME}
     ${${PROJECT_NAME}_SRCS}
     ${${PROJECT_NAME}_MOCS}
+    ${${PROJECT_NAME}_UIS_H}
     )
 
 ## Declare a C++ executable
@@ -215,6 +226,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES
   plugin1.xml
   plugin2.xml
+  plugin3.xml
   mode_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
