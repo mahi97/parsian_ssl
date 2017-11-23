@@ -144,7 +144,7 @@ void CSkillGotoPointAvoid::execute()
         result.clear();
         for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )
         {
-            ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
+           // ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
 //            drawer->draw(Circle2D(agent->pathPlannerResult[i],0.01),QColor(Qt::red));
         }
@@ -230,8 +230,8 @@ void CSkillGotoPointAvoid::execute()
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
     agent->accelerationLimiter(vf,oneTouchMode);
-    ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
-    ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
+   // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
+   // ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
 
     counter ++;
 }

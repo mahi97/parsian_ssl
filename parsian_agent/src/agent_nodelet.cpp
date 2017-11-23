@@ -17,7 +17,7 @@ void AgentNodelet::onInit(){
 
     agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size()-2)).toInt()));
 
-    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonconfigCb, this);
+    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonConfigCb, this);
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -42,7 +42,8 @@ void AgentNodelet::onInit(){
 }
 
 void AgentNodelet::commonConfigCb(const parsian_msgs::parsian_robot_common_configConstPtr & msg) {
-    conf.reset(msg.get());
+    conf = msg;
+    ROS_INFO_STREAM("ppppppppppppppppppppp"<<conf->VelMax);
 
 }
 
@@ -89,31 +90,31 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         case parsian_msgs::parsian_robot_task::GOTOPOINT: {
             gotoPoint->setMessage(&_task->gotoPointTask);
             skill = gotoPoint;
-            ROS_INFO("GOTOPOINT executed!");
+           // ROS_INFO("GOTOPOINT executed!");
         }
             break;
         case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
-            ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
+            //ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
         }
             break;
         case parsian_msgs::parsian_robot_task::KICK: {
             skillKick->setMessage(&_task->kickTask);
             skill = skillKick;
-            ROS_INFO("KICK executed!");
+            //ROS_INFO("KICK executed!");
             break;
         }
         case parsian_msgs::parsian_robot_task::ONETOUCH: {
             oneTouch->setMessage(&_task->oneTouchTask);
             skill = oneTouch;
-            ROS_INFO("ONETOUCH executed!");
+            //ROS_INFO("ONETOUCH executed!");
         }
             break;
         case parsian_msgs::parsian_robot_task::RECIVEPASS: {
             receivePass->setMessage(&_task->receivePassTask);
             skill = receivePass;
-            ROS_INFO("RECIVEPASS executed!");
+            //ROS_INFO("RECIVEPASS executed!");
         }
             break;
 

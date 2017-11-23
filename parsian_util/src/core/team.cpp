@@ -33,7 +33,7 @@ void CTeam::updateRobot(const std::vector<parsian_msgs::parsian_robot> &_robots)
 
    int k=0;
    for(auto& robot : _robots) {
-       ROS_INFO_STREAM(static_cast<int>(robot.id));
+      // ROS_INFO_STREAM(static_cast<int>(robot.id));
        data->teamMembers[robot.id]->update(robot);
        data->teamMembers[robot.id]->setActive(true);
    }

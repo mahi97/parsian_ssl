@@ -568,7 +568,7 @@ Vector2D Agent::distToBall()
 void Agent::setRobotAbsVel(double _vx, double _vy, double _w)
 {
     double ang = -dir().th().radian();
-    ROS_INFO_STREAM("ANG : " <<  ang);
+    //ROS_INFO_STREAM("ANG : " <<  ang);
     setRobotVel((cos(ang) * _vx) - (sin(ang) * _vy), (sin(ang) * _vx) + (cos(ang) * _vy), _w);
 }
 
@@ -579,7 +579,7 @@ void Agent::setRobotVel(double _vtan , double _vnorm , double _w )
     vforward = _vtan ;
     vnormal  = _vnorm ;
     vangular = _w *_RAD2DEG ;
-    ROS_INFO_STREAM("ANG :: " << vangular);
+    //ROS_INFO_STREAM("ANG :: " << vangular);
     double _v1,_v2,_v3,_v4;
     jacobian( _vtan , _vnorm , _w , _v1 , _v2 , _v3 , _v4);
     v1 = _v1;
@@ -929,7 +929,7 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
     //  timer.start();
     planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
     getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
-    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
+    //ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
 
 //    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
 //    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
@@ -954,7 +954,7 @@ void Agent::execute() {
 }
 
 parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
-    ROS_INFO("CommunicationCommand_generated");
+  //  ROS_INFO("CommunicationCommand_generated");
     parsian_msgs::parsian_robot_commandPtr command{new parsian_msgs::parsian_robot_command};
 
 

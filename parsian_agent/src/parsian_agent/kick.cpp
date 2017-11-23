@@ -1126,7 +1126,7 @@ void CSkillKick::execute()
     AngleDeg maxAngP,maxAngN;
     AngleDeg kickTargetDir ;
 
-    ROS_INFO_STREAM("ball speed x: "<<wm->ball->vel.x << "  "<< wm->ball->vel.y);
+//    ROS_INFO_STREAM("ball speed x: "<<wm->ball->vel.x << "  "<< wm->ball->vel.y);
 //    draw(Segment2D(agentPos,agentPos+agentDir*10));
     if(shotEmptySpot)
         target = findMostPossible();

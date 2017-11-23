@@ -674,7 +674,7 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
     oppRelaxList.clear();
     for (int i : _oppRelaxList){
         oppRelaxList.append(i);
-        ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
+        //ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
     }
 
     oppRelaxList.append(ID);
@@ -864,8 +864,8 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 //            }
         }
     }
-    ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
-    ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
+   // ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
+   // ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {
