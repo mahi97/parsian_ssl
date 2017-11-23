@@ -58,9 +58,9 @@ void CNewBangBang::trajectoryPlanner()
     double velnorm= -1*(cos(agentMovementTh.radian()))*sin(agentDir.th().radian()) + (sin(agentMovementTh.radian()))*cos(agentDir.th().radian());
 
     double thPIDKCoef =  atan(fabs(veltan)/fabs(velnorm))/_PI*2;
-    thPid->kp = conf.thKP* thPIDKCoef;
-    thPid->ki = conf.thKI;
-    thPid->kd = conf.thKD;
+    thPid->kp = conf->thKP* thPIDKCoef;
+    thPid->ki = conf->thKI;
+    thPid->kd = conf->thKD;
 //    if(fabs(thPid->error > 1) || currentVel < 0.5 || agentPos.dist(pos2) >3 ||( fabs((agentMovementTh - agentDir.th()).degree()) > 80 && fabs((agentMovementTh - agentDir.th()).degree()) < 100 )   )
 //        thPid->error =0;
 
@@ -105,37 +105,37 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
     }
     if(slow)
     {
-        posPid->kp = (conf.posKP)*(0.001/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        posPid->kp = (conf->posKP)*(0.001/(agentPos.dist(pos2)*agentPos.dist(pos2)));
         posPid->kp = min(posPid->kp,2.5);
         posPid->kp = max(posPid->kp,1.5);
 
-        posPid->kd =conf.posKD;
-        posPid->ki =conf.posKI;
+        posPid->kd =conf->posKD;
+        posPid->ki =conf->posKI;
     }
     else if(diveMode)
     {
         posPid->kp = 7;
         posPid->kd = 20;
-        posPid->ki = conf.posKI;
+        posPid->ki = conf->posKI;
     }
     else if(oneTouch)
     {
-        posPid->kp = (conf.posKP)*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        posPid->kp = (conf->posKP)*(0.04/(agentPos.dist(pos2)*agentPos.dist(pos2)));
         DEBUG(QString("kp: %1").arg(posPid->kp),D_MHMMD);
-        posPid->kp = min(posPid->kp,conf.posKP * 3);
-        posPid->kp = max(posPid->kp,conf.posKP);
+        posPid->kp = min(posPid->kp,conf->posKP * 3);
+        posPid->kp = max(posPid->kp,conf->posKP);
 
         posPid->kd = 15;
         posPid->ki = 0;
     }
     else
     {
-        posPid->kp = (conf.posKP)*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
+        posPid->kp = (conf->posKP)*(0.02/(agentPos.dist(pos2)*agentPos.dist(pos2)));
         DEBUG(QString("kp: %1").arg(posPid->kp),D_MHMMD);
-        posPid->kp = min(posPid->kp,conf.posKP*2);
-        posPid->kp = max(posPid->kp,conf.posKP);
-        posPid->kd = conf.posKD;
-        posPid->ki = conf.posKI;
+        posPid->kp = min(posPid->kp,conf->posKP*2);
+        posPid->kp = max(posPid->kp,conf->posKP);
+        posPid->kd = conf->posKD;
+        posPid->ki = conf->posKI;
     }
 
 

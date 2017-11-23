@@ -189,10 +189,10 @@ void C2DTree::drawBranch(state *first , state* second , QColor color){
 CPlanner::CPlanner(int _ID)
 {
     obst.clear();
-    threshold = conf.Target_Distance_Threshold;
-    wayPointProb = conf.Waypoint_Catch_Probablity;
-    goalProb = conf.Goal_Probablity;
-    stepSize = conf.Extend_Step;
+    threshold = conf->Target_Distance_Threshold;
+    wayPointProb = conf->Waypoint_Catch_Probablity;
+    goalProb = conf->Goal_Probablity;
+    stepSize = conf->Extend_Step;
     goal.invalidate();
     counter=0;
     flag = false;
@@ -680,11 +680,11 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
     oppRelaxList.append(ID);
 
     ballObstacleRadius = _ballObstacleRadius;
-    stepSize = conf.Extend_Step;
-    threshold = conf.Target_Distance_Threshold;
-    wayPointProb =conf.Waypoint_Catch_Probablity;
+    stepSize = conf->Extend_Step;
+    threshold = conf->Target_Distance_Threshold;
+    wayPointProb =conf->Waypoint_Catch_Probablity;
     if(! result.empty())
-        goalProb = conf.Goal_Probablity;
+        goalProb = conf->Goal_Probablity;
     else
         goalProb = 0.5;
 
@@ -715,8 +715,8 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
 
 double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vector2D posT){
     double _x3;
-    double acc = conf.AccMaxForward;
-    double dec = conf.DecMax;
+    double acc = conf->AccMaxForward;
+    double dec = conf->DecMax;
     double xSat;
     double veltan= (_vel.x)*cos(_dir.th().radian()) + (_vel.y)*sin(_dir.th().radian());
     double offset = 0.15;
@@ -726,22 +726,22 @@ double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vect
 
     if(_vel.length() < 0.2)
     {
-        acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
+        acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
     }
     else
     {
-        acc =  conf.AccMaxForward*(fabs(veltan)/_vel.length()) + conf.AccMaxNormal*(fabs(velnorm)/_vel.length());
+        acc =  conf->AccMaxForward*(fabs(veltan)/_vel.length()) + conf->AccMaxNormal*(fabs(velnorm)/_vel.length());
     }
 
     double vMaxReal = sqrt(((_pos.dist(posT)  + (_vel.length()*_vel.length()/2*acc))*2*acc*dec)/(acc+dec));
     vMaxReal = min(vMaxReal,4);
-    double vMax = conf.VelMax;
+    double vMax = conf->VelMax;
     vMax = min(vMax,vMaxReal);
     xSat = ((vMax*vMax)-(_vel.length()*_vel.length()))/acc + (vMax*vMax)/dec;
-    _x3 = ( -1* _vel.length()*_vel.length()) / (-2 * fabs(conf.DecMax)) ;
+    _x3 = ( -1* _vel.length()*_vel.length()) / (-2 * fabs(conf->DecMax)) ;
 
     if(_pos.dist(posT) < _x3 ) {
-        return std::max(0.0,(_vel.length()/ conf.DecMax - offset) );
+        return std::max(0.0,(_vel.length()/ conf->DecMax - offset) );
     } else if(_vel.length() < (vMax)) {
         if(_pos.dist(posT) < xSat)
         {

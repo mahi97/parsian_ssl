@@ -5,9 +5,9 @@
 #ifndef PARSIAN_AGENT_CONFIG_H
 #define PARSIAN_AGENT_CONFIG_H
 
-#include <parsian_agent/commonconfigConfig.h>
+#include <parsian_msgs/parsian_robot_common_config.h>
 
 
-extern agent_common_config::commonconfigConfig conf;
+extern parsian_msgs::parsian_robot_common_configConstPtr conf;
 
 #endif //PARSIAN_AGENT_CONFIG_H

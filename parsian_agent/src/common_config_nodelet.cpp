@@ -8,7 +8,7 @@ void CommonConfig::onInit(){
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    common_config_pub = nh.advertise<parsian_msgs::parsian_robot_common_config>("common_config", 10);
+    common_config_pub = nh.advertise<parsian_msgs::parsian_robot_common_config>("common_config", 1000);
 
     server.reset(new dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>(private_nh));
     dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>::CallbackType f;

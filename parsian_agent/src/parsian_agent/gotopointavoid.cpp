@@ -58,7 +58,7 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(conf.DecMax);
+    bangBang->setDecMax(conf->DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
     if(slowMode) {
@@ -66,7 +66,7 @@ void CSkillGotoPointAvoid::execute()
         bangBang->setSlow(true);
     } else {
         bangBang->setSlow(false);
-        bangBang->setVelMax(conf.VelMax);
+        bangBang->setVelMax(conf->VelMax);
     }
 
     if (!Vector2D(targetPos).valid()) {
@@ -274,8 +274,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc = conf.AccMaxForward;
-    double dec = conf.DecMax;
+    double acc = conf->AccMaxForward;
+    double dec = conf->DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -318,20 +318,21 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     }
 
     if(tAgentVel.length() < 0.2) {
-        acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
+        acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
 
     } else {
-        acc =conf.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
+        acc =conf->AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf->AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
 
     double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length()*tAgentVel.length()/2*acc))*2*acc*dec)/(acc+dec));
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.DecMax)) ;
+    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf->DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ conf.DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
     }
 
     if(tAgentVel.length() < (vMax)) {

@@ -1,8 +1,7 @@
 //
 // Created by parsian-ai on 10/20/17.
 //
-#include <parsian_agent/commonconfigConfig.h>
+#include <parsian_agent/config.h>
 
-
-agent_common_config::commonconfigConfig conf;
+parsian_msgs::parsian_robot_common_configConstPtr conf;
 

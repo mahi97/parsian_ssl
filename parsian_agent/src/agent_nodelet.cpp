@@ -10,13 +10,10 @@ void AgentNodelet::onInit(){
     drawer   = new Drawer;
     wm = new CWorldModel;
 
-//    ros::NodeHandle& nh = getNodeHandle();
-//    ros::NodeHandle& private_nh = getPrivateNodeHandle();
+    conf.reset(new parsian_msgs::parsian_robot_common_config);
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
-
-
 
     agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size()-2)).toInt()));
 
@@ -32,6 +29,7 @@ void AgentNodelet::onInit(){
     string publishName{"robot_command"};
     subscribeName.append(std::to_string(agent.get()->id()));
     publishName.append(std::to_string(agent.get()->id()));
+    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe(subscribeName.data(), 10000, &AgentNodelet::rtCb, this);
 
@@ -40,26 +38,12 @@ void AgentNodelet::onInit(){
 
     parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>(publishName, 1000);
 
-
-
-    server.reset(new dynamic_reconfigure::Server<agent_config::agentConfig>(private_nh));
-
-    dynamic_reconfigure::Server<agent_config::agentConfig>::CallbackType f;
-    f = boost::bind(&AgentNodelet::ConfigServerCallBack,this, _1, _2);
-    server->setCallback(f);
-
     timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
-
-
-
-
 }
 
-void AgentNodelet::commonconfigCb(const parsian_msgs::parsian_robot_common_configConstPtr &msg)
-{
-    //use common robot configs for all robot here
+void AgentNodelet::commonConfigCb(const parsian_msgs::parsian_robot_common_configConstPtr & msg) {
+    conf.reset(msg.get());
 
-       //ROS_INFO("common AccMaxForward: %f", msg->AccMaxForward);
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -138,13 +122,3 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
     }
     return skill;
 }
-
-void AgentNodelet::ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level)
-{
-    //config server callback for private agent config
-
-    //TODO create a .msg file from private config and a publisher to publish data for ai
-
-
-}
-
