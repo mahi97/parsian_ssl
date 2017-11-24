@@ -6,7 +6,6 @@
 #include <pluginlib/class_list_macros.h>
 #include <dynamic_reconfigure/server.h>
 #include <parsian_agent/commonconfigConfig.h>
-#include <parsian_msgs/parsian_robot_common_config.h>
 
     class CommonConfig : public nodelet::Nodelet {
     private:
