@@ -291,6 +291,9 @@ install(FILES
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
 
+
+catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############

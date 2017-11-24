@@ -17,8 +17,6 @@ void AgentNodelet::onInit(){
 
     agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size()-2)).toInt()));
 
-    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonConfigCb, this);
-
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
     skillKick = new CSkillKick(agent.get());
@@ -44,7 +42,6 @@ void AgentNodelet::onInit(){
 void AgentNodelet::commonConfigCb(const parsian_msgs::parsian_robot_common_configConstPtr & msg) {
     conf = msg;
     ROS_INFO_STREAM("ppppppppppppppppppppp"<<conf->VelMax);
-
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
