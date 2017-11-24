@@ -12,10 +12,11 @@ namespace rqt_parsian_gui
     {
 
         qApp->installEventFilter(this);
+        //this->installEventFilter(this);
         // Constructor is called first before initPlugin function, needless to say.
         // give QObjects reasonable names
         setObjectName("handycontroller");
-        //cmd = new parsian_msgs::parsian_robot_command;
+        cmd.reset(new parsian_msgs::parsian_robot_command);
     }
 
     void HandyController::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -31,12 +32,14 @@ namespace rqt_parsian_gui
         mUI.setupUi(widget_);
 
         //initial value
-        agentID = mUI.Agent_combobox->currentText().toInt();        cmd.robot_id = agentID;
+        agentID = mUI.Agent_combobox->currentText().toInt();        cmd->robot_id = agentID;
         speed = mUI.Speed_slide->sliderPosition();                  //no msg for it should effect in wheelspwwds
-        kickspeed = mUI.Kickspeed_slide->sliderPosition();          cmd.kickSpeed = 0;//kickspeed;
-        chipkickspeed = mUI.ChipKickSpeed_slide->sliderPosition();  cmd.kickspeedz = 0;//chipkickspeed;
-        rollerspeed = mUI.RollerSpeed_slide->sliderPosition();      cmd.roller_speed = rollerspeed;
-        cmd.wheelsspeed = true;
+        kickspeed = mUI.Kickspeed_slide->sliderPosition();          cmd->kickSpeed = 0;//kickspeed;
+        chipkickspeed = mUI.ChipKickSpeed_slide->sliderPosition();  cmd->kickspeedz = 0;//chipkickspeed;
+        rollerspeed = mUI.RollerSpeed_slide->sliderPosition();      cmd->roller_speed = 0;
+        cmd->wheelsspeed = true;
+        cmd->spinner = false;
+        cmd->chip = false;
 
         //connect signal and slots
         connect(mUI.Speed_slide, SIGNAL(valueChanged(int)), mUI.Speed_show, SLOT(setNum(int)));
@@ -52,15 +55,16 @@ namespace rqt_parsian_gui
         connect(mUI.Kick, SIGNAL(pressed()), this, SLOT(kickpressed()));
         connect(mUI.Chip, SIGNAL(pressed()), this, SLOT(chippressed()));
         connect(mUI.Roller, SIGNAL(pressed()), this, SLOT(rollerpressed()));
-        connect(mUI.Left, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Up, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Right, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Down, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Angle1, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Angle2, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Kick, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Chip, SIGNAL(released()), this, SLOT(released()));
-        connect(mUI.Roller, SIGNAL(released()), this, SLOT(released()));
+        connect(mUI.Halt, SIGNAL(pressed()), this, SLOT(haltpressed()));
+        connect(mUI.Left, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Up, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Right, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Down, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Angle1, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Angle2, SIGNAL(released()), this, SLOT(releasednav()));
+        connect(mUI.Kick, SIGNAL(released()), this, SLOT(releasedother()));
+        connect(mUI.Chip, SIGNAL(released()), this, SLOT(releasedother()));
+        connect(mUI.Roller, SIGNAL(released()), this, SLOT(releasedother()));
         connect(mUI.Agent_combobox, SIGNAL(activated(QString)),this, SLOT(agentidchanged(QString)));
         connect(mUI.Speed_slide, SIGNAL(valueChanged(int)), this, SLOT(speedchanged(int)));
         connect(mUI.Kickspeed_slide, SIGNAL(valueChanged(int)), this, SLOT(kickspeedchanged(int)));
@@ -70,7 +74,7 @@ namespace rqt_parsian_gui
         //initial publishing
         ros::NodeHandle& nh = getNodeHandle();
         ros::NodeHandle& nh_private = getPrivateNodeHandle();
-        grsim_pub  = nh.advertise<parsian_msgs::parsian_robot_command>("robot_command0", 1000);
+        grsim_pub  = nh.advertise<parsian_msgs::parsian_robot_command>("/robot_command0", 1000);
 
 
         // add widget to the user interface
@@ -83,6 +87,7 @@ namespace rqt_parsian_gui
     void HandyController::shutdownPlugin()
     {
         // unregister all publishers here
+        grsim_pub.shutdown();
     }
 
     void HandyController::saveSettings(qt_gui_cpp::Settings& plugin_settings,
@@ -101,15 +106,12 @@ namespace rqt_parsian_gui
     {
         switch(action)
         {
-        case EActionType::_STOP_NAVIGATION:         //TODO dont know what the hel is this
-//            for (int i=0;i<_NUM_PLAYERS;i++)
-//            {
-//                char r = 0;
-//                if (i==currentAgent) r = agents[i]->getRoller();
-//                agents[i]->waitHere();
-//                agents[i]->setBeep(true);
-//                if (i==currentAgent) agents[i]->setRoller(r);
-//            }
+        case EActionType::_STOP_NAVIGATION:         //TODO better to be checked
+        {
+            //double r = 0;
+            //r = cmd->roller_speed;
+            waitHere();
+            //cmd->roller_speed = r;
 
 //            haltBtn->setIcon(QIcon("./icons/small/stop_on.png"));
 //            upBtn->setIcon(QIcon("./icons/small/red_up.png"));
@@ -119,22 +121,20 @@ namespace rqt_parsian_gui
 //            ccwBtn->setIcon(QIcon("./icons/small/red_ccw.png"));
 //            cwBtn->setIcon(QIcon("./icons/small/red_cw.png"));
             break;
-
-        case EActionType::_STOP_OTHER:              //TODO dont know what the hel is this
-//            agents[currentAgent]->setKick(0);
-//            agents[currentAgent]->setForceKick(false);
+        }
+        case EActionType::_STOP_OTHER:              //TODO better to be checked
+            waitHere();
+//            cmd->kickSpeed = 0;
+//            cmd->kickspeedz = 0;
+//            cmd->chip = false;
 
 //            kickBtn->setIcon(QIcon("./icons/small/kick_off.png"));
 //            chipBtn->setIcon(QIcon("./icons/small/chip_off.png"));
             break;
 
         case EActionType::_FORWARD:
-            //upBtn->setIcon(QIcon("../resource/icons/green_up.png"));
+            //upBtn->setIcon(QIcon("../../resource/icons/green_up.png"));
             setRobotVel(speed*4.2 / 127.0, 0.0, 0.0);
-            break;
-
-        case EActionType::_BEEP:                    //TODO dont know what the hell is this
-            //agents[currentAgent]->beep = !agents[currentAgent]->beep;
             break;
 
         case EActionType::_BACKWARD:
@@ -166,31 +166,36 @@ namespace rqt_parsian_gui
         case EActionType::_KICK:
 
             // kickBtn->setIcon(QIcon("./icons/small/kick_on.png"));
-            cleanRobotChip();
-            cmd.kickSpeed = kickspeed;
+            cmd->kickSpeed = kickspeed;
             break;
 
         case EActionType::_CHIP:
             // chipBtn->setIcon(QIcon("./icons/small/chip_on.png"));
-            cleanRobotKick();
-            cmd.chip = true;
-            cmd.kickspeedz = chipkickspeed;
+            cmd->chip = true;
+            cmd->kickspeedz = chipkickspeed;
             break;
 
-        case EActionType::_ROLLER:  //TODO i know what the hel is this but i dont know what the hel to do
-//            if ( agents[currentAgent]->getRoller() )
-//            {
-//                //rollerBtn->setIcon(QIcon("./icons/small/roller_off.png"));
-//                agents[currentAgent]->setRoller(0);
-//            }
-//            else
-//            {
-//                //rollerBtn->setIcon(QIcon("./icons/small/roller_on.png"));
-//                agents[currentAgent]->setRoller(7);
-//            }
+        case EActionType::_ROLLER:  //TODO some issue when robot id changes
+            if ( cmd->spinner )
+            {
+                //rollerBtn->setIcon(QIcon("./icons/small/roller_off.png"));
+                cmd->spinner = false;
+                cmd->roller_speed = 0;
+                ROS_INFO("spin off");
+            }
+            else
+            {
+                //rollerBtn->setIcon(QIcon("./icons/small/roller_on.png"));
+                cmd->spinner = true;
+                cmd->roller_speed = rollerspeed;
+                ROS_INFO("spin on");
+            }
             break;
 
         case EActionType::_STOP_ALL:
+            waitHere();
+            cmd->roller_speed = 0;
+            cmd->spinner = false;
             break;
 
         }
@@ -199,74 +204,102 @@ namespace rqt_parsian_gui
 
     void HandyController::setRobotVel(double _vtan , double _vnorm , double _w )
     {
-        cmd.vel_F = _vtan;     cmd.vel_N = _vnorm;        cmd.vel_w = _w;
+        cmd->vel_F = _vtan;     cmd->vel_N = _vnorm;        cmd->vel_w = _w *_RAD2DEG;
         double wheel1, wheel2, wheel3, wheel4;
-        jacobian(_vtan, _vnorm, _w, wheel1, wheel2, wheel3, wheel4);
-        cmd.wheel1 = static_cast<float>(wheel1);   cmd.wheel2 = static_cast<float>(wheel2);   cmd.wheel3 = static_cast<float>(wheel3);   cmd.wheel4 = static_cast<float>(wheel4);
+        jacobian(_vtan, _vnorm, _w *_RAD2DEG, wheel1, wheel2, wheel3, wheel4);
+        cmd->wheel1 = static_cast<float>(wheel1);   cmd->wheel2 = static_cast<float>(wheel2);   cmd->wheel3 = static_cast<float>(wheel3);   cmd->wheel4 = static_cast<float>(wheel4);
     }
 
-    void HandyController::cleanRobotVel()
+    void HandyController::waitHere()
     {
-         cmd.vel_F = 0;     cmd.vel_N = 0;        cmd.vel_w = 0;
-         cmd.wheel1 = 0;   cmd.wheel2 = 0;   cmd.wheel3 = 0;   cmd.wheel4 = 0;
+        setRobotVel(0.0, 0.0, 0.0);
+        cmd->kickSpeed = 0;
+        cmd->kickspeedz = 0;
+        cmd->chip = false;
+        //cmd->roller_speed = 0;
     }
 
-    void HandyController::cleanRobotChip()
+    bool HandyController::eventFilter(QObject* target, QEvent* event)
     {
-        cmd.chip = false;
-        cmd.kickspeedz = 0;
-    }
-
-    void HandyController::cleanRobotKick()
-    {
-        cmd.kickSpeed = 0;
-    }
-
-    bool HandyController::eventFilter(QObject*, QEvent* event)
-    {
-        if (event->type() == QEvent::KeyPress)
+        //if(target == this)
         {
-            QKeyEvent* e = static_cast<QKeyEvent*>(event);
-            if(e->key() == Qt::Key_A)
-                emit mUI.Left->pressed();
-            if(e->key() == Qt::Key_W)
-                emit mUI.Up->pressed();
-            if(e->key() == Qt::Key_D)
-                emit mUI.Right->pressed();
-            if(e->key() == Qt::Key_S)
-                emit mUI.Down->pressed();
-            if(e->key() == Qt::Key_Q)
-                emit mUI.Angle1->pressed();
-            if(e->key() == Qt::Key_E)
-                emit mUI.Angle2->pressed();
-            if(e->key() == Qt::Key_K)
-                emit mUI.Kick->pressed();
-            if(e->key() == Qt::Key_C)
-                emit mUI.Chip->pressed();
-            if(e->key() == Qt::Key_R)
-                emit mUI.Roller->pressed();
-        }
-        if (event->type() == QEvent::KeyRelease)
-        {
-            QKeyEvent* e = static_cast<QKeyEvent*>(event);
-            if(e->key() == Qt::Key_A)
-                emit mUI.Left->released();
-            if(e->key() == Qt::Key_W)
-                emit mUI.Up->released();
-            if(e->key() == Qt::Key_D)
-                emit mUI.Right->released();
-            if(e->key() == Qt::Key_S)
-                emit mUI.Down->released();
-            if(e->key() == Qt::Key_Q)
-                emit mUI.Angle1->released();
-            if(e->key() == Qt::Key_E)
-                emit mUI.Angle2->released();
-            if(e->key() == Qt::Key_K)
-                emit mUI.Kick->released();
-            if(e->key() == Qt::Key_C)
-                emit mUI.Chip->released();
-            if(e->key() == Qt::Key_R)
-                emit mUI.Roller->released();
+            if (event->type() == QEvent::KeyPress)
+            {
+                QKeyEvent* e = static_cast<QKeyEvent*>(event);
+                if(e->key() == Qt::Key_A)
+                {
+                    emit mUI.Left->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_W)
+                {
+                    emit mUI.Up->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_D)
+                {
+                    emit mUI.Right->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_S)
+                {
+                    emit mUI.Down->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_Q)
+                {
+                    emit mUI.Angle1->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_E)
+                {
+                    emit mUI.Angle2->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_K)
+                {
+                    emit mUI.Kick->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_C)
+                {
+                    emit mUI.Chip->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_R)
+                {
+                    emit mUI.Roller->pressed();
+                    return true;
+                }
+                if(e->key() == Qt::Key_H)
+                {
+                    emit mUI.Halt->pressed();
+                    return true;
+                }
+            }
+            if (event->type() == QEvent::KeyRelease)
+            {
+                QKeyEvent* e = static_cast<QKeyEvent*>(event);
+
+                if( e->isAutoRepeat() )
+                    return false;
+
+
+                if(e->key() == Qt::Key_K || e->key() == Qt::Key_C || e->key() == Qt::Key_R)
+                {
+                    takeAction(_STOP_OTHER);
+                    grsim_pub.publish(cmd);
+                    return true;
+                }
+                if(e->key() == Qt::Key_W || e->key() == Qt::Key_A || e->key() == Qt::Key_S
+                        || e->key() == Qt::Key_D || e->key() == Qt::Key_Q || e->key() == Qt::Key_E)
+                {
+                    takeAction(_STOP_NAVIGATION);
+                    grsim_pub.publish(cmd);
+                    return true;
+                }
+
+            }
         }
         return false;
     }
@@ -276,71 +309,94 @@ namespace rqt_parsian_gui
         ROS_INFO("leftclicked");
         takeAction(EActionType::_LEFT);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::uppressed()
     {
         ROS_INFO("upclicked");
         takeAction(EActionType::_FORWARD);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::rightpressed()
     {
         ROS_INFO("rightclicked");
         takeAction(EActionType::_RIGHT);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::downpressed()
     {
         ROS_INFO("downclicked");
         takeAction(EActionType::_BACKWARD);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::angle1pressed()
     {
         ROS_INFO("angle1clicked");
         takeAction(EActionType::_TURN_CCW);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::angle2pressed()
     {
         ROS_INFO("angle2clicked");
         takeAction(EActionType::_TURN_CW);
         grsim_pub.publish(cmd);
-        cleanRobotVel();
+        //cleanRobotVel();
     }
     void HandyController::kickpressed()
     {
         ROS_INFO("kickclicked");
         takeAction(EActionType::_KICK);
         grsim_pub.publish(cmd);
-        cleanRobotKick();
+       // cleanRobotKick();
     }
     void HandyController::chippressed()
     {
         ROS_INFO("chipclicked");
         takeAction(EActionType::_CHIP);
         grsim_pub.publish(cmd);
-        cleanRobotChip();
+        //cleanRobotChip();
     }
-    void HandyController::rollerpressed()       //TODO not complete
+
+    void HandyController::haltpressed()
+    {
+        ROS_INFO("haltclicked");
+        takeAction(EActionType::_STOP_ALL);
+        grsim_pub.publish(cmd);
+    }
+
+    void HandyController::rollerpressed()
     {
         ROS_INFO("Rollerclicked");
         takeAction(EActionType::_ROLLER);
     }
 
-    void HandyController::released()
+    void HandyController::releasedother()
     {
+        takeAction(_STOP_OTHER);
+        grsim_pub.publish(cmd);
+    }
+
+    void HandyController::releasednav()
+    {
+        takeAction(_STOP_NAVIGATION);
         grsim_pub.publish(cmd);
     }
 
     void HandyController::agentidchanged(QString id)
     {
-        agentID = id.toInt();   cmd.robot_id = agentID;
+        agentID = id.toInt();
+        cmd.reset(new parsian_msgs::parsian_robot_command);
+        cmd->robot_id = agentID;
+        cmd->kickSpeed = 0;//kickspeed;
+        cmd->kickspeedz = 0;//chipkickspeed;
+        cmd->roller_speed = 0;
+        cmd->wheelsspeed = true;
+        cmd->spinner = false;
+        cmd->chip = false;
     }
     void HandyController::speedchanged(int speed_)
     {
@@ -348,15 +404,15 @@ namespace rqt_parsian_gui
     }
     void HandyController::kickspeedchanged(int speed_)
     {
-        kickspeed = speed_;     cmd.kickSpeed =kickspeed;
+        kickspeed = speed_;     cmd->kickSpeed =kickspeed;
     }
     void HandyController::chipkickspeedchanged(int speed_)
     {
-        chipkickspeed = speed_; cmd.kickspeedz = chipkickspeed;
+        chipkickspeed = speed_; cmd->kickspeedz = chipkickspeed;
     }
     void HandyController::rollerspeedchanged(int speed_)
     {
-        rollerspeed = speed_;   cmd.roller_speed = rollerspeed;
+        rollerspeed = speed_;   cmd->roller_speed = rollerspeed;
     }
 
 

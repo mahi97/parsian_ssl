@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QString>
+#include <QIcon>
 #include <pluginlib/class_list_macros.h>
 #include <rqt_parsian_gui/ui_handycontroller.h>
 #include <parsian_msgs/parsian_robot_command.h>
@@ -18,30 +19,22 @@
 
 
 // main TODOs:
-//     1)the cmd publishes in /rqt_parsian_gui/robot_command0 not in the /robot_command0
-//     2)the cmd is not Ptr and I dont know what to do
-//     3)the robots does not act very fluent and smooth
-//     4)the right and left actions doesnt work correctly
+//     1)the cmd publishes in /rqt_parsian_gui/robot_command0 not in the /robot_command0 [solved]
+//     2)the cmd is not Ptr and I dont know what to do [solved]
+//     3)the robots does not act very fluent and smooth [solved]
+//     4)the right and left actions doesnt work correctly [so does the old code]
+//     5)the plugin crashes in the use of close icon [solved]
+//     6)the event filter run more than once [solved]
+//     7)the pushbutton icons
+//     8)working in real not tested
 
 namespace rqt_parsian_gui
 {
     class HandyController
-            : public rqt_gui_cpp::Plugin/*, public QWidget*/
+            : public rqt_gui_cpp::Plugin
     {
     Q_OBJECT
     public:
-//        class KeyEvent : public QWidget
-//        {
-//        public:
-//            KeyEvent(QWidget *parent) : QWidget(parent){}
-//        protected:
-//            void keyPressEvent(QKeyEvent *event)
-//            {
-//                emit keypressed(event);
-//            }
-//        signals:
-//            void keypressed(QKeyEvent *event);
-//        };
 
         HandyController();
         virtual void initPlugin(qt_gui_cpp::PluginContext& context);
@@ -56,13 +49,11 @@ namespace rqt_parsian_gui
         void jacobian(double vx, double vy, double w, double &v1, double &v2, double &v3, double &v4);
         void takeAction(EActionType action);
         void setRobotVel(double _vtan , double _vnorm , double _w );
-        void cleanRobotVel();
-        void cleanRobotChip();
-        void cleanRobotKick();
+        void waitHere();
 
 
         ros::Publisher grsim_pub;
-        parsian_msgs::parsian_robot_command cmd;
+        parsian_msgs::parsian_robot_commandPtr cmd;
 
 
     public slots:
@@ -74,7 +65,10 @@ namespace rqt_parsian_gui
         void angle2pressed();
         void kickpressed();
         void chippressed();
-        void released();
+        void haltpressed();
+        void released(QKeyEvent *);
+        void releasedother();
+        void releasednav();
         void rollerpressed();
         void agentidchanged(QString);
         void speedchanged(int);

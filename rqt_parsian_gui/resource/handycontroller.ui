@@ -16,10 +16,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>180</y>
-     <width>351</width>
-     <height>95</height>
+     <x>40</x>
+     <y>230</y>
+     <width>376</width>
+     <height>101</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -100,9 +100,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_9">
+       <widget class="QPushButton" name="Halt">
         <property name="text">
-         <string>PushButton</string>
+         <string>Halt</string>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
      <x>11</x>
      <y>20</y>
      <width>421</width>
-     <height>157</height>
+     <height>196</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
