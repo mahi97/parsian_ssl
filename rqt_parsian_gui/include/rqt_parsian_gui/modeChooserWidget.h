@@ -18,7 +18,7 @@
 #define YELLOW 1
 #define LEFT 1
 #define SIMULATION 1
-#define FILE_PATH "rqt_parsian_gui/config/team_config.txt"
+#define FILE_PATH "config/team_config.txt"
 namespace rqt_parsian_gui
 {
 

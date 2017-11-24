@@ -1,5 +1,5 @@
-<library path="lib/libcommonstatus_nodelet">
-    <class name="parsian_agent/CommonStatus" type="CommonStatus" base_class_type="nodelet::Nodelet">
+<library path="lib/libparsian_agent_commonconfig_nodelet">
+    <class name="parsian_agent/CommonConfig" type="CommonConfig" base_class_type="nodelet::Nodelet">
         <description>
             nothing!!!!
         </description>
