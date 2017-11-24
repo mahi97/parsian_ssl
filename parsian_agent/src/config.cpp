@@ -3,5 +3,5 @@
 //
 #include <parsian_agent/config.h>
 
-parsian_msgs::parsian_robot_common_configConstPtr conf;
+agent_common_config::commonconfigConfig *conf = new agent_common_config::commonconfigConfig();
 

@@ -13,9 +13,6 @@
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_agent/agent.h>
-
-#include <dynamic_reconfigure/server.h>
-#include <parsian_msgs/parsian_robot_common_config.h>
 #include <parsian_agent/config.h>
 #include <parsian_agent/skills.h>
 
@@ -42,7 +39,7 @@ namespace parsian_agent {
 
         ros::Timer timer_;
 
-        void commonConfigCb(const parsian_msgs::parsian_robot_common_configConstPtr &);
+        void commonConfigCb(const dynamic_reconfigure::ConfigConstPtr & _cnf);
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 

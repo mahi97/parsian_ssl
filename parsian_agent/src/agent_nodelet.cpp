@@ -10,8 +10,6 @@ void AgentNodelet::onInit(){
     drawer   = new Drawer;
     wm = new CWorldModel;
 
-    conf.reset(new parsian_msgs::parsian_robot_common_config);
-
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
@@ -22,12 +20,11 @@ void AgentNodelet::onInit(){
     skillKick = new CSkillKick(agent.get());
     oneTouch = new CSkillKickOneTouch(agent.get());
     receivePass = new CSkillReceivePass(agent.get());
-    
     string subscribeName{"robot_task_"};
     string publishName{"robot_command"};
     subscribeName.append(std::to_string(agent.get()->id()));
     publishName.append(std::to_string(agent.get()->id()));
-    common_config_sub = nh.subscribe("common_config", 1000, &AgentNodelet::commonConfigCb, this);
+    common_config_sub = nh.subscribe("/com_agent/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe(subscribeName.data(), 10000, &AgentNodelet::rtCb, this);
 
@@ -39,9 +36,9 @@ void AgentNodelet::onInit(){
     timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
 }
 
-void AgentNodelet::commonConfigCb(const parsian_msgs::parsian_robot_common_configConstPtr & msg) {
-    conf = msg;
-    ROS_INFO_STREAM("ppppppppppppppppppppp"<<conf->VelMax);
+void AgentNodelet::commonConfigCb(const dynamic_reconfigure::ConfigConstPtr &_cnf) {
+    dynamic_reconfigure::Config* a = const_cast<dynamic_reconfigure::Config*>(_cnf.get());
+    conf->__fromMessage__(*a);
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -75,7 +72,6 @@ void AgentNodelet::timerCb(const ros::TimerEvent& event){
 }
 
 void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
-
   //  ROS_INFO("callBack called");
     agent->skill = getSkill(_robot_task);
 }
@@ -115,8 +111,8 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         }
             break;
 
-
-        default:break;
+        default:
+            break;
     }
     return skill;
 }

@@ -8,52 +8,7 @@ void CommonConfig::onInit(){
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    common_config_pub = nh.advertise<parsian_msgs::parsian_robot_common_config>("common_config", 1000);
-
     server.reset(new dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>(private_nh));
     dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>::CallbackType f;
-    f = boost::bind(&CommonConfig::ConfigServerCallBack,this, _1, _2);
-    server->setCallback(f);
 
-    agent_common_config::commonconfigConfig config;
-    server->getConfigDefault(config);
-    parsian_msgs::parsian_robot_common_configPtr msg =getMsg(config);
-    common_config_pub.publish(msg);
-
-}
-
-
-void CommonConfig::ConfigServerCallBack(const agent_common_config::commonconfigConfig &config, uint32_t level)
-{
-    parsian_msgs::parsian_robot_common_configPtr msg =getMsg(config);
-    common_config_pub.publish(msg);
-}
-
-
-parsian_msgs::parsian_robot_common_configPtr CommonConfig::getMsg(const agent_common_config::commonconfigConfig &config){
-    parsian_msgs::parsian_robot_common_configPtr msg{new parsian_msgs::parsian_robot_common_config};
-    //BangBang
-    msg->AccMaxForward = config.AccMaxForward;
-    msg->AccMaxNormal = config.AccMaxNormal;
-    msg->DecMax = config.DecMax;
-    msg->VelMax = config.VelMax;
-    msg->posKP = config.posKP;
-    msg->posKI = config.posKI;
-    msg->posKD = config.posKD;
-    msg->thKP = config.thKP;
-    msg->thKI = config.thKI;
-    msg->thKD = config.thKD;
-    //ERRT
-    msg->Draw_Path = config.Draw_Path;
-    msg->Goal_Probablity = config.Goal_Probablity;
-    msg->Waypoint_Catch_Probablity = config.Waypoint_Catch_Probablity;
-    msg->Extend_Step = config.Extend_Step;
-    msg->Target_Distance_Threshold = config.Target_Distance_Threshold;
-    //SkillsParametersKickOneTouch
-    msg->Landa = config.Landa;
-    msg->Gamma = config.Gamma;
-    msg->Delay = config.Delay;
-    msg->TimeFactor = config.TimeFactor;
-
-    return msg;
 }
