@@ -6,6 +6,7 @@
 #define PARSIAN_AGENT_CONFIG_H
 
 #include <parsian_agent/commonconfigConfig.h>
+#include <dynamic_reconfigure/Config.h>
 
 extern agent_common_config::commonconfigConfig *conf;
 
