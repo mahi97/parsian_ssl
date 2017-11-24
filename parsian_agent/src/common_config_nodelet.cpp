@@ -15,11 +15,22 @@ void CommonConfig::onInit(){
     f = boost::bind(&CommonConfig::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
 
+    agent_common_config::commonconfigConfig config;
+    server->getConfigDefault(config);
+    parsian_msgs::parsian_robot_common_configPtr msg =getMsg(config);
+    common_config_pub.publish(msg);
+
 }
 
 
 void CommonConfig::ConfigServerCallBack(const agent_common_config::commonconfigConfig &config, uint32_t level)
 {
+    parsian_msgs::parsian_robot_common_configPtr msg =getMsg(config);
+    common_config_pub.publish(msg);
+}
+
+
+parsian_msgs::parsian_robot_common_configPtr CommonConfig::getMsg(const agent_common_config::commonconfigConfig &config){
     parsian_msgs::parsian_robot_common_configPtr msg{new parsian_msgs::parsian_robot_common_config};
     //BangBang
     msg->AccMaxForward = config.AccMaxForward;
@@ -44,7 +55,5 @@ void CommonConfig::ConfigServerCallBack(const agent_common_config::commonconfigC
     msg->Delay = config.Delay;
     msg->TimeFactor = config.TimeFactor;
 
-    common_config_pub.publish(msg);
-
-
+    return msg;
 }

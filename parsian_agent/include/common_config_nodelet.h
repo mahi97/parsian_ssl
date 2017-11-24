@@ -19,6 +19,7 @@
 
         boost::shared_ptr<dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>> server;
         void ConfigServerCallBack(const agent_common_config::commonconfigConfig &config, uint32_t level) ;
+        parsian_msgs::parsian_robot_common_configPtr getMsg(const agent_common_config::commonconfigConfig &config);
 
         ros::Publisher common_config_pub;
 
