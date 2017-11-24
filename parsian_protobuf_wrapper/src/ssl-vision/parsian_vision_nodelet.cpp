@@ -9,6 +9,11 @@ void VisionNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
+
+    ros::param::get("/team_color", teamColor);
+    isOurColorYellow = (teamColor == "yellow");
+    packs = 0;
+
     timer = nh.createTimer(ros::Duration(.004), boost::bind(&VisionNodelet::timerCb, this, _1));
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
@@ -24,9 +29,7 @@ void VisionNodelet::onInit() {
     dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig>::CallbackType f;
     f = boost::bind(&VisionNodelet::configCb,this, _1, _2);
     configServer->setCallback(f);
-    ros::param::get("/team_color", teamColor);
-    isOurColorYellow = (teamColor == "yellow");
-    packs = 0;
+
 }
 
 void VisionNodelet::reconnect()

@@ -122,6 +122,14 @@ void GrsimNodelet::onInit()
 {
     NODELET_INFO("grsim_nodelet onInit");
     udp = new UDPSend(ip, port);
+
+    GrsimCommand = new grSim_Commands;
+    GrsimReplacement = new grSim_Replacement;
+
+    std::string col;
+    ros::param::get("team_color", color);
+    color = (col == "yellow");          //check if it is true!
+//    color = false;
     n = getNodeHandle();
     pn = getPrivateNodeHandle();
 //    sub0 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
@@ -151,13 +159,6 @@ void GrsimNodelet::onInit()
 
     vision_sub= n.subscribe<parsian_msgs::ssl_vision_detection>("vision_detection",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
     //timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
-
-    GrsimCommand = new grSim_Commands;
-    GrsimReplacement = new grSim_Replacement;
-
-    std::string col;
-    ros::param::get("team_color", color);
-    color = ! (col == "yellow");          //check if it is true!
 
 }
 

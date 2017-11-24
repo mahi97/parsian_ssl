@@ -60,6 +60,7 @@ public:
     } guiBall;
 
     CguiDrawer();
+    ~CguiDrawer();
     void drawRobot (Vector2D _pos = Vector2D(0,0), Vector2D _dir = Vector2D(0,0), QColor _color = QColor(255, 255, 0), int _ID = 0,int _comID=0, QString _str="", bool newRobots = false);
     void clear();
 };

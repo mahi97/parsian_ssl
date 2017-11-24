@@ -7,7 +7,7 @@ CSoccer::CSoccer()
     agents = new CAgent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
-        agents[i] = new CAgent();
+        agents[i] = new CAgent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
         agents[i]->self = *wm->our.active(i);
     }
 //    knowledge = new CKnowledge(agents);
@@ -131,7 +131,7 @@ void CSoccer::updateTask(){
     kick->setKickspeed(1023);
     kick->setTarget(wm->field->oppGoal());
     kick->setSlow(true);
-    kick->setKkshotempyspot(true);
+    kick->setShotemptyspot(true);
 
     auto* gtp = new GotopointavoidAction;
     Circle2D aroundBall = Circle2D(wm->ball->pos, 0.5);

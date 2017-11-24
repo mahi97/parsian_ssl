@@ -55,6 +55,7 @@ namespace rqt_parsian_gui
     private:
         QWidget* widget_;
 
+        CguiDrawer* drawer;
         parsian_msgs::parsian_world_modelConstPtr mywm;
         MonitorWidget* fieldWidget;
     };

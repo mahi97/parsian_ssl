@@ -36,7 +36,8 @@ public:
     void generateFromConfig(Agent* a);
     virtual CSkill* allocate(Agent* _agent)=0;
     virtual QString getName()=0;
-    double timeNeeded();  //in seconds
+
+    virtual double timeNeeded();  //in seconds
     double successRate(); //between 0-1
 
     //these functions should be defined in child classes    

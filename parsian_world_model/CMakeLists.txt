@@ -8,13 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        dynamic_reconfigure
-        parsian_msgs
-        parsian_util
-        roscpp
-        rospy
-        nodelet
-        )
+		dynamic_reconfigure
+		parsian_msgs
+		parsian_util
+		roscpp
+		rospy
+		nodelet
+		)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -22,64 +22,19 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt4 REQUIRED COMPONENTS QtCore)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS})
+
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
+
+qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
+
+file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
-##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   nav_msgs#   parsian_msgs
-# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -96,11 +51,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
- generate_dynamic_reconfigure_options(
-
-    cfg/worldmodel.cfg
-
- )
+generate_dynamic_reconfigure_options(
+		cfg/worldmodel.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -112,10 +65,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        #  INCLUDE_DIRS include
-        #  LIBRARIES parsian_world_model
-          CATKIN_DEPENDS dynamic_reconfigure parsian_msgs roscpp rospy nodelet
-        #  DEPENDS system_lib
+		INCLUDE_DIRS include
+		LIBRARIES ${PROJECT_NAME} ${PROJECT_NAME}_util ${PROJECT_NAME}_nodelet
+		CATKIN_DEPENDS dynamic_reconfigure parsian_msgs roscpp rospy nodelet parsian_util
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -125,43 +78,37 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
+		include
+		${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-        src/wm/worldmodel.cpp
-        src/wm/visionclient.cpp
-        src/wm/visionbelief.cpp
-        src/wm/movingobject.cpp
-        src/wm/rawobject.cpp
-        src/wm/halfworld.cpp
-        src/wm/robot.cpp
-        src/wm/ball.cpp
-        )
+		src/wm/visionclient.cpp
+		src/wm/visionbelief.cpp
+		src/wm/worldmodel.cpp
+		src/wm/movingobject.cpp
+		src/wm/rawobject.cpp
+		src/wm/halfworld.cpp
+		src/wm/robot.cpp
+		src/wm/ball.cpp
+		)
 
 add_library(${PROJECT_NAME}_util
-        src/util/robottracker.cpp
-        src/util/kalman.cpp
-        src/util/balltracker.cpp
-        src/util/tracker.cpp
-        src/util/matrix.cpp
-        )
+		src/util/robottracker.cpp
+		src/util/kalman.cpp
+		src/util/balltracker.cpp
+		src/util/tracker.cpp
+		src/util/matrix.cpp
+		)
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(${PROJECT_NAME}_nodelet
+		src/worldmodel_nodelet.cpp
+		)
 
-## Declare a C++ executable
-## With catkin_make all packages are built within a single CMake context
-## The recommended prefix ensures that target names across packages don't collide
-add_library(worldmodel_nodelet_lib
-        src/worldmodel_nodelet.cpp
-        )
-
-add_executable(worldmodel_node src/worldmodel_node.cpp)
+add_executable(${PROJECT_NAME}_node
+		src/worldmodel_node.cpp
+		)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -171,36 +118,54 @@ add_executable(worldmodel_node src/worldmodel_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
-add_dependencies(${PROJECT_NAME}_util ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
+
+add_dependencies(${PROJECT_NAME}_util
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		)
+
+add_dependencies(${PROJECT_NAME}_node
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		)
+
+add_dependencies(${PROJECT_NAME}_nodelet
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		)
 ## Specify libraries to link a library or executable target against
 
 
 target_link_libraries(${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}_util
-        )
+		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
+		${PROJECT_NAME}_util
+		)
 
 
 target_link_libraries(${PROJECT_NAME}_util
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        )
+		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
+		)
 
-add_dependencies(worldmodel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(worldmodel_nodelet_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
-## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_node
-        ${catkin_LIBRARIES}
-        )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(worldmodel_nodelet_lib
-        ${catkin_LIBRARIES}
-        ${QT_LIBRARIES}
-        ${PROJECT_NAME}
-        )
+target_link_libraries(${PROJECT_NAME}_node
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}_nodelet
+		)
+
+## Specify libraries to link a library or executable target against
+target_link_libraries(${PROJECT_NAME}_nodelet
+		${catkin_LIBRARIES}
+		${QT_LIBRARIES}
+		${PROJECT_NAME}
+		)
 
 
 #############
@@ -218,25 +183,24 @@ target_link_libraries(worldmodel_nodelet_lib
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}_util ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+		)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+		DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+		FILES_MATCHING PATTERN "*.h"
+		#   PATTERN ".svn" EXCLUDE
+		)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+		nodelet.xml
+		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+		)
 
 #############
 ## Testing ##

@@ -29,16 +29,9 @@ private:
     kkRPMode decideMode();
     double cirThresh;
     double kickCirThresh;
-    double velThresh;
 public:
     double ballRealVel;
     DEF_SKILL(CSkillReceivePass);
-    /*CSkillReceivePass() {CSkillReceivePass(NULL);}
-    CSkillReceivePass(CAgent*);*/
-    bool received;
-    /*void execute();
-    void setAgent(CAgent*);*/
-    bool isReceived();
 };
 
 

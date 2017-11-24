@@ -21,8 +21,6 @@ public:
 
 
     SkillProperty(ReceivepassAction, quint8, Robot_Id, robot_id);
-    SkillProperty(ReceivepassAction, bool, Avoidourpenaltyarea, avoidOurPenaltyArea);
-    SkillProperty(ReceivepassAction, bool, Avoidopppenaltyarea, avoidOppPenaltyArea);
     SkillProperty(ReceivepassAction, bool, Slow, slow);
     SkillProperty(ReceivepassAction, double, Receiveradius, receiveRadius);
     SkillProperty(ReceivepassAction, bool, Ignoreangle, ignoreAngle);

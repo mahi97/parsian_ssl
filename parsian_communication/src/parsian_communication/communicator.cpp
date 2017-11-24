@@ -1,6 +1,7 @@
 #include <parsian_communication/communicator.h>
 #include <string.h>
 #include <stdio.h>
+#include <parsian_util/tools/drawer.h>
 
 
 /*************************************** CBaseCommunicator Class ******************************************/
@@ -12,7 +13,120 @@ CBaseCommunicator::CBaseCommunicator()
     p = new CMySerialPort();
     p->serial_port = nullptr;
     PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF,40};
+//    recTime = new QTimer;
+//    recTime->setInterval(100);
+//    recTime->start();
+    recDataFlow.clear();
+    for(int i = 0 ; i < 16 ; i++)
+    {
+        for(int j = 0 ; j < 13 ; j ++)
+        {
+            robotPacket[i][j]=0;
+        }
+    }
+
+    for(int i = 0 ; i < 12 ; i++)
+    {
+        onlineRobotsTimer[i].start();
+    }
 }
+
+
+void CBaseCommunicator::readData()
+{
+
+    QByteArray dataFlow;
+    if(p->serial_port->bytesAvailable()) {
+        dataFlow = p->serial_port->read(p->serial_port->bytesAvailable());
+//        drawer->draw(Vector2D(1,0));
+    }
+    p->serial_port->flush();
+    recDataFlow.append(dataFlow);
+    if(recDataFlow.size() > 100)
+    {
+        recDataFlow.remove(0,recDataFlow.size()/2);
+    }
+
+//    debug(QString("SIZE : %1").arg(recDataFlow.size()), D_MHMMD);
+    if(recDataFlow.size())
+    {
+
+        for(int i = 0 ; i < recDataFlow.size() ; i++) {
+            if(recDataFlow[i] == 0x99)
+            {
+
+                if(i >= 12)
+                {
+
+                    for(int j = 0 ; j <= 12 ; j++)
+                    {
+                        if(i-12 < 12) {
+                            robotPacket[recDataFlow[i-12]][j] = static_cast<unsigned char>(recDataFlow[j + i - 12]);
+                            onlineRobotsTimer[recDataFlow[i-12]].restart();
+                        }
+                    }
+                    if (!recDataFlow.isEmpty())
+                    {
+                        recDataFlow.remove(0,i+1);
+                        i = 0;
+                    }
+
+                }
+                else
+                {
+                    if (!recDataFlow.isEmpty())
+                    {
+                        recDataFlow.remove(0,i+1);
+                        i =0;
+                    }
+                }
+
+            }
+        }
+    }
+
+
+
+//    knowledge->onlineRobots.clear();
+//    for(int i = 0 ; i < 12 ; i++)
+//    {
+//        knowledge->onlineRobots.append(i);
+//        if(onlineRobotsTimer[i].elapsed() > 200)
+//        {
+//            knowledge->onlineRobots.removeOne(i);
+//        }
+//    }
+
+//    debug(QString("id : %1").arg((int)robotPacket[4][1]), D_MHMMD);
+//
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        robotStat[i].id = i;
+        robotStat[i].shootSensor           = static_cast<unsigned char>(robotPacket[i][1] & 0x01);
+        robotStat[i].battery               = static_cast<unsigned char>((robotPacket[i][1] & 0b11111100) >> 2);
+        robotStat[i].capCharge             = static_cast<unsigned char>(robotPacket[i][2] & 0b00111111);
+        robotStat[i].dataLoss              = static_cast<unsigned char>(robotPacket[i][4] & 0b00001111);
+        robotStat[i].spinCatchBall         = static_cast<unsigned char>((robotPacket[i][1] & 0b00000010) >> 1);
+        robotStat[i].shootBoardFault       = static_cast<unsigned char>((robotPacket[i][5] & 0b01000000) >> 6);
+        robotStat[i].kickFault             = static_cast<unsigned char>((robotPacket[i][5] & 0b00100000) >> 5);
+        robotStat[i].chipFault             = static_cast<unsigned char>((robotPacket[i][5] & 0b00010000) >> 4);
+        robotStat[i].En1Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00001000) >> 3);
+        robotStat[i].En2Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00000100) >> 2);
+        robotStat[i].En3Fault              = static_cast<unsigned char>((robotPacket[i][5] & 0b00000010) >> 1);
+        robotStat[i].En4Fault              = static_cast<unsigned char>(robotPacket[i][5] & 0b00000001);
+        robotStat[i].m1Fault               = static_cast<unsigned char>(robotPacket[i][6] & 0b00000001);
+        robotStat[i].m2Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00000010) >> 1);
+        robotStat[i].m3Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00000100) >> 2);
+        robotStat[i].m4Fault               = static_cast<unsigned char>((robotPacket[i][6] & 0b00001000) >> 3);
+//        robotStat[i].motorFault[4]   = robotPacket[i][6] & 0b00010000;
+        robotStat[i].boardId               = static_cast<unsigned char>(robotPacket[i][3] & 0b00011111);
+    }
+    robotsStat.reset(new parsian_msgs::parsian_robots_status);
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        robotsStat->status.push_back(robotStat[i]);
+    }
+}
+
+
 
 CBaseCommunicator::~CBaseCommunicator()
 {

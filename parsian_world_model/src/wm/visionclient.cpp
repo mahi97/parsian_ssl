@@ -15,7 +15,7 @@ CVisionClient::~CVisionClient()
     delete vcTimer;
 }
 
-void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config)
+void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet)
 {
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
@@ -77,7 +77,7 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     v[id].ltcapture = t;
     v[id].visionLatency = (packet->t_sent - packet->t_capture);
     v[id].updated = true;
-    for (int i=0; i < min(MAX_OBJECT, packet->balls.size());i++)
+    for (int i=0; i < std::min(MAX_OBJECT, static_cast<int>(packet->balls.size())); i++)
     {
         if (packet->balls[i].confidence != -1
             && packet->balls[i].pos.x != 5000
@@ -173,7 +173,7 @@ void CVisionClient::merge(int camera_count)
         //Match between res and v[i]
         for (int j=0;j<v[i].ball.count();j++)
         {
-            //if (v[i].ball[j].confidence <= 0) continue;
+//            if (v[i].ball[j].confidence <= 0) continue;
             int best = -1;
             double dist = 0;
             double minDist = 0;

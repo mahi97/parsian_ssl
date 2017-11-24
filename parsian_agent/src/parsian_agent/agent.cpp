@@ -410,11 +410,11 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     accCoef = atan(fabs(vforward)/fabs(vnormal))/_PI*2;
     if(diveMode)
     {
-        realAcc = 1.5 * accCoef*conf.groups.bang_bang.AccMaxForward + (1-accCoef)*conf.groups.bang_bang.AccMaxNormal;
+        realAcc = 1.5 * accCoef*conf->AccMaxForward + (1-accCoef)*conf->AccMaxNormal;
     }
     else
     {
-        realAcc = accCoef*conf.groups.bang_bang.AccMaxForward + (1-accCoef)*conf.groups.bang_bang.AccMaxNormal;
+        realAcc = accCoef*conf->AccMaxForward + (1-accCoef)*conf->AccMaxNormal;
 
     }
 
@@ -434,28 +434,28 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     {
         if(vforward >= 0 )
         {
-            if(vforward > (lastVf + conf.groups.bang_bang.AccMaxForward* 0.0166667))
+            if(vforward > (lastVf + conf->AccMaxForward* 0.0166667))
             {
-                vforward = lastVf + (conf.groups.bang_bang.AccMaxForward* 0.0166667)*sign(vforward);
+                vforward = lastVf + (conf->AccMaxForward* 0.0166667)*sign(vforward);
             }
-            if(vforward < (lastVf - decCoef*conf.groups.bang_bang.DecMax* 0.0166667))
+            if(vforward < (lastVf - decCoef*conf->DecMax* 0.0166667))
             {
-                vforward = lastVf - (decCoef*conf.groups.bang_bang.DecMax * 0.0166667);
+                vforward = lastVf - (decCoef*conf->DecMax * 0.0166667);
             }
         }
         else
         {
-            if(vforward < (lastVf - conf.groups.bang_bang.AccMaxForward* 0.0166667))
+            if(vforward < (lastVf - conf->AccMaxForward* 0.0166667))
             {
-                vforward = lastVf - (conf.groups.bang_bang.AccMaxForward* 0.0166667);
+                vforward = lastVf - (conf->AccMaxForward* 0.0166667);
             }
-            if(vforward > (lastVf + decCoef*conf.groups.bang_bang.DecMax* 0.0166667))
+            if(vforward > (lastVf + decCoef*conf->DecMax* 0.0166667))
             {
-                vforward = lastVf + (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+                vforward = lastVf + (decCoef*conf->DecMax* 0.0166667);
             }
         }
     }
-//    debug(QString("vn: %1 , lVn :%2").arg(vnormal).arg(lastVn),D_MHMMD);
+////    debug(QString("vn: %1 , lVn :%2").arg(vnormal).arg(lastVn),D_MHMMD);
     if(vnormal >= 0)
     {
         if(diveMode)
@@ -467,15 +467,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal > (lastVn + conf.groups.bang_bang.AccMaxNormal* 0.0166667))
+            if(vnormal > (lastVn + conf->AccMaxNormal* 0.0166667))
             {
-                vnormal = lastVn + (conf.groups.bang_bang.AccMaxNormal* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + (conf->AccMaxNormal* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal < (lastVn - decCoef*conf.groups.bang_bang.DecMax* 0.0166667)))
+        if(!diveMode&&(vnormal < (lastVn - decCoef*conf->DecMax* 0.0166667)))
         {
-            vnormal = lastVn - (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+            vnormal = lastVn - (decCoef*conf->DecMax* 0.0166667);
         }
     }
     else
@@ -489,15 +489,15 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         }
         else
         {
-            if(vnormal < (lastVn - conf.groups.bang_bang.AccMaxNormal* 0.0166667))
+            if(vnormal < (lastVn - conf->AccMaxNormal* 0.0166667))
             {
-                vnormal = lastVn + (conf.groups.bang_bang.AccMaxNormal* 0.0166667)*sign(vnormal);
+                vnormal = lastVn + (conf->AccMaxNormal* 0.0166667)*sign(vnormal);
             }
         }
 
-        if(!diveMode&&(vnormal > (lastVn + decCoef*conf.groups.bang_bang.DecMax* 0.0166667)))
+        if(!diveMode&&(vnormal > (lastVn + decCoef*conf->DecMax* 0.0166667)))
         {
-            vnormal = lastVn + (decCoef*conf.groups.bang_bang.DecMax* 0.0166667);
+            vnormal = lastVn + (decCoef*conf->DecMax* 0.0166667);
         }
     }
 
@@ -568,7 +568,7 @@ Vector2D Agent::distToBall()
 void Agent::setRobotAbsVel(double _vx, double _vy, double _w)
 {
     double ang = -dir().th().radian();
-    ROS_INFO_STREAM("ANG : " <<  ang);
+    //ROS_INFO_STREAM("ANG : " <<  ang);
     setRobotVel((cos(ang) * _vx) - (sin(ang) * _vy), (sin(ang) * _vx) + (cos(ang) * _vy), _w);
 }
 
@@ -579,7 +579,7 @@ void Agent::setRobotVel(double _vtan , double _vnorm , double _w )
     vforward = _vtan ;
     vnormal  = _vnorm ;
     vangular = _w *_RAD2DEG ;
-    ROS_INFO_STREAM("ANG :: " << vangular);
+    //ROS_INFO_STREAM("ANG :: " << vangular);
     double _v1,_v2,_v3,_v4;
     jacobian( _vtan , _vnorm , _w , _v1 , _v2 , _v3 , _v4);
     v1 = _v1;
@@ -863,8 +863,8 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
 {
     Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
                                                                                   pos() - wm->ball->pos, wm->field->oppGoal(),
-                                                                                  conf.groups.skills_parameters_kick_one_touch.Landa,
-                                                                                  conf.groups.skills_parameters_kick_one_touch.Gamma));
+                                                                                  conf->Landa,
+                                                                                  conf->Gamma));
     Vector2D q;
     q.invalidate();
     bool oneTouchKick = false;
@@ -929,7 +929,7 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
     //  timer.start();
     planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
     getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
-    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
+    //ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
 
 //    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
 //    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
@@ -954,13 +954,13 @@ void Agent::execute() {
 }
 
 parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
-    ROS_INFO("CommunicationCommand_generated");
+  //  ROS_INFO("CommunicationCommand_generated");
     parsian_msgs::parsian_robot_commandPtr command{new parsian_msgs::parsian_robot_command};
-    int counter = 1;
+
 
     command->robot_id= static_cast<unsigned char>(id());
     command->chip= static_cast<unsigned char>(chip);
-    command->packet_id= static_cast<unsigned char>(counter++);
+    command->packet_id= static_cast<unsigned char>(1);
     command->roller_speed= static_cast<unsigned char>(roller);
 //    command.forceKick= static_cast<unsigned char>(forceKick);
     command->kickSpeed= static_cast<unsigned short>(kickSpeed);

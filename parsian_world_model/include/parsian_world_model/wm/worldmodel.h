@@ -7,6 +7,7 @@
 
 #include "QObject"
 #include "QDebug"
+#include <nodelet/nodelet.h>
 
 
 #include "parsian_msgs/parsian_world_model.h"
@@ -17,7 +18,7 @@
 #include <parsian_world_model/wm/ball.h>
 #include <parsian_world_model/wm/robot.h>
 
-#include "parsian_world_model/world_modelConfig.h"
+//#include "parsian_world_model/world_modelConfig.h"
 
 
 
@@ -28,7 +29,7 @@ public:
 
     void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
-    void execute(world_model_config::world_modelConfig & config);
+    void execute();
     void merge(int frame);
     void init();
 
@@ -47,7 +48,7 @@ private:
 
     CRobot* them[_MAX_NUM_PLAYERS];
     bool simulationMode;
-    void run(world_model_config::world_modelConfig & config);
+    void run();
     void update(CHalfWorld*);
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
     void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);

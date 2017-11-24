@@ -5,8 +5,6 @@
 void ReceivepassAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_receivePass msg = *((parsian_msgs::parsian_skill_receivePass*)_msg);
         robot_id = msg.robot_id;
-        avoidOurPenaltyArea = msg.avoidOurPenaltyArea;
-        avoidOppPenaltyArea = msg.avoidOppPenaltyArea;
         slow = msg.slow;
         receiveRadius = msg.receiveRadius;
         ignoreAngle = msg.ignoreAngle;
@@ -18,8 +16,6 @@ void ReceivepassAction::setMessage(const void* _msg) {
 void* ReceivepassAction::getMessage() {
     parsian_msgs::parsian_skill_receivePass* _msg = new parsian_msgs::parsian_skill_receivePass;
     _msg->robot_id = robot_id;
-    _msg->avoidOurPenaltyArea = avoidOurPenaltyArea;
-    _msg->avoidOppPenaltyArea = avoidOppPenaltyArea;
     _msg->slow = slow;
     _msg->receiveRadius = receiveRadius;
     _msg->ignoreAngle = ignoreAngle;
