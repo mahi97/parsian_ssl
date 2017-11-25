@@ -109,8 +109,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/commonconfigure.cfg
- )
+cfg/agent.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
