@@ -15,11 +15,11 @@ log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.txt")
 move_type = {"going": 0, "coming_back": 1}
 
 class MotionProfiler:
-    def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=3.0, ang_step=7.0, max_vel=4.5):
+    def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
         # type: (int, point.Point, point.Point,float, float, float, float) -> object
         self.__init_phase = init_phase
         self.__last_move_type = move_type["coming_back"]
-        self.__profilingIsFinished = False
+        self.__tasksAreFinished = False
         self.__doProfiling = False
         self.__ang_step = ang_step
         self.__dist_step = dist_step
@@ -50,7 +50,7 @@ class MotionProfiler:
 
     def wmCallback(self, data):
         # type:(parsian_world_model)
-        if self.__profilingIsFinished:
+        if self.__tasksAreFinished:
             return
 
         if self.__doProfiling:
@@ -127,10 +127,9 @@ class MotionProfiler:
     def __nextStep(self):
 
         if self.__current_dist_step == self.__dist_step:
-            if self.__current_ang_step == self.__ang_step:
+            if self.__current_ang_step == self.__ang_step - 1:
                 rospy.loginfo("profiling finished!!")
-                self.__saveResult()
-                self.__profilingIsFinished = True
+                self.__tasksAreFinished = True
             else :
                 self.__current_dist_step = 0
                 self.__current_ang_step += 1

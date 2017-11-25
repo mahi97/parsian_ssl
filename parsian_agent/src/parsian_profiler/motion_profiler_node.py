@@ -8,7 +8,7 @@ import rospy
 
 def talker():
     rospy.init_node('motion_profiler', anonymous=True)
-    profiler = motion_profiler.MotionProfiler(1, point.Point(-2, 2), point.Point(4, 3))
+    profiler = motion_profiler.MotionProfiler(1, point.Point(-2, -1), point.Point(-2, 1))
     rospy.spin()
 
 if __name__ == '__main__':
