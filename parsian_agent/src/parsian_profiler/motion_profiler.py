@@ -15,7 +15,7 @@ log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.txt")
 move_type = {"going": 0, "coming_back": 1}
 
 class MotionProfiler:
-    def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=1.0, ang_step=2.0, max_vel=4.5):
+    def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=3.0, ang_step=7.0, max_vel=4.5):
         # type: (int, point.Point, point.Point,float, float, float, float) -> object
         self.__init_phase = init_phase
         self.__last_move_type = move_type["coming_back"]
