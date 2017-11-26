@@ -37,9 +37,9 @@ class MotionProfiler:
         self.__start_time = time.time()
         self.__path_angle = self.__start_pos.angle(self.__end_pos)
         self.__robot_command = parsian_robot_command()
-        self.__wm_sub = rospy.Subscriber('world_model', parsian_world_model, self.wmCallback)
-        self.__rbt_cmd_sub = rospy.Subscriber('robot_command' + str(robot_id), parsian_robot_command, self.rcCallback)
-        self.__task_pub = rospy.Publisher('robot_task_'+str(self.__robot_id), parsian_robot_task, queue_size=100, latch=True)
+        self.__wm_sub = rospy.Subscriber('world_model', parsian_world_model, self.wmCallback,queue_size=1, buff_size=2**24)
+        self.__rbt_cmd_sub = rospy.Subscriber('robot_command' + str(robot_id), parsian_robot_command, self.rcCallback,queue_size=1, buff_size=2**24)
+        self.__task_pub = rospy.Publisher('robot_task_'+str(self.__robot_id), parsian_robot_task, queue_size=1, latch=True)
         self.__current_task = parsian_robot_task()
         self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
         self.__wait_time = 0.0
@@ -53,10 +53,13 @@ class MotionProfiler:
         if self.__tasksAreFinished:
             return
 
-        if self.__doProfiling:
+        if self.__doProfiling :
             self.doProfiling(data)
         else:
-            self.__getTask()
+            rospy.loginfo("is not prof")
+        if self.__wating_mode:
+            rospy.loginfo("is waiting")
+
 
         my_robot = parsian_robot()
         my_robot.id = -1
@@ -68,21 +71,22 @@ class MotionProfiler:
             rospy.loginfo("robot "+str(self.__robot_id)+" losted!")
             return
 
-        dis=point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
+        dis = point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
                         self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
             point.Point(my_robot.pos.x, my_robot.pos.y)
         )
 
-        if dis < .03 :
-            if(self.__wating_mode):
-                if time.time() - self.__wait_time > .5:
-                    self.__doProfiling = False
-            else:
-                self.__wait_time = time.time()
-                self.__wating_mode = True
+        vel = math.hypot(my_robot.vel.x, my_robot.vel.y)
 
-        else :
-            self.__wating_mode = False
+        if dis < .03 and vel < .1 and not self.__wating_mode:
+            self.__doProfiling = False
+            self.__wating_mode = True
+            self.__wait_time = time.time()
+
+        if self.__wating_mode :
+            if time.time() - self.__wait_time > .3:
+                self.__wating_mode = False
+                self.__getTask()
 
 
         self.__task_pub.publish(self.__current_task)
