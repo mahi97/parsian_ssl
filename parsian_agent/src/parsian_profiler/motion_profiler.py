@@ -4,6 +4,7 @@ import math
 import point
 import rospy
 from os import path
+import sys
 from parsian_msgs.msg import parsian_skill_gotoPointAvoid
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import parsian_world_model
@@ -12,15 +13,13 @@ from parsian_msgs.msg import parsian_robot_command
 
 log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.txt"), "w+")
 
-move_type = {"going": 0, "coming_back": 1}
+move_type = {"going": False, "coming_back": True}
 
 class MotionProfiler:
     def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
         # type: (int, point.Point, point.Point,float, float, float, float) -> object
         self.__init_phase = init_phase
         self.__last_move_type = move_type["coming_back"]
-        self.__tasksAreFinished = False
-        self.__doProfiling = False
         self.__ang_step = ang_step
         self.__dist_step = dist_step
         self.__start_pos = start_pos
@@ -28,10 +27,9 @@ class MotionProfiler:
         self.__robot_id = robot_id
         self.__max_vel = max_vel
         self.__result = dict()
-        self.__result["max_vel"] = max_vel
-        self.__result["robot_id"] = robot_id
-        self.__result["data"] = list()
-        self.__profiling = False
+#        self.__result["max_vel"] = max_vel
+#        self.__result["robot_id"] = robot_id
+        self.__result["data"] = dict()
         self.__current_ang_step = 0
         self.__current_dist_step = -1
         self.__start_time = time.time()
@@ -44,21 +42,30 @@ class MotionProfiler:
         self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
         self.__wait_time = 0.0
         self.__wating_mode = False
+        self.__isSaved = False
+        self.__tasksAreFinished = False
+        self.__doProfiling = False
+        self.__getTask()
 
     def rcCallback(self, data):
         self.__robot_command = data
 
     def wmCallback(self, data):
         # type:(parsian_world_model)
-        if self.__tasksAreFinished:
-            return
+        if self.__tasksAreFinished and not self.__doProfiling :
+            if self.__isSaved:
+                return
+            else:
+                self.__saveResult()
+                self.__isSaved = True
+                rospy.loginfo("saved")
+                return
+
+        rospy.loginfo("running")
 
         if self.__doProfiling :
             self.doProfiling(data)
-        else:
-            rospy.loginfo("is not prof")
-        if self.__wating_mode:
-            rospy.loginfo("is waiting")
+
 
 
         my_robot = parsian_robot()
@@ -132,7 +139,6 @@ class MotionProfiler:
 
         if self.__current_dist_step == self.__dist_step:
             if self.__current_ang_step == self.__ang_step - 1:
-                rospy.loginfo("profiling finished!!")
                 self.__tasksAreFinished = True
             else :
                 self.__current_dist_step = 0
@@ -167,9 +173,9 @@ class MotionProfiler:
                 task.base.targetDir.y = math.sin(self.__getPhase())
                 self.__last_move_type = move_type["coming_back"]
                 self.__nextStep()
-            self.__doProfiling = True
+            if not self.__tasksAreFinished:
+                self.__doProfiling = True
         self.__current_task.gotoPointAvoidTask = task
-        rospy.loginfo(str(self.__current_task.gotoPointAvoidTask.base.targetPos.x)+"  "+str(self.__current_task.gotoPointAvoidTask.base.targetPos.x))
 
     def __getPhase(self):
         return math.pi * (self.__current_ang_step * 2 / float(self.__ang_step) + self.__init_phase / 180.0) + self.__path_angle
