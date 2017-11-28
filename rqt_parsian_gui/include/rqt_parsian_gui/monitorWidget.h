@@ -49,12 +49,15 @@ namespace rqt_parsian_gui
     protected:
 
 
-
         void initializeGL();
+
         void paintGL();
         void resizeGL(int width, int height);
         QPainter painter;
         void mousePressEvent(QMouseEvent *event);
+        void wheelEvent(QWheelEvent *event);
+        double viewportWidth;
+        QSizeF viewportSize;
 
 
     private:
