@@ -1,4 +1,3 @@
-import json
 import time
 import math
 import point
@@ -11,7 +10,7 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_robot_command
 
-log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.txt"), "w+")
+log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.profile"), "w+")
 
 move_type = {"going": False, "coming_back": True}
 
@@ -29,7 +28,8 @@ class MotionProfiler:
         self.__result = dict()
 #        self.__result["max_vel"] = max_vel
 #        self.__result["robot_id"] = robot_id
-        self.__result["data"] = dict()
+        self.__current_key = ()
+        self.__current_value = []
         self.__current_ang_step = 0
         self.__current_dist_step = -1
         self.__start_time = time.time()
@@ -41,6 +41,7 @@ class MotionProfiler:
         self.__current_task = parsian_robot_task()
         self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
         self.__wait_time = 0.0
+        self.__task_start_time = 0.0
         self.__wating_mode = False
         self.__isSaved = False
         self.__tasksAreFinished = False
@@ -52,16 +53,14 @@ class MotionProfiler:
 
     def wmCallback(self, data):
         # type:(parsian_world_model)
-        if self.__tasksAreFinished and not self.__doProfiling :
+        if self.__tasksAreFinished and not self.__doProfiling:
             if self.__isSaved:
                 return
             else:
-                self.__saveResult()
                 self.__isSaved = True
                 rospy.loginfo("saved")
+                self.__saveResult()
                 return
-
-        rospy.loginfo("running")
 
         if self.__doProfiling :
             self.doProfiling(data)
@@ -100,7 +99,7 @@ class MotionProfiler:
 
     def doProfiling(self, world_model):
         # type: (parsian_world_model) -> null
-        dataList = list(self.__result["data"])
+
 
         my_robot = parsian_robot()
         my_robot.id = -1
@@ -113,38 +112,35 @@ class MotionProfiler:
             return
 
         vel_F = my_robot.vel.x * math.cos(self.__path_angle) + my_robot.vel.y * math.sin(self.__path_angle)
-        vel_N = -1 * my_robot.vel.x * math.sin(self.__path_angle) + my_robot.vel.y * math.cos(self.__path_angle)
+
 
         if self.__last_move_type == move_type["coming_back"]:
             vel_F *= -1
-            vel_N *= -1
 
-        dis=point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
+        dis = point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
                         self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
             point.Point(my_robot.pos.x, my_robot.pos.y)
         )
         data = {
-            "task" : {"dist" : dis},
-            "world_model": {"vel_F": vel_F, "vel_N": vel_N},
-            "robot_command": {"vel_F": self.__robot_command.vel_F, "vel_N": self.__robot_command.vel_N}
+            "remain_dist": dis,
+            "world_model": vel_F,
+            "robot_command": math.hypot( self.__robot_command.vel_F ,self.__robot_command.vel_N),
+            "time": time.time() - self.__task_start_time
         }
+        rospy.loginfo(time.time() - self.__task_start_time)
+        self.__current_value.append(data)
 
-        dataList.append(data)
-        self.__result["data"] = dataList
 
     def __saveResult(self):
-        log_file.write(json.dumps(self.__result, sort_keys=True, indent=4, ensure_ascii=False))
+        log_file.write(str(self.__result))
 
     def __nextStep(self):
-
         if self.__current_dist_step == self.__dist_step:
-            if self.__current_ang_step == self.__ang_step - 1:
-                self.__tasksAreFinished = True
-            else :
-                self.__current_dist_step = 0
+                self.__current_dist_step = 1
                 self.__current_ang_step += 1
-        else :
+        else:
             self.__current_dist_step += 1
+
 
     def __getTask(self):
         task = parsian_skill_gotoPointAvoid()
@@ -153,12 +149,16 @@ class MotionProfiler:
         task.base.lookAt.x = 5000
         task.base.lookAt.y = 5000
         task.base.maxVelocity = self.__max_vel
+
+        self.__task_start_time = time.time()
+        rospy.loginfo("-------------------  "+str(time.time() - self.__task_start_time))
         if self.__current_dist_step == -1:
             task.base.targetPos.x = self.__start_pos.x
             task.base.targetPos.y = self.__start_pos.y
             self.__nextStep()
         else:
             if self.__last_move_type == move_type["coming_back"]:
+                self.__nextStep()
                 task.base.targetPos.x = self.__start_pos.x + self.__start_pos.difX(
                     self.__end_pos) * self.__current_dist_step / float(self.__dist_step)
                 task.base.targetPos.y = self.__start_pos.y + self.__start_pos.difY(
@@ -166,17 +166,31 @@ class MotionProfiler:
                 task.base.targetDir.x = math.cos(self.__getPhase())
                 task.base.targetDir.y = math.sin(self.__getPhase())
                 self.__last_move_type = move_type["going"]
+                if len(self.__current_key) is not 0:
+                    self.__addValueToKey()
             else:  # "COMING BACK"
                 task.base.targetPos.x = self.__start_pos.x
                 task.base.targetPos.y = self.__start_pos.y
                 task.base.targetDir.x = math.cos(self.__getPhase())
                 task.base.targetDir.y = math.sin(self.__getPhase())
                 self.__last_move_type = move_type["coming_back"]
-                self.__nextStep()
+                if self.__current_ang_step == self.__ang_step - 1 and self.__current_dist_step == self.__dist_step:
+                    self.__tasksAreFinished = True
+                if len(self.__current_key) is not 0:
+                    self.__addValueToKey()
+
             if not self.__tasksAreFinished:
+                self.__addNewKey()
                 self.__doProfiling = True
         self.__current_task.gotoPointAvoidTask = task
 
     def __getPhase(self):
-        return math.pi * (self.__current_ang_step * 2 / float(self.__ang_step) + self.__init_phase / 180.0) + self.__path_angle
+        return math.pi * (self.__current_ang_step * 2 / float(self.__ang_step) + self.__init_phase / 180.0) \
+               + self.__path_angle
 
+    def __addNewKey(self):
+        self.__current_key = (self.__end_pos.distance(self.__start_pos) * self.__current_dist_step , self.__getPhase())
+
+    def __addValueToKey(self):
+        self.__result[self.__current_key] = {"data" : self.__current_value , "total_time" : self.__current_value[-1]["time"]}
+        self.__current_value = []
