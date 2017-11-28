@@ -187,10 +187,10 @@ class MotionProfiler:
 
     def __addNewKey(self):
         if self.__last_move_type == move_type["going"]:
-            self.__current_key = (self.__end_pos.distance(self.__start_pos) * self.__current_dist_step , self.__getPhase())
+            self.__current_key = (self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step , self.__getPhase(),"raft")
         else:
             self.__current_key = (
-            self.__end_pos.distance(self.__start_pos) * self.__current_dist_step, math.pi - self.__getPhase())
+            self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step, math.pi - self.__getPhase(),"brghasht")
 
     def __addValueToKey(self):
         self.__result[self.__current_key] = {"data": self.__current_value, "total_time": self.__current_value[-1]["time"]}
