@@ -110,8 +110,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/agent.cfg
-  cfg/commonstat.cfg
+  cfg/commonconfigure.cfg
  )
 
 ###################################
@@ -143,13 +142,6 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_nodelet
-        src/agent_nodelet.cpp
-        )
-
-add_library(commonstatus_nodelet
-        src/common_status_nodelet.cpp
-        )
 
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
@@ -165,16 +157,23 @@ add_library(${PROJECT_NAME}
         src/config.cpp
         )
 
+add_library(${PROJECT_NAME}_nodelet
+        src/agent_nodelet.cpp
+        )
+
+add_library(${PROJECT_NAME}_commonconfig_nodelet
+        src/common_config_nodelet.cpp
+        )
+
 add_executable(${PROJECT_NAME}_node
         src/agent_node.cpp
         )
 
-add_dependencies(${PROJECT_NAME}_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
+add_executable(${PROJECT_NAME}_commonconfig_node
+        src/common_config_node.cpp
         )
 
+# target link libraries
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
@@ -186,32 +185,51 @@ target_link_libraries(${PROJECT_NAME}_node
         ${PROJECT_NAME}_nodelet
         )
 
-add_dependencies(${PROJECT_NAME}
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
-add_dependencies(${PROJECT_NAME}_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
-
 target_link_libraries(${PROJECT_NAME}_nodelet
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
         )
-add_dependencies(commonstatus_nodelet
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_nodelet
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        ${QT_LIBRARIES}
+        )
+
+# dependencies
+
+add_dependencies(${PROJECT_NAME}
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(${PROJECT_NAME}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(${PROJECT_NAME}_commonconfig_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_gencfg
         )
 
-target_link_libraries(commonstatus_nodelet
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME}
-        ${QT_LIBRARIES}
+add_dependencies(${PROJECT_NAME}_commonconfig_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
         )
 
 ## Add cmake target dependencies of the library
@@ -273,6 +291,9 @@ install(FILES
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
 
+
+catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############
