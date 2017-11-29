@@ -5,19 +5,17 @@
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <dynamic_reconfigure/server.h>
-#include <parsian_agent/commonconfigConfig.h>
+#include <parsian_agent/agentConfig.h>
 
     class CommonConfig : public nodelet::Nodelet {
     private:
 
         virtual void onInit();
 
-        ros::NodeHandle nh;
         ros::NodeHandle private_nh;
 
-        boost::shared_ptr<dynamic_reconfigure::Server<agent_common_config::commonconfigConfig>> server;
+        boost::shared_ptr<dynamic_reconfigure::Server<agent_common::agentConfig>> server;
 
-//      void timerCb(const ros::TimerEvent &event);
 
 
     };
