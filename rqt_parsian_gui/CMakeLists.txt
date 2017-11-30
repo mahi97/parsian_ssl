@@ -124,6 +124,7 @@ catkin_package(
 set (${PROJECT_NAME}_SRCS
   src/${PROJECT_NAME}/monitor.cpp
   src/${PROJECT_NAME}/robotstatus.cpp
+  src/${PROJECT_NAME}/robotstatus_widget.cpp
   src/${PROJECT_NAME}/monitorWidget.cpp
   src/${PROJECT_NAME}/guiDrawer.cpp
   src/${PROJECT_NAME}/mode_chooser.cpp

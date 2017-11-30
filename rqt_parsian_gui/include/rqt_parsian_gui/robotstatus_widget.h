@@ -1,18 +1,19 @@
 #include <QWidget>
 #include <QSlider>
 #include <QLabel>
-
-class RobotStatusWidget : public QWidget
-{
+#include <ros/ros.h>
+namespace rqt_parsian_gui {
+    class RobotStatusWidget : public QWidget {
     Q_OBJECT
-public:
-    explicit RobotStatusWidget(QWidget *parent = 0);
+    public:
+        explicit RobotStatusWidget(ros::NodeHandle &n);
 
 
-signals:
+    signals:
 
-public slots:
-private:
+    public slots:
+    private:
 
 
-};
+    };
+}
