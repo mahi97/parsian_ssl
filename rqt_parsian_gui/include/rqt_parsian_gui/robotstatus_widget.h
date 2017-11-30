@@ -8,6 +8,9 @@
 #include <QCheckBox>
 #include <QProgressBar>
 #include <QGridLayout>
+#include <QVBoxLayout>
+#include <QPixmap>
+#include <QPainter>
 #include <parsian_msgs/parsian_robots_status.h>
 #include <ros/ros.h>
 namespace rqt_parsian_gui {
@@ -33,9 +36,13 @@ namespace rqt_parsian_gui {
         parsian_msgs::parsian_robot_statusConstPtr robotStatus;
 
         //#######################################################
-        QGridLayout *main_layout;
-        QGroupBox *robot_vel,*battery,*data_loss,*sensors,*faults;
+        QGroupBox   *robot_vel,*battery,*data_loss,*sensors,*faults;
+        QGridLayout *main_layout,*faults_l;
+        QVBoxLayout *robot_vel_l,*battery_l,*data_loss_l,*sensors_l;
         QProgressBar *battery_percentage, *data_loss_percentage;
-        QCheckBox ** motors_f,encoders_f,*kick_f,*chip_f,*shoot_sens_f,shoot_sens,spin_sens;
+        QCheckBox ** motors_f,**encoders_f,*kick_f,*chip_f,*shoot_sens_f,*shoot_board_f,*shoot_sens,*spin_sens;
+        QLabel *vel,*ang_vel,*agent;
+        QPixmap agent_i;
+        QPainter agent_p;
     };
 }
