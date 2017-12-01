@@ -146,7 +146,7 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/soccer.cpp
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
-	       src/${PROJECT_NAME}/coach.cpp
+#	       src/${PROJECT_NAME}/coach.cpp
 
         src/plan_server/planselector.cpp
         )
