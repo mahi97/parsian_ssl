@@ -10,25 +10,38 @@
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/mathtools.h>
 
-class CPlanSelector{
+class CPlanSelector {
 public:
     CPlanSelector();
-    void initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers);
-    QList<NGameOff::SPlan *> getValidPlans(const POMODE _mode, const QList<int>& _ourPlayers);
-    void matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers);
-    bool isRegionMatched(const Vector2D& _ball, const double&& _radius = 1.0) const;
-    QPair<int, int> findTheLastShoot(const NGameOff::SExecution &_plan);
-    void analyseShoot(NGameOff::SPlan* thePlan);
-    void analysePass(NGameOff::SPlan* thePlan);
-    void findThePasserAndReceiver(const NGameOff::SExecution &_plan, QList<AgentPair> &_pairList);
-    int PlayoffShufflePolicy(QList<NGameOff::SPlan*> prevValidPlans, QList<NGameOff::SPlan*> validPlans);
-    void ShufflePlanIndexing(QList<NGameOff::SPlan*> Plans);
-    void setHavePassInPlan(bool input){havePassInPlan = input;}
-    bool getHavePassInPlan(){return havePassInPlan;}
-    NGameOff::SPlan* getSelectedPlan(){return selectedPlan;}
 
-    NGameOff::SPlan * selectedPlan;
-    CLoadPlayOffJson* planLoader;
+    void initStaticPlay(const POMODE _mode, const QList<int> &_ourplayers);
+
+    QList<NGameOff::SPlan *> getValidPlans(const POMODE _mode, const QList<int> &_ourPlayers);
+
+    void matchPlan(NGameOff::SPlan *_plan, const QList<int> &_ourplayers);
+
+    bool isRegionMatched(const Vector2D &_ball, const double &&_radius = 1.0) const;
+
+    QPair<int, int> findTheLastShoot(const NGameOff::SExecution &_plan);
+
+    void analyseShoot(NGameOff::SPlan *thePlan);
+
+    void analysePass(NGameOff::SPlan *thePlan);
+
+    void findThePasserAndReceiver(const NGameOff::SExecution &_plan, QList<AgentPair> &_pairList);
+
+    int  PlayoffShufflePolicy(QList<NGameOff::SPlan *> prevValidPlans, QList<NGameOff::SPlan *> validPlans);
+
+    void ShufflePlanIndexing(QList<NGameOff::SPlan *> Plans);
+
+    void setHavePassInPlan(bool input) { havePassInPlan = input; }
+
+    bool getHavePassInPlan() { return havePassInPlan; }
+
+    NGameOff::SPlan *getSelectedPlan() { return selectedPlan; }
+
+    NGameOff::SPlan *selectedPlan;
+    CLoadPlayOffJson *planLoader;
     bool havePassInPlan;
 
     unsigned int shuffleCounter;
