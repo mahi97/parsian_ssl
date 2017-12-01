@@ -58,7 +58,7 @@ QList<NGameOff::SPlan *> CPlanSelector::getValidPlans(const POMODE _mode, const 
     QList<NGameOff::SPlan*> activePlans;
     QList<NGameOff::SPlan*> masterPlans;
 
-    //TODO: check gui for active and master plans and update lists
+    //TODO: check gui for active and master plans to update lists
 
     int symmetry = 1;
     QList<NGameOff::SPlan*> validPlans;
@@ -231,10 +231,10 @@ void CPlanSelector::analyseShoot(NGameOff::SPlan* thePlan) {
     }
 }
 
-void CPlanSelector::analysePass(NGameOff::SPlan* thePlan) {
-    // TODO : need edit for mulitiple pass
+void CPlanSelector::analysePass(NGameOff::SPlan *thePlan = nullptr) {
+    // TODO : need edit for multiple pass
     if (thePlan != NULL) {
-        // first : passer second : reciver
+        // first : passer second : receiver
         QList<AgentPair> tPass;
         findThePasserAndReceiver(thePlan->execution, tPass);
         havePassInPlan = tPass.size() > 0;
@@ -278,13 +278,13 @@ void CPlanSelector::findThePasserAndReceiver(const NGameOff::SExecution &_plan, 
         int rid = _plan.AgentPlan[id][st].skill[si].targetAgent;
         int rs  = _plan.AgentPlan[id][st].skill[si].targetIndex;
         DEBUG(QString("PASS : %1, %2, %3, %4").arg(id).arg(st).arg(rid).arg(rs), D_MAHI);
-        NGameOff::AgentPoint tempReciver;
-        tempReciver.id    = rid;
-        tempReciver.state = rs;
+        NGameOff::AgentPoint tempReceiver;
+        tempReceiver.id    = rid;
+        tempReceiver.state = rs;
 
         AgentPair ap;
         ap.first  = passer[i];
-        ap.second = tempReciver;
+        ap.second = tempReceiver;
         _pairList.append(ap);
     }
 }
