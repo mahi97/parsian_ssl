@@ -6,6 +6,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 #include <QtCore/QTime>
+#include <parsian_ai/config.h>
 
 #define PASS_BEHAVS 5
 
@@ -88,6 +89,8 @@ public:
     bool timerStartFlag;
 
 public:
+    CRolePlayMake(CAgent *_agent);
+    ~CRolePlayMake();
     void executeOurDirect();
     void executeOurIndirect();
     void executeOurKickOff();
@@ -102,9 +105,14 @@ public:
     double lastBounce();
     bool ShootPenalty();
     void executeDefault();
+    void parse(QStringList params);
+    double progress();
+    void generateFromConfig(CAgent *a);
     void resetOffPlays();
     void resetPlayMake();
     bool canScoreGoal();
+    void execute();
+
     void kickPass( int kickSpeed );
     enum KickPassMode{KickPassFirst , KickPassSecond};
     enum penaltyStrategy{pgoaheadShoot , pchipShoot , pshootDirect};

@@ -54,7 +54,7 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ai->execute();
 
     for(int i=0; i<wm->our.activeAgentsCount(); i++) {
-    robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
+        robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
     }
 
 }

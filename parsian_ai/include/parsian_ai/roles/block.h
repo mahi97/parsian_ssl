@@ -21,6 +21,7 @@ class CRoleBlock : public CRole
 {
 protected:
     GotopointavoidAction* gotopoint;
+    static CRoleBlockInfo* roleInfo;
 public:
     CRoleBlock(CAgent *_agent);
     ~CRoleBlock();

@@ -132,9 +132,9 @@ void CRoleStop::execute()
 
     gotopoint->setBallobstacleradius(0.50);
     // gotopoint->setAvoidBall(true); todo: should be deleted?
-	gotopoint->execute();
 	drawer->draw(Circle2D(target , 0.03) , "magenta" , true);
     drawer->draw(QString("%1").arg(kkk) , target);
+    agent->action = gotopoint;
 }
 
 void CRoleStop::parse(QStringList params)
@@ -158,7 +158,7 @@ void CRoleStop::generateFromConfig(CAgent *a)
 
 CRoleStopInfo* CRoleStop::info()
 {
-	return (CRoleStopInfo*) CSkills::getInfo("stop");
+//	return (CRoleStopInfo*) CSkills::getInfo("stop");
 }
 
 

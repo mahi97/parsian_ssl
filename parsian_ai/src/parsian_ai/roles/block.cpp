@@ -13,7 +13,7 @@ CRoleBlock::~CRoleBlock()
 
 void CRoleBlock::execute()
 {
-    gotopoint->setRobot_Id(agent->id());
+    gotopoint->setRobot_Id(static_cast<quint8>(agent->id()));
 	info()->findPos(blockGoal);
 
 	Vector2D dir, p;
@@ -22,17 +22,16 @@ void CRoleBlock::execute()
 	{
         gotopoint->setTargetdir(dir);
         gotopoint->setTargetpos(p);
-		//gotopoint->init(p ,dir);
-		gotopoint->execute();
+
 	}
 	else
 	{
 
         gotopoint->setTargetpos(info()->blockPosition);
         gotopoint->setTargetdir(dir);
-        //gotopoint->init(info()->blockPosition ,dir);
-		gotopoint->execute();
+
 	}
+    agent->action = gotopoint;
 }
 
 double CRoleBlock::progress()
@@ -53,7 +52,7 @@ void CRoleBlock::parse(QStringList params)
 
 CRoleBlockInfo* CRoleBlock::info()
 {
-    return (CRoleBlockInfo*) CSkills::getInfo("block");
+    return roleInfo;
 }
 
 CRoleBlockInfo::CRoleBlockInfo(QString _roleName) : CRoleInfo(_roleName)
