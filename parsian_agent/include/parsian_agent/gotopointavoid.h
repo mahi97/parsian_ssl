@@ -12,8 +12,6 @@
 class CSkillGotoPointAvoid : public CSkill, public GotopointavoidAction
 {
 private:
-//    CMotionProfile *prof;
-    bool pathRestarted;
     CNewBangBang *bangBang;
 
 protected:
@@ -22,19 +20,14 @@ protected:
     Vector2D agentPos;
     Vector2D agentVel;
 
-    int stucked;
-    Vector2D lastPoint;
     CSkillGotoPoint* gotopoint;
     QList<int> ourRelaxList , oppRelaxList;
     QList <Vector2D> pathPoints;
     int counter;
-    bool inited;
     Vector2D averageDir;
 public:
-    int counting;
     void init(Vector2D _target, Vector2D _targetDir, Vector2D _targetVel = Vector2D(0.0, 0.0));
 
-    double timeStarted, timeEstimated; //for skill widget
     static double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
     DEF_SKILL(CSkillGotoPointAvoid);
     CSkillGotoPointAvoid* noRelax();

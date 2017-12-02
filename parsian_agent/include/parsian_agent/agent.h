@@ -6,7 +6,6 @@
 #include <parsian_util/geom/geom.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/matrix.h>
-#include <parsian_msgs/grsim_robot_command.h>
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_robot_task.h>
 #include <QDebug>
@@ -174,7 +173,6 @@ public:
     const double gain = 1.013;
     void execute();
     parsian_msgs::parsian_robot_commandPtr getCommand();
-    parsian_msgs::grsim_robot_commandPtr getGrSimCommand();
     parsian_msgs::parsian_robot_task getTask();
 };
 

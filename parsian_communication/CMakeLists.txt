@@ -8,13 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  parsian_msgs
-  parsian_util
-  nodelet
-  roscpp
-  rospy
-)
+        dynamic_reconfigure
+        parsian_msgs
+        parsian_util
+        nodelet
+        roscpp
+        rospy
+        )
 
 file(GLOB_RECURSE HEADER_FILES include *.h)
 
@@ -106,7 +106,7 @@ link_directories(/usr/include/qt4/QtExtSerialPort)
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/communication.cfg
+        cfg/communication.cfg
 )
 
 ###################################
@@ -119,10 +119,10 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
-#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES ${PROJECT_NAME}
+        CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
+        #  DEPENDS system_lib
 )
 
 ###########
@@ -132,19 +132,19 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
+        include
+        ${catkin_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
-   src/${PROJECT_NAME}/communicator.cpp
-)
+        src/${PROJECT_NAME}/communicator.cpp
+        )
 
 add_library(${PROJECT_NAME}_packet
-    src/packet_generate/packet.cpp
-)
+        src/packet_generate/packet.cpp
+        )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -155,19 +155,19 @@ add_library(${PROJECT_NAME}_packet
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node
-    src/communication_node.cpp
-)
+        src/communication_node.cpp
+        )
 
 add_executable(${PROJECT_NAME}_packet_node
-    src/packet_generate/packet_node.cpp
-)
+        src/packet_generate/packet_node.cpp
+        )
 
 add_library(${PROJECT_NAME}_nodelet
         src/communication_nodelet.cpp)
 
 add_library(${PROJECT_NAME}_packet_nodelet
-    src/packet_generate/packet_nodelet.cpp
-)
+        src/packet_generate/packet_nodelet.cpp
+        )
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -188,10 +188,11 @@ add_dependencies(${PROJECT_NAME}_packet_nodelet ${${PROJECT_NAME}_EXPORTED_TARGE
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES}
-   ${QT_LIBRARIES}
-   ${PROJECT_NAME}
-)
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_nodelet
+        )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_nodelet
@@ -203,9 +204,10 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_packet_node
-   ${catkin_LIBRARIES}
-   ${QT_LIBRARIES}
-)
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}_packet_nodelet
+        )
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_packet_nodelet
@@ -219,9 +221,9 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
-   ${catkin_LIBRARIES}
-   ${QT_LIBRARIES} -lqextserialport
-)
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES} -lqextserialport
+        )
 #############
 ## Install ##
 #############
@@ -232,30 +234,30 @@ target_link_libraries(${PROJECT_NAME}
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
-  script/install_dep.sh
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+        script/install_dep.sh
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node ${PROJECT_NAME}_packet_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        #   PATTERN ".svn" EXCLUDE
+        )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  nodelet_plugin.xml
-  packet_nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+        nodelet_plugin.xml
+        packet_nodelet.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 #############
 ## Testing ##

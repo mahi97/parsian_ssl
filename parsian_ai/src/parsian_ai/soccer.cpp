@@ -133,7 +133,7 @@ void CSoccer::updateTask(){
     kick->setKickspeed(1023);
     kick->setTarget(wm->field->oppGoal());
     kick->setSlow(true);
-    kick->setKkshotempyspot(true);
+    kick->setShotemptyspot(true);
 
     auto* gtp = new GotopointavoidAction;
     Circle2D aroundBall = Circle2D(wm->ball->pos, 0.5);

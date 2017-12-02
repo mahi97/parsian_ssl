@@ -189,10 +189,10 @@ void C2DTree::drawBranch(state *first , state* second , QColor color){
 CPlanner::CPlanner(int _ID)
 {
     obst.clear();
-    threshold = conf.Target_Distance_Threshold;
-    wayPointProb = conf.Waypoint_Catch_Probablity;
-    goalProb = conf.Goal_Probablity;
-    stepSize = conf.Extend_Step;
+    threshold = conf->Target_Distance_Threshold;
+    wayPointProb = conf->Waypoint_Catch_Probablity;
+    goalProb = conf->Goal_Probablity;
+    stepSize = conf->Extend_Step;
     goal.invalidate();
     counter=0;
     flag = false;
@@ -674,17 +674,17 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
     oppRelaxList.clear();
     for (int i : _oppRelaxList){
         oppRelaxList.append(i);
-        ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
+        //ROS_INFO_STREAM("ali "<<i<<"  " <<oppRelaxList.size()<<"  "<<_oppRelaxList.size());
     }
 
     oppRelaxList.append(ID);
 
     ballObstacleRadius = _ballObstacleRadius;
-    stepSize = conf.Extend_Step;
-    threshold = conf.Target_Distance_Threshold;
-    wayPointProb =conf.Waypoint_Catch_Probablity;
+    stepSize = conf->Extend_Step;
+    threshold = conf->Target_Distance_Threshold;
+    wayPointProb =conf->Waypoint_Catch_Probablity;
     if(! result.empty())
-        goalProb = conf.Goal_Probablity;
+        goalProb = conf->Goal_Probablity;
     else
         goalProb = 0.5;
 
@@ -715,8 +715,8 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,con
 
 double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vector2D posT){
     double _x3;
-    double acc = conf.AccMaxForward;
-    double dec = conf.DecMax;
+    double acc = conf->AccMaxForward;
+    double dec = conf->DecMax;
     double xSat;
     double veltan= (_vel.x)*cos(_dir.th().radian()) + (_vel.y)*sin(_dir.th().radian());
     double offset = 0.15;
@@ -726,22 +726,22 @@ double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vect
 
     if(_vel.length() < 0.2)
     {
-        acc = (conf.AccMaxForward + conf.AccMaxNormal)/2;
+        acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
     }
     else
     {
-        acc =  conf.AccMaxForward*(fabs(veltan)/_vel.length()) + conf.AccMaxNormal*(fabs(velnorm)/_vel.length());
+        acc =  conf->AccMaxForward*(fabs(veltan)/_vel.length()) + conf->AccMaxNormal*(fabs(velnorm)/_vel.length());
     }
 
     double vMaxReal = sqrt(((_pos.dist(posT)  + (_vel.length()*_vel.length()/2*acc))*2*acc*dec)/(acc+dec));
     vMaxReal = min(vMaxReal,4);
-    double vMax = conf.VelMax;
+    double vMax = conf->VelMax;
     vMax = min(vMax,vMaxReal);
     xSat = ((vMax*vMax)-(_vel.length()*_vel.length()))/acc + (vMax*vMax)/dec;
-    _x3 = ( -1* _vel.length()*_vel.length()) / (-2 * fabs(conf.DecMax)) ;
+    _x3 = ( -1* _vel.length()*_vel.length()) / (-2 * fabs(conf->DecMax)) ;
 
     if(_pos.dist(posT) < _x3 ) {
-        return std::max(0.0,(_vel.length()/ conf.DecMax - offset) );
+        return std::max(0.0,(_vel.length()/ conf->DecMax - offset) );
     } else if(_vel.length() < (vMax)) {
         if(_pos.dist(posT) < xSat)
         {
@@ -762,7 +762,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
     double timeForObs = 0;
     ///TODO: should read from vartypes
     double maxA = 4;
-    double maxObstRad = 1.5;
+    double maxObstRad = 1;
     double maxTime = 0.5;
     if(_vel.length() < 0.2)
     {
@@ -781,12 +781,12 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
             timeForObs *= agentPos.dist(intersectPoint)/agentPos.dist(agentGoal);
             timeForObs *=1;
             timeForObs = min(maxTime,timeForObs);
-            for(double i = -0.2;i< 0.3 ; i+=0.05)
+            for(double i = 0;i< maxTime ; i+=0.05)
             {
 
                 timeForObs +=i;
                 _center= _pos + _vel*timeForObs;
-                _rad = 0.7*maxA*timeForObs*timeForObs ;
+                _rad = maxA*timeForObs*timeForObs ;
 
                 _rad = min(maxObstRad,_rad);
                 _rad = min(agentPos.dist(_center) - 0.3,_rad);
@@ -813,6 +813,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
 void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id,Vector2D agentGoal){
     obs.clear();
     obs.targetPosition = goal;
+    
     bool isValid = false;
 
     Vector2D agentPos;
@@ -846,7 +847,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         if( (ourRelaxList.contains(wm->our.active(j)->id) == false) && (ID != wm->our.active(j)->id))
         {
 
-//            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
+            createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
 
 
             double obstVelFactor = 0.15;
@@ -863,8 +864,8 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 //            }
         }
     }
-    ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
-    ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
+   // ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
+   // ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {

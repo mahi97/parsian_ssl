@@ -74,11 +74,9 @@ namespace rqt_parsian_gui
                       rob.newRobots);
 
         }
-        ROS_INFO("ok");
 
         if (drawerBuffer->guiBall.inSight > 0)
         {
-            ROS_INFO("lll");
             drawArc(drawerBuffer->guiBall.pos.x,
                     drawerBuffer->guiBall.pos.y,
                     0.03,
@@ -304,6 +302,7 @@ namespace rqt_parsian_gui
         QFontMetrics fm(font);
         double pixelsWide = fm.width(text);
 
+
         painter.begin(this);
 
         painter.setPen(color);
@@ -334,6 +333,14 @@ namespace rqt_parsian_gui
 
         glCallList(drawLine(field.left(), - _GOAL_WIDTH / 2.0, field.left() , _GOAL_WIDTH / 2.0, QColor("black")));
         glCallList(drawLine(field.right(), - _GOAL_WIDTH / 2.0, field.right() , _GOAL_WIDTH / 2.0, QColor("black")));
+    }
+
+    void MonitorWidget::mousePressEvent(QMouseEvent *event)
+    {
+//        QPoint tempMousePressPos = event->pos();
+//        mousePressPos.x = ( ((double(tempMousePressPos.x()) / double(viewportSize.width())) * double(stadiumSize.width())) - (double(stadiumSize.width())/2.0));
+//        mousePressPos.y = (-1.0*(((double(tempMousePressPos.y()) / double(viewportSize.height())) * double(stadiumSize.height())) - (double(stadiumSize.height())/2.0)));
+//        ROS_INFO("__%f__%f__",mousePressPos.x ,mousePressPos.y);
     }
 
 }  // namespace rqt_example_cpp

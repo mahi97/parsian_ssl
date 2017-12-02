@@ -7,11 +7,7 @@ CSkillReceivePass::CSkillReceivePass(Agent *_agent)
     agent = _agent;
     gotopointavoid = new CSkillGotoPointAvoid(_agent);
     slow = true;
-    avoidOurPenaltyArea = true;
-    avoidOppPenaltyArea = true;
     receiveRadius = 1.0;
-    received = false;
-    velThresh = 0;
     cirThresh = 0;
     kickCirThresh = 0;
     ignoreAngle = true;
@@ -31,39 +27,19 @@ kkRPMode CSkillReceivePass::decideMode()
     Circle2D tempCircle2(target, receiveRadius);
     drawer->draw(tempCircle, QColor(Qt::cyan));
 
-    if(tempCircle.contains(kkAgentPos) && ballRealVel > 0.2 )
-    {
         cirThresh = 1.0;
         Circle2D tempKickCircle(kkAgentPos, 0.3 + kickCirThresh);
         Segment2D tempBallPath(kkBallPos, kkBallPos + wm->ball->vel.norm()*10);
         drawer->draw(tempBallPath,QColor(Qt::yellow));
         Vector2D sol1, sol2;
-        if(tempCircle2.intersection(tempBallPath, &sol1, &sol2) == 0 && !tempCircle.contains(kkBallPos))
+        if(tempCircle2.intersection(tempBallPath, &sol1, &sol2)  )
         {
             kickCirThresh = 0;
-            velThresh = 0;
-            return RPNONE;
-        }
-        else if(tempKickCircle.contains(kkBallPos))
-        {
-            kickCirThresh = 0.5;
-            velThresh = 0.2;
-            return RPDAMP;
-        }
-        else
-        {
-            kickCirThresh = 0;
-            velThresh = 0;
             return RPINTERSECT;
         }
-    }
-    else
-    {
-        cirThresh = 0;
-        kickCirThresh = 0;
-        velThresh = 0;
+
         return RPWAITPOS;
-    }
+
 }
 
 void CSkillReceivePass::execute()
@@ -73,8 +49,6 @@ void CSkillReceivePass::execute()
     gotopointavoid->setAgent(agent);
     gotopointavoid->setNoavoid(false);
     gotopointavoid->setBallobstacleradius(0.4);
-    gotopointavoid->setAvoidball(true);
-
     kkBallPos = wm->ball->pos;
     kkAgentPos = agent->pos();
     receivePassMode = decideMode();
@@ -85,10 +59,7 @@ void CSkillReceivePass::execute()
 
 
     Vector2D oneTouchDir;
-    if(ignoreAngle)
         oneTouchDir = (kkBallPos - kkAgentPos).norm();
-    else
-        oneTouchDir = IATargetDir;
 
     drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
 
@@ -108,6 +79,7 @@ void CSkillReceivePass::execute()
                 gotopointavoid->init(target, oneTouchDir);
             else
                 gotopointavoid->init(agent->pos(), oneTouchDir);
+            agent->setRoller(0);
             gotopointavoid->setSlowmode(false);
             gotopointavoid->execute();
             DEBUG("RPWAITPOS",D_KK);

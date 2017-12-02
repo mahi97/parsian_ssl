@@ -1,9 +1,4 @@
-//
-// Created by parsian-ai on 10/13/17.
-//
-
 #include <parsian_world_model/wm/ball.h>
-
 
 
 const double _ROBOT_RADIUS = 0.09;
@@ -244,7 +239,6 @@ void CBall::filter(int vanished)
         tracker->observeNew(v,0,0);
 //		pos = tracker->position(1*getFramePeriod());
         vel = tracker->velocity(8*getFramePeriod());
-
 //		knowledge->plotWidgetCustom[1] = vel.y;
         pos = observation->pos;
 //		knowledge->plotWidgetCustom[0] = pos.y;
@@ -288,12 +282,6 @@ void CBall::filter(int vanished)
         }
     }
 
-#ifdef velProblem1
-    vel *=2;
-#endif
-#ifdef velProblem2
-    vel /=2;
-#endif
 }
 
 double CBall::whenBallReachToPoint(double dist)

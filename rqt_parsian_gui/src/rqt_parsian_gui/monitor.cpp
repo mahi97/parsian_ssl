@@ -30,6 +30,7 @@ namespace rqt_parsian_gui
         QStringList argv = context.argv();
         // create QWidget
         widget_ = new QWidget();
+        drawer=new CguiDrawer();
 
 //        QPushButton *startProf;
 //        startProf=new QPushButton("nnnn",widget_);
@@ -43,8 +44,6 @@ namespace rqt_parsian_gui
 //        wm=new CWorldModel();
 
         fieldWidget=new MonitorWidget();
-//        fieldWidget->paintGL();
-//        fieldWidget->drawerBuffer->clear();
 
 
         // extend the widget with all attributes and children from UI file
@@ -61,8 +60,11 @@ namespace rqt_parsian_gui
         mywm =_wm;
 
 
-        fieldWidget->drawerBuffer->robotBuffer.clear();
-        if(mywm->isYellow) {
+
+        drawer=new CguiDrawer();
+
+        ROS_INFO("__%d__",drawer->robotBuffer.length());
+        if(mywm->isYellow){
             ourCol = QColor("yellow");
             oppCol = QColor("blue");
         }
@@ -72,17 +74,17 @@ namespace rqt_parsian_gui
         }
 
 
-        fieldWidget->drawerBuffer->guiBall.inSight=mywm->ball.inSight;
-        fieldWidget->drawerBuffer->guiBall.pos.x=mywm->ball.pos.x;
-        fieldWidget->drawerBuffer->guiBall.pos.y=mywm->ball.pos.y;
-        fieldWidget->drawerBuffer->guiBall.radius=mywm->ball.obstacleRadius;
+        drawer->guiBall.inSight=mywm->ball.inSight;
+        drawer->guiBall.pos.x=mywm->ball.pos.x;
+        drawer->guiBall.pos.y=mywm->ball.pos.y;
+        drawer->guiBall.radius=mywm->ball.obstacleRadius;
         for( int i = 0; i < mywm->our.size(); i++ )
         {
             if (fabs(mywm->our[i].inSight-0.5)<0.01)
             {
                 ourCol.setAlpha(150);
             }
-            fieldWidget->drawerBuffer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
+            drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
                                                  ourCol, mywm->our[i].id, i, "" ,false);
 
             //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
@@ -93,20 +95,20 @@ namespace rqt_parsian_gui
 
 
 
-        for( int i = 0; i < mywm->opp.size(); i++ )
-        {
+        for (const auto &i : mywm->opp) {
 
 
-            if (fabs(mywm->opp[i].inSight-0.5)<0.01)
+            if (fabs(i.inSight-0.5)<0.01)
             {
                 oppCol.setAlpha(150);
             }
 
 
-            fieldWidget->drawerBuffer->drawRobot(mywm->opp[i].pos, mywm->opp[i].dir,
-                                    oppCol, mywm->opp[i].id, -1);
+            drawer->drawRobot(i.pos, i.dir,
+                                    oppCol, i.id, -1);
 
         }
+//        fieldWidget->update();
 
 
 
@@ -115,38 +117,43 @@ namespace rqt_parsian_gui
 
     void Monitor::drawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
 
-        fieldWidget->drawerBuffer->clear();
+//        fieldWidget->drawerBuffer->clear();
         for (parsian_msgs::parsian_draw_circle cir: _draw->circles) {
-            fieldWidget->drawerBuffer->arcBuffer.append(cir);
+            drawer->arcBuffer.append(cir);
 
         }
         for (parsian_msgs::parsian_draw_polygon polygon: _draw->polygons) {
-            fieldWidget->drawerBuffer->polygonBuffer.append(polygon);
+            drawer->polygonBuffer.append(polygon);
 
         }
         for (parsian_msgs::parsian_draw_rect rect: _draw->rects) {
-            fieldWidget->drawerBuffer->rectBuffer.append(rect);
+            drawer->rectBuffer.append(rect);
 
         }
         for (parsian_msgs::parsian_draw_segment seg: _draw->segments) {
-            fieldWidget->drawerBuffer->segBuffer.append(seg);
+            drawer->segBuffer.append(seg);
         }
         for (parsian_msgs::parsian_draw_text txt: _draw->texts) {
-            fieldWidget->drawerBuffer->textBuffer.append(txt);
+            drawer->textBuffer.append(txt);
 
         }
         for (parsian_msgs::parsian_draw_vector point: _draw->vectors) {
-            fieldWidget->drawerBuffer->pointBuffer.append(point);
+            drawer->pointBuffer.append(point);
 
         }
+//        fieldWidget->update();
 
     }
 
     void Monitor::timerCb(const ros::TimerEvent &_timer) {
 
+        fieldWidget->drawerBuffer->clear();
+        fieldWidget->drawerBuffer=drawer;
+
 //        fieldWidget->drawerBuffer->draw(Circle2D(ballpos, radius), 0, 360, QColor("orange"), true);
 
         fieldWidget->update();
+//        fieldWidget->drawerBuffer->robotBuffer.clear();
     }
 
 

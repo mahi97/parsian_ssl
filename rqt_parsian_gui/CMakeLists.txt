@@ -126,6 +126,8 @@ set (${PROJECT_NAME}_SRCS
   src/${PROJECT_NAME}/robotstatus.cpp
   src/${PROJECT_NAME}/monitorWidget.cpp
   src/${PROJECT_NAME}/guiDrawer.cpp
+  src/${PROJECT_NAME}/mode_chooser.cpp
+  src/${PROJECT_NAME}/modeChooserWidget.cpp
 )
 
 set(${PROJECT_NAME}_HDRS
@@ -134,6 +136,8 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/robotstatus_widget.h
   include/${PROJECT_NAME}/monitorWidget.h
   include/${PROJECT_NAME}/guiDrawer.h
+  include/${PROJECT_NAME}/mode_chooser.h
+  include/${PROJECT_NAME}/modeChooserWidget.h
 )
 
 
@@ -211,6 +215,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES
   plugin1.xml
   plugin2.xml
+  mode_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

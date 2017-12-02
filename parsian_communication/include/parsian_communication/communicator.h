@@ -1,8 +1,15 @@
 #include <parsian_msgs/parsian_packets.h>
 #include <QtExtSerialPort/qextserialport.h>
 #include <QString>
+#include <QTimer>
+#include <QTime>
+#include <QObject>
+#include <QByteArray>
 #include <string>
 #include <ros/ros.h>
+#include "parsian_util/base.h"
+#include <parsian_msgs/parsian_robots_status.h>
+#include "parsian_msgs/parsian_robot_status.h"
 /*************************************** CMySerialPort Class ******************************************/
 
 class CMySerialPort
@@ -86,6 +93,8 @@ public:
 /*************************************** CBaseCommunicator Class ******************************************/
 class CBaseCommunicator
 {
+
+
 public:
     CBaseCommunicator();
     ~CBaseCommunicator();
@@ -97,8 +106,8 @@ public:
     void closeSerial();
     bool isSerialConnected();
     bool errorOccured();
-    QString getError();
-    QString getSerialPort();
+//    QString getError();
+//    QString getSerialPort();
 protected:
     CMySerialPort* p;
 private:
@@ -106,6 +115,18 @@ private:
     QString err;
     bool error;
     bool serial_open;
+public :
+    void readData();
+    parsian_msgs::parsian_robots_statusPtr robotsStat;
+private:
+    char a;
+    QTimer *recTime;
+    QTime onlineRobotsTimer[12];
+    QByteArray recDataFlow;
+    unsigned char rPack[13];
+    unsigned char robotPacket[16][13];
+    parsian_msgs::parsian_robot_status robotStat[_MAX_NUM_PLAYERS];
+
 
 };
 /*************************************** communicator class ******************************************/
