@@ -1,6 +1,4 @@
-#include "stop.h"
-
-INIT_ROLE(CRoleStop, "stop");  
+#include "parsian_ai/roles/stop.h"
 
 
 const double StopRadius = 0.55;//0.70;//1.02;//0.78;
@@ -96,7 +94,7 @@ void CRoleStopInfo::findPositions()
 
 CRoleStop::CRoleStop(CAgent *_agent) : CRole(_agent)
 {
-	gotopoint = new CSkillGotoPointAvoid(_agent);
+	gotopoint = new GotopointavoidAction();
 }
 
 CRoleStop::~CRoleStop()
@@ -105,15 +103,7 @@ CRoleStop::~CRoleStop()
 }
 
 void CRoleStop::execute()
-{        
-
-	if ( knowledge->switchState == 0 && switchAgent)
-	{
-		knowledge->selectedId = agent->id();
-		knowledge->switchState = 1;
-		knowledge->setSwapDefAndAtt(true);
-	}
-
+{
 
 	Vector2D target;
 	info()->findPositions();
@@ -128,20 +118,23 @@ void CRoleStop::execute()
 	}
 
 
-	gotopoint->setSlowMode(true);
-	gotopoint->setAgent(agent);
-	gotopoint->setMaxVelocity(2.0);
-	gotopoint->setMaxVelocityNormal(1.0);
+	gotopoint->setSlowmode(true);
+	gotopoint->setRobot_Id(static_cast<quint8>(agent->id()));//gotopoint->setAgent(agent);
+	gotopoint->setMaxvelocity(2.0);
+	//gotopoint->setMaxVelocityNormal(1.0); todo: should be deleted?
 	if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {agent->waitHere();return;}
 	info()->findPositions();
-	gotopoint->setTargetLook(target, wm->ball->pos);
-	gotopoint->setAvoidPenaltyArea(true);
+	gotopoint->setTargetpos(target);
+	gotopoint->setTargetdir(Vector2D(1.0, 0.0));
+	gotopoint->setLookat(wm->ball->pos);
+	// gotopoint->setKeepLooking(true); todo: should be deleted?
+	gotopoint->setAvoidpenaltyarea(true);
 
-    gotopoint->setBallObstacleRadius(0.50);
-    gotopoint->setAvoidBall(true);
+    gotopoint->setBallobstacleradius(0.50);
+    // gotopoint->setAvoidBall(true); todo: should be deleted?
 	gotopoint->execute();
-	draw(Circle2D(target , 0.03) , "magenta" , true);
-    draw(QString("%1").arg(kkk) , target);
+	drawer->draw(Circle2D(target , 0.03) , "magenta" , true);
+    drawer->draw(QString("%1").arg(kkk) , target);
 }
 
 void CRoleStop::parse(QStringList params)
@@ -158,18 +151,18 @@ double CRoleStop::progress()
 	return 0.0;
 }
 
-CSkillConfigWidget* CRoleStop::generateConfigWidget(QWidget */*parent*/)
-{
-	return NULL;
-}
-
 void CRoleStop::generateFromConfig(CAgent *a)
 {
 	agent = a;
 }
 
+CRoleStopInfo* CRoleStop::info()
+{
+	return (CRoleStopInfo*) CSkills::getInfo("stop");
+}
+
+
 //--------------------------------Halt--------------------------------//
-INIT_ROLE(CRoleHalt, "halt");  
 
 CRoleHaltInfo::CRoleHaltInfo(QString _roleName) : CRoleInfo(_roleName)
 {
@@ -193,11 +186,6 @@ void CRoleHalt::execute()
 double CRoleHalt::progress()
 {
   return 1.0;
-}
-
-CSkillConfigWidget* CRoleHalt::generateConfigWidget(QWidget */*parent*/)
-{
-  return NULL;
 }
 
 void CRoleHalt::generateFromConfig(CAgent *a)

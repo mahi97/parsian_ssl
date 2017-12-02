@@ -1,6 +1,10 @@
 #ifndef ROLE_H
 #define ROLE_H
 
+#include <parsian_util/core/worldmodel.h>
+#include <parsian_util/base.h>
+#include <parsian_ai/soccer.h>
+
 //#include <skills.h> TODO : Actions
 //#include <knowledge.h>
 //#include <behaviours/behaviour.h>

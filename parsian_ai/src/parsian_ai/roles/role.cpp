@@ -1,7 +1,4 @@
 #include <parsian_ai/roles/role.h>
-#include <parsian_util/core/worldmodel.h>
-#include <parsian_util/base.h>
-#include <parsian_ai/soccer.h>
 
 CRole::CRole()
 {
@@ -43,11 +40,12 @@ CAgent* CRoleInfo::robot(int i)
 {
     int k=0;
     for (int j=0;j < _MAX_NUM_PLAYERS;j++)
-//		if (soccer->agents[j]->roleName == roleName // TODO : add RoleName attr to Agent
-//				&& (wm->our[j]->inSight > 0)
-//				)
+		if (soccer->agents[j]->roleName == roleName // TODO : add RoleName attr to Agent
+				&& (wm->our[j]->inSight > 0)
+				)
         {
-            if (k==i) return soccer->agents[j];
+            if (k==i)
+                return soccer->agents[j];
             k++;
         }
     return nullptr;

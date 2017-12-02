@@ -1,8 +1,8 @@
 #ifndef STOP_H
 #define STOP_H
 
-#include <role.h>
-
+#include <parsian_ai/roles/role.h>
+#include <parsian_util/core/worldmodel.h>
 class CRoleStopInfo : public CRoleInfo
 {
 public:
@@ -20,14 +20,20 @@ public:
 class CRoleStop : public CRole
 {
 protected:
-    CSkillGotoPointAvoid* gotopoint;
+    GotopointavoidAction* gotopoint;
 	bool switchAgent;
 public:
-    DEF_ROLE(CRoleStop);
     virtual void generateFromConfig(CAgent *a);
 	virtual void parse(QStringList params);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
+	CRoleStop(CAgent *_agent);
+	~CRoleStop();
+	void execute();
+
+    CRoleStopInfo* info();
+    double progress();
 };
+
+
 
 class CRoleHaltInfo : public CRoleInfo
 {
@@ -38,9 +44,11 @@ public:
 class CRoleHalt : public CRole
 {
 public:
-    DEF_ROLE(CRoleHalt);
     virtual void generateFromConfig(CAgent *a);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
+    CRoleHalt(CAgent *_agent);
+    ~CRoleHalt();
+    void execute();
+    double progress();
 };
 
 #endif // STOP_H

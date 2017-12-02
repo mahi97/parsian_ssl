@@ -48,7 +48,7 @@ public:
     void selectRobot(Vector2D pos);
 //    virtual void customControl(bool& custom);
 
-    CWorldModel* wm;
+//    CWorldModel* wm;
 
     CAgent **agents;
 //    CCoach *coach;

@@ -1,9 +1,9 @@
 #include <parsian_ai/roles/block.h>
 
 
-CRoleBlock::CRoleBlock(Agent *_agent) : CRole(_agent)
+CRoleBlock::CRoleBlock(CAgent *_agent) : CRole(_agent)
 {
-    gotopoint = new Goto(_agent);
+    gotopoint = new GotopointavoidAction();
 }
 
 CRoleBlock::~CRoleBlock()
@@ -13,19 +13,24 @@ CRoleBlock::~CRoleBlock()
 
 void CRoleBlock::execute()
 {
-    gotopoint->setAgent(agent);
+    gotopoint->setRobot_Id(agent->id());
 	info()->findPos(blockGoal);
 
 	Vector2D dir, p;
 	p = agent->oneTouchCheck(info()->blockPosition, &dir);
 	if (p.valid())
 	{
-		gotopoint->init(p ,dir);
+        gotopoint->setTargetdir(dir);
+        gotopoint->setTargetpos(p);
+		//gotopoint->init(p ,dir);
 		gotopoint->execute();
 	}
 	else
 	{
-		gotopoint->init(info()->blockPosition ,dir);
+
+        gotopoint->setTargetpos(info()->blockPosition);
+        gotopoint->setTargetdir(dir);
+        //gotopoint->init(info()->blockPosition ,dir);
 		gotopoint->execute();
 	}
 }
@@ -44,6 +49,11 @@ void CRoleBlock::parse(QStringList params)
         if (params[i].trimmed().toLower()=="stop") setStop(true);
         else if (params[i].trimmed().toLower()=="goal") setBlockGoal(true);
     }
+}
+
+CRoleBlockInfo* CRoleBlock::info()
+{
+    return (CRoleBlockInfo*) CSkills::getInfo("block");
 }
 
 CRoleBlockInfo::CRoleBlockInfo(QString _roleName) : CRoleInfo(_roleName)
@@ -72,12 +82,12 @@ void CRoleBlockInfo::findPos(bool blockGoal)
 		else{
 			pos = ( wm->ball->pos - wm->opp[kicker]->pos).norm()*( blockDist + CRobot::robot_radius_old) + wm->ball->pos;
 
-            Rect2D checkRect = Rect2D( wm->field->fieldRect().left() + CRobot::robot_radius_old, wm->field->fieldRect().top() - CRobot::robot_radius_old , _FIELD_WIDTH- 2 *CRobot::robot_radius_old, _FIELD_HEIGHT-2*CRobot::robot_radius_old);
+            Rect2D checkRect = Rect2D( wm->field->fieldRect().left() + CRobot::robot_radius_old, wm->field->fieldRect().top() - CRobot::robot_radius_old , wm->field->_FIELD_WIDTH- 2 *CRobot::robot_radius_old, wm->field->_FIELD_HEIGHT -2*CRobot::robot_radius_old);
             if ( Vector2D::angleBetween( ( wm->ball->pos - wm->opp[kicker]->pos) , ( wm->field->ourGoal() - wm->ball->pos)).abs() < 30 && checkRect.contains( pos))
                 blockPosition = pos;                
             else
                 blockPosition = goalPos;
-            if ( knowledge->getGameState()==CKnowledge::TheirKickOff)
+            if ( gameState->theirKickoff())
             {
                 if (blockPosition.x > -CRobot::robot_radius_old)
                 {

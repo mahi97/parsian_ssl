@@ -48,7 +48,6 @@ void CRolePlayOff::update() {
             gotoPointAvoidSkill->setTargetdir(targetDir);
             gotoPointAvoidSkill->setAvoidpenaltyarea(avoidPenaltyArea);
             gotoPointAvoidSkill->setMaxvelocity(maxVelocity);
-            gotoPointAvoidSkill->setAvoidball(avoidBall);
             gotoPointAvoidSkill->setNoavoid(noAvoid);
             gotoPointAvoidSkill->setBallobstacleradius(1);
 
@@ -100,7 +99,6 @@ void CRolePlayOff::update() {
 //            oneTouchSkill->setKickSpeed(1023);
 //        updated = false;
             receivePassSkill->setTarget(target);
-            receivePassSkill->setAvoidopppenaltyarea(avoidPenaltyArea);
             receivePassSkill->setReceiveradius(receiveRadius);
             if(ignoreAngle)
             {
