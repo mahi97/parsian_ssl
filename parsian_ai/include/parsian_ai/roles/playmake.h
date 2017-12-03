@@ -7,6 +7,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QTime>
 #include <parsian_ai/config.h>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/util/knowledge.h>
+
 
 #define PASS_BEHAVS 5
 

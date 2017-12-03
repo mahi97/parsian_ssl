@@ -13,7 +13,7 @@ CRolePlayMake::CRolePlayMake(CAgent *_agent) : CRole(_agent)
     gotoball = new CSkillGotoBall(_agent);
     onetouch = new CSkillKickOneTouch(_agent);
     spin = new CSkillSpinBack(_agent);
-    gotopoint = new CSkillGotoPointAvoid(_agent);
+    gotopoint = new GotopointavoidAction();
     hitTheBall = new CSkillHitTheBall(_agent);
     turn = new CSkillTurn(_agent);
     chip = slow = false;
@@ -76,7 +76,7 @@ CRolePlayMake::~CRolePlayMake()
 
 void CRolePlayMake::passShootNew()
 {
-    if (knowledge->getGameMode() != CKnowledge::OurIndirectKick && knowledge->getGameState() != CKnowledge::OurIndirectKick){
+    if (!gameState->ourIndirectKick()){
         knowledge->variables["passtopoint"] = "false";
         knowledge->variables["passpointdef"] = "false";
         knowledge->variables["passpointsw"] = "false";
@@ -144,7 +144,7 @@ void CRolePlayMake::passShootNew()
         }
     }
     else {
-        if (knowledge->getGameState() == CKnowledge::OurKickOff)
+        if (gameState->ourKickoff())
         {
             if ((agent != lastAgent) || (t - lastDecisionTime > 3.0) || (currentBehaviour == NULL) || (knowledge->getGameStateChanged())||( currentBehaviour->getName() == "kick" && currentBehaviour->probability() < 0.3 ))
             {
