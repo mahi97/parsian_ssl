@@ -1,7 +1,8 @@
 #include <parsian_ai/plans/markplan.h>
 #include <parsian_util/core/robot.h>
 #include <algorithm>
-#include <parsian_util/core/worldmodel.h>
+//#include <parsian_util/core/worldmodel.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/util/knowledge.h>
 #include <parsian_ai/config.h>
