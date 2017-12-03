@@ -14,6 +14,8 @@ public:
 
     bool isInOurPenaltyArea(Vector2D point);
     bool AHZIsInOurPenaltyArea(Vector2D point);
+    QList<Vector2D> AHZOurPAreaIntersect(Segment2D segment,QString role);
+
 
 
 

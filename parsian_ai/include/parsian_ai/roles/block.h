@@ -3,14 +3,12 @@
 
 #include <parsian_ai/roles/role.h>
 #include <parsian_util/core/agent.h>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/util/knowledge.h>
 
 class CRoleBlockInfo : public CRoleInfo
 {
 public:
-
-    CRoleBlockInfo::CRoleBlockInfo(QString _roleName) : CRoleInfo(_roleName)
-    void CRoleBlockInfo::findPos(bool blockGoal)
-
     CRoleBlockInfo(QString _roleName);
 	void findPos( bool blockGoal );
     Vector2D blockPosition;

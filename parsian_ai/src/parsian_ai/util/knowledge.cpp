@@ -736,10 +736,22 @@ double Knowledge::chipGoalPropability(bool isOurChip, Vector2D _goaliePos){
     else return 0;
 }
 
-
-
-
-
-
+int Knowledge::getNearestOppToPoint(Vector2D point)
+{
+    double minDist = 1.0e13;
+    int nearest = -1;
+    for(int i = 0; i < wm->opp.activeAgentsCount(); i++ )
+    {
+        if (wm->opp.active(i)->inSight <=0)
+            continue;
+        double dist = (wm->opp.active(i)->pos - point).length();
+        if( dist < minDist )
+        {
+            minDist = dist;
+            nearest = wm->opp.active(i)->id;
+        }
+    }
+    return nearest;
+}
 
 Knowledge * know = new Knowledge();

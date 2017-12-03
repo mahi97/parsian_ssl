@@ -2,7 +2,6 @@
 #define DEFENSE_H
 
 #include <cmath>
-//#include <parsian_util/core/worldmodel.h>
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/plans/plan.h>
 #include <parsian_ai/util/knowledge.h>

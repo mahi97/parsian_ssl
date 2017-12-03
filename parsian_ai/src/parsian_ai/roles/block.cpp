@@ -74,7 +74,7 @@ void CRoleBlockInfo::findPos(bool blockGoal)
 	else{
 		Vector2D goalPos = ( wm->field->ourGoal() - wm->ball->pos).norm()*( blockDist + CRobot::robot_radius_old) + wm->ball->pos;
         Vector2D pos;
-		int kicker = knowledge->getNearestOppToPoint( wm->ball->pos );
+		int kicker = know->getNearestOppToPoint( wm->ball->pos );
 		if (kicker == -1){
 			blockPosition = goalPos;
 		}

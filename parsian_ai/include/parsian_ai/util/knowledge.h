@@ -95,10 +95,12 @@ public:
     bool isPointClear(Vector2D point, Vector2D from, double rad = 0.0795, bool considerRelaxedIDs = false, QList<int> ourRelaxedIDs = NULL, QList<int> oppRelaxedIDs = NULL);
     bool isPointClear(Vector2D point, Vector2D from, double radBig, double radSmall, bool considerRelaxedIDs, QList<int>ourRelaxedIDs, QList<int>oppRelaxedIDs, QList<int>ourSmallIDs, QList<int>oppSmallIDs);
     double chipGoalPropability(bool isOurChip, Vector2D _goaliePos);
+    int getNearestOppToPoint(Vector2D point);
 
 
 
-        private:
+
+private:
 
     QList<AngleRange> emptyAngles;
 };
