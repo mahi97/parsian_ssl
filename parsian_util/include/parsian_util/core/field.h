@@ -179,6 +179,8 @@ public:
     Rect2D ourPenaltyRect ();
 
     Rect2D oppPenaltyRect ();
+	
+    Vector2D getfOurGoal();
 
     bool isInField (Vector2D point);
 

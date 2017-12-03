@@ -2519,8 +2519,8 @@ bool DefensePlan::defenseClearOrNot(){
                 for(int i = 0; i < wm->our.activeAgentsCount(); i++){
                     if(defenseAgents[defenseClearIndex]->id() != wm->our.active(i)->id
                             && wm->our.active(i)->id != goalKeeperAgent->id()){
-                        if((defenseAgents[defenseClearIndex]->distToBall().length() - wm->our.active(i)->pos.dist(ballPos) >  0.3)
-                                || defenseAgents[defenseClearIndex]->distToBall().length() > 1.5 + defClearThr){
+                        if((wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) - wm->our.active(i)->pos.dist(ballPos) >  0.3)
+                                || wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) > 1.5 + defClearThr){
                             return false;
                         }
                     }
@@ -2529,14 +2529,14 @@ bool DefensePlan::defenseClearOrNot(){
             else{
                 for(int i = 0; i < wm->our.activeAgentsCount(); i++){
                     if (defenseAgents[defenseClearIndex]->id() != wm->our.active(i)->id){
-                        if((defenseAgents[defenseClearIndex]->distToBall().length() - wm->our.active(i)->pos.dist(ballPos) > 0.3)
-                                || defenseAgents[defenseClearIndex]->distToBall().length() > 1.5 + defClearThr)
+                        if( (wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) - wm->our.active(i)->pos.dist(ballPos)) > 0.3
+                                || wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) > 1.5 + defClearThr)
                             return false;
                     }
                 }
                 for(int i = 0; i < wm->opp.activeAgentsCount(); i++){
-                    if((defenseAgents[defenseClearIndex]->distToBall().length() - wm->opp.active(i)->pos.dist(ballPos) > 0.3)
-                            || defenseAgents[defenseClearIndex]->distToBall().length() > 1.5 + defClearThr)
+                    if((wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) - wm->opp.active(i)->pos.dist(ballPos) > 0.3)
+                            || wm->ball->pos.dist(defenseAgents[defenseClearIndex]->pos()) > 1.5 + defClearThr)
                         return false;
                 }
             }

@@ -98,7 +98,6 @@ public:
 
 
 
-
         private:
 
     QList<AngleRange> emptyAngles;

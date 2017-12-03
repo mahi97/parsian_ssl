@@ -1,5 +1,5 @@
 #include <parsian_ai/util/knowledge.h>
-#include <parsian_util/core/worldmodel.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <ros/ros.h>
 
 Knowledge::Knowledge() {
@@ -735,6 +735,7 @@ double Knowledge::chipGoalPropability(bool isOurChip, Vector2D _goaliePos){
         return ((GoalDistanceToBall-GoalieDistanseToBall)/GoalDistanceToGoalie)*2;
     else return 0;
 }
+
 
 
 

@@ -13,6 +13,8 @@ public:
     ~WorldModel();
 
     bool isInOurPenaltyArea(Vector2D point);
+    bool AHZIsInOurPenaltyArea(Vector2D point);
+
 
 
 private:
