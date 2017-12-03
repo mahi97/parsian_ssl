@@ -22,6 +22,6 @@ public:
 private:
 };
 
-extern CWorldModel* wm;
+//extern CWorldModel* wm;
 
 #endif // WORLD_MODEL_H

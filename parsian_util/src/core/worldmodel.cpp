@@ -3,7 +3,7 @@
 //
 #include "parsian_util/core/worldmodel.h"
 
-CWorldModel* wm;
+//CWorldModel* wm;
 
 CWorldModel::CWorldModel() : our{false, false}, opp{true, true}{
     field = new CField();
