@@ -4,7 +4,6 @@
 #include <QtAlgorithms>
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/config.h>
-#include <parsian_util/knowledge.h>
 #include <QList>
 #include <vector>
 #include <QPair>
@@ -735,7 +734,7 @@ void DefensePlan::setGoalKeeperState(){
                     oneTouchCnt = 0;
                     return;
                 }
-                else if(wm->field->AHZIsInOurPenaltyArea(wm->ball->pos)){ // todo: AHZ
+                else if(wm->field->isInOurPenaltyArea(wm->ball->pos)){ // todo: AHZ
                     if(ourLeftPole.contains(wm->ball->pos) || ourRightPole.contains(wm->ball->pos)){
                         ballIsBesidePoles = true;
                         goalKeeperOneTouch = false;
@@ -1420,7 +1419,7 @@ void DefensePlan::execute(){
         lastBallPosition = wm->ball->pos;
         return;
     }
-    else if( gameState->isPlayOn()/*knowledge->getGameMode() == CKnowledge::Start*/ && wm->gs->penalty_shootout()){
+    else if( gameState->isPlayOn()/*knowledge->getGameMode() == CKnowledge::Start*/ && gameState->penaltyShootout()){
         penaltyShootOutMode();
     }
     else{
@@ -1510,7 +1509,7 @@ Vector2D DefensePlan::getGoalieShootOutTarget(bool isSkyDive){
 
         Line2D bisectorLine(wm->ball->pos+0.2*wm->ball->vel,wm->ball->pos+degree*10);
 
-        if(know->chipGoalPropability(false, goalKeeperAgent->pos()) > 0.1 || know->chipGoalPropability(false, goalKeeperAgent->pos()) < 0.05) //TODO: knowledge->chipGoalPropability
+        if(know->chipGoalPropability(false, goalKeeperAgent->pos()) > 0.1 || know->chipGoalPropability(false, goalKeeperAgent->pos()) < 0.05)
             shootOutDiam = min(2*wm->ball->pos.dist(wm->field->ourGoal())/5.0, 2);
 
         DBUG(QString("ballBisector, diam:%1").arg(shootOutDiam), D_FATEME);
