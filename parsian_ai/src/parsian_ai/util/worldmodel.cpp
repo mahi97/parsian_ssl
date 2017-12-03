@@ -18,9 +18,9 @@ WorldModel::~WorldModel() {
 
 bool WorldModel::AHZIsInOurPenaltyArea(Vector2D point)
 {
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_AHZ_GOAL_RAD_FOR_GOALKEEPER);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4), _AHZ_GOAL_RAD_FOR_GOALKEEPER);
-    Rect2D r(fOurGoal + Vector2D(+0,-_GOAL_WIDTH/4),fOurGoal + Vector2D(+_AHZ_GOAL_RAD_FOR_GOALKEEPER,+_GOAL_WIDTH/4));
+    Circle2D c1(field->ourGoal() + Vector2D(0,-field->_GOAL_WIDTH/4),_GOAL_RAD_FOR_GOALKEEPER);
+    Circle2D c2(field->ourGoal() + Vector2D(0,+field->_GOAL_WIDTH/4), _GOAL_RAD_FOR_GOALKEEPER);
+    Rect2D r(field->ourGoal() + Vector2D(+0,-field->_GOAL_WIDTH/4),field->ourGoal + Vector2D(+_GOAL_RAD_FOR_GOALKEEPER,+field->_GOAL_WIDTH/4));
     drawer->draw(c1,0,90,"blue",false);
     drawer->draw(c2,90,180,"blue",false);
     drawer->draw(r,"blue");
