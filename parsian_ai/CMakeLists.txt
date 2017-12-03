@@ -111,12 +111,12 @@ add_library(${PROJECT_NAME}
 #		src/parsian_ai/plays/stopplay.cpp
 #		)
 #
-#add_library(${PROJECT_NAME}_plans
-#		src/parsian_ai/plans/defenseplan.cpp
-#		src/parsian_ai/plans/markplan.cpp
-#		src/parsian_ai/plans/plan.cpp
-#		src/parsian_ai/plans/positioningplan.cpp
-#		)
+add_library(${PROJECT_NAME}_plans
+		src/parsian_ai/plans/defenseplan.cpp
+		src/parsian_ai/plans/markplan.cpp
+		src/parsian_ai/plans/plan.cpp
+                src/parsian_ai/plans/positioningplan.cpp
+		)
 
 add_library(${PROJECT_NAME}_roles
         src/parsian_ai/roles/role.cpp
@@ -129,6 +129,8 @@ add_library(${PROJECT_NAME}_roles
 
 add_library(${PROJECT_NAME}_util
 		src/parsian_ai/util/defpos.cpp
+		src/parsian_ai/util/knowledge.cpp
+		src/parsian_ai/util/worldmodel.cpp
 		#		src/parsian_ai/util/planloader.cpp
 #		src/parsian_ai/util/loadplayoffjson.cpp
 		)

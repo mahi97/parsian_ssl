@@ -5,6 +5,7 @@
 #include "parsian_util/mathtools.h"
 #include <parsian_util/action/action.h>
 #include <parsian_util/core/agent.h>
+#include <parsian_ai/util/knowledge.h>
 //#include <skills.h> // TODO : Actions
 
 class Plan

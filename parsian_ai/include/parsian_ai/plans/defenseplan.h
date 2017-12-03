@@ -2,9 +2,10 @@
 #define DEFENSE_H
 
 #include <cmath>
-#include <parsian_util/core/worldmodel.h>
+//#include <parsian_util/core/worldmodel.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/plans/plan.h>
-#include <parsian_util/knowledge.h>
+#include <parsian_ai/util/knowledge.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>

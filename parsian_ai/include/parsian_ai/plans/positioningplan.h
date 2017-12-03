@@ -2,6 +2,14 @@
 #define POSITIONINGPLAN_H
 
 #include <parsian_ai/plans/plan.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/gamestate.h>
+#include <parsian_ai/util/knowledge.h>
+#include <vector>
+#include <queue>
+#include <qbytearray.h>
 
 enum class positioningType{
     ONETOUCH,
@@ -85,6 +93,7 @@ private:
 public:
     PositioningPlan();
 	void staticInit( QList< holdingPoints > &_staticPoints );
+    void init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode );
 	void staticExec();
 	void execute();
     void reset();
@@ -122,7 +131,7 @@ public:
         double target_to_home_pos_dist();
         double target_to_last_target();
 		double getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs);
-		double coveredArea( std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar >& obstacles );
+		double coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles );
     };
 };
 

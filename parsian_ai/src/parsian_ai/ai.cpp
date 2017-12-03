@@ -6,7 +6,7 @@
 
 AI::AI() {
     soccer = new CSoccer();
-    wm = new CWorldModel();
+    wm = new WorldModel();
     gameState =new GameState();
 }
 
