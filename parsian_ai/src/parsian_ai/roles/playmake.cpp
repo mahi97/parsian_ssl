@@ -10,6 +10,8 @@ CRolePlayMake::CRolePlayMake(CAgent *_agent) : CRole(_agent)
     justTurn = false;
     kickToTheirDefense = false;
     kick = new KickAction();
+    wait = new NoAction();
+    wait->setWaithere(true);
     gotoball = new CSkillGotoBall(_agent);
     onetouch = new CSkillKickOneTouch(_agent);
     spin = new CSkillSpinBack(_agent);
@@ -161,7 +163,7 @@ void CRolePlayMake::passShootNew()
 
     if ((knowledge->getTechnicalMode().isEmpty()) &&
         (
-                (knowledge->getGameMode()==CKnowledge::Start
+                (gameState->isPlayOn()
                  &&
                  (wm->field->isInOurPenaltyArea( (wm->ball->pos-wm->field->ourGoal())*0.7 + wm->field->ourGoal() )
                   || wm->field->isInOurPenaltyArea( (wm->ball->predict(0.15)-wm->field->ourGoal())*0.7 + wm->field->ourGoal() )
@@ -403,7 +405,8 @@ void CRolePlayMake::executeDefault()
     if ( cyclesExecuted < cyclesToWait )
     {
         drawer->draw("waiting",Vector2D(0,-2));
-        agent->waitHere();
+        wait->setRobot_Id(agent->id());
+        agent->action = wait;
         return;
     }
 
@@ -536,7 +539,7 @@ void CRolePlayMake::executeOurKickOff()
         stopBehindBall(false);
     }
     else{
-        if(policy()->OurKickOff_ChipToGoal() || chipToOppGoal){
+        if(conf.OurKickOffChipToGoal || chipToOppGoal){
             kick->setRobot_Id(agent->id());
             double w;
             kick->setTolerance(0.05);
@@ -554,7 +557,11 @@ void CRolePlayMake::executeOurKickOff()
             agent->action = kick;
         }
         else{
-            if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {agent->waitHere();return;}
+            if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
+                wait->setRobot_Id(agent->id());
+                agent->action = wait;
+                return;
+            }
 
             Vector2D target = wm->field->oppGoal();
             int kickSpeed = agent->kickSpeedValue(5 , false);
@@ -956,7 +963,8 @@ void CRolePlayMake::execute() {
     if( wm->ball->inSight <= 0
         || !wm->ball->pos.valid()
         || !wm->field->marginedField().contains(wm->ball->pos)){
-        agent->waitHere();
+        wait->setRobot_Id(agent->id());
+        agent->action = wait;
         return;
     }
 
@@ -1260,8 +1268,8 @@ void CRolePlayMake::executeOurDirect() {
     }
     else slow = true;
     double w;
-    if (policy()->OurDirect_ChipToGoal() ||
-        (policy()->OurDirect_ChipToGoalInOurField()
+    if (conf.OurDirectChipToGoal ||
+        (conf.OurDirectChipToGoalInOurField
          && CGameConditions::check("ballinside",QStringList() << "field1stquarter")))
     {
         drawer->draw("Chip it: direct", Vector2D(-1,-1), "black");
@@ -1346,9 +1354,9 @@ void CRolePlayMake::executeOurIndirect() {
         kick->setChip(true);
         kick->setSpin(true);
         bool chipIt=false;
-        if ((policy()->OurIndirect_ChipToGoalInOurField() && knowledge->getGameMode()==CKnowledge::OurIndirectKick)
+        if ((conf.OurIndirectChipToGoalInOurField && gameState->ourIndirectKick())
             ||
-            (policy()->OurDirect_ChipToGoalInOurField() && knowledge->getGameMode()==CKnowledge::OurDirectKick)
+            (conf.OurDirectChipToGoalInOurField && gameState->ourIndirectKick())
                 )
         {
             if (CGameConditions::check("ballinside",QStringList() << "field1stquarter"))
@@ -1478,7 +1486,7 @@ void CRolePlayMake::executeOurIndirect() {
     debugger->debug("indirect ! ",D_SEPEHR,"orange");
     indirect = true;
     slow = true;
-    if (policy()->OurIndirect_NoPass() || policy()->OurIndirect_ChipToGoal() || chipIndirect)
+    if (policy()->OurIndirect_NoPass() || conf.OurIndirectChipToGoal || chipIndirect)
     {
 
         kick->setRobot_Id(agent->id());
@@ -1494,7 +1502,7 @@ void CRolePlayMake::executeOurIndirect() {
         }
         kick->setKickspeed(agent->chipDistanceValue(wm->ball->pos.dist(hoyBechipInja) - 0.3, true));
         kick->setSpin(false);
-        kick->setChip(policy()->OurIndirect_ChipToGoal() || chipIndirect);
+        kick->setChip(conf.OurIndirectChipToGoal || chipIndirect);
         kick->setAutoChipSpeed(false);
         //        kick->setTurn(true);
         kick->setSlow(true);
@@ -1516,8 +1524,10 @@ void CRolePlayMake::executeOurIndirect() {
         bool waitforP2 = false;
         if ( safeIndirect && knowledge->currentTime() - knowledge->getLastTimeGameStateChanged()< 3.6)
             waitforP2 = true;
-        if( waitforP2)
-            agent->waitHere();
+        if( waitforP2) {
+            wait->setRobot_Id(agent->id());
+            agent->action = wait;
+        }
     }
     else {
         executeDefault();

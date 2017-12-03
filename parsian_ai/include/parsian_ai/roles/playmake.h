@@ -40,6 +40,7 @@ public:
 //    CSkillGotoBall* gotoball;
     OnetouchAction* onetouch;
     GotopointavoidAction* gotopoint;
+    NoAction* wait;
 //    CSkillHitTheBall* hitTheBall;
 //    CSkillTurn* turn;
     int kickDecision;

@@ -15,6 +15,7 @@
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/action/autogenerate/onetouchaction.h>
 #include <parsian_util/action/autogenerate/receivepassaction.h>
+#include <parsian_util/action/autogenerate/noaction.h>
 
 enum ESkill {
     Gotopoint      = 0,
