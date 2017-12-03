@@ -4,6 +4,7 @@ PLUGINLIB_DECLARE_CLASS(parsian_agent, CommonConfig, CommonConfig, nodelet::Node
 
 void CommonConfig::onInit(){
     ROS_INFO("CommonConfig onInit");
+<<<<<<< HEAD
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
@@ -48,3 +49,8 @@ void CommonConfig::ConfigServerCallBack(const agent_common_config::commonconfigC
 
 
 }
+=======
+    private_nh = getPrivateNodeHandle();
+    server.reset(new dynamic_reconfigure::Server<agent_common::agentConfig>(private_nh));
+}
+>>>>>>> 5af32b0f31cbffeb42da4f8be34496f49cee0755

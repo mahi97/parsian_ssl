@@ -13,12 +13,8 @@
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_agent/agent.h>
-
-#include <dynamic_reconfigure/server.h>
-#include "parsian_agent/agentConfig.h"
-#include  <parsian_agent/config.h>
+#include <parsian_agent/config.h>
 #include <parsian_agent/skills.h>
-#include <parsian_msgs/parsian_robot_common_config.h>
 
 
 namespace parsian_agent {
@@ -44,7 +40,7 @@ namespace parsian_agent {
 
         ros::Timer timer_;
 
-        void commonconfigCb(const parsian_msgs::parsian_robot_common_configConstPtr &);
+        void commonConfigCb(const dynamic_reconfigure::ConfigConstPtr & _cnf);
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 
@@ -52,10 +48,8 @@ namespace parsian_agent {
 
         void aiCb(const parsian_msgs::parsian_ai_statusConstPtr &);
 
-        boost::shared_ptr<Agent> agent;
 
-        boost::shared_ptr<dynamic_reconfigure::Server<agent_config::agentConfig>> server;
-        void ConfigServerCallBack(const agent_config::agentConfig &config, uint32_t level) ;
+        boost::shared_ptr<Agent> agent;
 
         CSkill* getSkill(const parsian_msgs::parsian_robot_taskConstPtr &);
 
@@ -69,4 +63,3 @@ namespace parsian_agent {
     };
 }
 
-#endif //PARSIAN_AGENT_AGENTNODELET_H

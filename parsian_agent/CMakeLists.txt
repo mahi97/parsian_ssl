@@ -17,7 +17,6 @@ find_package(catkin REQUIRED COMPONENTS
         parsian_util
         roscpp
         rospy
-        std_msgs
         )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
@@ -110,9 +109,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/agent.cfg
-  cfg/commonconfigure.cfg
- )
+cfg/agent.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -126,8 +124,8 @@ generate_dynamic_reconfigure_options(
 catkin_package(
         INCLUDE_DIRS
         include
-        LIBRARIES ${PROJECT_NAME}_nodelet
-        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
+        LIBRARIES
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy
         #  DEPENDS
 )
 
@@ -143,13 +141,6 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_nodelet
-        src/agent_nodelet.cpp
-        )
-
-add_library(commonconfig_nodelet
-        src/common_config_nodelet.cpp
-        )
 
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
@@ -165,16 +156,23 @@ add_library(${PROJECT_NAME}
         src/config.cpp
         )
 
+add_library(${PROJECT_NAME}_nodelet
+        src/agent_nodelet.cpp
+        )
+
+add_library(${PROJECT_NAME}_commonconfig_nodelet
+        src/common_config_nodelet.cpp
+        )
+
 add_executable(${PROJECT_NAME}_node
         src/agent_node.cpp
         )
 
-add_dependencies(${PROJECT_NAME}_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
+add_executable(${PROJECT_NAME}_commonconfig_node
+        src/common_config_node.cpp
         )
 
+# target link libraries
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
@@ -186,36 +184,53 @@ target_link_libraries(${PROJECT_NAME}_node
         ${PROJECT_NAME}_nodelet
         )
 
-add_dependencies(${PROJECT_NAME}
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
-add_dependencies(${PROJECT_NAME}_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-        )
-
 target_link_libraries(${PROJECT_NAME}_nodelet
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
         )
-add_dependencies(commonconfig_nodelet
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_commonconfig_nodelet
+        )
+
+# dependencies
+
+add_dependencies(${PROJECT_NAME}
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+#
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${PROJECT_NAME}_gencfg
+        )
+
+
+add_dependencies(${PROJECT_NAME}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+#
+add_dependencies(${PROJECT_NAME}_commonconfig_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_gencfg
         )
 
-target_link_libraries(commonconfig_nodelet
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME}
-        ${QT_LIBRARIES}
+#
+add_dependencies(${PROJECT_NAME}_commonconfig_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
         )
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
+#
+# Add cmake target dependencies of the library
+# as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -273,6 +288,9 @@ install(FILES
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
 
+
+catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############
@@ -285,3 +303,4 @@ install(FILES
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
