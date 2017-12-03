@@ -4,6 +4,7 @@
 #include <rqt_parsian_gui/modeChooserWidget.h>
 #include <QFile>
 #include <QTextStream>
+#include <rospack/rospack.h>
 namespace rqt_parsian_gui
 {
 ModeChooserWidget::ModeChooserWidget(ros::NodeHandle & n)
@@ -99,9 +100,15 @@ void ModeChooserWidget::sendTeamConfig()
 
 void ModeChooserWidget::saveTeamConfig()
 {
-    QFile myFile(FILE_PATH);
+    rospack::Rospack p;
+    std::string s;
+    p.find("rqt_parsian_gui",s);
+    ROS_INFO_STREAM(s);
+    QString ss;
+    ss.fromStdString(s);
+    QFile myFile(ss+FILE_PATH);
     if(!myFile.open(QFile::WriteOnly |QFile::Text)){
-        ROS_INFO("saving team config failed");
+        ROS_INFO_STREAM("saving team config failed" << ss.toStdString());
         return;
     }
     QTextStream out(&myFile);
@@ -112,6 +119,7 @@ void ModeChooserWidget::saveTeamConfig()
 
 void ModeChooserWidget::loadTeamConfig()
 {
+
     QFile myFile(FILE_PATH);
     if(!myFile.open(QFile::ReadOnly |QFile::Text)){
         ROS_INFO("loading team config failed");
