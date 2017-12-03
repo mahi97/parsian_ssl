@@ -4,11 +4,12 @@
 #include <parsian_ai/plans/plan.h>
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
-#include <parsian_util/core/worldmodel.h>
-#include <parsian_util/base.h>
-#include <QByteArray>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/gamestate.h>
+#include <parsian_ai/util/knowledge.h>
+#include <vector>
 #include <queue>
-
+#include <qbytearray.h>
 
 enum class positioningType{
     ONETOUCH,
@@ -92,9 +93,9 @@ private:
 public:
     PositioningPlan();
 	void staticInit( QList< holdingPoints > &_staticPoints );
+    void init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode );
 	void staticExec();
-    void init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode );    //kian:: why it has more args than parental class
-    void execute();
+	void execute();
     void reset();
 
     class PositioningObject
@@ -106,11 +107,11 @@ public:
 
         double score;
 
-        static constexpr double target_to_goal_openness_coeff = 100.0;
-        static constexpr double target_to_ball_openness_coeff = 100.0;
-        static constexpr double target_opp_mean_dist_coeff    = 250.0;
+        static const double target_to_goal_openness_coeff = 100.0;
+        static const double target_to_ball_openness_coeff = 100.0;
+        static const double target_opp_mean_dist_coeff    = 250.0;
 //        static const double target_to_home_pos_dist_coeff =-1.0;
-		static constexpr double target_to_last_target_coeff    =-10.0;//-100.0;
+		static const double target_to_last_target_coeff    =-10.0;//-100.0;
 
     public:
 
@@ -127,7 +128,7 @@ public:
         double target_to_goal_openness();
         double target_to_ball_openness();
         double target_opp_mean_dist();
-        double target_to_home_pos_dist();			//kian: delete or not?
+        double target_to_home_pos_dist();
         double target_to_last_target();
 		double getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs);
 		double coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles );
