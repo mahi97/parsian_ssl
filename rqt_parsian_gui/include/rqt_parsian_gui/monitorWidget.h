@@ -46,6 +46,7 @@ namespace rqt_parsian_gui
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
         Vector2D mousePressPos;
+        int getViewportWidth();
     protected:
 
 
@@ -56,8 +57,6 @@ namespace rqt_parsian_gui
         QPainter painter;
         void mousePressEvent(QMouseEvent *event);
         void wheelEvent(QWheelEvent *event);
-        double viewportWidth;
-        QSizeF viewportSize;
 
 
     private:

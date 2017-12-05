@@ -21,13 +21,12 @@ namespace rqt_parsian_gui
         leftPenalty.setRect(-_FIELD_WIDTH/2.0, - _PENALTY_WIDTH/2.0, _GOAL_RAD, _PENALTY_WIDTH);
         rightPenalty.setRect(_FIELD_WIDTH/2.0 - _GOAL_RAD, -_PENALTY_WIDTH/2.0, _GOAL_RAD, _PENALTY_WIDTH);
         this->setMouseTracking(true);
-        //    this->setFixedSize((viewportSize.width()) , (viewportSize.height()));
 
         stadiumGreen = QColor::fromRgbF(0.34,0.78,0.18,1.0);//QColor::fromRgbF(0.50,0.25,0.0,1.0);//
         fieldGreen = QColor::fromRgbF(0.27,0.76,0.10,1.0);
         stadiumSize.setWidth((_STADIUM_WIDTH));
         stadiumSize.setHeight((_STADIUM_HEIGHT));
-//        setViewportWidth(conf()->Common_Viewport_Width());
+        setViewportWidth(800);
         drawerBuffer=new CguiDrawer();
     }
     void MonitorWidget::setViewportWidth(int width)
@@ -38,8 +37,21 @@ namespace rqt_parsian_gui
         viewportSize.setHeight(double(viewportWidth / WH_RATIO));
         resizeGL(viewportWidth, ((double) viewportWidth)/WH_RATIO); //Dont care inputs
         setFixedSize(viewportSize.width(), viewportSize.height());
-        //    setFixedSize(800, 600);
 
+
+    }
+    int MonitorWidget::getViewportWidth()
+    {
+        return viewportWidth;
+    }
+    void MonitorWidget::wheelEvent(QWheelEvent *event)
+    {
+        if( event->delta() > 0 ){
+            setViewportWidth( getViewportWidth()+12);
+        }
+        else{
+            setViewportWidth( getViewportWidth()-12);
+        }
     }
 
     void MonitorWidget::initializeGL()
