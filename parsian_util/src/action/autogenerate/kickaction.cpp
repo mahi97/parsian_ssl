@@ -58,3 +58,4 @@ QString KickAction::getActionName(){
     static QString name("KickAction");
     return name;
 }
+

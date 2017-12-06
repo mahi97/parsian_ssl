@@ -8,6 +8,7 @@
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_receivePass.h>
+#include <list>
 
 class ReceivepassAction : public Action {
 
@@ -20,12 +21,13 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(ReceivepassAction, quint8, Robot_Id, robot_id);
+    SkillProperty(ReceivepassAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(ReceivepassAction, bool, Slow, slow);
     SkillProperty(ReceivepassAction, double, Receiveradius, receiveRadius);
     SkillProperty(ReceivepassAction, bool, Ignoreangle, ignoreAngle);
     SkillProperty(ReceivepassAction, Vector2D, Target, target);
     SkillProperty(ReceivepassAction, Vector2D, Iatargetdir, IATargetDir);
+
 
 };
 

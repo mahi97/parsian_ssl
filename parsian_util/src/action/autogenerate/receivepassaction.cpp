@@ -30,3 +30,4 @@ QString ReceivepassAction::getActionName(){
     static QString name("ReceivepassAction");
     return name;
 }
+

@@ -3,7 +3,6 @@
 
 #include <queue>
 #include "parsian_ai/roles/roles.h"
-//#include "skills.h" TODO : Actions
 #include "parsian_ai/plans/plans.h"
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/soccer.h>
@@ -37,7 +36,7 @@ public:
     bool lockAgents;
     CMasterPlay();
     virtual ~CMasterPlay();
-    int getDefenseNum();
+    virtual void reset() = 0;
     virtual void execute_0() = 0;
     virtual void execute_1() = 0;
     virtual void execute_2() = 0;
@@ -45,15 +44,19 @@ public:
     virtual void execute_4() = 0;
     virtual void execute_5() = 0;
     virtual void execute_6() = 0;
+    virtual void init(QList <int> _agents) = 0;
+
     void execute();
     virtual QString whoami() {return "MasterPlay";}
     bool canScore();
     QList <CAgent *> markAgents;
     //////////////////////////////////////
     bool noPlanException;
-    //////////////////////////////////////
 
-    virtual void reset() = 0;
+    static PositioningPlan positioningPlan;
+    static CMarkPlan markPlan;
+    static DefensePlan defensePlan;
+
 private:
     void execPlay();
     QString formationName;
@@ -74,9 +77,7 @@ protected:
     CAgent *playMakeAgent;
     CAgent *blockAgent;
 
-    static PositioningPlan positioningPlan;
-    static CMarkPlan markPlan;
-    static DefensePlan defensePlan;
+
 
     static CRolePlayMake playMakeRole;
     static CRoleBlock blockRole;

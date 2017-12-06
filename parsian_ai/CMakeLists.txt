@@ -97,9 +97,9 @@ add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/coach.cpp
 )
 
-#add_library(${PROJECT_NAME}_plays
+add_library(${PROJECT_NAME}_plays
 #		src/parsian_ai/plays/dynamicattack.cpp
-#		src/parsian_ai/plays/masterplay.cpp
+		src/parsian_ai/plays/masterplay.cpp
 #		src/parsian_ai/plays/ourballplacement.cpp
 #		src/parsian_ai/plays/playoff.cpp
 #		src/parsian_ai/plays/ourpenalty.cpp
@@ -109,8 +109,8 @@ add_library(${PROJECT_NAME}
 #		src/parsian_ai/plays/theirdirect.cpp
 #		src/parsian_ai/plays/theirballplacement.cpp
 #		src/parsian_ai/plays/stopplay.cpp
-#		)
-#
+		)
+
 add_library(${PROJECT_NAME}_plans
 		src/parsian_ai/plans/defenseplan.cpp
 		src/parsian_ai/plans/markplan.cpp
@@ -179,8 +179,6 @@ target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
         ${PROJECT_NAME}
         ${QT_LIBRARIES}
-#		${PROJECT_NAME}_plays
-#		${PROJECT_NAME}_plans
         )
 
 add_dependencies(${PROJECT_NAME}
@@ -192,17 +190,19 @@ add_dependencies(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
 		${catkin_LIBRARIES}
 		${QT_LIBRARIES}
+		${PROJECT_NAME}_plays
+		${PROJECT_NAME}_plans
 		)
 
-#target_link_libraries(${PROJECT_NAME}_plays
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
+target_link_libraries(${PROJECT_NAME}_plays
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
 
-#target_link_libraries(${PROJECT_NAME}_plans
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
+target_link_libraries(${PROJECT_NAME}_plans
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		)
 
 #target_link_libraries(${PROJECT_NAME}_util
 #		${QT_LIBRARIES}
