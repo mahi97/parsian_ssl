@@ -69,14 +69,14 @@ int CTeam::activeAgentID(int i)
     return -1;
 
 }
-CRobot* CTeam::operator [](const int i)
+CRobot* CTeam::operator [](const int i) const
 {
     if (i>=0 && i<_MAX_NUM_PLAYERS) return data->teamMembers[i];
     PDEBUG("id out of range", i, D_ERROR);
     return nullptr;
 }
 
-CRobot* CTeam::active(const int i)
+CRobot* CTeam::active(const int i) const
 {
     if((i<data->activeAgents.size())&&(i>=0))
     {

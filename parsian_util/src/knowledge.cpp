@@ -316,7 +316,7 @@ int CKnowledge::getNearestRobotToPoint(CTeam _team, Vector2D _point) {
     return nearest;
 }
 
-NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList){
+NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList, const CWorldModel*& wm){
     ////
     ////Code By Sepehr
     ////
@@ -370,7 +370,7 @@ NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourLis
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
             {
-                result.ourF.append(pair<double,int>(t , ourList[i]));
+                result.ourF.append(std::pair<double,int>(t , ourList[i]));
                 ourCalced[i] = true;
                 if( result.catch_time > t ){
                     result.catch_time = t;
@@ -400,7 +400,7 @@ NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourLis
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))
             {
-                result.oppF.append(pair<double,int>(t , oppList[i]));
+                result.oppF.append(std::pair<double,int>(t , oppList[i]));
                 oppCalced[i] = true;
                 if( result.catch_time > t ){
                     result.catch_time = t;
@@ -418,7 +418,7 @@ NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourLis
     return result;
 }
 
-FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppList)
+FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppList, const CWorldModel*& wm)
 {
     /////Extracted from DefensePlan
     /////By Pooria
@@ -465,10 +465,10 @@ FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppLi
             if (wm->ball->vel.length() > 0.2) {
                 Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
                 if (f.ourFastest == -1 and ourList.count() > 0) {
-                    float min = 99999;
+                    double min = 99999;
                     for (int i = 0; i < ourList.count(); i++) {
                         Vector2D playerPos = wm->our[ourList[i]]->pos;
-                        float dist = line.dist(playerPos);
+                        double dist = line.dist(playerPos);
                         if (dist < min) {
                             f.ourFastest = ourList[i];
                             min = dist;
@@ -479,10 +479,10 @@ FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppLi
                         f.catch_time = time;
                 }
                 if (f.oppFastest == -1 and oppList.count() > 0) {
-                    float min = 99999;
+                    double min = 99999;
                     for (int i = 0; i < oppList.count(); i++) {
                         Vector2D playerPos = wm->opp[oppList[i]]->pos;
-                        float dist = line.dist(playerPos);
+                        double dist = line.dist(playerPos);
                         if (dist < min) {
                             f.oppFastest = oppList[i];
                             min = dist;
@@ -500,5 +500,140 @@ FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppLi
     return f;
 }
 
+double CKnowledge::kickTimeEstimation(CAgent *_agent, Vector2D _target, const CBall& _ball, const double& _VMax, double AccMaxForward, double DecMax, double AccMaxNormal)
+{
+    QList<int> ourRelax,oppRelax;
+    Vector2D finalPos;
+    Vector2D ballPosInFuture;
+    Vector2D s1,s2;
+    Segment2D ballPath(_ball.pos,_ball.pos + _ball.vel.norm()*10);
+    Circle2D robotAreaNear (_agent->pos(),0.4);
 
+    if(_ball.vel.length() > 0.2)
+    {
+        if((robotAreaNear.intersection(ballPath,&s1,&s2) != 0) && _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos())) >= 0)
+        {
+            return _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos()));
+        }
 
+        for(double i = 0 ; i < 3 ; i += 0.03)
+        {
+            ballPosInFuture = _ball.getPosInFuture(i);
+            finalPos = ballPosInFuture - (_target-ballPosInFuture).norm()*0.11;
+            if(timeNeeded(_agent,finalPos,_VMax, AccMaxForward, DecMax, AccMaxNormal)<= i+0.1)
+            {
+                //draw(finalPos,1,QColor(Qt::blue));
+                return i;
+            }
+        }
+
+    }
+
+    finalPos = _ball.pos - (_target - _ball.pos).norm() * 0.11;
+//    draw(finalPos);
+    return 100 - timeNeeded(_agent,finalPos,_VMax, AccMaxForward, DecMax, AccMaxNormal);
+
+}
+
+double CKnowledge::timeNeeded(CAgent *_agentT,Vector2D posT,
+                              double vMax, double AccMaxForward, double DecMax, double AccMaxNormal)
+{
+
+    double _x3;
+    double acc = AccMaxForward;
+    double dec = DecMax;
+    double xSat;
+    Vector2D tAgentVel = _agentT->vel();
+    Vector2D tAgentDir = _agentT->dir();
+    double veltan= (tAgentVel.x)*cos(tAgentDir.th().radian()) + (tAgentVel.y)*sin(tAgentDir.th().radian());
+    double offset = 0;
+    double velnorm= -1 * (tAgentVel.x)*sin(tAgentDir.th().radian()) + (tAgentVel.y)*cos(tAgentDir.th().radian());
+    double distEffect = 1, angCoef = 0.003;
+    double dist = 0;
+    double rrtAngSum = 0;
+    QList <Vector2D> _result;
+    Vector2D _target;
+
+    _result.clear();
+
+    if( _result.size() >= 3) {
+        for(int i = 0 ; i < _result.size() - 1; i++)
+        {
+            dist += _result[i].dist(_result[i+1]);
+        }
+        for(int i = 1 ; i < _result.size() - 1; i++)
+        {
+            rrtAngSum += fabs(Vector2D::angleBetween(_result[i] - _result[i-1] , _result[i+1] - _result[i]).degree());
+        }
+        distEffect = dist / _agentT->pos().dist(posT);
+        distEffect += rrtAngSum*angCoef;
+        distEffect = std::max(1.0, distEffect);
+    }
+
+    if(tAgentVel.length() < 0.2) {
+        acc = (AccMaxForward + AccMaxNormal)/2;
+
+    } else {
+        acc =AccMaxForward*(fabs(veltan)/tAgentVel.length()) + AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
+    }
+
+    double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length()*tAgentVel.length()/2*acc))*2*acc*dec)/(acc+dec));
+    vMaxReal = min(vMaxReal, 4);
+    vMax = min(vMax, vMaxReal);
+    xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
+    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(DecMax)) ;
+
+    if(_agentT->pos().dist(posT) < _x3 ) {
+        return std::max(0.0,(tAgentVel.length()/ DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ DecMax - offset) * distEffect);
+    }
+
+    if(tAgentVel.length() < (vMax)) {
+        if(_agentT->pos().dist(posT) > xSat) {
+            return std::max(0.0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
+        }
+        return std::max(0.0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
+
+    } else {
+        return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
+    }
+
+}
+
+double CKnowledge::oneTouchAngle(Vector2D pos,
+                                         Vector2D vel,
+                                         Vector2D ballVel,
+                                         Vector2D ballDir,
+                                         Vector2D goal,
+                                         double lambda,
+                                         double gamma)
+{
+    const double &ang1 = (-ballDir).th().degree();
+    const double &ang2 = (goal - pos).th().degree();
+    double theta = AngleDeg::normalize_angle(ang2 - ang1);
+    double th = fabs(theta) * _DEG2RAD;
+    float vkick = 8; // agent->self()->kickValueSpeed(kickSpeed, false);// + Vector2D::unitVector(self().pos.d).innerProduct(self().vel);
+    double v = (ballVel - vel).length();
+    double th1;
+    double fmin=1e10;
+    double f;
+    double th1best = 0;
+    for (int k=0;k<6000;k++)
+    {
+        th1 = ((float)k/6000.0)*th;
+        f  = gamma*v*(1.0/ std::tan(th-th1))*sin(th1)-lambda*v*cos(th1)-vkick;
+        if (fabs(f)<fmin)
+        {
+            fmin = fabs(f);
+            th1best = th1;
+        }
+    }
+    th1 = th1best;
+    th1 *= _RAD2DEG;
+    AngleDeg::normalize_angle(th1);
+    double ang = 0;
+    if (theta>0) ang = ang1 + th1;
+    else ang = ang1 - th1;
+
+    return ang;
+}

@@ -185,7 +185,7 @@ add_library(${PROJECT_NAME}_core
         src/core/ball.cpp
         src/core/team.cpp
         src/core/robot.cpp
-#        src/knowledge.cpp
+        src/knowledge.cpp
         src/core/movingobject.cpp
         )
 
