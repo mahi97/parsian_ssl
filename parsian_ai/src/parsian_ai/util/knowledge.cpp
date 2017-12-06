@@ -754,4 +754,9 @@ int Knowledge::getNearestOppToPoint(Vector2D point)
     return nearest;
 }
 
+int Knowledge::nearestOppToBall()
+{
+    return getNearestOppToPoint(wm->ball->pos);
+}
+
 Knowledge * know = new Knowledge();

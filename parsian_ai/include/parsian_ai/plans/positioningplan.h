@@ -93,7 +93,7 @@ private:
 public:
     PositioningPlan();
 	void staticInit( QList< holdingPoints > &_staticPoints );
-    void init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode );
+    void init(const QList<CAgent*> & _agents , QString playMode );
 	void staticExec();
 	void execute();
     void reset();

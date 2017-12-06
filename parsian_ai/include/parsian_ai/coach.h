@@ -16,7 +16,7 @@
 #include <QPair>
 #include <QTextStream>
 #include "parsian_util/base.h"
-#include "parsian_util/core/worldmodel.h"
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/plans/plans.h>
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>

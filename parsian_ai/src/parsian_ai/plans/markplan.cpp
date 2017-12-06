@@ -1340,9 +1340,9 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
         isInPenaltyArea.assign(opp, wm->ball->pos);
         QList<Vector2D> tempVec;
         tempVec.clear();
-        if(!wm->field->AHZOurPAreaIntersectForMark(isInPenaltyArea).isEmpty()) // todo : ahz
+        if(!wm->AHZOurPAreaIntersect(isInPenaltyArea, "mark").isEmpty()) // todo : ahz
         {
-            tempVec.append(wm->field->AHZOurPAreaIntersectForMark(tempSeg));
+            tempVec.append(wm->AHZOurPAreaIntersect(tempSeg, "mark"));
             if(tempVec.size() == 1)
             {
                 tempQlist.append(tempVec.first());
