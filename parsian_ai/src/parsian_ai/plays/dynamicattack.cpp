@@ -1,6 +1,6 @@
 #include <parsian_ai/plays/dynamicattack.h>
 
-CDynamicAttack::CDynamicAttack() {
+CDynamicAttack::CDynamicAttack() : CMasterPlay() {
     dribbleIntention.start();
     lastPMInitWasDribble = false;
     //isShotInPass = false;
@@ -69,7 +69,7 @@ CDynamicAttack::~CDynamicAttack() {
 
 }
 
-void CDynamicAttack::init(QList<int> _agents){
+void CDynamicAttack::init(QList<CAgent*> _agents){
     setAgentsID(_agents);
     initMaster();
 
@@ -84,39 +84,9 @@ void CDynamicAttack::reset(){
     DBUG(QString("Dynamic Attack Reset"),D_MAHI);
 }
 
-void CDynamicAttack::execute_0() {
-    DBUG(QString("Dynamic Attack : 0"),D_MAHI);
-    globalExecute(0);
-}
-
-void CDynamicAttack::execute_1() {
-    DBUG(QString("Dynamic Attack : 1"),D_MAHI);
-    globalExecute(1);
-}
-
-void CDynamicAttack::execute_2() {
-    DBUG(QString("Dynamic Attack : 2"),D_MAHI);
-    globalExecute(2);
-}
-
-void CDynamicAttack::execute_3() {
-    DBUG(QString("Dynamic Attack : 3"),D_MAHI);
-    globalExecute(3);
-}
-
-void CDynamicAttack::execute_4() {
-    DBUG(QString("Dynamic Attack : 4"),D_MAHI);
-    globalExecute(4);
-}
-
-void CDynamicAttack::execute_5() {
-    DBUG(QString("Dynamic Attack : 5"),D_MAHI);
-    globalExecute(5);
-}
-
-void CDynamicAttack::execute_6() {
-    DBUG(QString("Dynamic Attack : 6"),D_MAHI);
-    globalExecute(6);
+void CDynamicAttack::execute_x() {
+    DBUG(QString("Dynamic Attack : %1").arg(agentsID.size()),D_MAHI);
+    globalExecute(agentsID.size());
 }
 
 void CDynamicAttack::globalExecute(int agentSize) {
@@ -365,7 +335,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
 
     for(int i = 0; i < agentSize; i++) {
-        activeAgents.append(knowledge->getAgent(agentsID.at(i)));
+        activeAgents.append(agentsID[i]);
     }
 
     makePlan(agentSize);
@@ -395,21 +365,21 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
 
     for (int i = 0; i < semiDynamicPosition.size(); i++) {
-        draw(semiDynamicPosition[i], 0, QColor(Qt::black));
+        drawer->draw(semiDynamicPosition[i], QColor(Qt::black));
     }
 
     for(size_t i = 0;i < dynamicPosition.size();i++) {
-        draw(Circle2D(dynamicPosition.at(i),0.2),QColor(Qt::red),false);
+        drawer->draw(Circle2D(dynamicPosition.at(i),0.2),QColor(Qt::red),false);
     }
 
-    showRegions(currentPlan.agentSize, QColor(Qt::gray));
-    showLocations(currentPlan.agentSize, QColor(Qt::red));
+    showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
+    showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
 
 
     // TODO : remove this
     if(isPlayMakeChanged()) {
-        for(size_t i = 0;i < 5;i++) {
-            goToDynamic[i] = false;
+        for (bool &i : goToDynamic) {
+            i = false;
         }
     }
 
@@ -417,12 +387,12 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
 void CDynamicAttack::playMake() {
 
-    draw(Circle2D(mahiPlayMaker->pos(), 0.1),QColor(Qt::red),true);
-    if(wm->getTeamColor() == _COLOR_BLUE) {
-        draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::blue),true);
-    } else {
-        draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::yellow),true);
-    }
+    drawer->draw(Circle2D(mahiPlayMaker->pos(), 0.1),QColor(Qt::red),true);
+//    if(wm->getTeamColor() == _COLOR_BLUE) {
+        drawer->draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::blue),true);
+//    } else {
+//        draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::yellow),true);
+//    }
 
     roleAgentPM->setAgent(mahiPlayMaker);
     roleAgentPM->setAgentID(mahiAgentsID[0]);
@@ -472,17 +442,17 @@ void CDynamicAttack::playMake() {
         if (currentPlan.playmake.region == DynamicEnums::Goal) {
             roleAgentPM ->setTarget(wm->field->oppGoal());
             if (wm->ball->pos.x < -2) {
-                roleAgentPM ->setKickRealSpeed(policy()->DynamicPlay_HighSpeedChip());
+                roleAgentPM ->setKickRealSpeed(conf.HighSpeedChip);
             } else {
-                roleAgentPM ->setKickRealSpeed(policy()->DynamicPlay_MediumSpeedChip());
+                roleAgentPM ->setKickRealSpeed(conf.MediumSpeedChip);
 
             }
         } else if (currentPlan.playmake.region == DynamicEnums::Forward) {
             roleAgentPM->setTarget(Vector2D(1000, 0));
-            roleAgentPM->setKickRealSpeed(policy()->DynamicPlay_LowSpeedChip());
+            roleAgentPM->setKickRealSpeed(conf.LowSpeedChip);
         } else {
             roleAgentPM->setTarget(wm->field->oppGoal());
-            roleAgentPM->setKickRealSpeed(policy()->DynamicPlay_LowSpeedChip());
+            roleAgentPM->setKickRealSpeed(conf.LowSpeedChip);
         }
         roleAgentPM->setChip(true);
         roleAgentPM->setSelectedSkill(DynamicEnums::Chip);// Skill Chip
@@ -512,7 +482,7 @@ void CDynamicAttack::playMake() {
 
 void CDynamicAttack::positioning(QList<Vector2D> _points) {
     bool check = false;
-    for(size_t i = 0 ;i < currentPlan.agentSize;i++) {
+    for(int i = 0 ;i < currentPlan.agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->setAgentID(mahiAgentsID[i]);
             roleAgents[i]->setAgent(mahiPoisitionAgents.at(i));
@@ -524,8 +494,8 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
 
                     roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setReceiveRadius(
-                                max(0.0, 1 - roleAgents[i]->getAgent()->pos()
-                                    .dist(roleAgents[i]->getTarget())));
+                            std::max(0.0, 1 - roleAgents[i]->getAgent()->pos()
+                                                                .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Ready);// Receive Skill
 
                     break;
@@ -556,7 +526,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                 //debug(QString("pos positions : %1 %2").arg(roleAgents[i]->getTarget().x).arg(roleAgents[i]->getTarget().y), D_PARSA);
             }
         } else {
-            debug("[dynamicAttack] mahiagent ha eshtebahe chera ?", D_MAHI);
+            DBUG("[dynamicAttack] mahiagent ha eshtebahe chera ?", D_MAHI);
         }
     }
     //assert(check);
@@ -590,7 +560,7 @@ bool CDynamicAttack::isPathClear(Vector2D _pos1,Vector2D _pos2,
     _poly.addVertex(sol1);
     _poly.addVertex(sol3);
 
-    draw(_poly,"red");
+    drawer->draw(_poly,"red");
 
     for(int i = 0;i < wm->opp.activeAgentsCount();i++) {
         if(_poly.contains(wm->opp.active(i)->pos)) return false;
@@ -600,7 +570,7 @@ bool CDynamicAttack::isPathClear(Vector2D _pos1,Vector2D _pos2,
 
 bool CDynamicAttack::isPlayMakeChanged() {
 
-    if(mahiPlayMaker != NULL) {
+    if(mahiPlayMaker != nullptr) {
         if(mahiPlayMaker->id() != lastPlayMakerId) {
             lastPlayMakerId = mahiPlayMaker->id();
             return true;
@@ -613,38 +583,38 @@ int CDynamicAttack::appropriatePassSpeed() {
 
     double tempDistance = 0;
     double speed = 0;
-    if(mahiPlayMaker != NULL) {
+    if(mahiPlayMaker != nullptr) {
         tempDistance = mahiPlayMaker->pos().dist(currentPlan.passPos);
 
-        if (true) {// dynamic pass Speed
-            if (tempDistance < 2) {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_LowSpeedPass();
-
-            } else if(tempDistance > 4) {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_HighSpeedPass();
-
-            } else {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_MediumSpeedPass();
-
-            }
+        if (false) {// dynamic pass Speed // FALSED IN ROS
+//            if (tempDistance < 2) {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_LowSpeedPass();
+//
+//            } else if(tempDistance > 4) {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_HighSpeedPass();
+//
+//            } else {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance) + policy()->DynamicPlay_MediumSpeedPass();
+//
+//            }
 
         } else {
             if (tempDistance < 2) {
-                speed = policy()->DynamicPlay_LowSpeedPass();
+                speed = conf.LowSpeedPass;
 
             } else if(tempDistance > 4) {
-                speed = policy()->DynamicPlay_HighSpeedPass();
+                speed = conf.HighSpeedPass;
 
             } else {
-                speed = policy()->DynamicPlay_MediumSpeedPass();
+                speed = conf.MediumSpeedPass;
 
             }
 
         }
     } else {
-        speed = policy()->DynamicPlay_MediumSpeedPass();
+        speed = conf.MediumSpeedPass;
     }
-    return speed;
+    return static_cast<int>(speed);
 }
 
 
@@ -652,38 +622,38 @@ int CDynamicAttack::appropriateChipSpeed() {
 
     double tempDistance = 0;
     double speed = 0;
-    if(mahiPlayMaker != NULL) {
+    if(mahiPlayMaker != nullptr) {
         tempDistance = mahiPlayMaker->pos().dist(currentPlan.passPos);
 
-        if (true) {// dynamic chip Speed
-            if (tempDistance < 2) {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_LowSpeedChip();
-
-            } else if(tempDistance > 4) {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_HighSpeedChip();
-
-            } else {
-                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_MediumSpeedChip();
-
-            }
+        if (false) {// dynamic chip Speed
+//            if (tempDistance < 2) {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_LowSpeedChip();
+//
+//            } else if(tempDistance > 4) {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_HighSpeedChip();
+//
+//            } else {
+//                speed = knowledge->getProfile(mahiPlayMaker->id(), tempDistance, false) + policy()->DynamicPlay_MediumSpeedChip();
+//
+//            }
 
         } else {
             if (tempDistance < 2) {
-                speed = policy()->DynamicPlay_LowSpeedChip();
+                speed = conf.LowSpeedChip;
 
             } else if(tempDistance > 4) {
-                speed = policy()->DynamicPlay_HighSpeedChip();
+                speed = conf.HighSpeedChip;
 
             } else {
-                speed = policy()->DynamicPlay_MediumSpeedChip();
+                speed = conf.MediumSpeedChip;
 
             }
 
         }
     } else {
-        speed = policy()->DynamicPlay_MediumSpeedPass();
+        speed = conf.MediumSpeedPass;
     }
-    return speed;
+    return static_cast<int>(speed);
 }
 
 void CDynamicAttack::chooseBestPositons()
@@ -700,7 +670,7 @@ void CDynamicAttack::chooseBestPositons()
 
     semiDynamicPosition.clear();
 
-    if(mahiPlayMaker != NULL && ballPos.dist(mahiPlayMaker->pos()) < 0.15)
+    if(mahiPlayMaker != nullptr && ballPos.dist(mahiPlayMaker->pos()) < 0.15)
     {
         passPos        = currentPlan.passPos;
         lastPassPosLoc = currentPlan.passPos;
@@ -774,7 +744,7 @@ void CDynamicAttack::chooseBestPositons()
 
         //if it wants to get the BEST position :
             //first if we can have supporter :
-        if(!haveSupporter && policy()->DynamicPlay_SupportPriority() <= agentSize)
+        if(!haveSupporter && conf.SupportPriority <= agentSize)
         {
             haveSupporter = true;
             semiDynamicPosition.append(Vector2D(ballPos.x - 1, ballPos.y));
@@ -1092,26 +1062,26 @@ void CDynamicAttack::chooseMarkPos() {
     markPositions.clear();
     for(int i = 0; i < 3; i++)
         markPositions.append((Vector2D(5000, 5000)));
-    if(roleAgentPM->getAgent()== NULL)
+    if(roleAgentPM->getAgent()== nullptr)
         return;
     Vector2D reflectPos[3];
     Vector2D temp[4];
-    Circle2D oppCircle(Vector2D(_FIELD_WIDTH/2,0) + Vector2D(0.5,0),1.5);
-    draw(oppCircle,QColor(Qt::black));
+    Circle2D oppCircle(Vector2D(wm->field->_FIELD_WIDTH/2,0) + Vector2D(0.5,0),1.5);
+    drawer->draw(oppCircle,QColor(Qt::black));
     //third marker
-    Vector2D good = Vector2D(_FIELD_WIDTH/2,0);
-    if(roleAgentPM->getAgent()!= NULL && roleAgentPM->getAgent()->pos().y <= 0)
+    Vector2D good = Vector2D(wm->field->_FIELD_WIDTH/2,0);
+    if(roleAgentPM->getAgent()!= nullptr && roleAgentPM->getAgent()->pos().y <= 0)
         good = wm->field->oppGoalR();
     else
         good = wm->field->oppGoalL();
     oppCircle.intersection(Segment2D(wm->ball->pos, good), &temp[2], &temp[3]);
-    if(roleAgentPM->getAgent()!= NULL)
-        reflectPos[2] = knowledge->getReflectPos((Vector2D(_FIELD_WIDTH/2,0) + good)/2, max(1.5, min(2.0, roleAgentPM->getAgent()->pos().dist(Vector2D(_FIELD_WIDTH/2,0)) - 0.9)));
+//    if(roleAgentPM->getAgent()!= nullptr) // TODO : reflect pos
+//        reflectPos[2] = knowledge->getReflectPos((Vector2D(wm->field->_FIELD_WIDTH/2,0) + good)/2, max(1.5, min(2.0, roleAgentPM->getAgent()->pos().dist(Vector2D(wm->field->_FIELD_WIDTH/2,0)) - 0.9)));
     int l = 3;
-    if(roleAgentPM->getAgent()!= NULL)
+    if(roleAgentPM->getAgent()!= nullptr)
     {
         l = 0;
-        vector <Vector2D> vt;
+        std::vector <Vector2D> vt;
         for(int i = 0; i < 3; i++)
             if(reflectPos[i].x < 20)
             {
@@ -1121,7 +1091,7 @@ void CDynamicAttack::chooseMarkPos() {
         for(int i = 0; i < l; i++)
             for(int j = 0; j < l - 1; j++)
                 if(roleAgentPM->getAgent()->pos().dist(vt[j]) < roleAgentPM->getAgent()->pos().dist(vt[j + 1]))
-                    swap(vt[j], vt[j + 1]);
+                    std::swap(vt[j], vt[j + 1]);
         /*for(int i = 0; i < 3; i++)
         {
             reflectPos[i].x = reflectPos[i].y = 5000;
@@ -1137,8 +1107,8 @@ void CDynamicAttack::chooseMarkPos() {
 
     markPositions.clear();
 
-    for(size_t i = 0;i < 3;i++) {
-        draw(reflectPos[i], 0, QColor(Qt::cyan));
+    for (auto reflectPo : reflectPos) {
+        drawer->draw(reflectPo, QColor(Qt::cyan));
     }
 
 
@@ -1161,7 +1131,7 @@ void CDynamicAttack::chooseMarkPos() {
     {
         //debug(QString("%1").arg(matcher.getMatch(i)),D_ALI);
         markPositions.append(reflectPos[matcher.getMatch(i)]);
-        draw(markPositions.at(i), 0, QColor(Qt::black));
+        drawer->draw(markPositions.at(i), QColor(Qt::black));
     }
 
 }
@@ -1172,8 +1142,8 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     QList <Vector2D> temp;
     int ans = 0;
     double points[10] = {};
-    for (int i = 0; i < _points.size(); i++)
-        temp.append(_points.at(i));
+    for (auto _point : _points)
+        temp.append(_point);
 //    debug(QString("DIntention %3").arg(dribbleIntention.elapsed()), D_PARSA);
     //if we are dribbling
     if(dribbleIntention.elapsed() < 3000)
@@ -1186,9 +1156,9 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     {
         if(lastPassPosLoc == temp[i])
                 points[i] += 2;
-        debug(QString("%1 %2 point is %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
+        DBUG(QString("%1 %2 point is %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
         double M = 100;
-        if(mahiPlayMaker != NULL)
+        if(mahiPlayMaker != nullptr)
         {
             for(int j = 0; j < wm->opp.activeAgentsCount(); j++)
             {
@@ -1202,11 +1172,11 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
                            mahiPlayMaker->dir().norm() * 1 + mahiPlayMaker->pos()).degree();
                 double p = (e / 30) / (M + 0.001);
                 points[i] -= p;
-                debug(QString("angle is %1").arg(mahiPlayMaker->dir().angleOf(temp[i], mahiPlayMaker->pos(),
+                DBUG(QString("angle is %1").arg(mahiPlayMaker->dir().angleOf(temp[i], mahiPlayMaker->pos(),
                                  mahiPlayMaker->dir().norm() * 1 + mahiPlayMaker->pos()).degree()), D_PARSA);
             }
         }
-        debug(QString("%1 %2 near opp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
+        DBUG(QString("%1 %2 near opp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
         M = 100;
         for(int j = 0; j < wm->opp.activeAgentsCount(); j++)
             M = min(M, wm->opp.active(j)->pos.dist(temp[i]));
@@ -1214,7 +1184,7 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
             points[i] += M;
         else
             points[i] += 4;
-        debug(QString("%1 %2 opptotemp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
+        DBUG(QString("%1 %2 opptotemp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
 //        points[i] -= ballPos.dist(temp[i]) / 2;
         M = 100;
         for(int j = 0; j < wm->our.activeAgentsCount(); j++)
@@ -1223,72 +1193,12 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
             points[i] -= 5;
         if(points[i] > points[ans])
             ans = i;
-        debug(QString("%1 %2 ourtopoint %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
-        debug(QString("end"), D_PARSA);
+        DBUG(QString("%1 %2 ourtopoint %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
+        DBUG(QString("end"), D_PARSA);
     }
     currentPlan.passPos = temp[ans];
     lastPassPosLoc = currentPlan.passPos;
-    debug(QString("pass Pos %1 %2").arg(currentPlan.passPos.x).arg(currentPlan.passPos.y), D_PARSA);
-
-
-
-
-
-    //the old one:
-//    QList <Vector2D> temp;
-    // TODO : segment mide
-//    for (int i = 0; i < _points.size(); i++) {
-//        temp.append(_points.at(i));
-//        //debug(QString("pass candidates : %1 %2").arg(temp.at(i).x).arg(temp.at(i).y), D_PARSA);
-//    }
-//    int tempIndex = 0;
-
-//    /*if(mahiPlayMaker != NULL && mahiPlayMaker->pos().dist(ballPos) > 0.15)
-//        return;*/
-
-//    //TODO : sharte paiin bayad isBallInOurField bashe amma felan isBallInOurField eshteba por mishe.
-//    if(ballPos.x < 0) {
-//        if(policy()->DynamicPlay_FarForward()) {
-//            tempIndex = minHorizontalDistID(temp);
-//        } else {
-//            tempIndex = maxHorizontalDistID(temp);
-//        }
-//    } else {
-//        QList <Vector2D> valids;
-//        for(int i = 0; i < temp.size(); i++)
-//        {
-//            int matchAgent    = mahiPoisitionAgents.at(i)->id();
-//            Vector2D agentPos = wm->our[matchAgent]->pos;
-//            Vector2D agentVel = wm->our[matchAgent]->vel;
-//            Vector2D nextPos  = agentPos + agentVel * 0.5;
-//            if(nextPos.dist(temp[i]) < policy()->DynamicPlay_Area())
-//                valids.append(temp[i]);
-//            else
-//                valids.append(ballPos);
-//            /*debug(QString("nextPos : %1 %2").arg(nextPos.x).arg(nextPos.y), D_PARSA);
-//            debug(QString("agent is %1").arg(matchAgent), D_PARSA);
-//            debug(QString("valids %1 %2").arg(valids[i].x).arg(valids[i].y), D_PARSA);*/
-
-//        }
-//        if(policy()->DynamicPlay_NearForward()) {
-//            tempIndex = minHorizontalDistID(valids);
-//        } else {
-//            tempIndex = maxHorizontalDistID(valids);
-//        }
-//        if(tempIndex == -1)
-//            for(int i = 0; i < temp.size(); i++)
-//                if(tempIndex == -1 || temp[i].x > temp[tempIndex].x)
-//                    tempIndex = i;
-//            /*currentPlan.passPos = wm->field->oppGoal();*/
-//       /* if(valids.at(tempIndex).dist(ballPos) < 0.2)
-//            roleAgentPM->setNoKick(true);*/
-//    }
-
-//    if(0 <= tempIndex && tempIndex < temp.size()) {
-//        currentPlan.passPos = _points.at(tempIndex);
-//    }
-//    else
-//        currentPlan.passPos = Vector2D(_FIELD_WIDTH / 2, mahiPlayMaker->pos().y);
+    DBUG(QString("pass Pos %1 %2").arg(currentPlan.passPos.x).arg(currentPlan.passPos.y), D_PARSA);
 }
 
 double CDynamicAttack::getDynamicValue(const Vector2D &_dynamicPos) const {
@@ -1301,15 +1211,15 @@ Vector2D CDynamicAttack::neaerstGuardToPoint(const Vector2D &startVec) const {
     int regionIndex = 0;
     double tempDist,minDist = 10000;
     const int positionAgentCnt = currentPlan.agentSize - 1;
-    int index;
-    for(size_t i = 0;i < positionAgentCnt;i++) {
+    int index = 0;
+    for(int i = 0;i < positionAgentCnt;i++) {
         if(guards[positionAgentCnt][i].contains(startVec)) {
             regionIndex = i;
             break;
         }
     }
 
-    for(size_t i = 0;i < 3;i++) {
+    for(int i = 0;i < 3;i++) {
         tempDist = guardLocations[positionAgentCnt][regionIndex][i].dist(startVec);
         if(tempDist < minDist) {
             minDist = tempDist;
@@ -1322,9 +1232,9 @@ Vector2D CDynamicAttack::neaerstGuardToPoint(const Vector2D &startVec) const {
 
 bool CDynamicAttack::isRightTimeToPass() {
     double minDist = 99999, tempDist;
-    int tempDefIndex;
+    int tempDefIndex = 0;
 
-    for(size_t i = 0;i < mahiPoisitionAgents.size();i++) {
+    for(int i = 0;i < mahiPoisitionAgents.size();i++) {
         tempDist = mahiPoisitionAgents.at(i)->pos().dist(currentPlan.passPos);
         if(tempDist < minDist) {
             minDist      = tempDist;
@@ -1333,7 +1243,7 @@ bool CDynamicAttack::isRightTimeToPass() {
     }
     if(semiDynamicPosition.size() > tempDefIndex) {
         if(mahiPoisitionAgents.at(tempDefIndex)->pos()
-                .dist(semiDynamicPosition.at(tempDefIndex)) < policy()->DynamicPlay_Area()) {
+                .dist(semiDynamicPosition.at(tempDefIndex)) < conf.Area) {
             return true;
         }
     }
@@ -1398,9 +1308,9 @@ void CDynamicAttack::managePasser() {
 
 int CDynamicAttack::farGuardFromPoint(const int &_guardIndex,
                                       const Vector2D &_point) {
-    double tempDist, tempIndex, tempMax = 0;
-    tempIndex = -1;
-    for(size_t i = 0;i < 3;i++) {
+    double tempDist, tempMax = 0;
+    int tempIndex = -1;
+    for(int i = 0;i < 3;i++) {
         tempDist = guardLocations[currentPlan.agentSize]
                 [guardIndexList.at(_guardIndex)]
                 [i].dist(_point);
@@ -1416,10 +1326,10 @@ int CDynamicAttack::farGuardFromPoint(const int &_guardIndex,
 
 void CDynamicAttack::checkPoints(QList<Vector2D>& _points) {
 
-    Rect2D validField(-_FIELD_WIDTH/2,
-                      _FIELD_HEIGHT/2,
-                      _FIELD_WIDTH,
-                      _FIELD_HEIGHT);
+    Rect2D validField(-wm->field->_FIELD_WIDTH/2,
+                      wm->field->_FIELD_HEIGHT/2,
+                      wm->field->_FIELD_WIDTH,
+                      wm->field->_FIELD_HEIGHT);
 
     for(size_t i = 0; i < _points.size() - 1;i++) {
         if(!validField.contains(_points.at(i))) {
@@ -1432,7 +1342,7 @@ int CDynamicAttack::minHorizontalDistID(const QList<Vector2D> &_points) {
     double tempDist,minDist = 100000;
     int tempIndex = -1;
 
-    for(size_t i = 0; i < _points.size();i++) {
+    for(int i = 0; i < _points.size();i++) {
         tempDist = fabs(ballPos.y - _points.at(i).y);
         if (lastPassPos == i) {
             tempDist -= 2;
@@ -1450,7 +1360,7 @@ int CDynamicAttack::maxHorizontalDistID(const QList<Vector2D> &_points) {
     double tempDist,maxDist = -1;
     int tempIndex = -1;
 
-    for(size_t i = 0;i < _points.size();i++) {
+    for(int i = 0;i < _points.size();i++) {
         tempDist = fabs(ballPos.y - _points.at(i).y);
         if (lastPassPos == i) {
             tempDist += 2;
@@ -1491,84 +1401,84 @@ void CDynamicAttack::assignRegions() {
 
 void CDynamicAttack::assignRegion_0() {
     //Opp Field
-    guards[0]->assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                      _FIELD_HEIGHT/2,                     //top_Y
-                      _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                      _FIELD_HEIGHT);                      //Y_Length
+    guards[0]->assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                      wm->field->_FIELD_HEIGHT/2,                     //top_Y
+                      wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                      wm->field->_FIELD_HEIGHT);                      //Y_Length
 }
 
 
 void CDynamicAttack::assignRegion_1() {
     //Opp Field
-    guards[1][0].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/2,                     //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT);                      //Y_Length
+    guards[1][0].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        wm->field->_FIELD_HEIGHT/2,                     //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT);                      //Y_Length
 
 }
 
 
 void CDynamicAttack::assignRegion_2() {
     //Top Opp Half
-    guards[2][0].assign(-_CENTER_CIRCLE_RAD,                //top_X
-                        _FIELD_HEIGHT/2,                    //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD,//X_Length
-                        _FIELD_HEIGHT/2);                   //Y_Length
+    guards[2][0].assign(-wm->field->_CENTER_CIRCLE_RAD,                //top_X
+                        wm->field->_FIELD_HEIGHT/2,                    //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD,//X_Length
+                        wm->field->_FIELD_HEIGHT/2);                   //Y_Length
 
     //Bottom Opp Half
-    guards[2][1].assign(-_CENTER_CIRCLE_RAD,                 //top_X
+    guards[2][1].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
                         0,                                   //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/2);                    //Y_Length
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/2);                    //Y_Length
 
 }
 
 
 void CDynamicAttack::assignRegion_3() {
     //Top Opp Tertium
-    guards[3][0].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/2,                     //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/3);                    //Y_Length
+    guards[3][0].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                         wm->field->_FIELD_HEIGHT/2,                     //top_Y
+                         wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                         wm->field->_FIELD_HEIGHT/3);                    //Y_Length
 
     //Middle Opp Tertium
-    guards[3][1].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/2 - _FIELD_HEIGHT/3,   //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/3);                    //Y_Length
+    guards[3][1].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        wm->field->_FIELD_HEIGHT/2 - wm->field->_FIELD_HEIGHT/3,   //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/3);                    //Y_Length
 
     //Bottom Opp Tertium
-    guards[3][2].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/2 - 2*_FIELD_HEIGHT/3, //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/3);                    //Y_Length
+    guards[3][2].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        wm->field->_FIELD_HEIGHT/2 - 2*wm->field->_FIELD_HEIGHT/3, //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/3);                    //Y_Length
 
 }
 
 
 void CDynamicAttack::assignRegion_4() {
     //Top Opp 1/4
-    guards[4][0].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/2,                     //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/4);                    //Y_Length
+    guards[4][0].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        wm->field->_FIELD_HEIGHT/2,                     //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/4);                    //Y_Length
 
     //Mid-Top Opp 1/4
-    guards[4][1].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        _FIELD_HEIGHT/4,                     //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/4);                    //Y_Length
+    guards[4][1].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        wm->field->_FIELD_HEIGHT/4,                     //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/4);                    //Y_Length
 
     //Mid-Bottom Opp 1/4
-    guards[4][2].assign(-_CENTER_CIRCLE_RAD,                 //top_X
+    guards[4][2].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
                         0,                                   //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/4);                    //Y_Length                    //Y_Length
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/4);                    //Y_Length                    //Y_Length
     //Bottom Opp 1/4
-    guards[4][3].assign(-_CENTER_CIRCLE_RAD,                 //top_X
-                        -_FIELD_HEIGHT/4,                    //top_Y
-                        _FIELD_WIDTH/2 + _CENTER_CIRCLE_RAD, //X_Length
-                        _FIELD_HEIGHT/4);                    //Y_Length
+    guards[4][3].assign(-wm->field->_CENTER_CIRCLE_RAD,                 //top_X
+                        -wm->field->_FIELD_HEIGHT/4,                    //top_Y
+                        wm->field->_FIELD_WIDTH/2 + wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_FIELD_HEIGHT/4);                    //Y_Length
 
 }
 
@@ -1579,10 +1489,10 @@ void CDynamicAttack::assignRegion_5() {
     }
 
     //BackUp Line
-    guards[5][4].assign(-_CENTER_CIRCLE_RAD - 1,             //top_X
-                        _FIELD_HEIGHT/2,                     //top_Y
+    guards[5][4].assign(-wm->field->_CENTER_CIRCLE_RAD - 1,             //top_X
+                        wm->field->_FIELD_HEIGHT/2,                     //top_Y
                         1,                                   //X_Length
-                        _FIELD_HEIGHT);                      //Y_Length
+                        wm->field->_FIELD_HEIGHT);                      //Y_Length
 
 }
 
@@ -1593,10 +1503,10 @@ void CDynamicAttack::assignRegion_6() {
     }
 
     //BackUp Line
-    guards[6][5].assign(-_FIELD_WIDTH/2 + _FIELD_PENALTY,        //top_X
-                        _PENALTY_WIDTH/2,                        //top_Y
-                        _FIELD_WIDTH/2 - 1 - _CENTER_CIRCLE_RAD, //X_Length
-                        _PENALTY_WIDTH);                         //Y_Length
+    guards[6][5].assign(-wm->field->_FIELD_WIDTH/2 + wm->field->_FIELD_PENALTY,        //top_X
+                        wm->field->_PENALTY_WIDTH/2,                        //top_Y
+                        wm->field->_FIELD_WIDTH/2 - 1 - wm->field->_CENTER_CIRCLE_RAD, //X_Length
+                        wm->field->_PENALTY_WIDTH);                         //Y_Length
 
 }
 
@@ -1604,7 +1514,7 @@ void CDynamicAttack::showRegions(unsigned int agentSize,
                                  QColor color) {
 
     for(size_t i = 0; i < agentSize; i++) {
-        draw(guards[agentSize][i], color);
+        drawer->draw(guards[agentSize][i], color);
     }
 }
 
@@ -1612,7 +1522,7 @@ void CDynamicAttack::showLocations(unsigned int agentSize,
                                    QColor color) {
     for(size_t i = 0;i < agentSize;i++) { //RegionsCount
         for(size_t j = 0;j < 3;j++) {
-            draw(guardLocations[agentSize][i][j], 0, color);
+            drawer->draw(guardLocations[agentSize][i][j], color);
         }
     }
 }
@@ -1626,9 +1536,9 @@ void CDynamicAttack::assignLocations_0() {
 
 void CDynamicAttack::assignLocations_1() {
     //Opp Feild
-    guardLocations[1][0][0].assign(_FIELD_WIDTH/2 - 1,  _FIELD_HEIGHT/4 + 0.5);
-    guardLocations[1][0][1].assign(_FIELD_WIDTH/4, 0);
-    guardLocations[1][0][2].assign(_FIELD_WIDTH/2 - 1, -_FIELD_HEIGHT/4 - 0.5);
+    guardLocations[1][0][0].assign(wm->field->_FIELD_WIDTH/2 - 1,  wm->field->_FIELD_HEIGHT/4 + 0.5);
+    guardLocations[1][0][1].assign(wm->field->_FIELD_WIDTH/4, 0);
+    guardLocations[1][0][2].assign(wm->field->_FIELD_WIDTH/2 - 1, -wm->field->_FIELD_HEIGHT/4 - 0.5);
 }
 
 void CDynamicAttack::assignLocations_2() {
@@ -1792,8 +1702,8 @@ void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
     dynamicPosition.clear();
     for (int i : _positioningRegion) {
         regionsList.append(i);
-        dynamicPosition.append(knowledge->getStaticPoses
-                               (_positioningRegion.at(i)));
+//        dynamicPosition.append(knowledge->getStaticPoses
+//                               (_positioningRegion.at(i))); // TODO : Static Pos
     }
 }
 

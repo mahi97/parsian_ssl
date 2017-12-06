@@ -68,29 +68,29 @@ void CMasterPlay::resetPlayMaker(){
 // result in bad bugs!
 void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
 
-    QList <int> remainings;
+    QList <CAgent*> remainings;
 
-    for (int i : agentsID) {
+    for (auto i : agentsID) {
         remainings.append(i);
     }
 
     if( blockAgent ){
-        remainings.removeOne(blockAgent->id());
+        remainings.removeOne(blockAgent);
     }
     if( playMakeAgent ){
-        remainings.removeOne(playMakeAgent->id());
+        remainings.removeOne(playMakeAgent);
     }
 
     for (auto markAgent : markAgents) {
-        remainings.removeOne(markAgent->id());
+        remainings.removeOne(markAgent);
     }
 
     for (auto positionAgent : positionAgents) {
-        remainings.removeOne(positionAgent->id());
+        remainings.removeOne(positionAgent);
     }
 
-    for (int remaining : remainings) {
-        _list.append(soccer->agents[remaining]);
+    for (auto remaining : remainings) {
+        _list.append(remaining);
     }
 }
 
@@ -98,8 +98,8 @@ void CMasterPlay::choosePlayMaker(){
     int playMakeID = -1;
     QList <CAgent *> playAgents;
     playAgents.clear();
-    for (int i : agentsID) {
-        playAgents.append(soccer->agents[i]);
+    for (auto i : agentsID) {
+        playAgents.append(i);
     }
 
 
@@ -138,8 +138,8 @@ void CMasterPlay::chooseBlocker(){
     int blockID = -1;
     QList <CAgent *> playAgents;
     playAgents.clear();
-    for (int i : agentsID) {
-        playAgents.append(soccer->agents[i]);
+    for (auto i : agentsID) {
+        playAgents.append(i);
     }
 
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
@@ -263,32 +263,9 @@ double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double 
 
 void CMasterPlay::execute() {
 
-    switch(agentsID.count()) {
-        case 0:
-            execute_0();
-            break;
-        case 1:
-            execute_1();
-            break;
-        case 2:
-            execute_2();
-            break;
-        case 3:
-            execute_3();
-            break;
-        case 4:
-            execute_4();
-            break;
-        case 5:
-            execute_5();
-            break;
-        case 6:
-            execute_6();
-            break;
-        default:
-            DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
-    }
+    execute_x();
     execPlay();
+    DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
 }
 
 void CMasterPlay::execPlay(){

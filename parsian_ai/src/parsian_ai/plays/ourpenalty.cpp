@@ -9,7 +9,7 @@ void COurPenalty::reset(){
 	executedCycles = 0;
 }
 
-void COurPenalty::init(QList<int> _agents){
+void COurPenalty::init(QList<CAgent*> _agents){
 	setAgentsID(_agents);
 	initMaster();
 
@@ -33,30 +33,6 @@ void COurPenalty::penaltyKick(){
 
 }
 
-void COurPenalty::execute_0(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_1(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_2(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_3(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_4(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_5(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_6(){
+void COurPenalty::execute_x(){
     penaltyKick();
 }

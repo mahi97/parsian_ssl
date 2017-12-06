@@ -107,11 +107,11 @@ public:
 
         double score;
 
-        static const double target_to_goal_openness_coeff = 100.0;
-        static const double target_to_ball_openness_coeff = 100.0;
-        static const double target_opp_mean_dist_coeff    = 250.0;
-//        static const double target_to_home_pos_dist_coeff =-1.0;
-		static const double target_to_last_target_coeff    =-10.0;//-100.0;
+        static constexpr double target_to_goal_openness_coeff = 100.0;
+        static constexpr double target_to_ball_openness_coeff = 100.0;
+        static constexpr double target_opp_mean_dist_coeff    = 250.0;
+//        static constexpr double target_to_home_pos_dist_coeff =-1.0;
+		static constexpr double target_to_last_target_coeff    =-10.0;//-100.0;
 
     public:
 
@@ -120,7 +120,7 @@ public:
 						   const Vector2D _target ,
                            const Vector2D _last_target );
 
-        int Score()
+        double Score()
         {
             return score;
         }
