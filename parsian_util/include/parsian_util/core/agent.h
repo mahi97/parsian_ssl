@@ -18,6 +18,7 @@ public:
 
     Action* action;
     CRobot self;
+    bool changeIsNeeded;
 };
 
 #endif // AGENT_H

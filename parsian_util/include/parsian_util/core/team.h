@@ -25,8 +25,8 @@ public:
     CTeam(const bool isYellow, const bool isLeft);
     CTeam(const bool isYellow, const bool isLeft, const std::vector<parsian_msgs::parsian_robot>&);
     ~CTeam();
-    CRobot* operator [](const int i);
-    CRobot* active(const int i);
+    CRobot* operator [](const int i) const;
+    CRobot* active(const int i) const;
     int activeAgentsCount();
     int activeAgentID(int i);
     void update();
