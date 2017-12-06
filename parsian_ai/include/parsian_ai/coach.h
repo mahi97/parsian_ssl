@@ -20,7 +20,7 @@
 #include <parsian_ai/plans/plans.h>
 #include <parsian_ai/plays/plays.h>
 
-enum class BallPosset {
+enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
     WEHAVETHEBALL = 1,
     SOSOOUR = 2,
@@ -39,8 +39,8 @@ public:
     void saveGoalie(); // TODO : Move To roles/Agent
 //    DefensePlan& getDefense();
     QList<int> findBestPoses(int numberOfPositionAgents);
-//    CKnowledge::ballPossesionState lastBallPossesionState;
-    ballPossesionState isBallOurs();
+    BallPossesion lastBallPossesionState;
+    BallPossesion isBallOurs();
 //    CKnowledge::ballPossesionState ballPStateIntented;
 //    static QMap<QString, EditData*> editData; //Contains Formations
     /*  ClassProperty(CCoach, Vector2D, LastBallVelPm, lastBallVelPM, updated);

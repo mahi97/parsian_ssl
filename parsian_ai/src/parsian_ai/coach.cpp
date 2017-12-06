@@ -73,27 +73,13 @@ CCoach::CCoach(CAgent**_agents)
     exeptionPlayMake = nullptr;
     exeptionPlayMakeThr = 0;
 
-    staticPlayoffPlansCounter = 0;
-    shuffleCounter = 0;
-    shuffleSize = 0;
-    shuffled = false;
-    firstPlanRepeatInit = true;
-    staticPlayoffPlansShuffleIndexing.clear();
 //    m_planLoader = new CLoadPlayOffJson(QDir::currentPath() + QString("/playoff"));
     goalieAgent = nullptr;
     firstPlay = true;
     firstIsFinished = false;
     preferedDefenseCounts = 2;
-//    preferedShotSpot = EveryWhere;
-//    ///HMD
     overDefThr = 0;
 
-    minChance = 10;
-    minChanceRepeat = 10;
-
-//    playoffPlanSelectionDataFile.setFileName("PlayoffPlanRepeat.txt");
-//    out.setDevice(&playoffPlanSelectionDataFile);
-//
     for (int &i : faultDetectionCounter) i = 0;
 }
 
@@ -376,7 +362,7 @@ void CCoach::assignGoalieAgent( int goalieID ){
         goalieAgent = agents[goalieID];
     }
 }
-CKnowledge::ballPossesionState CCoach::isBallOurs()
+BallPossesion CCoach::isBallOurs()
 {
     int oppNearestToBall = -1, ourNearestToBall = -1;
     double oppNearestToBallDist = 100000, ourNearestToBallDist = 100000;
@@ -387,18 +373,18 @@ CKnowledge::ballPossesionState CCoach::isBallOurs()
     Segment2D oppPath;
     Vector2D dummy1, dummy2;
     int oppIntersectAgent = -1, ourIntersectAgent = -1;
-    CKnowledge::ballPossesionState decidePState;
-    QList <CAgent*> ourAgents;
+    BallPossesion decidePState;
+    QList <int> ourAgents;
     QList <CRobot*> oppAgents; // TODO : What the Heck !?
 
     ////////////////// our
-    ourAgents = knowledge->getActiveAgents();
+    ourAgents = wm->our.data->activeAgents;
     if(goalieAgent != nullptr) {
-        ourAgents.removeOne(knowledge->goalie);
+        ourAgents.removeOne(goalieAgent->id());
     }
 
-    for(int i = 0 ; i<knowledge->defenseAgents.count() ; i++){
-        ourAgents.removeOne(knowledge->defenseAgents[i]);
+    for(int i = 0 ; i<defenseAgents.count() ; i++){
+        ourAgents.removeOne(defenseAgents[i]->id());
     }
 
     for (int i = 0 ; i < oppAgents.count() ; i++) {
@@ -444,33 +430,33 @@ CKnowledge::ballPossesionState CCoach::isBallOurs()
     ///
 
     if(oppNearestToBall == -1 || (wm->field->isInOurPenaltyArea(wm->ball->pos) && wm->ball->vel.length() < 0.5)) {
-        decidePState =  CKnowledge::WEHAVETHEBALL;
+        decidePState =  BallPossesion ::WEHAVETHEBALL;
     } else if(oppIntersectAgent != -1 && ourIntersectAgent == -1 && wm->ball->vel.length() > 1) {
-        decidePState = CKnowledge::WEDONTHAVETHEBALL;
+        decidePState = BallPossesion::WEDONTHAVETHEBALL;
     } else if(oppIntersectAgent != -1 && ourIntersectAgent != -1 && (ourIntersetMin > oppIntersetMin - 0.1) && wm->ball->vel.length() > 0.5) {
-        decidePState = CKnowledge::WEDONTHAVETHEBALL;
+        decidePState = BallPossesion::WEDONTHAVETHEBALL;
     } else if(oppNearestToBallDist <= ourNearestToBallDist) {
-        decidePState = CKnowledge::WEDONTHAVETHEBALL;
+        decidePState = BallPossesion::WEDONTHAVETHEBALL;
     } else if(ourNearestToBallDist < 0.3 && oppNearestToBallDist > ourNearestToBallDist){
-        decidePState = CKnowledge::WEHAVETHEBALL;
+        decidePState = BallPossesion::WEHAVETHEBALL;
     } else if(oppNearestToBallDist > ourNearestToBallDist + 0.5){
-        decidePState = CKnowledge::WEHAVETHEBALL;
+        decidePState = BallPossesion::WEHAVETHEBALL;
     } else if(ourNearestToBallDist < oppNearestToBallDist && ballPos.x < 0.1){
-        decidePState = CKnowledge::SOSOTHEIR;
+        decidePState = BallPossesion::SOSOTHEIR;
     } else if(ourNearestToBallDist < oppNearestToBallDist && ballPos.x >= 0.1){
-        decidePState = CKnowledge::SOSOOUR;
+        decidePState = BallPossesion::SOSOOUR;
     } else if(oppIntersectAgent == -1 && ourIntersectAgent != -1 && wm->ball->vel.length() > 0.7) {
-        decidePState = CKnowledge::WEHAVETHEBALL;
+        decidePState = BallPossesion::WEHAVETHEBALL;
     } else {
-        decidePState = CKnowledge::SOSOTHEIR;
+        decidePState = BallPossesion::SOSOTHEIR;
     }
 
-    if (decidePState == CKnowledge::WEHAVETHEBALL) {
+    if (decidePState == BallPossesion::WEHAVETHEBALL) {
         playOnExecTime.restart();
     }
 
-    if(lastBallPossesionState == CKnowledge::WEHAVETHEBALL && (decidePState == CKnowledge::WEDONTHAVETHEBALL || decidePState == CKnowledge::SOSOTHEIR || decidePState == CKnowledge::SOSOOUR) && playOnExecTime.elapsed() < playOnTime) {
-        decidePState = CKnowledge::WEHAVETHEBALL;
+    if(lastBallPossesionState == BallPossesion::WEHAVETHEBALL && (decidePState == BallPossesion::WEDONTHAVETHEBALL || decidePState == BallPossesion::SOSOTHEIR || decidePState == BallPossesion::SOSOOUR) && playOnExecTime.elapsed() < playOnTime) {
+        decidePState = BallPossesion::WEHAVETHEBALL;
     }
 
 
@@ -479,12 +465,12 @@ CKnowledge::ballPossesionState CCoach::isBallOurs()
         Circle2D oppNearestDribblerArea(wm->opp[oppNearestToBall]->pos + wm->opp[oppNearestToBall]->dir.norm()*0.1 , 0.15);
         drawer->draw(oppNearestDribblerArea,QColor(Qt::red));
         if(oppNearestDribblerArea.contains(ballPos) && ourNearestToBallDist > 0.3) {
-            decidePState = CKnowledge::WEDONTHAVETHEBALL;
+            decidePState = BallPossesion::WEDONTHAVETHEBALL;
         } else if( oppNearestDribblerArea.contains(ballPos) ) {
             if(wm->ball->pos.x >= 0.1) {
-                decidePState = CKnowledge::SOSOOUR;
+                decidePState = BallPossesion::SOSOOUR;
             } else {
-                decidePState = CKnowledge::SOSOTHEIR;
+                decidePState = BallPossesion::SOSOTHEIR;
             }
         }
     }
@@ -504,21 +490,21 @@ CKnowledge::ballPossesionState CCoach::isBallOurs()
     double temp = wm->ball->pos.x + wm->ball->vel.x * 1;
 
     if(temp > 0.5) {
-        decidePState = CKnowledge::WEHAVETHEBALL;
+        decidePState = BallPossesion::WEHAVETHEBALL;
     } else if (temp < 0.1){
-        decidePState = CKnowledge::WEDONTHAVETHEBALL;
+        decidePState = BallPossesion::WEDONTHAVETHEBALL;
     } else {
         decidePState = lastBallPossesionState;
     }
 
     if (wm->field->isInOurPenaltyArea(wm->ball->pos)
         &&  wm->ball->vel.length() < 0.1) {
-        decidePState = CKnowledge::SOSOTHEIR;
+        decidePState = BallPossesion::SOSOTHEIR;
     }
 
     if (wm->field->isInOppPenaltyArea(wm->ball->pos)
         && wm->ball->vel.length() < 0.1) {
-        decidePState = CKnowledge::SOSOOUR;
+        decidePState = BallPossesion::SOSOOUR;
     }
 
     lastBallPossesionState = decidePState;
