@@ -875,42 +875,6 @@ double CSkillKick::oneTouchAngle(Vector2D pos,
     return ang;
 }
 
-double CSkillKick::kickTimeEstimation(Agent *_agent, Vector2D _target, const CBall& _ball)
-{
-    QList<int> ourRelax,oppRelax;
-    Vector2D finalPos;
-    Vector2D ballPosInFuture;
-    Vector2D s1,s2;
-    Segment2D ballPath(_ball.pos,_ball.pos + _ball.vel.norm()*10);
-    Circle2D robotAreaNear (_agent->pos(),0.4);
-
-    if(_ball.vel.length() > 0.2)
-    {
-        if((robotAreaNear.intersection(ballPath,&s1,&s2) != 0) && _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos())) >= 0)
-        {
-            return _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos()));
-        }
-
-
-        for(double i = 0 ; i < 3 ; i += 0.03)
-        {
-            ballPosInFuture = _ball.getPosInFuture(i);
-            finalPos = ballPosInFuture - (_target-ballPosInFuture).norm()*0.11;
-            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf->VelMax,ourRelax,oppRelax,true,0.2,true)<= i+0.1)
-            {
-                //draw(finalPos,1,QColor(Qt::blue));
-                return i;
-            }
-        }
-
-    }
-
-    finalPos = _ball.pos - (_target - _ball.pos).norm() * 0.11;
-//    draw(finalPos);
-    return 100 - CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf->VelMax,ourRelax,oppRelax,true,0.2,false);
-
-}
-
 void CSkillKick::findPosToGo()
 {
     Circle2D  agentNearArea(agentPos,0.15);
