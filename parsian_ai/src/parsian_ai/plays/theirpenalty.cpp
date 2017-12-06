@@ -14,7 +14,7 @@ void CTheirPenalty::reset(){
     executedCycles = 0;
 }
 
-void CTheirPenalty::init(QList<int> _agents) {
+void CTheirPenalty::init(const QList<CAgent*>& _agents) {
     setAgentsID(_agents);
     initMaster();
 
@@ -24,56 +24,11 @@ void CTheirPenalty::init(QList<int> _agents) {
 //	knowledge->setLastPlayExecuted(TheirPenaltyPlay);
 }
 
-void CTheirPenalty::execute_0(){
-
-}
-
-void CTheirPenalty::execute_1(){
+void CTheirPenalty::execute_x(){
+    if (agentsID.empty()) return;
     executedCycles++;
-    if (gameState->penaltyShootout()) {
-        choosePlayMaker();
-    }
+    if (gameState->penaltyShootout()) choosePlayMaker();
     appendRemainingsAgents(positionAgents);
-
     setFormation("TheirP");
-}
 
-void CTheirPenalty::execute_2(){
-    executedCycles++;
-
-    appendRemainingsAgents(positionAgents);
-
-    setFormation("TheirP");
-}
-
-void CTheirPenalty::execute_3(){
-    executedCycles++;
-
-    appendRemainingsAgents(positionAgents);
-
-    setFormation("TheirP");
-}
-
-void CTheirPenalty::execute_4(){
-    executedCycles++;
-
-    appendRemainingsAgents(positionAgents);
-
-    setFormation("TheirP");
-}
-
-void CTheirPenalty::execute_5(){
-    executedCycles++;
-
-    appendRemainingsAgents(positionAgents);
-
-    setFormation("TheirP");
-}
-
-void CTheirPenalty::execute_6(){
-    executedCycles++;
-
-    appendRemainingsAgents(positionAgents);
-
-    setFormation("TheirP");
 }

@@ -2,12 +2,9 @@
 #include "parsian_ai/roles/playmake.h"
 #include "parsian_ai/soccer.h"
 
-CTheirKickOff::CTheirKickOff(){
-}
+CTheirKickOff::CTheirKickOff() = default;
 
-CTheirKickOff::~CTheirKickOff(){
-
-}
+CTheirKickOff::~CTheirKickOff() = default;
 
 void CTheirKickOff::reset(){
     executedCycles = 0;

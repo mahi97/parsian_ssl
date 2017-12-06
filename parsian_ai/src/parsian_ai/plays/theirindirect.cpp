@@ -14,7 +14,7 @@ void CTheirIndirect::reset(){
 	executedCycles = 0;
 }
 
-void CTheirIndirect::init(QList<CAgent*> _agents){
+void CTheirIndirect::init(const QList<CAgent*>& _agents){
 	setAgentsID(_agents);
 	initMaster();
 
@@ -26,10 +26,7 @@ void CTheirIndirect::init(QList<CAgent*> _agents){
 
 void CTheirIndirect::execute_x(){
 	if (agentsID.empty()) return;
-	if (agentsID.size() == 1) {
-        executedCycles++;
-        chooseBlocker();
-        return;
-    }
-    appendRemainingsAgents(markAgents);
+    executedCycles++;
+    chooseBlocker();
+    if (agentsID.size() > 1) appendRemainingsAgents(markAgents);
 }

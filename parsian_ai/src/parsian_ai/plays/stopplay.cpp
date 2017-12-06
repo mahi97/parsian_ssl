@@ -1,16 +1,14 @@
 #include "parsian_ai/plays/stopplay.h"
 
 CStopPlay::CStopPlay() : CMasterPlay() {
-    for (int i = 0; i < 6 ; i++) {
-        gpa[i] = new GotopointavoidAction();
-        gpa[i]->setSlowmode(true);
-        gpa[i]->setNoavoid(false);
+    for (auto &i : gpa) {
+        i = new GotopointavoidAction();
+        i->setSlowmode(true);
+        i->setNoavoid(false);
     }
 }
 
-CStopPlay::~CStopPlay(){
-
-}
+CStopPlay::~CStopPlay() = default;
 
 void CStopPlay::reset(){
     positioningPlan.reset();
@@ -58,36 +56,6 @@ void CStopPlay::stopPosition() {
 
 }
 
-void CStopPlay::execute_0(){
+void CStopPlay::execute_x(){
     stopPosition();
-}
-
-void CStopPlay::execute_1(){
-    stopPosition();
-
-}
-
-void CStopPlay::execute_2(){
-    stopPosition();
-
-}
-
-void CStopPlay::execute_3(){
-    stopPosition();
-
-}
-
-void CStopPlay::execute_4(){
-    stopPosition();
-
-}
-
-void CStopPlay::execute_5(){
-    stopPosition();
-
-}
-
-void CStopPlay::execute_6(){
-    stopPosition();
-
 }

@@ -7,19 +7,13 @@ class CStopPlay : public CMasterPlay
 {
 public:
     CStopPlay();
-    ~CStopPlay();
+    ~CStopPlay() override;
 
-    void execute_0();
-    void execute_1();
-    void execute_2();
-    void execute_3();
-    void execute_4();
-    void execute_5();
-    void execute_6();
-    void init(const QList <CAgent*>& _agents);
+    void execute_x() override;
+    void init(const QList <CAgent*>& _agents) override;
 private:
     void stopPosition();
-    void reset();
+    void reset() override;
 
     GotopointavoidAction *gpa[6];
     Vector2D rolePosition[6];
