@@ -19,6 +19,7 @@
 #include "parsian_util/core/worldmodel.h"
 #include <parsian_ai/plans/plans.h>
 #include <parsian_ai/plays/plays.h>
+#include <parsian_ai/roles/stop.h>
 
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
@@ -37,14 +38,12 @@ public:
     ~CCoach();
     void execute();
     void saveGoalie(); // TODO : Move To roles/Agent
-//    DefensePlan& getDefense();
-    QList<int> findBestPoses(int numberOfPositionAgents);
+    DefensePlan& getDefense();
     BallPossesion lastBallPossesionState;
     BallPossesion isBallOurs();
-//    CKnowledge::ballPossesionState ballPStateIntented;
+    BallPossesion ballPStateIntented;
+    BallPossesion ballPState;
 //    static QMap<QString, EditData*> editData; //Contains Formations
-    /*  ClassProperty(CCoach, Vector2D, LastBallVelPm, lastBallVelPM, updated);
-      ClassProperty(CCoach, Vector2D, LastBallPos, lastBallPos, updated);*/
 
 private:
     bool lastASWasCritical;
@@ -54,12 +53,11 @@ private:
     Vector2D lastBallPos;
     bool updated;
     double findMostPossible(Vector2D agentPos);
-//    CKnowledge::State kkLastState;
+    States lastState;
     CAgent *goalieAgent;
     CAgent *exeptionPlayMake;
     double exeptionPlayMakeThr;
     QList<CAgent*> defenseAgents;
-//    DefensePlan defenses;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
     Vector2D defenseTargets[12];
@@ -73,22 +71,22 @@ private:
 
     CMasterPlay          *selectedPlay;
 
-//    CPlayOff             *ourPlayOff;
-//    COurPenalty          *ourPenalty;
-//    COurBallPlacement    *ourBallPlacement;
-//
-//    CTheirDirect         *theirDirect;
-//    CTheirPenalty        *theirPenalty;
-//    CTheirKickOff        *theirKickOff;
-//    CTheirIndirect       *theirIndirect;
-//    CTheirBallPlacement  *theirBallPlacement;
-//
-//    CDynamicAttack       *dynamicAttack;
-//
-//    CStopPlay            *stopPlay;
-//
-//
-//    CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+    CPlayOff             *ourPlayOff;
+    COurPenalty          *ourPenalty;
+    COurBallPlacement    *ourBallPlacement;
+
+    CTheirDirect         *theirDirect;
+    CTheirPenalty        *theirPenalty;
+    CTheirKickOff        *theirKickOff;
+    CTheirIndirect       *theirIndirect;
+    CTheirBallPlacement  *theirBallPlacement;
+
+    CDynamicAttack       *dynamicAttack;
+
+    CStopPlay            *stopPlay;
+
+
+    CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
@@ -111,7 +109,6 @@ private:
     QList <CAgent*> lastDefenseAgents;
     QList <int> lastDefenderAgents;
 
-    void clearIntentions();
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
@@ -148,19 +145,19 @@ private:
 
 
     ///////////////////////New Play Off
-//    void selectPlayOffMode(int agentSize, NGameOff::EMode& _mode);
-//    void initPlayOffMode(NGameOff::EMode _mode,
-//                         POMODE _gameMode,
-//                         const QList<int>& _agentSize);
-//    void setPlayOff(NGameOff::EMode _mode);
-//    void initStaticPlay(POMODE _mode, const QList<int>& _agentSize);
-//    void initDynamicPlay(QList<int> _ourplayers);
-//    void initFastPlay(QList<int> _ourplayers);
-//    void initFirstPlay(QList<int> _ourplayers);
-//    void setStaticPlay();
-//    void setDynamicPlay();
-//    void setFirstPlay();
-//    void setFastPlay();
+    void selectPlayOffMode(int agentSize, NGameOff::EMode& _mode);
+    void initPlayOffMode(NGameOff::EMode _mode,
+                         POMODE _gameMode,
+                         const QList<int>& _agentSize);
+    void setPlayOff(NGameOff::EMode _mode);
+    void initStaticPlay(POMODE _mode, const QList<int>& _agentSize);
+    void initDynamicPlay(const QList<int> &_ourplayers);
+    void initFastPlay(const QList<int> &_ourplayers);
+    void initFirstPlay(const QList<int> &_ourplayers);
+    void setStaticPlay();
+    void setDynamicPlay();
+    void setFirstPlay();
+    void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
 
     bool isTagsMatched(const QStringList& base, const QStringList& required);

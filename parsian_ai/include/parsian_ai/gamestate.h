@@ -8,7 +8,7 @@
 #include <parsian_msgs/ssl_refree_stage.h>
 
 
-enum States{
+enum class States{
     Halt,
     PlayOff,
     PlayOn,
@@ -40,50 +40,50 @@ using namespace  parsian_msgs;
 
 class GameState {
 private:
-    enum States state;
+    States state;
     int ourScore,theirScore;
     bool isReady;
 public:
 
 
 
-  GameState();
-  bool ready();
-  void setRefree(ssl_refree_wrapperConstPtr ref_wrapper);
-  bool isPlayOn();
-  bool isPlayOff();
-  bool restart();
-  bool ourRestart();
-  bool theirRestart();
-  bool kickoff();
-  bool ourKickoff();
-  bool theirKickoff();
-  bool penaltyKick();
-  bool ourPenaltyKick();
-  bool theirPenaltyKick();
-  bool directKick();
-  bool ourDirectKick();
-  bool theirDirectKick();
-  bool indirectKick();
-  bool ourIndirectKick();
-  bool theirIndirectKick();
-  bool freeKick();
-  bool ourFreeKick();
-  bool theirFreeKick();
-  bool canMove();
-  bool allowedNearBall();
-  bool canKickBall();
-  int  getOurScore();
-  int  getTheirScore();
-  bool ballPlacement();
-  bool ourBallPlacement();
-  bool theirBallPlacement();
-  bool halfTimeLineUp();
-  bool penaltyShootout();
-  bool ourPenaltyShootout();
-  bool theirPenaltyShootout();
-    ////
-  enum States getState();
+    GameState();
+    bool ready();
+    void setRefree(ssl_refree_wrapperConstPtr ref_wrapper);
+    bool isPlayOn();
+    bool isPlayOff();
+    bool restart();
+    bool ourRestart();
+    bool theirRestart();
+    bool kickoff();
+    bool ourKickoff();
+    bool theirKickoff();
+    bool penaltyKick();
+    bool ourPenaltyKick();
+    bool theirPenaltyKick();
+    bool directKick();
+    bool ourDirectKick();
+    bool theirDirectKick();
+    bool indirectKick();
+    bool ourIndirectKick();
+    bool theirIndirectKick();
+    bool freeKick();
+    bool ourFreeKick();
+    bool theirFreeKick();
+    bool canMove();
+    bool allowedNearBall();
+    bool canKickBall();
+    int  getOurScore();
+    int  getTheirScore();
+    bool ballPlacement();
+    bool ourBallPlacement();
+    bool theirBallPlacement();
+    bool halfTimeLineUp();
+    bool penaltyShootout();
+    bool ourPenaltyShootout();
+    bool theirPenaltyShootout();
+
+    States getState();
 };
 extern GameState *gameState;
 #endif

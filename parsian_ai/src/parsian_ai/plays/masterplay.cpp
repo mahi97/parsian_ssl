@@ -1,9 +1,12 @@
 #include <parsian_ai/plays/masterplay.h>
 
+#include <utility>
+
 PositioningPlan CMasterPlay::positioningPlan;
-CRolePlayMake CMasterPlay::playMakeRole;
 CMarkPlan CMasterPlay::markPlan;
-CRoleBlock CMasterPlay::blockRole;
+DefensePlan CMasterPlay::defensePlan;
+CRolePlayMake CMasterPlay::playMakeRole(nullptr);
+CRoleBlock CMasterPlay::blockRole(nullptr);
 
 CMasterPlay::CMasterPlay(){
     executedCycles = 0;
@@ -11,13 +14,11 @@ CMasterPlay::CMasterPlay(){
     //defenseN = 2;
 }
 
-CMasterPlay::~CMasterPlay(){
-
-}
+CMasterPlay::~CMasterPlay() = default;
 
 void CMasterPlay::initMaster(){
-    blockAgent = NULL;
-    playMakeAgent = NULL;
+    blockAgent = nullptr;
+    playMakeAgent = nullptr;
     positionAgents.clear();
     if(gameState->isPlayOn())
         markAgents.clear();
@@ -46,12 +47,12 @@ void CMasterPlay::setAgentsID(QList<int> _agentsID){
 }
 
 void CMasterPlay::setFormation(QString _formationName){
-    formationName = _formationName;
+    formationName = std::move(_formationName);
 }
 
 void CMasterPlay::setStaticPoints(QList< holdingPoints > _staticPoints){
     staticInited = true;
-    masterStaticPoints = _staticPoints;
+    masterStaticPoints = std::move(_staticPoints);
 }
 
 void CMasterPlay::resetPositioning(){
@@ -69,8 +70,8 @@ void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
 
     QList <int> remainings;
 
-    for( int i=0 ; i<agentsID.size(); i++ ){
-        remainings.append(agentsID.at(i));
+    for (int i : agentsID) {
+        remainings.append(i);
     }
 
     if( blockAgent ){
@@ -80,20 +81,16 @@ void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
         remainings.removeOne(playMakeAgent->id());
     }
 
-    if( markAgents.size() ){
-        for( int i=0 ; i<markAgents.size() ; i++ ){
-            remainings.removeOne(markAgents.at(i)->id());
-        }
+    for (auto markAgent : markAgents) {
+        remainings.removeOne(markAgent->id());
     }
 
-    if( positionAgents.size() ){
-        for( int i=0 ; i<positionAgents.size() ; i++ ){
-            remainings.removeOne(positionAgents.at(i)->id());
-        }
+    for (auto positionAgent : positionAgents) {
+        remainings.removeOne(positionAgent->id());
     }
 
-    for( int i=0 ; i<remainings.size() ; i++ ){
-        _list.append(soccer->agents[remainings.at(i)]);
+    for (int remaining : remainings) {
+        _list.append(soccer->agents[remaining]);
     }
 }
 
@@ -101,8 +98,8 @@ void CMasterPlay::choosePlayMaker(){
     int playMakeID = -1;
     QList <CAgent *> playAgents;
     playAgents.clear();
-    for( int i=0 ; i < agentsID.size() ; i++ ){
-        playAgents.append(soccer->agents[agentsID.at(i)]);
+    for (int i : agentsID) {
+        playAgents.append(soccer->agents[i]);
     }
 
 
@@ -141,8 +138,8 @@ void CMasterPlay::chooseBlocker(){
     int blockID = -1;
     QList <CAgent *> playAgents;
     playAgents.clear();
-    for( int i=0 ; i<agentsID.size() ; i++ ){
-        playAgents.append(soccer->agents[agentsID.at(i)]);
+    for (int i : agentsID) {
+        playAgents.append(soccer->agents[i]);
     }
 
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
@@ -171,11 +168,11 @@ void CMasterPlay::chooseBlocker(){
 
 
 bool CMasterPlay::canOneTouch(QList<CAgent *> posAgents, CAgent *playMake){
-    for( int i=0 ; i<posAgents.size() ; i++ ){
+    for (auto posAgent : posAgents) {
         QList<int> ourRelaxIDS,oppRelaxIDS;
-        int positioner = posAgents.at(i)->id();
+        int positioner = posAgent->id();
         ourRelaxIDS.push_back(positioner);
-        Vector2D pos = posAgents.at(i)->pos() + posAgents.at(i)->dir().setLengthVector(CRobot::center_from_kicker_new);
+        Vector2D pos = posAgent->pos() + posAgent->dir().setLengthVector(CRobot::center_from_kicker_new);
         if( getOpenness( pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS ) > 0.8 )
             return true;
     }
@@ -211,8 +208,8 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
             if( lowerbound < least )
                 lowerbound = least;
 
-            blockedLines.push( qMakePair(TOP,upperbound) );
-            blockedLines.push( qMakePair(BOT,lowerbound) );
+            blockedLines.push( qMakePair(edgeMode::TOP,upperbound) );
+            blockedLines.push( qMakePair(edgeMode::BOT,lowerbound) );
         }
     }
     for (int i=0;i<wm->opp.activeAgentsCount();i++)
@@ -234,8 +231,8 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
             if( lowerbound < least )
                 lowerbound = least;
 
-            blockedLines.push( qMakePair(TOP,upperbound) );
-            blockedLines.push( qMakePair(BOT,lowerbound) );
+            blockedLines.push( qMakePair(edgeMode::TOP,upperbound) );
+            blockedLines.push( qMakePair(edgeMode::BOT,lowerbound) );
         }
     }
 
@@ -251,13 +248,13 @@ double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double 
     obstacles.pop();
     QPair< edgeMode , double > second_lastest = obstacles.top();
 
-    if( lastest.first == TOP && second_lastest.first == TOP )
+    if( lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP )
         return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
-    else if( lastest.first == BOT && second_lastest.first == BOT )
+    else if( lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT )
         return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
-    else if( lastest.first == TOP && second_lastest.first == BOT )
+    else if( lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT )
         return ( lastest.second - second_lastest.second ) + coveredArea( obstacles );
 
     else
@@ -267,29 +264,29 @@ double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double 
 void CMasterPlay::execute() {
 
     switch(agentsID.count()) {
-    case 0:
-        execute_0();
-        break;
-    case 1:
-        execute_1();
-        break;
-    case 2:
-        execute_2();
-        break;
-    case 3:
-        execute_3();
-        break;
-    case 4:
-        execute_4();
-        break;
-    case 5:
-        execute_5();
-        break;
-    case 6:
-        execute_6();
-        break;
-    default:
-        DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
+        case 0:
+            execute_0();
+            break;
+        case 1:
+            execute_1();
+            break;
+        case 2:
+            execute_2();
+            break;
+        case 3:
+            execute_3();
+            break;
+        case 4:
+            execute_4();
+            break;
+        case 5:
+            execute_5();
+            break;
+        case 6:
+            execute_6();
+            break;
+        default:
+            DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
     }
     execPlay();
 }
@@ -310,14 +307,14 @@ void CMasterPlay::execPlay(){
     }
 
 
-    if( markAgents.size() ){
+    if(!markAgents.empty()){
         markPlan.init(markAgents);
         markPlan.execute();
     }
 
     if( gameState->isPlayOff() )
     {
-        if( positionAgents.size() ){
+        if(!positionAgents.empty()){
             ///////// added to prevent Segmentatino fault! //////////
             DBUG(QString("Invalid Formation Name: %1").arg(formationName) , D_ERROR);
             formationName = "Stop6";
@@ -328,8 +325,4 @@ void CMasterPlay::execPlay(){
             positioningPlan.execute();
         }
     }
-}
-
-int CMasterPlay::getDefenseNum() {
-    return 0;
 }
