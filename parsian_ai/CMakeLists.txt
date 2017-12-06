@@ -18,6 +18,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+file(GLOB_RECURSE LibFiles "include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -126,7 +129,8 @@ add_library(${PROJECT_NAME}
 
 
 add_library(${PROJECT_NAME}_nodelet
-        src/ai_nodelet.cpp)
+        src/ai_nodelet.cpp
+		)
 
 
 ## Add cmake target dependencies of the library
@@ -167,7 +171,8 @@ add_dependencies(${PROJECT_NAME}_nodelet
 target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
-		${QT_LIBRARIES})
+		${QT_LIBRARIES}
+		)
 
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
