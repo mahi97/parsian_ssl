@@ -8,6 +8,7 @@
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_no.h>
+#include <list>
 
 class NoAction : public Action {
 
@@ -20,8 +21,9 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(NoAction, quint8, Robot_Id, robot_id);
+    SkillProperty(NoAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(NoAction, bool, Waithere, waithere);
+
 
 };
 

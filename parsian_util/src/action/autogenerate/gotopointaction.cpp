@@ -46,3 +46,4 @@ QString GotopointAction::getActionName(){
     static QString name("GotopointAction");
     return name;
 }
+

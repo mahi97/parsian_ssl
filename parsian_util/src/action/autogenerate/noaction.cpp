@@ -22,3 +22,4 @@ QString NoAction::getActionName(){
     static QString name("NoAction");
     return name;
 }
+
