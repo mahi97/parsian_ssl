@@ -3,33 +3,40 @@
 //
 #include <rqt_parsian_gui/robotstatus_widget.h>
 
+
 namespace rqt_parsian_gui
 {
     RobotStatusWidget::RobotStatusWidget(ros::NodeHandle & n) :QWidget() {
         list = glGenLists(0);
         glNewList(list, GL_COMPILE);
-        this ->setFixedSize(550,300);
+        this ->setFixedSize(400,150);
+
+        QFile file("resource/style_sheet/check_box.ssh");
+        bool bOpened = file.open(QFile::ReadOnly);
+        assert (bOpened);
+        QString styleSheet = QLatin1String(file.readAll());
 
         //########################################### layouts
         robot_vel_l = new QVBoxLayout;
-        sensors_l = new QVBoxLayout;
+        status_l = new QVBoxLayout;
         battery_l = new QVBoxLayout;
         data_loss_l = new QVBoxLayout;
-        main_layout = new QGridLayout;
-        faults_l = new QGridLayout;
-        main_layout = new QGridLayout;
+        main_layout = new QHBoxLayout;
+        faults_l = new QVBoxLayout;
+        motors_l = new QHBoxLayout;
+        encoders_l = new QHBoxLayout;
         //########################################### group boxs
         robot_vel = new QGroupBox("Robot Vel",this);
         battery = new QGroupBox("Battery",this);
         data_loss = new QGroupBox("Data Loss",this);
-        sensors = new QGroupBox("Sensors",this);
+        status = new QGroupBox("Status",this);
         faults = new QGroupBox("Faults",this);
 
-        robot_vel->setFixedSize(150,300);
-        battery->setFixedSize(150,50);
-        data_loss->setFixedSize(150,50);
-        sensors->setFixedSize(150,100);
-        faults->setFixedSize(200,300);
+        robot_vel->setFixedSize(80,120);
+        battery->setFixedSize(120,40);
+        data_loss->setFixedSize(120,40);
+        status->setFixedSize(120,120);
+        faults->setFixedSize(120,120);
 
         //############################################################### progress bars
 
@@ -39,16 +46,6 @@ namespace rqt_parsian_gui
         battery_l->addWidget(battery_percentage);
         data_loss_l->addWidget(data_loss_percentage);
 
-        //############################################################### faults
-
-        shoot_sens = new QCheckBox("Shoot Sensor");
-        spin_sens = new QCheckBox("Spin Sensor");
-
-        shoot_sens->setEnabled(false);
-        spin_sens->setEnabled(false);
-
-        sensors_l->addWidget(shoot_sens);
-        sensors_l->addWidget(spin_sens);
 
         //############################################################### faults
 
@@ -56,14 +53,14 @@ namespace rqt_parsian_gui
         encoders_f = new QCheckBox*[4];
         for(int i=0;i<4;i++) {
             motors_f[i] = new QCheckBox("M"+QString::number(i+1));
-            motors_f[i]->setFixedSize(45,30);
+            motors_f[i]->setStyleSheet(styleSheet);
             motors_f[i]->setEnabled(false);
-            faults_l->addWidget(motors_f[i],0,i);
+            motors_l->addWidget(motors_f[i]);
             //----------------
             encoders_f[i] = new QCheckBox("E"+QString::number(i+1));
-            encoders_f[i]->setFixedSize(45,30);
+            encoders_f[i]->setStyleSheet(styleSheet);
             encoders_f[i]->setEnabled(false);
-            faults_l->addWidget(encoders_f[i],1,i);
+            encoders_l->addWidget(encoders_f[i]);
         }
 
         kick_f = new QCheckBox("Kick");
@@ -76,28 +73,44 @@ namespace rqt_parsian_gui
         shoot_sens_f->setEnabled(false);
         shoot_board_f->setEnabled(false);
 
-        kick_f->setFixedSize(185,30);
-        chip_f->setFixedSize(185,30);
-        shoot_sens_f->setFixedSize(185,30);
-        shoot_board_f->setFixedSize(185,30);
+        kick_f->setStyleSheet(styleSheet);
+        chip_f->setStyleSheet(styleSheet);
+        shoot_sens_f->setStyleSheet(styleSheet);
+        shoot_board_f->setStyleSheet(styleSheet);
 
-        faults_l->addWidget(kick_f,2,0);
-        faults_l->addWidget(chip_f,3,0);
-        faults_l->addWidget(shoot_sens_f,4,0);
-        faults_l->addWidget(shoot_board_f,5,0);
-        //############################################## add widgets and layouts
+        faults_l->addLayout(motors_l);
+        faults_l->addLayout(encoders_l);
+        faults_l->addWidget(kick_f);
+        faults_l->addWidget(chip_f);
+        faults_l->addWidget(shoot_sens_f);
+        faults_l->addWidget(shoot_board_f);
 
-        robot_vel->setLayout(robot_vel_l);
-        sensors->setLayout(sensors_l);
+        //############################################################### status
+
+        shoot_sens = new QCheckBox("Shoot Sensor");
+        spin = new QCheckBox("Spin");
+
+        shoot_sens->setEnabled(false);
+        spin->setEnabled(false);
+
+        shoot_sens->setStyleSheet(styleSheet);
+        spin->setStyleSheet(styleSheet);
+
         battery->setLayout(battery_l);
         data_loss->setLayout(data_loss_l);
+
+        status_l->addWidget(battery);
+        status_l->addWidget(data_loss);
+        status_l->addWidget(shoot_sens);
+        status_l->addWidget(spin);
+        //############################################## add widgets and layouts
+        robot_vel->setLayout(robot_vel_l);
+        status->setLayout(status_l);
         faults->setLayout(faults_l);
         //---------------------------
-        main_layout->addWidget(robot_vel,0,0);
-        main_layout->addWidget(battery,0,1);
-        main_layout->addWidget(data_loss,1,1);
-        main_layout->addWidget(sensors,2,1);
-        main_layout->addWidget(faults,0,2);
+        main_layout->addWidget(robot_vel);
+        main_layout->addWidget(status);
+        main_layout->addWidget(faults);
         //--------------------------
         this->setLayout(main_layout);
     }

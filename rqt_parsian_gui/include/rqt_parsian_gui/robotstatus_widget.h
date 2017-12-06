@@ -1,4 +1,5 @@
 #include <QOpenGLWidget>
+#include <QFile>
 #include <QWidget>
 #include <QtOpenGL/qgl.h>
 #include <QSlider>
@@ -7,8 +8,8 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QProgressBar>
-#include <QGridLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPixmap>
 #include <QPainter>
 #include <parsian_msgs/parsian_robots_status.h>
@@ -36,11 +37,11 @@ namespace rqt_parsian_gui {
         parsian_msgs::parsian_robot_statusConstPtr robotStatus;
 
         //#######################################################
-        QGroupBox   *robot_vel,*battery,*data_loss,*sensors,*faults;
-        QGridLayout *main_layout,*faults_l;
-        QVBoxLayout *robot_vel_l,*battery_l,*data_loss_l,*sensors_l;
+        QGroupBox   *robot_vel,*battery,*data_loss,*status,*faults;
+        QVBoxLayout *robot_vel_l,*battery_l,*data_loss_l,*status_l,*faults_l;
+        QHBoxLayout *motors_l,*encoders_l,*main_layout;
         QProgressBar *battery_percentage, *data_loss_percentage;
-        QCheckBox ** motors_f,**encoders_f,*kick_f,*chip_f,*shoot_sens_f,*shoot_board_f,*shoot_sens,*spin_sens;
+        QCheckBox ** motors_f,**encoders_f,*kick_f,*chip_f,*shoot_sens_f,*shoot_board_f,*shoot_sens,*spin;
         QLabel *vel,*ang_vel,*agent;
         QPixmap agent_i;
         QPainter agent_p;
