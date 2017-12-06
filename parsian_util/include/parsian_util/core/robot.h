@@ -63,6 +63,11 @@ public:
         return (newRobot) ? wheel_rad_new : wheel_rad_old;
     }
 
+    Vector2D getKickerPos(double margin = 0)
+    {
+    	return pos + dir*(centerFromKicker()+margin);
+    }
+
 
 
 private:

@@ -96,6 +96,8 @@ public:
     bool isPointClear(Vector2D point, Vector2D from, double radBig, double radSmall, bool considerRelaxedIDs, QList<int>ourRelaxedIDs, QList<int>oppRelaxedIDs, QList<int>ourSmallIDs, QList<int>oppSmallIDs);
     double chipGoalPropability(bool isOurChip, Vector2D _goaliePos);
     int getNearestOppToPoint(Vector2D point);
+    int nearestOppToBall();
+
 
 
 
