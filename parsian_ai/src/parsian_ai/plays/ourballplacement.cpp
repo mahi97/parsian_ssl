@@ -1,5 +1,4 @@
-#include "plays/ourballplacement.h"
-#include "skills/autoballplacement.h"
+#include "parsian_ai/plays/ourballplacement.h"
 
 COurBallPlacement::COurBallPlacement(){
 
@@ -13,33 +12,32 @@ void COurBallPlacement::reset(){
 
 }
 
-void COurBallPlacement::init(QList<int> _agents, QMap<QString, EditData *> *_editData){
+void COurBallPlacement::init(QList<int> _agents){
     setAgentsID(_agents);
-    setEditData(_editData);
     initMaster();
 
-    if( knowledge->getLastPlayExecuted() != OurBallPlacement ){
-        reset();
-    }
-    knowledge->setLastPlayExecuted(OurBallPlacement);
+//    if( knowledge->getLastPlayExecuted() != OurBallPlacement ){
+//        reset();
+//    }
+//    knowledge->setLastPlayExecuted(OurBallPlacement);
 }
 
 
 void COurBallPlacement::execute_0(){
-    debug("execute_0 is running", D_ATOUSA);
-    debug("ballPlacement execute_0", D_ERROR);
+    DBUG("execute_0 is running", D_ATOUSA);
+    DBUG("ballPlacement execute_0", D_ERROR);
 }
 
 void COurBallPlacement::execute_1(){
 
-    debug("execute_1 is running", D_ATOUSA);
+    DBUG("execute_1 is running", D_ATOUSA);
 
     static CSkillAutoBallPlacement *abp = new CSkillAutoBallPlacement(knowledge->getAgent(agentsID.at(0)));
     abp->execute();
 }
 
 void COurBallPlacement::execute_2(){
-    debug("execute_2 is running", D_ATOUSA);
+    DBUG("execute_2 is running", D_ATOUSA);
 
     Vector2D ballPos = Vector2D(0,3);//??????
     float distt = 0;

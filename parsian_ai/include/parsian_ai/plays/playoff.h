@@ -1,7 +1,7 @@
 #ifndef PLAYOFF_H
 #define PLAYOFF_H
 
-#include "masterplay.h"
+#include "parsian_ai/plays/masterplay.h"
 
 #include <QtSql/QtSql>
 #include <QtSql/QSqlDatabase>
@@ -337,7 +337,7 @@ private:
 
     // Critical Play
     bool criticalPlay();
-    CSkillKick* criticalKick;
+    KickAction* criticalKick;
     bool criticalInit;
 
     bool initial;

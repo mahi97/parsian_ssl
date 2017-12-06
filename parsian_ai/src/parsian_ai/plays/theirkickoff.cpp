@@ -1,6 +1,6 @@
-#include "plays/theirkickoff.h"
-#include "roles/playmake.h"
-#include "soccer.h"
+#include "parsian_ai/plays/theirkickoff.h"
+#include "parsian_ai/roles/playmake.h"
+#include "parsian_ai/soccer.h"
 
 CTheirKickOff::CTheirKickOff(){
 }
@@ -13,15 +13,14 @@ void CTheirKickOff::reset(){
 	executedCycles = 0;
 }
 
-void CTheirKickOff::init(QList<int> _agents , QMap<QString , EditData*> *_editData){
+void CTheirKickOff::init(QList<int> _agents){
 	setAgentsID(_agents);
-	setEditData(_editData);
 	initMaster();
 
-	if( knowledge->getLastPlayExecuted() != TheirKickOffPlay ){
-		reset();
-	}
-	knowledge->setLastPlayExecuted(TheirKickOffPlay);
+//	if( knowledge->getLastPlayExecuted() != TheirKickOffPlay ){
+//		reset();
+//	}
+//	knowledge->setLastPlayExecuted(TheirKickOffPlay);
 }
 
 void CTheirKickOff::execute_0(){

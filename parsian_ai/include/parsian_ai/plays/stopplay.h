@@ -1,7 +1,7 @@
 #ifndef CSTOPPLAY_H
 #define CSTOPPLAY_H
 
-#include "masterplay.h"
+#include "parsian_ai/plays/masterplay.h"
 
 class CStopPlay : public CMasterPlay
 {
@@ -16,12 +16,12 @@ public:
     void execute_4();
     void execute_5();
     void execute_6();
-    void init(QList <int> _agents , QMap<QString , EditData*> *_editData);
+    void init(const QList <CAgent*>& _agents);
 private:
     void stopPosition();
     void reset();
 
-    CSkillGotoPointAvoid *gpa[6];
+    GotopointavoidAction *gpa[6];
     Vector2D rolePosition[6];
 
 };

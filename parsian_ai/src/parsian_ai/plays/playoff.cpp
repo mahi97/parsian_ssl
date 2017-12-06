@@ -1,4 +1,4 @@
-#include "plays/playoff.h"
+#include "parsian_ai/plays/playoff.h"
 
 
 CPlayOff::CPlayOff()
@@ -44,7 +44,7 @@ CPlayOff::CPlayOff()
     blockerStep= S0;
 
     criticalInit = true;
-    criticalKick = new CSkillKick(NULL);
+    criticalKick = new KickAction();
 }
 
 CPlayOff::~CPlayOff()
@@ -61,8 +61,8 @@ CPlayOff::~CPlayOff()
 bool CPlayOff:: isBlockDisturbing(){
     if(blockerState == 7)
         return true;
-    else if(policy()->PlayOff_UseForcedBlock()){
-        blockerID=knowledge->nearestOppToBall;
+    else if(conf.UseForcedBlock){
+//        blockerID=knowledge->nearestOppToBall; // TODO : FIX
         return true;
     }
     else
@@ -74,8 +74,8 @@ void CPlayOff::globalExecute() {
 
     if (masterMode == NGameOff::StaticPlay) {
 
-        debug(QString("lastTime : %1").arg(knowledge->getCurrentTime() - lastTime), D_MAHI);
-        if (knowledge->getCurrentTime() - lastTime > 1000 && !initial && lastBallPos.dist(wm->ball->pos) > 0.06) {
+        DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
+        if (ros::Time::now().sec - lastTime > 1000 && !initial && lastBallPos.dist(wm->ball->pos) > 0.06) {
             //             TODO : write critical play here
             if (criticalPlay()) {
                 playOnFlag = true;
@@ -84,16 +84,16 @@ void CPlayOff::globalExecute() {
         }
 
 
-        Q_ASSERT(masterPlan != NULL);
-        if(masterPlan != NULL) {
-            debug (QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
+        Q_ASSERT(masterPlan != nullptr);
+        if(masterPlan != nullptr) {
+            DBUG(QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
 
             if (initial) {
                 qDebug() << *masterPlan;
                 lastBallPos = wm->ball->pos;
-                lastTime = knowledge->getCurrentTime();
+                lastTime = ros::Time::now().sec;
 
-                if (isBlockDisturbing() && policy()->PlayOff_UseBlockBlocker()) {
+                if (isBlockDisturbing() && conf.UseBlockBlocker) {
                     masterPlan->common.currentSize -= 1;
                     BlockerStopperID = masterPlan->common.matchedID[masterPlan->common.currentSize];
 
@@ -102,8 +102,8 @@ void CPlayOff::globalExecute() {
                 staticExecute();
 
             }
-            debug(QString("policy:%1").arg(policy()->PlayOff_UseBlockBlocker()),D_NADIA);
-            if(isBlockDisturbing() && policy()->PlayOff_UseBlockBlocker()){
+            DBUG(QString("policy:%1").arg(conf.UseBlockBlocker),D_NADIA);
+            if(isBlockDisturbing() && conf.UseBlockBlocker){
                 agentsID.removeOne(BlockerStopperID);
                 if(BlockerExecute(BlockerStopperID)){
                     staticExecute();
@@ -154,7 +154,7 @@ bool CPlayOff::BlockerExecute(int agentID){
 
     switch(blockerStopStates){
     case Diversion:
-        if(newRoleAgent[0]->getRoleUpdate() == false) {
+        if(!newRoleAgent[0]->getRoleUpdate()) {
             newRoleAgent[0]->setUpdated(true);
             newRoleAgent[0]->setAgent(knowledge->getAgent(dynamicMatch[0]));
             newRoleAgent[0]->setRoleUpdate(true);
@@ -191,7 +191,7 @@ bool CPlayOff::BlockerExecute(int agentID){
 
 
         result = true;
-        debug("plan ejra sho",D_NADIA);
+        DBUG("plan ejra sho",D_NADIA);
         break;
     case BlockStop:
         ID=masterPlan->common.currentSize;
@@ -233,12 +233,12 @@ void CPlayOff::staticExecute() {
 
     } else {
 
-        if (knowledge->getGameState() != CKnowledge::OurKickOff) {
+        if (!gameState->ourKickoff()) {
 
             fillRoleProperties();
             posExecute();
             checkEndState();
-            debug(QString("ID : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            DBUG(QString("ID : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
             if(masterPlan->common.currentSize > 1 && havePassInPlan) {
                 passManager();
             }

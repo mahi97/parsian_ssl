@@ -1,7 +1,7 @@
 #ifndef DYNAMICATTACK_H
 #define DYNAMICATTACK_H
 
-#include"masterplay.h"
+#include <parsian_ai/plays/masterplay.h>
 
 //#define _MAX_REGION 7
 
@@ -35,7 +35,7 @@ public:
 
 
     CDynamicAttack();
-    ~CDynamicAttack();
+    ~CDynamicAttack() override;
 
     void execute_0();
     void execute_1();
@@ -44,8 +44,7 @@ public:
     void execute_4();
     void execute_5();
     void execute_6();
-    void init(QList <int> _agents ,
-              QMap<QString , EditData*> *_editData);
+    void init(QList <int> _agents);
 
     void setDefenseClear(bool _isDefenseClearing);
     void setDirectShot(bool _directShot);
@@ -53,7 +52,7 @@ public:
     void setWeHaveBall(bool _ballPoss);
     void setNoPlanException(bool _noPlanException);
     void setFast(bool _fast);
-    void setPlayMake(int _playMake);
+    void setPlayMake(CAgent* _playMake);
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
 
@@ -83,7 +82,6 @@ private:
     void makePlan(int agentSize);
     void assignId();
     void assignTasks();
-    void checkPlanner();
     ///////////////////////30em 2015
 
     //[RegionCount][RegionIndex]
@@ -162,6 +160,7 @@ private:
     bool isBallInOurField;
 
     int playmakeID = -1;
+    CAgent* playmake;
 
     Vector2D ballPos;
     Vector2D ballVel;
@@ -178,7 +177,7 @@ private:
 
 
 protected:
-    void reset();
+    void reset() override;
 
 
 };

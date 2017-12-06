@@ -1,6 +1,6 @@
-#include "plays/theirpenalty.h"
-#include "roles/playmake.h"
-#include "soccer.h"
+#include "parsian_ai/plays/theirpenalty.h"
+#include "parsian_ai/roles/playmake.h"
+#include "parsian_ai/soccer.h"
 
 CTheirPenalty::CTheirPenalty(){
 }
@@ -10,19 +10,18 @@ CTheirPenalty::~CTheirPenalty(){
 }
 
 void CTheirPenalty::reset(){
-	position.reset();
-	executedCycles = 0;
+    positioningPlan.reset();
+    executedCycles = 0;
 }
 
-void CTheirPenalty::init(QList<int> _agents , QMap<QString , EditData*> *_editData){
-	setAgentsID(_agents);
-	setEditData(_editData);
-	initMaster();
+void CTheirPenalty::init(QList<int> _agents) {
+    setAgentsID(_agents);
+    initMaster();
 
-	if( knowledge->getLastPlayExecuted() != TheirPenaltyPlay ){
-		reset();
-	}
-	knowledge->setLastPlayExecuted(TheirPenaltyPlay);
+//	if( knowledge->getLastPlayExecuted() != TheirPenaltyPlay ){
+//		reset();
+//	}
+//	knowledge->setLastPlayExecuted(TheirPenaltyPlay);
 }
 
 void CTheirPenalty::execute_0(){
@@ -30,51 +29,51 @@ void CTheirPenalty::execute_0(){
 }
 
 void CTheirPenalty::execute_1(){
-	executedCycles++;
-        if (wm->gs->penalty_shootout()) {
-            choosePlayMaker();
-        }
-            appendRemainingsAgents(positionAgents);
+    executedCycles++;
+    if (gameState->penaltyShootout()) {
+        choosePlayMaker();
+    }
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }
 
 void CTheirPenalty::execute_2(){
-	executedCycles++;
+    executedCycles++;
 
-	appendRemainingsAgents(positionAgents);
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }
 
 void CTheirPenalty::execute_3(){
-	executedCycles++;
+    executedCycles++;
 
-	appendRemainingsAgents(positionAgents);
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }
 
 void CTheirPenalty::execute_4(){
-	executedCycles++;
+    executedCycles++;
 
-	appendRemainingsAgents(positionAgents);
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }
 
 void CTheirPenalty::execute_5(){
-	executedCycles++;
+    executedCycles++;
 
-	appendRemainingsAgents(positionAgents);
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }
 
 void CTheirPenalty::execute_6(){
-	executedCycles++;
+    executedCycles++;
 
-	appendRemainingsAgents(positionAgents);
+    appendRemainingsAgents(positionAgents);
 
     setFormation("TheirP");
 }

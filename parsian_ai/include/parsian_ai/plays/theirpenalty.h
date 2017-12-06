@@ -14,7 +14,7 @@ public:
 	void execute_4();
 	void execute_5();
 	void execute_6();
-	void init(QList <int> _agents , QMap<QString , EditData*> *_editData);
+	void init(QList <int> _agents);
 private:
 	void reset();
 };

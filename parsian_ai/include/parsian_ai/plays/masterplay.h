@@ -37,14 +37,8 @@ public:
     CMasterPlay();
     virtual ~CMasterPlay();
     virtual void reset() = 0;
-    virtual void execute_0() = 0;
-    virtual void execute_1() = 0;
-    virtual void execute_2() = 0;
-    virtual void execute_3() = 0;
-    virtual void execute_4() = 0;
-    virtual void execute_5() = 0;
-    virtual void execute_6() = 0;
-    virtual void init(QList <int> _agents) = 0;
+    virtual void execute_x() = 0;
+    virtual void init(const QList <CAgent*>& _agents) = 0;
 
     void execute();
     virtual QString whoami() {return "MasterPlay";}
@@ -65,7 +59,7 @@ private:
 
 protected:
 
-    QList <int> agentsID;
+    QList <CAgent*> agentsID;
 
     int executedCycles;
     int defenseN ;
@@ -83,7 +77,7 @@ protected:
     static CRoleBlock blockRole;
 
     void initMaster();
-    void setAgentsID(QList <int> _agentsID);
+    void setAgentsID(const QList <CAgent*>& _agentsID);
     void setFormation(QString _formationName);
     void setStaticPoints(QList< holdingPoints > _staticPoints);
     void resetPositioning();

@@ -17,17 +17,6 @@
 #include <parsian_util/action/autogenerate/receivepassaction.h>
 #include <parsian_util/action/autogenerate/noaction.h>
 
-enum ESkill {
-    Gotopoint      = 0,
-    GotopointAvoid = 1,
-    Kick           = 2,
-    ReceivePass    = 3,
-    OneTouch       = 4,
-    Mark           = 5,  // After Life (Steady)
-    Support        = 6,  // After Life (Move for ball)
-    Defense        = 7   // After Life (Move back to our field)
-};
-
 class CRoleInfo;
 
 class CRole
@@ -47,7 +36,8 @@ protected:
     QString roleName;
 public:        
     bool calculated;
-    CRoleInfo(QString _roleName);
+
+    explicit CRoleInfo(QString _roleName);
 
     virtual CAgent* robot(int i);
     virtual int count();
@@ -56,10 +46,7 @@ public:
     virtual void reset(){}
 };
 
-#define ClassProperty(skill,type,name,local,chflag) \
-        public: inline type get##name() const {return local;} \
-        public: inline skill* set##name(type val) {local = val;chflag = true;return this;} \
-        protected: type local
+
 
 
 

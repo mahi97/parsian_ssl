@@ -16,7 +16,6 @@ CCoach::CCoach(CAgent**_agents)
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
-    lastSelected = -1;
     lastAssignCycle = -10;
     lastBallVelPM = Vector2D(0,0);
     lastBallPos = Vector2D(0,0);
@@ -914,7 +913,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     BallPossesion ballPState = isBallOurs();
 
     if(playmakeId > -1 && playmakeId < 12) {
-        dynamicAttack->setPlayMake(playmakeId);
+        dynamicAttack->setPlayMake(agents[playmakeId]);
         ourPlayers.removeOne(playmakeId);
         debugger->debug(QString("playMake : %1").arg(playmakeId), D_MHMMD);
     }
@@ -978,25 +977,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     }
 }
 
-bool CCoach::isTagsMatched(const QStringList& base, const QStringList& required) {
-    Q_FOREACH(QString tag, required)
-            if (!base.contains(tag))
-                return false;
-    return true;
-}
-
-bool CCoach::isTagsNearMatched(const QStringList& base, const QStringList& required) {
-    Q_FOREACH(QString tag, required)
-            if (base.contains(tag))
-                return true;
-    return false;
-}
-
-bool CCoach::isRegionMatched(const Vector2D &_ball, const double& regionRadius) {
-
-    return (wm->ball->pos.dist(_ball) < regionRadius);
-
-}
 
 void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     if (agentSize < 2) {
@@ -1004,13 +984,12 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (isFastPlay() && false) { // TODO : fastPlay should be completed!
         _mode = NGameOff::FastPlay;
 
-    } else if (knowledge->getGameState() == CKnowledge::OurKickOff
-               ||  knowledge->getGameMode()  == CKnowledge::OurKickOff) {
+    } else if (gameState->ourKickoff()) {
         _mode = NGameOff::StaticPlay;
     } else if (wm->ball->pos.x < -1) {
         _mode = NGameOff::DynamicPlay;
 
-    } else if (!firstIsFinished && policy()->PlayOff_UseFirstPlay()) {
+    } else if (!firstIsFinished && conf.UseFirstPlay) {
         _mode = NGameOff::FirstPlay;
 
     } else if (wm->ball->pos.x > -1) {
@@ -1159,48 +1138,36 @@ void CCoach::setFastPlay() {
 
 void CCoach::execute()
 {
-    //draw penalty area
-//    draw(Circle2D(Vector2D(_PENALTY_AREA_CIRCLE_X , 0) , _PENALTY_AREA_CIRCLE_RAD) , 0 , 360 , "red");
-
-    // reset idle state!
-//    for (int i = 0; i < _MAX_NUM_PLAYERS ; i++) {
-//        agents[i]->idle = false;
-//    }
 
     QTime timer;
     timer.start();
 
     // place your reset codes about knowledge vars in this function
-//    knowledge->resetEssentialVars();
-
-//    updateKnowledgeVars();
-
-//    doIntention();
-
-//    virtualTheirPlayOffState();
-//    decidePreferedDefenseAgentsCountAndGoalieAgent();
-//    debug(QString("TS : %1").arg(transientFlag), D_GAME);
-//    //    draw(QString("TS : %1").arg(transientFlag), Vector2D(2,-3));
-//    /////////////////////////////////////// choose playmake
+    virtualTheirPlayOffState();
+    decidePreferedDefenseAgentsCountAndGoalieAgent();
+    DBUG(QString("TS : %1").arg(transientFlag), D_GAME);
+    //    draw(QString("TS : %1").arg(transientFlag), Vector2D(2,-3));
+    /////////////////////////////////////// choose playmake
     double critAreaRadius = 1.6;
-//    Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
-//    playmakeId = -1;
-//    if((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && knowledge->stateForMark != "BlockPass")) {
-//        decideDefense();
-//        choosePlaymakeAndSupporter(true);
-//    } else {
-//        choosePlaymakeAndSupporter(false);
-//        decideDefense();
-//    }
-//
-//    ////////////////////////////////////////////
-//
-//    decideAttack();
-//    checkSensorShootFault();
-//    // checks whether the goalie is under the net or not if it is moves out
-//    checkGoalieInsight();
-//    // Old Role Base Execution -- used for block, old_playmaker
-//    checkRoleAssignments();
+    Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
+    playmakeId = -1;
+    if((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")) {
+        decideDefense();
+        choosePlaymakeAndSupporter(true);
+    } else {
+        choosePlaymakeAndSupporter(false);
+        decideDefense();
+    }
+
+    ////////////////////////////////////////////
+
+    decideAttack();
+    checkSensorShootFault();
+    // checks whether the goalie is under the net or not if it is moves out
+    checkGoalieInsight();
+    // Old Role Base Execution -- used for block, old_playmaker
+    checkRoleAssignments();
+// TODO : SKILL HANDLE IN MSG
 //    for (int i=0;i<_NUM_PLAYERS;i++) {
 //        if (agents[i]->isVisible() && agents[i]->idle == false) {
 //            if (agents[i]->skill != NULL) {
@@ -1208,8 +1175,8 @@ void CCoach::execute()
 //            }
 //        }
 //    }
-//
-//    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
+
+    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
 }
 
 void CCoach::checkRoleAssignments()
@@ -1228,25 +1195,6 @@ void CCoach::checkRoleAssignments()
 }
 
 DefensePlan& CCoach::getDefense() {return selectedPlay->defensePlan;}
-
-void CCoach::savePostAssignment()
-{
-    QFile file("posts");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-    QStringList s1, s2;
-    for (int i=0;i<defenseAgents.size();i++)
-    {
-        s1.append(QString("%1").arg(defenseAgents.at(i)->id()));
-    }
-    //	for (int i=0;i<knowledge->currentFormation.second.count();i++)
-    //	{
-    //		s2.append(QString("%1").arg(knowledge->currentFormation.second.at(i)));
-    //	}
-    QTextStream out(&file);
-    out << QString(s1.join(",")/*+QString(";")+s2.join(",")*/) << "\n";
-}
-
 
 void CCoach::decideHalt(QList<int>& _ourPlayers) {
     firstTime = true;

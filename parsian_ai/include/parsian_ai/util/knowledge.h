@@ -4,6 +4,7 @@
 #include <parsian_util/mathtools.h>
 #include <parsian_util/core/agent.h>
 #include <parsian_util/core/worldmodel.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <QVariant>
 #include <QMap>
 
@@ -87,12 +88,12 @@ public:
 
 
     NewFastestToBall newFastestToBall(double timeStep = 0.1, QList<int> ourList=wm->our.data->activeAgents, QList<int> oppList=wm->opp.data->activeAgents);
-    int Matching(const QList <CAgent*> robots, const QList <Vector2D> pointsToMatch, QList <int> &matchPoints);
+    int Matching(QList <CAgent*> robots, QList <Vector2D> pointsToMatch, QList <int> &matchPoints);
     Vector2D getPointInDirection(Vector2D firstPoint , Vector2D secondPoint , double proportion);
     double getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circle2D> obs, double& percent, double &mostOpenAngle, double& biggestAngle, bool oppGoal, bool _draw = false);
     double getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circle2D> obs, double& percent, double &mostOpenAngle, double& biggestAngle);
     Vector2D getEmptyPosOnGoal(Vector2D from, double &regionWidth, bool oppGoal, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs, double wOpenness = 0.5, bool _draw = false);
-    bool isPointClear(Vector2D point, Vector2D from, double rad = 0.0795, bool considerRelaxedIDs = false, QList<int> ourRelaxedIDs = NULL, QList<int> oppRelaxedIDs = NULL);
+    bool isPointClear(Vector2D point, Vector2D from, double rad = 0.0795, bool considerRelaxedIDs = false, QList<int> ourRelaxedIDs = QList<int>(), QList<int> oppRelaxedIDs = QList<int>());
     bool isPointClear(Vector2D point, Vector2D from, double radBig, double radSmall, bool considerRelaxedIDs, QList<int>ourRelaxedIDs, QList<int>oppRelaxedIDs, QList<int>ourSmallIDs, QList<int>oppSmallIDs);
     double chipGoalPropability(bool isOurChip, Vector2D _goaliePos);
     int getNearestOppToPoint(Vector2D point);

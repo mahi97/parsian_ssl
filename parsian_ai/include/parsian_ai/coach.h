@@ -41,9 +41,7 @@ public:
     DefensePlan& getDefense();
     BallPossesion lastBallPossesionState;
     BallPossesion isBallOurs();
-    BallPossesion ballPStateIntented;
     BallPossesion ballPState;
-//    static QMap<QString, EditData*> editData; //Contains Formations
 
 private:
     bool lastASWasCritical;
@@ -51,7 +49,6 @@ private:
     bool passPlayMake;
     Vector2D lastBallVelPM;
     Vector2D lastBallPos;
-    bool updated;
     double findMostPossible(Vector2D agentPos);
     States lastState;
     CAgent *goalieAgent;
@@ -64,10 +61,8 @@ private:
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
-    QTime playMakeSelectTime;
     double playMakeIntentionInterval;
     double possessionIntentionInterval;
-    double playMakeIntended;
 
     CMasterPlay          *selectedPlay;
 
@@ -93,9 +88,6 @@ private:
     CAgent** agents;
     int lastAssignCycle;
 
-    QPair<QList<CAgent *>, QList<CAgent *> > lastAssign;
-    void savePostAssignment();
-    void loadPostAssignment();
     void checkRoleAssignments();
     ///////manage over number of agents
     ///
@@ -104,10 +96,8 @@ private:
     bool first;
     QList <int> missMatchIds;
     ///////////////////////////////////////
-    int lastSelected;
     int cyclesWaitAfterballMoved;
     QList <CAgent*> lastDefenseAgents;
-    QList <int> lastDefenderAgents;
 
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
@@ -126,7 +116,7 @@ private:
     bool isBallcollide();
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
-    int playmakeId,supporterId;
+    int playmakeId;
     double playMakeTh;
     int lastPlayMake;
     void choosePlaymakeAndSupporter(bool defenseFirst);
@@ -137,8 +127,7 @@ private:
     {
         SAFE     = 0,
         FAST     = 1,
-        CRITICAL = 2,
-        BallInOppJaw  = 3
+        CRITICAL = 2
     };
     attackState ourAttackState;
     void updateAttackState();
@@ -160,13 +149,8 @@ private:
     void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
 
-    bool isTagsMatched(const QStringList& base, const QStringList& required);
-    bool isTagsNearMatched(const QStringList& base, const QStringList& required);
 
-    bool isRegionMatched(const Vector2D& _ball, const double& _radius = 1.0); //circular Matching
-    QStringList currentTags;
     int preferedShotSpot;
-    QStringList guiTags; // TODO : add tags to gui playoffTab
 
     QList<int> lastPlayers;
     Vector2D lastBallVel;
@@ -181,7 +165,6 @@ private:
     void decideTheirDirect        (QList<int>&);
     void decideOurPenalty         (QList<int>&);
     void decideTheirPenalty       (QList<int>&);
-    void decideNormalStart        (QList<int>&);
     void decideStart              (QList<int>&);
     void decideOurBallPlacement   (QList<int>&);
     void decideTheirBallPlacement (QList<int>&);
@@ -201,8 +184,8 @@ private:
 
     // MAHI ADD IN ROS
     QList <CRobot*> toBeMopps;
-    QList <CRobot*> toBeMoppsPast;
     int desiredDefCount;
+    QString stateForMark;
 };
 
 #endif //PARSIAN_AI_COACH_H

@@ -98,17 +98,17 @@ add_library(${PROJECT_NAME}
 )
 
 add_library(${PROJECT_NAME}_plays
-#		src/parsian_ai/plays/dynamicattack.cpp
+		src/parsian_ai/plays/dynamicattack.cpp
 		src/parsian_ai/plays/masterplay.cpp
 #		src/parsian_ai/plays/ourballplacement.cpp
-#		src/parsian_ai/plays/playoff.cpp
-#		src/parsian_ai/plays/ourpenalty.cpp
-#		src/parsian_ai/plays/theirpenalty.cpp
-#		src/parsian_ai/plays/theirkickoff.cpp
-#		src/parsian_ai/plays/theirindirect.cpp
-#		src/parsian_ai/plays/theirdirect.cpp
-#		src/parsian_ai/plays/theirballplacement.cpp
-#		src/parsian_ai/plays/stopplay.cpp
+		src/parsian_ai/plays/playoff.cpp
+		src/parsian_ai/plays/ourpenalty.cpp
+		src/parsian_ai/plays/theirpenalty.cpp
+		src/parsian_ai/plays/theirkickoff.cpp
+		src/parsian_ai/plays/theirindirect.cpp
+		src/parsian_ai/plays/theirdirect.cpp
+		src/parsian_ai/plays/theirballplacement.cpp
+		src/parsian_ai/plays/stopplay.cpp
 		)
 
 add_library(${PROJECT_NAME}_plans

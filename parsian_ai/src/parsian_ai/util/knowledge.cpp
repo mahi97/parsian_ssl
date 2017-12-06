@@ -19,7 +19,7 @@ void Knowledge::initVariables()
     variables[Def_Var].toMap()["stateForMark"] = QString("");
     variables[Def_Var].toMap()["lastStateForMark"] = QString("");
     variables[Def_Var].toMap()["defenseOneTouchMode"] = false;
-    variables[Def_Var].toMap()"defenseClearMode"] = false;
+    variables[Def_Var].toMap()["defenseClearMode"] = false;
     variables[Def_Var].toMap()["goalKeeperClearMode"] = false;
     variables[Def_Var].toMap()["goalKeeperOneTouchMode"] = false;
     variables[Def_Var].toMap()["clearing"] = "false";
@@ -425,16 +425,16 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circl
     }
 
     for (int i=0;i<r.count();i++)
-        drawer->(Segment2D(p, p + Vector2D::unitVector(r[i].angle)), "red");
+        drawer->draw(Segment2D(p, p + Vector2D::unitVector(r[i].angle)), "red");
 
     emptyAngles.clear();
     AngleRange rng;
     rng.begin = r[0].angle;
     rng.end = r[0].angle;
-    if (r[0].begin == true) emptyAngles.append(rng);
+    if (r[0].begin) emptyAngles.append(rng);
     rng.begin = r[1].angle;
     rng.end = r[1].angle;
-    if (r[1].begin == false) emptyAngles.append(rng);
+    if (!r[1].begin) emptyAngles.append(rng);
     qSort(r.begin(), r.end());
     double ang = 0.0;
     biggestAngle = 0.0;
@@ -446,12 +446,12 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circl
         if (par < 0) par = 0;
         if (i>=0)
         {
-            if ((r[i].begin == false) && (r[i+1].begin == true) && (par==0))
+            if (!r[i].begin && r[i + 1].begin && (par == 0))
             {
-                AngleRange rng;
-                rng.begin = r[i].angle;
-                rng.end = r[i+1].angle;
-                emptyAngles.append(rng);
+                AngleRange tempRange;
+                tempRange.begin = r[i].angle;
+                tempRange.end = r[i+1].angle;
+                emptyAngles.append(tempRange);
                 double d = fabs(AngleDeg::normalize_angle(r[i+1].angle-r[i].angle));
                 ang += d;
                 if (d>biggestAngle)

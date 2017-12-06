@@ -41,7 +41,7 @@ bool CMasterPlay::canScore(){
 }
 
 
-void CMasterPlay::setAgentsID(QList<int> _agentsID){
+void CMasterPlay::setAgentsID(const QList<CAgent*>& _agentsID){
     agentsID.clear();
     agentsID.append(_agentsID);
 }

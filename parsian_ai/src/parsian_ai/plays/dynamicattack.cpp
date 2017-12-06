@@ -1,4 +1,4 @@
-#include "dynamicattack.h"
+#include <parsian_ai/plays/dynamicattack.h>
 
 CDynamicAttack::CDynamicAttack() {
     dribbleIntention.start();
@@ -6,12 +6,12 @@ CDynamicAttack::CDynamicAttack() {
     //isShotInPass = false;
     lastPassPosLoc = Vector2D(5000, 5000);
     guardSize = 3;
-    for(int i = 0; i < 6; i++)
-        lastGuards[i] = -1;
+    for (int &lastGuard : lastGuards)
+        lastGuard = -1;
     positioningIntentionInterval = 500;
     shotInPass = false;
 
-    for(size_t i = 0;i  < 6;i++) {
+    for(int i = 0;i  < 6;i++) {
         roleAgents[i] = new CRoleDynamic();
     }
     roleAgentPM = new CRoleDynamic();
@@ -23,8 +23,7 @@ CDynamicAttack::CDynamicAttack() {
     currentPlan.agentSize = 0;
     lastPasserRoleIndex  = -1;
 
-    if(ballPos.x >= 0) isBallInOurField = false;
-    else isBallInOurField = true;
+    isBallInOurField = ballPos.x < 0;
 
     guards[0] = new Rect2D();
     for(size_t i = 1;i < 7;i++) {
@@ -37,8 +36,8 @@ CDynamicAttack::CDynamicAttack() {
 
 
 
-    for(size_t i = 0; i < 5;i++) {
-        goToDynamic[i] = false;
+    for (bool &i : goToDynamic) {
+        i = false;
     }
 
     assignRegions();
@@ -70,54 +69,53 @@ CDynamicAttack::~CDynamicAttack() {
 
 }
 
-void CDynamicAttack::init(QList<int> _agents , QMap<QString , EditData*> *_editData){
+void CDynamicAttack::init(QList<int> _agents){
     setAgentsID(_agents);
-    setEditData(_editData);
     initMaster();
 
-    if( knowledge->getLastPlayExecuted() != StartPlay){
-        reset();
-    }
-    knowledge->setLastPlayExecuted(StartPlay);
+//    if( knowledge->getLastPlayExecuted() != StartPlay){
+//        reset();
+//    }
+//    knowledge->setLastPlayExecuted(StartPlay);
 }
 
 void CDynamicAttack::reset(){
     executedCycles = 0;
-    debug(QString("Dynamic Attack Reset"),D_MAHI);
+    DBUG(QString("Dynamic Attack Reset"),D_MAHI);
 }
 
 void CDynamicAttack::execute_0() {
-    debug(QString("Dynamic Attack : 0"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 0"),D_MAHI);
     globalExecute(0);
 }
 
 void CDynamicAttack::execute_1() {
-    debug(QString("Dynamic Attack : 1"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 1"),D_MAHI);
     globalExecute(1);
 }
 
 void CDynamicAttack::execute_2() {
-    debug(QString("Dynamic Attack : 2"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 2"),D_MAHI);
     globalExecute(2);
 }
 
 void CDynamicAttack::execute_3() {
-    debug(QString("Dynamic Attack : 3"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 3"),D_MAHI);
     globalExecute(3);
 }
 
 void CDynamicAttack::execute_4() {
-    debug(QString("Dynamic Attack : 4"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 4"),D_MAHI);
     globalExecute(4);
 }
 
 void CDynamicAttack::execute_5() {
-    debug(QString("Dynamic Attack : 5"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 5"),D_MAHI);
     globalExecute(5);
 }
 
 void CDynamicAttack::execute_6() {
-    debug(QString("Dynamic Attack : 6"),D_MAHI);
+    DBUG(QString("Dynamic Attack : 6"),D_MAHI);
     globalExecute(6);
 }
 
@@ -135,11 +133,11 @@ void CDynamicAttack::makePlan(int agentSize) {
     //Initialize Plan with NULL values
     currentPlan.mode = DynamicEnums::NoMode;
     currentPlan.agentSize = agentSize;
-    debug(QString("[dynamicAttack] ball pos : %1").arg(ballPos.x), D_MAHI);
+    DBUG(QString("[dynamicAttack] ball pos : %1").arg(ballPos.x), D_MAHI);
 
-    for(size_t i = 0;i < 5;i++) {
-        currentPlan.positionAgents[i].region = DynamicEnums::NoMatter;
-        currentPlan.positionAgents[i].skill  = DynamicEnums::NoSkill;
+    for (auto &positionAgent : currentPlan.positionAgents) {
+        positionAgent.region = DynamicEnums::NoMatter;
+        positionAgent.skill  = DynamicEnums::NoSkill;
     }
 
     /// Start Role Assigning
@@ -166,7 +164,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     if (wm->ball->pos.x < 0) {
         notInFirst = false;
         currentPlan.mode = DynamicEnums::NotWeHaveBall;
-        if(policy()->DynamicPlay_ChipForward() == true)
+        if(conf.ChipForward)
             currentPlan.playmake.init(DynamicEnums::Chip, DynamicEnums::Forward);
         else
             currentPlan.playmake.init(DynamicEnums::Chip, DynamicEnums::Goal);
@@ -216,10 +214,10 @@ void CDynamicAttack::makePlan(int agentSize) {
                     oppRob = wm->opp.active(i)->pos;
                 }
                 notInFirst = false;
-                if(policy()->DynamicPlay_DribbleEveryWhere() == true)
+                if(conf.DribbleEveryWhere)
                 {
                     dribbleIntention.restart();
-                    debug(QString("WOW we are dribbling"), D_PARSA);
+                    DBUG(QString("WOW we are dribbling"), D_PARSA);
                     currentPlan.playmake.init(DynamicEnums::Dribble, DynamicEnums::Goal);
                     for(size_t i = 0;i < agentSize;i++) {
                         if(i < 2)
@@ -243,7 +241,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     }
     lastPMInitWasDribble = (currentPlan.playmake.skill == DynamicEnums::Dribble);
 //    debug(QString(" %1 ").arg(notInFirst), D_PARSA);
-    if(notInFirst == true)
+    if(notInFirst)
     {
 //        debug(QString(" %1 ").arg(notInFirst), D_PARSA);
         if(critical) {
@@ -252,7 +250,7 @@ void CDynamicAttack::makePlan(int agentSize) {
                 oppRob = wm->field->oppGoal();
                 lastPMInitWasDribble = true;
                 //            debug(QString("NOOOOOO we are not Dribbling"), D_PARSA);
-                if(policy()->DynamicPlay_DribbleInFast() == true)
+                if(conf.DribbleInFast)
                     currentPlan.playmake.init(DynamicEnums::Dribble, DynamicEnums::Goal);
                 else
                     currentPlan.playmake.init(DynamicEnums::Shot, DynamicEnums::Goal);
@@ -280,7 +278,7 @@ void CDynamicAttack::makePlan(int agentSize) {
         else if(fast) {
             oppRob = wm->field->oppGoal();
             currentPlan.mode = DynamicEnums::Fast;
-            if(policy()->DynamicPlay_DribbleInFast() == true)
+            if(conf.DribbleInFast)
                 currentPlan.playmake.init(DynamicEnums::Dribble, DynamicEnums::Goal);
             else
                 currentPlan.playmake.init(DynamicEnums::Shot, DynamicEnums::Goal);
@@ -313,9 +311,9 @@ CAgent* CDynamicAttack::getMahiPlayMaker() {
 
 void CDynamicAttack::assignId() {
 
-    mahiPlayMaker = NULL;
+    mahiPlayMaker = nullptr;
     if (playmakeID != -1) {
-        mahiPlayMaker = knowledge->getAgent(playmakeID);
+        mahiPlayMaker = playmake;
     }
 
     int tempIndex;
@@ -341,11 +339,11 @@ void CDynamicAttack::assignId() {
         mahiPoisitionAgents.append(activeAgents.at(tempIndex));
     }
     for(int i = 0; i < mahiPoisitionAgents.size(); i++)
-        debug(QString("1 : %2").arg(mahiPoisitionAgents.at(i)->id()), D_MAHI);
+        DBUG(QString("1 : %2").arg(mahiPoisitionAgents.at(i)->id()), D_MAHI);
 }
 
 void CDynamicAttack::assignTasks() {
-    if (mahiPlayMaker != NULL) {
+    if (mahiPlayMaker != nullptr) {
         playMake();
     }
 
@@ -366,7 +364,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         mahiAgentsID[i] = -1;
     }
 
-    for(size_t i = 0; i < agentSize; i++) {
+    for(int i = 0; i < agentSize; i++) {
         activeAgents.append(knowledge->getAgent(agentsID.at(i)));
     }
 
@@ -380,17 +378,17 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         chooseBestPosForPass(semiDynamicPosition);
     }
     assignTasks();
-    debug(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI,QColor(Qt::red));
-    debug(QString("BALL : %1").arg(isBallInOurField),D_MAHI,QColor(Qt::red));
+    DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
+    DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
 
     for(size_t i = 0;i < agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->execute();
         } else {
-            debug(QString("[dynamicAttack - %1] mahiAgentID buged").arg(__LINE__), D_MAHI);
+            DBUG(QString("[dynamicAttack - %1] mahiAgentID buged").arg(__LINE__), D_MAHI);
         }
     }
-    debug(QString("[DA] PM SKILL: %1").arg(roleAgentPM->getSelectedSkill()), D_MAHI, QColor(Qt::red));
+    DBUG(QString("[DA] PM SKILL: %1").arg(roleAgentPM->getSelectedSkill()), D_MAHI);
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
@@ -1792,15 +1790,16 @@ void CDynamicAttack::setDirectShot(bool _directShot) {
 void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
     regionsList.clear();
     dynamicPosition.clear();
-    for(size_t i = 0;i < _positioningRegion.size();i++) {
-        regionsList.append(_positioningRegion.at(i));
+    for (int i : _positioningRegion) {
+        regionsList.append(i);
         dynamicPosition.append(knowledge->getStaticPoses
                                (_positioningRegion.at(i)));
     }
 }
 
-void CDynamicAttack::setPlayMake(int _playMake) {
-    playmakeID = _playMake;
+void CDynamicAttack::setPlayMake(CAgent* _playMake) {
+    playmakeID = _playMake->id();
+    playmake = _playMake;
 }
 
 void CDynamicAttack::setWeHaveBall(bool _ballPoss) {
