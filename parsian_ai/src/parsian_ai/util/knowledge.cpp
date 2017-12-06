@@ -19,7 +19,7 @@ void Knowledge::initVariables()
     variables[Def_Var].toMap()["stateForMark"] = QString("");
     variables[Def_Var].toMap()["lastStateForMark"] = QString("");
     variables[Def_Var].toMap()["defenseOneTouchMode"] = false;
-    variables[Def_Var].toMap()"defenseClearMode"] = false;
+    variables[Def_Var].toMap()["defenseClearMode"] = false;
     variables[Def_Var].toMap()["goalKeeperClearMode"] = false;
     variables[Def_Var].toMap()["goalKeeperOneTouchMode"] = false;
     variables[Def_Var].toMap()["clearing"] = "false";

@@ -8,7 +8,7 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_util/base.h>
 #include <parsian_util/core/agent.h>
-#include <parsian_util/core/worldmodel.h>
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/coach.h>
 #include <parsian_ai/gamestate.h>
 #include <parsian_util/action/autogenerate/kickaction.h>

@@ -33,33 +33,18 @@ PositioningPlan::PositioningPlan()
     }
 }
 
-void PositioningPlan::init(const QList<CAgent*> & _agents , EditData *_editData , QString playMode )
+void PositioningPlan::init(const QList<CAgent*> & _agents , QString playMode )
 {
 
     dynamicPositioners.clear();
     staticPositioners.clear();
     agents.clear();
     agents.append(_agents);
-    editData = _editData;
     posCount = 0;
 
     double minDist = 1000.0;
     int minID = -1;
     Vector2D temp;
-
-    for( int i=0 ; i<6 ; i++ )
-    {
-        if( editData != NULL && editData->formation()->getRoleName(i+1) == "Position" )
-        {
-            temp = editData->formation()->getPosition(i+1, wm->ball->pos);
-            rolesPositions[posCount++] = temp;
-            if( temp.dist( wm->ball->pos ) < minDist )
-            {
-                minDist = temp.dist( wm->ball->pos );
-                minID = posCount - 1;
-            }
-        }
-    }
 
     if( playMode == "OurFreeKick6" && minID != -1 )
     {
