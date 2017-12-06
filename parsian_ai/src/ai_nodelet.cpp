@@ -19,8 +19,8 @@ void AINodelet::onInit() {
     debugger = new Debugger();
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
-    robotStatusSub = nh.subscribe("/robot_status", 1000, &AI::updateRobotStatus, ai);
-    refereeSub = nh.subscribe("/referee", 1000,  &AI::updateReferee, ai);
+    robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, ai);
+    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, ai);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -62,8 +62,7 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
     ai->updateRobotStatus(_rs);
 }
 
-void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level)
-{
+void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
     conf = config;
 }
 

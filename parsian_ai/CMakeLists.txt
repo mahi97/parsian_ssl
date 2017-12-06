@@ -88,9 +88,6 @@ include_directories(
 		${catkin_INCLUDE_DIRS}
 )
 
-file(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
-add_custom_target(headers SOURCES ${LibFiles})
-
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/ai.cpp

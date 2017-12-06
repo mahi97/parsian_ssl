@@ -161,53 +161,6 @@ void CCoach::checkGoalieInsight()
     }
 }
 
-void CCoach::checkTransitionToForceStart(){
-    Vector2D lastPos;
-    if(wm->ball->hist.size() > 10 ){
-        lastPos = wm->ball->hist.at(wm->ball->hist.size()-10).pos;
-    }
-    else{
-        if( wm->ball->hist.size() )
-            lastPos = wm->ball->hist.first().pos;
-        else
-            lastPos = wm->ball->pos;
-    }
-
-    double ballChangedPosDist = wm->ball->pos.dist(lastPos);
-
-    if( knowledge->isStart() == false ){
-        if( cyclesWaitAfterballMoved == 0 && ballChangedPosDist > 0.05 ){
-            cyclesWaitAfterballMoved = 1;
-        }
-        else if( cyclesWaitAfterballMoved ){
-            cyclesWaitAfterballMoved++;
-        }
-    }
-    ///////////////////////////////////// by DON
-    if (knowledge->isOurNonPlayOnKick())
-    {
-        //transition to game on
-
-        if ( cyclesWaitAfterballMoved > 6 && selectedPlay->playOnFlag == true)
-        {
-            wm->gs->transition('s'); //force start
-            CKnowledge::State s = CKnowledge::Start;
-            knowledge->setGameMode(s);
-            knowledge->updateGameState();
-        }
-    }
-
-    if( knowledge->isTheirNonPlayOnKick() ){
-        //transition to game on
-        if ( cyclesWaitAfterballMoved > 0 )
-        {
-            wm->gs->transition('s'); //force start
-            CKnowledge::State s = CKnowledge::Start;
-            knowledge->setGameMode(s);
-            knowledge->updateGameState();
-        }
-    }
-}
 
 
 void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
@@ -225,7 +178,7 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
         }
     }
 
-    if(knowledge->isStop() || knowledge->getGameState() == CKnowledge::Halt)
+    if(gameState->isPlayOff() || !gameState->canMove())
     {
         if(wm->our.activeAgentsCount() != 0u)
         {
@@ -263,23 +216,23 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
         }
     }
 
-    if (policy()->Formation_GoalieFromGUI()) {
-        preferedGoalieAgent = policy()->Formation_Goalie();
+    if (conf.GoalieFromGUI) {
+        preferedGoalieAgent = conf.Goalie;
     } else {
         preferedGoalieAgent = wm->our.data->goalieID;
     }
 
     // handle stop
-    if (knowledge->isStop()) {
+    if (gameState->isPlayOff()) {
         if (wm->ball->pos.x < 0){
             preferedDefenseCounts = agentsCount - 1;
 
         } else if (wm->ball->pos.x > 1) {
-            preferedDefenseCounts = policy() -> Formation_Defense();
+            preferedDefenseCounts = conf.Defense;
 
         }
 
-    } else if (knowledge->isStart()) {
+    } else if (gameState->isPlayOn()) {
         if (transientFlag) {
             if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
@@ -313,7 +266,7 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
 
             }
         }
-    } else if (knowledge->isOurNonPlayOnKick()) {
+    } else if (gameState->ourRestart()) {
         if (wm->ball->pos.x < -1)  {
             preferedDefenseCounts = (checkOverdef()) ? 1 : 2;
 
@@ -321,8 +274,8 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
             preferedDefenseCounts = 0;
         }
 
-    } else if (knowledge->isTheirNonPlayOnKick()) {
-        if (knowledge->getGameState() == CKnowledge::TheirKickOff) {
+    } else if (gameState->theirRestart()) {
+        if (gameState->theirKickoff()) {
             preferedDefenseCounts = 2;
         } else {
             preferedDefenseCounts = std::max(agentsCount - missMatchIds.count() - 1, 0);
@@ -335,12 +288,12 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
 //        preferedDefenseCounts = policy()->Formation_Defense();
 //    }
 
-    if(knowledge->getGameState()== CKnowledge::HalfTimeLineUp){
+    if(gameState->halfTimeLineUp()){
         preferedGoalieAgent = -1;
         preferedDefenseCounts = 0;
     }
 
-    if (wm->gs->penalty_shootout()) {
+    if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
 
@@ -360,82 +313,56 @@ void CCoach::calcDesiredMarkCounts()
     // used in playoff without counting goalie
 
     if( agentsCount == 2 ) {
-        knowledge->desiredDefCount = 0;
+        desiredDefCount = 0;
     } else if( agentsCount == 3 ) {
 
-        if(knowledge->toBeMopps.count() == 0) {
-            knowledge->desiredDefCount = 1;
-        } else if(knowledge->toBeMopps.count() <=2 ) {
-            knowledge->desiredDefCount = 2 - knowledge->toBeMopps.count();
+        if(toBeMopps.count() == 0) {
+            desiredDefCount = 1;
+        } else if(toBeMopps.count() <=2 ) {
+            desiredDefCount = 2 - toBeMopps.count();
         } else {
-            knowledge->desiredDefCount = 0;
+            desiredDefCount = 0;
         }
 
 
     } else if( agentsCount == 4  ){
-//    for(int i = 0 ; i < ourAgents.count() ; i++) {
-//        double ourDist = ourAgents[i]->pos().dist(ballPos);
-//        if(ourDist < ourNearestToBallDist) {
-//            ourNearestToBallDist = ourDist;
-//            ourNearestToBall = ourAgents[i]->id();
-//        }
-//        draw(ourAgents[i]->pos(),1,QColor(Qt::black));
-//
-//        if(wm->ball->vel.length() > 0.5){
-//            if(Circle2D(ourAgents[i]->pos() , 0.12).intersection(ballPath,&dummy1,&dummy2)) {
-//                ourDist = ourAgents[i]->pos().dist(ballPos);
-//                if(ourDist < ourIntersetMin) {
-//                    ourIntersetMin    = ourDist;
-//                    ourIntersectAgent = ourAgents[i]->id();
-//                }
-//            }
-//        }
-//    }
-//
-//    ////////////////// opp
-//    oppAgents.clear();
-//    for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
-//        oppAgents.append(wm->opp.active(i));
-//    }
-//
 
-
-        if(knowledge->toBeMopps.count() == 0)
-            knowledge->desiredDefCount = 2;
-        else if(knowledge->toBeMopps.count() <=2 )
+        if(toBeMopps.count() == 0)
+            desiredDefCount = 2;
+        else if(toBeMopps.count() <=2 )
         {
-            knowledge->desiredDefCount = 2 - knowledge->toBeMopps.count();
+            desiredDefCount = 2 - toBeMopps.count();
         }
         else
         {
-            knowledge->desiredDefCount = 0;
+            desiredDefCount = 0;
         }
 
     } else if( agentsCount == 5 ){
 
-        if(knowledge->toBeMopps.count() == 0)
-            knowledge->desiredDefCount = 2;
-        else if(knowledge->toBeMopps.count() <=3 )
+        if(toBeMopps.count() == 0)
+            desiredDefCount = 2;
+        else if(toBeMopps.count() <=3 )
         {
-            knowledge->desiredDefCount = 3 - knowledge->toBeMopps.count();
+            desiredDefCount = 3 - toBeMopps.count();
         }
         else
         {
-            knowledge->desiredDefCount = 0;
+            desiredDefCount = 0;
         }
 
     }
 
     else if( agentsCount == 6 ) {
-        if(knowledge->toBeMopps.count() <= 1)
-            knowledge->desiredDefCount = 1;
-        else if(knowledge->toBeMopps.count() <=3 )
+        if(toBeMopps.count() <= 1)
+            desiredDefCount = 1;
+        else if(toBeMopps.count() <=3 )
         {
-            knowledge->desiredDefCount = 3 - knowledge->toBeMopps.count();
+            desiredDefCount = 3 - toBeMopps.count();
         }
         else
         {
-            knowledge->desiredDefCount = 0;
+            desiredDefCount = 0;
         }
     }
 
@@ -443,7 +370,7 @@ void CCoach::calcDesiredMarkCounts()
 
 
 void CCoach::assignGoalieAgent( int goalieID ){
-    QQueue<int> ids = wm->our.data->activeAgents;
+    QList<int> ids = wm->our.data->activeAgents;
     goalieAgent = nullptr;
     if( ids.contains(goalieID) ){
         goalieAgent = agents[goalieID];

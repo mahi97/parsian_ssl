@@ -11,7 +11,9 @@ AI::AI() {
 }
 
 AI::~AI() {
-
+    delete soccer;
+    delete wm;
+    delete gameState;
 }
 
 void AI::execute() {
@@ -84,11 +86,4 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     DEBUG("is running", D_MAHI);
 
     soccer->updateTask();
-}
-
-void AI::publish(std::vector<ros::Publisher*> publishers) {
-//        for(CAgent* agent : soccer->agents) {
-//            if (agent!= nullptr)
-//            publishers.at(i)->getTopic();
-//        }
 }
