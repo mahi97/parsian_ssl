@@ -310,7 +310,7 @@ void CPlanner::runPlanner(){
     bool marginFlag = true , RmarginFlag = true;
 
 
-    obst.obsMargin = CRobot::robot_radius_new+0.03;
+    obst.obsMargin = Robot::robot_radius_new+0.03;
 
     nearestToGoal = nodes.findNearest(goal);
     nearestDist = nearestToGoal->pos.dist(goal);
@@ -326,7 +326,7 @@ void CPlanner::runPlanner(){
 
         if( validState(newNode) && nodes.findNearest(newNode->pos)->pos.dist(newNode->pos) > threshold ){
             marginFlag = true;
-            obst.obsMargin = CRobot::robot_radius_new+0.03;
+            obst.obsMargin = Robot::robot_radius_new+0.03;
             nnn = 0;
             nearest->next = newNode;
             nodes.add(newNode);
@@ -348,7 +348,7 @@ void CPlanner::runPlanner(){
         }
     }
 
-    obst.obsMargin = CRobot::robot_radius_new+0.03;
+    obst.obsMargin = Robot::robot_radius_new+0.03;
 
     if( Rnodes.head && nearestDist + EPSILON > threshold ){
         RnearestToGoal = Rnodes.findNearest(Rgoal);
@@ -363,7 +363,7 @@ void CPlanner::runPlanner(){
 
             if( validState(newNode) && Rnodes.findNearest(newNode->pos)->pos.dist(newNode->pos) > threshold){
                 RmarginFlag = true;
-                obst.obsMargin = CRobot::robot_radius_new+0.03;
+                obst.obsMargin = Robot::robot_radius_new+0.03;
                 Rnnn = 0;
                 Rnearest->next = newNode;
                 Rnodes.add(newNode);
@@ -385,7 +385,7 @@ void CPlanner::runPlanner(){
         }
     }
 
-    obst.obsMargin = CRobot::robot_radius_new+0.03;
+    obst.obsMargin = Robot::robot_radius_new+0.03;
 
     vector <Vector2D> temp;
     state *lll = NULL;
@@ -767,7 +767,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
     if(_vel.length() < 0.2)
     {
         _center = _pos;
-        _rad =CRobot::robot_radius_new;
+        _rad =Robot::robot_radius_new;
     }
     else
     {
@@ -791,7 +791,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
                 _rad = min(maxObstRad,_rad);
                 _rad = min(agentPos.dist(_center) - 0.3,_rad);
                 _rad = min(_pos.dist(_center) - 0.3 ,_rad );
-                _rad +=CRobot::robot_radius_new;
+                _rad +=Robot::robot_radius_new;
                 if(timeForObs >=0)
                 {
                     obs.add_circle(_center.x , _center.y , _rad , 0 , 0);
@@ -802,7 +802,7 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
         else
         {
             _center = _pos;
-            _rad =CRobot::robot_radius_new;
+            _rad =Robot::robot_radius_new;
         }
     }
 
@@ -854,7 +854,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
 
             //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
 
-//            if(1 || Circle2D(wm->our[j]->pos,CRobot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
+//            if(1 || Circle2D(wm->our[j]->pos,Robot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
 //            {
 //            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
 
