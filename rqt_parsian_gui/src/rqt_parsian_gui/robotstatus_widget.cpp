@@ -63,17 +63,22 @@ namespace rqt_parsian_gui
 
         //############################################################### vel
         vel_dir = new QLabel;
-        vel = new QLabel("vel");
-        vel_ang = new QLabel("vel ang");
+        vel = new QLabel("vel: ");
+        vel_ang = new QLabel("vel ang: ");
+        robot_id_l = new QLabel("robot id: ");
+        board_id_l = new QLabel("board id: ");
 
+        robot_vel_l->addWidget(robot_id_l);
+        robot_vel_l->addWidget(board_id_l);
         robot_vel_l->addWidget(vel_dir);
         robot_vel_l->addWidget(vel);
         robot_vel_l->addWidget(vel_ang);
 
+
         //########################################### load image
 
         color = (team_color == parsian_msgs::parsian_team_config::isYellow) ? 'y' : 'b';
-        draw_id();
+        draw_dir();
         //############################################################### progress bars
 
         battery_percentage = new QProgressBar;
@@ -158,8 +163,11 @@ namespace rqt_parsian_gui
         return QString("resource/images/" + color + robot_id + ".png");
     }
     void RobotStatusWidget::setMessage(parsian_msgs::parsian_robot_status msg){
-        robot_id = QString::number(msg.id , 16);
-        board_id = QString::number(msg.boardId , 16);
+        robot_id = QString::number(msg.id);
+        board_id = QString::number(msg.boardId);
+
+        draw_dir();
+
         battery_percentage->setValue(msg.battery);
         data_loss_percentage->setValue(msg.dataLoss);
 
@@ -179,14 +187,17 @@ namespace rqt_parsian_gui
 
         shoot_sens->setChecked(msg.shootSensor);
         spin->setChecked(msg.spinCatchBall);
+
+        vel->setText("vel: "+ QString::number(0));
+        vel_ang->setText("vel ang: "+ QString::number(0));
+        robot_id_l->setText("robot id: "+ QString::number(msg.id,16));
+        board_id_l->setText("board id: "+ QString::number(msg.boardId,16));
+
     }
 
-    void RobotStatusWidget::draw_id(){
+    void RobotStatusWidget::draw_dir(){
         agent_i = new QPixmap(QPixmap::fromImage(QImage(getFileName())));
         agent_p = new QPainter(agent_i);
-        agent_p->setFont(QFont("serif",10));
-        agent_p->drawText(10,8,"robot id: " + robot_id);
-        agent_p->drawText(10,15,"board id: " + board_id);
         vel_dir->setPixmap(*agent_i);
     }
 

@@ -19,6 +19,8 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
 {
     n = getNodeHandle();
     n_private = getPrivateNodeHandle();
+
+    rs_sub = n_private.subscribe("/robots_status",1000,&RobotStatus::rsCallback,this);
   // create QWidget
     scroll_widget = new QWidget;
     scrollArea =new QScrollArea;
@@ -46,6 +48,13 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
 
     context.addWidget(scrollArea);
 }
+    void RobotStatus::rsCallback(parsian_msgs::parsian_robots_statusConstPtr msg){
+        int counter=0;
+        for(auto &i : statusWidget) {
+            i->setMessage(msg->status[counter++]);
+            break;
+        }
+    }
 
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::RobotStatus, rqt_gui_cpp::Plugin)

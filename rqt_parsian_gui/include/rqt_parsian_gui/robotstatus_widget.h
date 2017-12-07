@@ -24,14 +24,14 @@ namespace rqt_parsian_gui {
     private:
 
         QString getFileName();
-        void draw_id();
+        void draw_dir();
         //#######################################################
         QGroupBox   *robot_vel,*battery,*data_loss,*cap_charge,*status,*faults;
         QVBoxLayout *robot_vel_l,*battery_l,*data_loss_l,*cap_charge_l,*status_l,*faults_l;
         QHBoxLayout *motors_l,*encoders_l,*main_layout;
         QProgressBar *battery_percentage, *data_loss_percentage,*cap_charge_percentage;
         QCheckBox ** motors_f,**encoders_f,*kick_f,*chip_f,*shoot_sens_f,*shoot_board_f,*shoot_sens,*spin;
-        QLabel *vel_dir,*vel,*vel_ang;
+        QLabel *vel_dir,*vel,*vel_ang,* robot_id_l,*board_id_l;
         QString color,robot_id,board_id;
         QPixmap *agent_i;
         QPainter *agent_p;

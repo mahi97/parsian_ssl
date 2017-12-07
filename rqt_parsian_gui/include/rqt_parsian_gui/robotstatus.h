@@ -27,6 +27,9 @@ public:
 private:
     ros::NodeHandle n;
     ros::NodeHandle n_private;
+    ros::Subscriber rs_sub;
+    void rsCallback(parsian_msgs::parsian_robots_statusConstPtr);
+
     RobotStatusWidget *statusWidget[max_robot];
 
 
