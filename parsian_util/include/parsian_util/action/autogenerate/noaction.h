@@ -21,7 +21,6 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(NoAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(NoAction, bool, Waithere, waithere);
 
 

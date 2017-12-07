@@ -21,7 +21,6 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(ReceivepassAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(ReceivepassAction, bool, Slow, slow);
     SkillProperty(ReceivepassAction, double, Receiveradius, receiveRadius);
     SkillProperty(ReceivepassAction, bool, Ignoreangle, ignoreAngle);

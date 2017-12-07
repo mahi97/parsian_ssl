@@ -21,7 +21,6 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(GotopointAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);
     SkillProperty(GotopointAction, float, Maxacceleration, maxAcceleration);
     SkillProperty(GotopointAction, float, Maxdeceleration, maxDeceleration);
@@ -31,6 +30,7 @@ public:
     SkillProperty(GotopointAction, bool, Penaltykick, penaltyKick);
     SkillProperty(GotopointAction, bool, Divemode, diveMode);
     SkillProperty(GotopointAction, bool, Smooth, smooth);
+    SkillProperty(GotopointAction, unsigned char, Roller, roller);
     SkillProperty(GotopointAction, Vector2D, Targetpos, targetPos);
     SkillProperty(GotopointAction, Vector2D, Targetdir, targetDir);
     SkillProperty(GotopointAction, Vector2D, Targetvel, targetVel);

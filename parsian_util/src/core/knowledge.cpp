@@ -1,34 +1,12 @@
-//
-// Created by parsian-ai on 9/21/17.
-//
+#include "parsian_util/core/knowledge.h"
 
-#include "parsian_util/knowledge.h"
 
-CKnowledge::CKnowledge() {
-
-}
-
-CKnowledge::~CKnowledge() {
-
-}
-
-double CKnowledge::getEmptyAngle(Vector2D p , Vector2D p1 , Vector2D p2 , QList<Circle2D> obs , double &percent ,
+double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 , Vector2D p2 , QList<Circle2D> obs , double &percent ,
                                 double &mostOpenAngle , double &biggestAngle , bool oppGoal , bool _draw) {
 
     bool drawn = false;
 //    QColor rect_color;
-    if(oppGoal)
-    {
-        int r , g , b;
-//        QColor("darkcyan").getRgb(&r , &g, &b);
-//        rect_color =  QColor(r, g, b, 21);
-    }
-    else
-    {
-        int r , g , b;
-//        QColor("magenta").getRgb(&r , &g, &b);
-//        rect_color = QColor(r , g, b, 21);
-    }
+    int g , b;
     Vector2D goal_pos;
 
     if(oppGoal)
@@ -50,11 +28,11 @@ double CKnowledge::getEmptyAngle(Vector2D p , Vector2D p1 , Vector2D p2 , QList<
     lb = gx1-gx2;
     lc = -gx1*la-gy1*lb;
     bool inobs = false;
-    struct range tmpr{};
+    range tmpr{};
     int count = 0;
     int i,j;
     d = 0;
-    struct range r[20];
+    range r[20];
     bool flag[20];
     for (i = 0;i<20;i++)
         flag[i] = false;
@@ -69,11 +47,11 @@ double CKnowledge::getEmptyAngle(Vector2D p , Vector2D p1 , Vector2D p2 , QList<
         q1 = q2;
         q2 = a;
     }
-    float openangle = 0;
+    double openangle = 0;
     for (i = 0; i < obs.count(); ++i) {
         ox = obs[i].center().x;
         oy = obs[i].center().y;
-        float rad = obs[i].radius();
+        double rad = obs[i].radius();
         l = len(x,y,ox,oy);
         if (l<rad) {inobs = true;break;}
         a1 = ox*la + oy*lb + lc;
@@ -275,15 +253,13 @@ double CKnowledge::getEmptyAngle(Vector2D p , Vector2D p1 , Vector2D p2 , QList<
     return openangle * 180.0 / M_PI;
 }
 
-Vector2D CKnowledge::getReflectPos(Vector2D goal, double dist, Vector2D _ballpos) {
+Vector2D CKnowledge::getReflectPos(const CField& field,Vector2D goal, double dist, Vector2D _ballpos) {
     Vector2D res;
     Segment2D dummySeg(goal,goal+Vector2D(-5,0));
     Vector2D nearest(dummySeg.nearestPoint(_ballpos));
     Vector2D sol1,sol2;
     Rect2D oppField(0,field._FIELD_HEIGHT/2 -0.01,field._FIELD_WIDTH/2 + 0.01,field._FIELD_HEIGHT -0.01);
     Circle2D oppCircle(Vector2D(field._FIELD_WIDTH/2,0)- Vector2D(1,0),dist);
-
-
 
     res.x = nearest.x;
     res.y = nearest.y*2 - _ballpos.y;
@@ -314,190 +290,6 @@ int CKnowledge::getNearestRobotToPoint(CTeam _team, Vector2D _point) {
         }
     }
     return nearest;
-}
-
-NewFastestToBall CKnowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList, const CWorldModel*& wm){
-    ////
-    ////Code By Sepehr
-    ////
-
-    // reset everything
-    NewFastestToBall result;
-    if(!wm->field->fieldRect().contains(wm->ball->pos))
-        return result;
-
-    double t = 0;
-    Vector2D ballPredict;
-
-    bool ourCalced[_MAX_NUM_PLAYERS];
-    bool oppCalced[_MAX_NUM_PLAYERS];
-    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-        ourCalced[i] = false;
-        oppCalced[i] = false;
-    }
-
-    // use the correct Robot acceleration and maximum Velocity below :
-    double robotMaxVel;
-    ros::param::get("agent_node/VelMax", robotMaxVel); 
-    double robotMAxAcc;
-    ros::param::get("agent_node/AccMaxForward", robotMAxAcc);
-
-    while ( t < 20 && (result.ourF.size() < ourList.size() || result.oppF.size() < oppList.size()) )
-    {
-        ballPredict = wm->ball->predict(t);
-
-        double tToVMax;
-        Vector2D center;
-        double radius;
-        for ( int i = 0; i < ourList.count(); i++ )
-        {
-            if ( ourCalced[i] )
-                continue;
-            center = wm->our[ourList[i]]->pos + wm->our[ourList[i]]->vel * t;
-            tToVMax = ( robotMaxVel - wm->our[ourList[i]]->vel.length()) / robotMAxAcc;
-            radius = 0;
-            if ( tToVMax > t)
-                radius = 0.5*robotMAxAcc*t*t + wm->our[ourList[i]]->vel.length() * t;
-            else if ( tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel)
-            {
-                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->our[ourList[i]]->vel.length()*tToVMax;
-                radius += ( t - tToVMax ) * robotMaxVel;
-            }
-            else
-                radius = t * wm->our[ourList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
-            Circle2D cir = Circle2D( center, radius);
-            Vector2D s0,s2;
-            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
-            {
-                result.ourF.append(std::pair<double,int>(t , ourList[i]));
-                ourCalced[i] = true;
-                if( result.catch_time > t ){
-                    result.catch_time = t;
-                    result.isFastestOurs = true;
-                }
-            }
-            //            draw( cir, 0 , 360, "red");
-        }
-        for ( int i = 0; i < oppList.count(); i++ )
-        {
-            if ( oppCalced[i] )
-                continue;
-            center = wm->opp[oppList[i]]->pos + wm->opp[oppList[i]]->vel * t;
-            tToVMax = ( robotMaxVel - wm->opp[oppList[i]]->vel.length()) / robotMAxAcc;
-            radius = 0;
-            if ( tToVMax > t)
-                radius = 0.5*robotMAxAcc*t*t + wm->opp[oppList[i]]->vel.length() * t;
-            else if ( tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel)
-            {
-                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->opp[oppList[i]]->vel.length()*tToVMax;
-                radius += ( t - tToVMax ) * robotMaxVel;
-            }
-            else
-                radius = t * wm->opp[oppList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
-            Circle2D cir = Circle2D( center, radius) ;
-            Vector2D s0,s2;
-            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))
-            {
-                result.oppF.append(std::pair<double,int>(t , oppList[i]));
-                oppCalced[i] = true;
-                if( result.catch_time > t ){
-                    result.catch_time = t;
-                    result.isFastestOurs = false;
-                }
-            }
-            //            draw( cir, 0 , 360, "blue");
-        }
-        t += timeStep;
-    }
-    qSort(result.ourF.begin() , result.ourF.end());
-    qSort(result.oppF.begin() , result.oppF.end());
-    if( result.catch_time > 10 )
-        result.catch_time = 0;
-    return result;
-}
-
-FastestToBall CKnowledge::findFastestToBall(QList<int> ourList, QList<int> oppList, const CWorldModel*& wm)
-{
-    /////Extracted from DefensePlan
-    /////By Pooria
-    /////
-    FastestToBall f;
-    double time = 0.f;
-    f.catch_time = 1000;
-    while (true) {
-        Vector2D ballPos = wm->ball->predict(min(time, f.catch_time));
-        //            draw(ballPos, 1, "red");
-        if (wm->ball->vel.length() < 0.05)
-            ballPos = wm->ball->pos;
-        double rad = time * 0.6 + 0.2;
-        if (f.ourFastest == -1)
-            for (int i = 0; i < ourList.count(); i++) {
-                Vector2D playerPos = wm->our[ourList[i]]->pos;
-                if (playerPos.dist(ballPos) < rad) {
-                    f.ourFastest = ourList[i];
-                    f.ourFastestTime = time;
-                    if (time < f.catch_time)
-                        f.catch_time = time;
-                    break;
-                }
-            }
-
-        if (f.oppFastest == -1)
-            for (int i = 0; i < oppList.count(); i++) {
-                Vector2D playerPos = wm->opp[oppList[i]]->pos;
-                if (playerPos.dist(ballPos) < rad) {
-                    f.oppFastest = oppList[i];
-                    f.oppFastestTime = time;
-                    if (time < f.catch_time)
-                        f.catch_time = time;
-                    break;
-                }
-            }
-
-        if ((f.ourFastest > -1 || ourList.count() == 0) && (f.oppFastest > -1 || oppList.count() == 0)) {
-            //				LOG("FFFF: ", f.ourFastest);
-            break;
-        }
-        time += 0.1;
-        if (time > 20) {
-            if (wm->ball->vel.length() > 0.2) {
-                Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
-                if (f.ourFastest == -1 and ourList.count() > 0) {
-                    double min = 99999;
-                    for (int i = 0; i < ourList.count(); i++) {
-                        Vector2D playerPos = wm->our[ourList[i]]->pos;
-                        double dist = line.dist(playerPos);
-                        if (dist < min) {
-                            f.ourFastest = ourList[i];
-                            min = dist;
-                        }
-                    }
-                    f.ourFastestTime = time;
-                    if (time < f.catch_time)
-                        f.catch_time = time;
-                }
-                if (f.oppFastest == -1 and oppList.count() > 0) {
-                    double min = 99999;
-                    for (int i = 0; i < oppList.count(); i++) {
-                        Vector2D playerPos = wm->opp[oppList[i]]->pos;
-                        double dist = line.dist(playerPos);
-                        if (dist < min) {
-                            f.oppFastest = oppList[i];
-                            min = dist;
-                        }
-                    }
-                    f.oppFastestTime = time;
-                    if (time < f.catch_time)
-                        f.catch_time = time;
-                }
-            }
-            break;
-        }
-    }
-    f.catch_time = min(time, f.catch_time);
-    return f;
 }
 
 double CKnowledge::kickTimeEstimation(CAgent *_agent, Vector2D _target, const CBall& _ball, const double& _VMax, double AccMaxForward, double DecMax, double AccMaxNormal)
@@ -540,7 +332,7 @@ double CKnowledge::timeNeeded(CAgent *_agentT,Vector2D posT,
 {
 
     double _x3;
-    double acc = AccMaxForward;
+    double acc;
     double dec = DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
@@ -584,7 +376,6 @@ double CKnowledge::timeNeeded(CAgent *_agentT,Vector2D posT,
     _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ DecMax - offset) * distEffect);
         return std::max(0.0,(tAgentVel.length()/ DecMax - offset) * distEffect);
     }
 
@@ -636,4 +427,58 @@ double CKnowledge::oneTouchAngle(Vector2D pos,
     else ang = ang1 - th1;
 
     return ang;
+}
+
+
+inline double CKnowledge::getangle(double x1,double y1,double x2,double y2)
+{
+    return atan2(y2-y1,x2-x1);
+}
+
+inline double CKnowledge::len(double x1,double y1,double x2,double y2)
+{
+    return hypot(x1-x2, y1-y2);
+}
+
+inline double CKnowledge::len2(double x1,double y1,double x2,double y2)
+{
+    return (x1-x2) * (x1-x2) + (y1-y2) * (y1-y2);
+}
+
+
+inline double CKnowledge::normalang(double dir)
+{
+    const double _2PI = 2.0 * M_PI;
+    if ( dir < -2.0*M_PI || 2.0*M_PI < dir )
+    {
+        dir = fmod( dir, _2PI );
+    }
+    if ( dir < -M_PI)
+    {
+        dir += 2.0*M_PI;
+    }
+    if ( dir > M_PI)
+    {
+        dir -= 2.0*M_PI;
+    }
+    return dir;
+}
+
+inline double CKnowledge::normalangabs(double dir)
+{
+    const double _2PI = 2.0 * M_PI;
+    if ( dir < -2.0*M_PI || 2.0*M_PI < dir )
+    {
+        dir = fmod( dir, _2PI );
+    }
+    if ( dir < -M_PI)
+    {
+        dir += 2.0*M_PI;
+    }
+    if ( dir > M_PI)
+    {
+        dir -= 2.0*M_PI;
+    }
+    if (dir < 0) return -dir;
+    return dir;
 }

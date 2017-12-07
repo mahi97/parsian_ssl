@@ -21,7 +21,6 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(KickAction, unsigned char, Robot_Id, robot_id);
     SkillProperty(KickAction, double, Tolerance, tolerance);
     SkillProperty(KickAction, bool, Chip, chip);
     SkillProperty(KickAction, double, Kickspeed, kickSpeed);

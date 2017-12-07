@@ -4,7 +4,6 @@
 
 void KickAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_kick msg = *((parsian_msgs::parsian_skill_kick*)_msg);
-        robot_id = msg.robot_id;
         tolerance = msg.tolerance;
         chip = msg.chip;
         kickSpeed = msg.kickSpeed;
@@ -29,7 +28,6 @@ void KickAction::setMessage(const void* _msg) {
 
 void* KickAction::getMessage() {
     parsian_msgs::parsian_skill_kick* _msg = new parsian_msgs::parsian_skill_kick;
-    _msg->robot_id = robot_id;
     _msg->tolerance = tolerance;
     _msg->chip = chip;
     _msg->kickSpeed = kickSpeed;
