@@ -5,3 +5,6 @@
 #include <parsian_util/action/action.h>
 
 
+QString Action::getActionName() {
+    return QString("Action");
+}
