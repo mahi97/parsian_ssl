@@ -825,7 +825,7 @@ Vector2D CSkillKick::findMostPossible()
     }
     double prob,angle,biggestAngle;
 
-    CKnowledge::getEmptyAngle(wm->ball->pos-(wm->field->oppGoal()-ballPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field,wm->ball->pos-(wm->field->oppGoal()-ballPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
     //debug(QString("prob: %1 , angle :%2, biggest:%3").arg(prob).arg(angle).arg(biggestAngle),D_MHMMD);
 
     Segment2D goalSeg(wm->field->oppGoalL(),wm->field->oppGoalR());
@@ -966,7 +966,7 @@ void CSkillKick::findPosToGo()
     }
     if(finalPos.x > wm->field->_FIELD_WIDTH)
     {
-        finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
+        finalPos = CKnowledge::getReflectPos(*wm->field, wm->field->oppGoal(), 3, wm->ball->pos);
     }
 
     if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
@@ -1047,7 +1047,7 @@ void CSkillKick::findPosToGoAlt()
 
     if(finalPos.x > wm->field->_FIELD_WIDTH)
     {
-        finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
+        finalPos = CKnowledge::getReflectPos(*wm->field,wm->field->oppGoal(), 3, wm->ball->pos);
     }
 
     Vector2D finalDir;
