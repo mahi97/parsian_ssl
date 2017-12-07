@@ -13,8 +13,6 @@
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/config.h>
 
-//#define OLD_FASTEST 1
-
 #define LOOP_TIME_BYKK 0.016
 struct velAndAccByKK {
   double vel;
@@ -37,11 +35,7 @@ protected:
     float tooFarDiffAngle;
     int defenseCount;
     int chipGKCounter;
-#ifndef OLD_FASTEST
     NewFastestToBall fastestToBall;
-#else
-    FastestToBall fastestToBall;
-#endif
     bool isItPossibleToClear;
     int upper_player;
     double catch_time;    

@@ -5,12 +5,10 @@ CSoccer* soccer;
 CSoccer::CSoccer()
 {
     agents = new Agent*[_MAX_NUM_PLAYERS];
-    for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
+    for(int i = 0; i < _MAX_NUM_PLAYERS; i++ )
     {
-        agents[i] = new Agent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
-        agents[i]->self = *wm->our.active(i);
+        agents[i] = new Agent(i);
     }
-
     coach = new CCoach(agents);
 }
 
@@ -29,7 +27,7 @@ void CSoccer::execute() {
     bool custom = false;
     customControl(custom);
     if (! custom) {
-//        coach->execute();
+        coach->execute();
     }
 
 }
@@ -44,6 +42,7 @@ void CSoccer::updateTask(){
     auto* gtp = new GotopointavoidAction;
     Circle2D aroundBall = Circle2D(wm->ball->pos, 0.5);
     Vector2D vec1, vec2;
+    ROS_INFO_STREAM(wm->ball->pos.x << "  " << wm->ball->pos.y);
     aroundBall.intersection(Line2D(Vector2D(0,0), wm->ball->pos), &vec1, &vec2);
     gtp->setTargetpos(vec1.absX() < vec2.absX() ? vec1 : vec2);
 
@@ -57,8 +56,8 @@ void CSoccer::updateTask(){
 }
 
 void CSoccer::customControl(bool &custom) {
-    custom = true;
-    updateTask();
     custom = false;
     return;
+    custom = true;
+    updateTask();
 }
