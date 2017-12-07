@@ -4,6 +4,7 @@
 
 #include "rqt_parsian_gui/robotstatus.h"
 
+class parsian_robot_status;
 namespace rqt_parsian_gui
 {
 
@@ -21,6 +22,11 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
     n_private = getPrivateNodeHandle();
 
     rs_sub = n_private.subscribe("/robots_status",1000,&RobotStatus::rsCallback,this);
+    for (int j = 0; j < max_robot; ++j) {
+        QString sub_name = QString("/robot_command")+QString::number(j);
+        rc_sub[j] = n_private.subscribe(sub_name.toStdString(),1000,&RobotStatus::rcCallback,this);
+    }
+
   // create QWidget
     scroll_widget = new QWidget;
     scrollArea =new QScrollArea;
@@ -48,7 +54,7 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
 
     context.addWidget(scrollArea);
 }
-    void RobotStatus::rsCallback(parsian_msgs::parsian_robots_statusConstPtr msg){
+    void RobotStatus::rsCallback(const parsian_msgs::parsian_robots_statusConstPtr msg){
         int counter=0;
         for(auto &i : statusWidget) {
             i->setMessage(msg->status[counter++]);
@@ -56,5 +62,10 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
         }
     }
 
+    void RobotStatus::rcCallback(const parsian_msgs::parsian_robot_commandConstPtr msg){
+
+            statusWidget[msg->robot_id]->setVel(*msg);
+
+    }
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::RobotStatus, rqt_gui_cpp::Plugin)

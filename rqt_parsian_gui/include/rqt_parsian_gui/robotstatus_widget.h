@@ -12,7 +12,9 @@
 #include <QHBoxLayout>
 #include <QPixmap>
 #include <QPainter>
+#include <QBrush>
 #include <parsian_msgs/parsian_robots_status.h>
+#include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <ros/ros.h>
 namespace rqt_parsian_gui {
@@ -20,11 +22,12 @@ namespace rqt_parsian_gui {
     Q_OBJECT
     public:
         explicit RobotStatusWidget(int color);
-        void setMessage(parsian_msgs::parsian_robot_status msg);
+        void setMessage(const parsian_msgs::parsian_robot_status msg);
+        void setVel(const parsian_msgs::parsian_robot_command msg);
     private:
 
         QString getFileName();
-        void draw_dir();
+        void draw_dir(double);
         //#######################################################
         QGroupBox   *robot_vel,*battery,*data_loss,*cap_charge,*status,*faults;
         QVBoxLayout *robot_vel_l,*battery_l,*data_loss_l,*cap_charge_l,*status_l,*faults_l;

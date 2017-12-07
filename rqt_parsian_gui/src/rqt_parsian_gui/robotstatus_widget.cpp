@@ -78,7 +78,7 @@ namespace rqt_parsian_gui
         //########################################### load image
 
         color = (team_color == parsian_msgs::parsian_team_config::isYellow) ? 'y' : 'b';
-        draw_dir();
+        draw_dir(0);
         //############################################################### progress bars
 
         battery_percentage = new QProgressBar;
@@ -162,11 +162,9 @@ namespace rqt_parsian_gui
     QString RobotStatusWidget::getFileName(){
         return QString("resource/images/" + color + robot_id + ".png");
     }
-    void RobotStatusWidget::setMessage(parsian_msgs::parsian_robot_status msg){
+    void RobotStatusWidget::setMessage(const parsian_msgs::parsian_robot_status msg){
         robot_id = QString::number(msg.id);
         board_id = QString::number(msg.boardId);
-
-        draw_dir();
 
         battery_percentage->setValue(msg.battery);
         data_loss_percentage->setValue(msg.dataLoss);
@@ -188,16 +186,29 @@ namespace rqt_parsian_gui
         shoot_sens->setChecked(msg.shootSensor);
         spin->setChecked(msg.spinCatchBall);
 
-        vel->setText("vel: "+ QString::number(0));
-        vel_ang->setText("vel ang: "+ QString::number(0));
+
         robot_id_l->setText("robot id: "+ QString::number(msg.id,16));
         board_id_l->setText("board id: "+ QString::number(msg.boardId,16));
 
     }
 
-    void RobotStatusWidget::draw_dir(){
+    void RobotStatusWidget::setVel(const parsian_msgs::parsian_robot_command msg){
+        vel->setText("vel: "+ QString::number(std::hypot(msg.vel_F,msg.vel_N)));
+        vel_ang->setText("vel ang: "+ QString::number(msg.vel_w));
+        if(msg.vel_F == 0 && msg.vel_N ==0)
+            draw_dir(0);
+        else
+            draw_dir(std::atan2(msg.vel_F,msg.vel_N));
+
+    }
+    void RobotStatusWidget::draw_dir(double ang){
         agent_i = new QPixmap(QPixmap::fromImage(QImage(getFileName())));
         agent_p = new QPainter(agent_i);
+        QBrush *b = new QBrush();
+        b->setColor(Qt::red);
+        agent_p->setBrush(*b);
+        agent_p->drawLine(25, 25, static_cast<int>(25 * (1 + std::cos(ang))),
+                          static_cast<int>(25 * (1 - std::sin(ang))));
         vel_dir->setPixmap(*agent_i);
     }
 

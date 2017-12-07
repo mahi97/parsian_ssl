@@ -9,6 +9,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_msgs/parsian_robots_status.h>
+#include <parsian_msgs/parsian_robot_command.h>
 #include <QScrollArea>
 #include <QVBoxLayout>
 
@@ -27,9 +28,9 @@ public:
 private:
     ros::NodeHandle n;
     ros::NodeHandle n_private;
-    ros::Subscriber rs_sub;
-    void rsCallback(parsian_msgs::parsian_robots_statusConstPtr);
-
+    ros::Subscriber rs_sub,rc_sub[max_robot];
+    void rsCallback(const parsian_msgs::parsian_robots_statusConstPtr);
+    void rcCallback(const parsian_msgs::parsian_robot_commandConstPtr);
     RobotStatusWidget *statusWidget[max_robot];
 
 
