@@ -30,8 +30,6 @@ public:
 
     virtual void customControl(bool& custom);
 
-    CWorldModel* wm;
-
     Agent **agents;
     CCoach *coach;
     clock_t realTimeTime;

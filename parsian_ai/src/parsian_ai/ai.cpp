@@ -5,9 +5,9 @@
 #include <parsian_ai/ai.h>
 
 AI::AI() {
-    soccer = new CSoccer();
     wm = new WorldModel();
     gameState =new GameState();
+    soccer = new CSoccer();
 }
 
 AI::~AI() {

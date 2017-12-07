@@ -4,7 +4,6 @@ CSoccer* soccer;
 
 CSoccer::CSoccer()
 {
-    wm = new CWorldModel;
     agents = new Agent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
@@ -30,7 +29,7 @@ void CSoccer::execute() {
     bool custom = false;
     customControl(custom);
     if (! custom) {
-        coach->execute();
+//        coach->execute();
     }
 
 }

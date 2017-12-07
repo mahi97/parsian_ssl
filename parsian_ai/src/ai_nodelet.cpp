@@ -8,8 +8,8 @@ void AINodelet::onInit() {
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    ROS_INFO("inited");
     ai = new AI();
+    ROS_INFO("inited");
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
         std::string topic("robot_task_"+std::to_string(i));
@@ -31,6 +31,7 @@ void AINodelet::onInit() {
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
     f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
+    ROS_INFO("MAHI");
 
 }
 

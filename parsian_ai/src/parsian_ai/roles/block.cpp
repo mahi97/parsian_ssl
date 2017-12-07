@@ -1,5 +1,6 @@
 #include <parsian_ai/roles/block.h>
 
+CRoleBlockInfo* CRoleBlock::roleInfo{};
 
 CRoleBlock::CRoleBlock(Agent *_agent) : CRole(_agent)
 {

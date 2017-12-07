@@ -36,32 +36,28 @@ CCoach::CCoach(Agent**_agents)
     playMakeTh = 0.3;
 
 
-//    // Old Plays
-//    ourKickOff          = new COurKickOff;
-//    ourPenalty          = new COurPenalty;
-//    forceStart          = new CForceStart;
-//    ourIndirect         = new COurIndirect;
-//    theirDirect         = new CTheirDirect;
-//    theirKickOff        = new CTheirKickOff;
-//    theirPenalty        = new CTheirPenalty;
-//    theirIndirect       = new CTheirIndirect;
-//    ourBallPlacement    = new COurBallPlacement;
+    // Old Plays
+    ourPenalty          = new COurPenalty;
+    theirDirect         = new CTheirDirect;
+    theirKickOff        = new CTheirKickOff;
+    theirPenalty        = new CTheirPenalty;
+    theirIndirect       = new CTheirIndirect;
+    ourBallPlacement    = new COurBallPlacement;
 //    halfTimeLineup    = new CHalftimeLineup;
-//    theirBallPlacement  = new CTheirBallPlacement;
-//    ourDoubleSizeDirect = new CDoubleSizeOurDirect;
-//
-//
-//    // New Plays
-//    ourPlayOff          = new CPlayOff;
-//    dynamicAttack       = new CDynamicAttack();
-//
-//    //Stop
-//    stopPlay            = new CStopPlay();
-//
-//    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-//        stopRoles[i] = new CRoleStop(knowledge->getAgent(i));
-//    }
-//
+    theirBallPlacement  = new CTheirBallPlacement;
+
+
+    // New Plays
+    ourPlayOff          = new CPlayOff;
+    dynamicAttack       = new CDynamicAttack();
+
+    //Stop
+    stopPlay            = new CStopPlay();
+
+    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
+        stopRoles[i] = new CRoleStop(agents[i]);
+    }
+
     lastDefenseAgents.clear();
 
     defenseTimeForVisionProblem[0].start();
@@ -78,12 +74,13 @@ CCoach::CCoach(Agent**_agents)
     firstIsFinished = false;
     preferedDefenseCounts = 2;
     overDefThr = 0;
-
+    selectedPlay = stopPlay;
     for (int &i : faultDetectionCounter) i = 0;
 }
 
 CCoach::~CCoach()
 {
+    delete stopPlay;
 //    savePostAssignment();
 //    saveLFUReapeatData(LFUList);
 }
