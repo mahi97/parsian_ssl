@@ -2,7 +2,7 @@
 
 INIT_ROLE(CRoleGaurd, "gaurd");
 
-CRoleGaurd::CRoleGaurd(CAgent *_agent) : CRole(_agent)
+CRoleGaurd::CRoleGaurd(Agent *_agent) : CRole(_agent)
 {
     gotopoint = new CSkillGotoPointAvoid(_agent);
 }

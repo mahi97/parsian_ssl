@@ -10,7 +10,7 @@ class CRoleMarkInfo : public CRoleInfo
 public:
     QList <int> markedOpp;
     CRoleMarkInfo(QString _roleName);
-    CAgent* blocker(int i);
+    Agent* blocker(int i);
 	QList<int> oneToucher;
 	double oneToucherDist2Ball;
 	void matching();
@@ -28,7 +28,7 @@ private:
 
 public:
 	DEF_ROLE(CRoleMark)
-    virtual void generateFromConfig(CAgent *a);
+    virtual void generateFromConfig(Agent *a);
     virtual void parse(QStringList params);
 	virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
     QStringList toBeMarkedRole;

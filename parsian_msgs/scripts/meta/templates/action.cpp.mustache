@@ -36,3 +36,19 @@ QString {{action_name}}::getActionName(){
     static QString name("{{action_name}}");
     return name;
 }
+
+{{#list_properties}}
+void {{action_name}}::clear{{name}}() {
+    {{local}}.clear();
+}
+
+void {{action_name}}::add{{name}}({{m_type}} _t) {
+    {{local}}.push_back(_t);
+}
+void {{action_name}}::remove{{name}}({{m_type}} _t) {
+    {{local}}.remove(_t);
+}
+{{{type}}} {{action_name}}::get{{name}}() {
+    return {{local}};
+}
+{{/list_properties}}

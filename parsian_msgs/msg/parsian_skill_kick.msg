@@ -1,7 +1,6 @@
-uint8 robot_id
 float64 tolerance
 bool chip
-int32 kickSpeed
+float64 kickSpeed
 int32 spin
 bool slow
 bool avoidPenaltyArea

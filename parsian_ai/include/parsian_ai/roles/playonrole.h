@@ -44,7 +44,7 @@ private:
     CSkillReceivePass *receivePassSkill;
     CSkillKickOneTouch *oneTouchSkill;
 
-    CAgent *agent;
+    Agent *agent;
 public:
     CRolePlayOn();
     ~CRolePlayOn();
@@ -53,12 +53,12 @@ public:
     bool updated;
     void initTask();
 
-    void setAgent(CAgent *_agent);
+    void setAgent(Agent *_agent);
 
     ClassProperty(CRolePlayOn, PSkills, Task, task, updated);
     ClassProperty(CRolePlayOn, bool, IsActive, isActive, updated);
     ClassProperty(CRolePlayOn, int, AgentID, agentID, updated);
-//    ClassProperty(CRolePlayOn, CAgent ,Agent, agent,  updated);
+//    ClassProperty(CRolePlayOn, Agent ,Agent, agent,  updated);
     ClassProperty(CRolePlayOn, roleSkill::ESkill, SelectedSkill, selectedSkill, updated);
 
 

@@ -303,3 +303,4 @@ catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+

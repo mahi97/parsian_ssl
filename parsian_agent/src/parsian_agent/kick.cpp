@@ -825,7 +825,7 @@ Vector2D CSkillKick::findMostPossible()
     }
     double prob,angle,biggestAngle;
 
-    CKnowledge::getEmptyAngle(wm->ball->pos-(wm->field->oppGoal()-ballPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field,wm->ball->pos-(wm->field->oppGoal()-ballPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
     //debug(QString("prob: %1 , angle :%2, biggest:%3").arg(prob).arg(angle).arg(biggestAngle),D_MHMMD);
 
     Segment2D goalSeg(wm->field->oppGoalL(),wm->field->oppGoalR());
@@ -873,42 +873,6 @@ double CSkillKick::oneTouchAngle(Vector2D pos,
     else ang = ang1 - th1;
 
     return ang;
-}
-
-double CSkillKick::kickTimeEstimation(Agent *_agent, Vector2D _target, const CBall& _ball)
-{
-    QList<int> ourRelax,oppRelax;
-    Vector2D finalPos;
-    Vector2D ballPosInFuture;
-    Vector2D s1,s2;
-    Segment2D ballPath(_ball.pos,_ball.pos + _ball.vel.norm()*10);
-    Circle2D robotAreaNear (_agent->pos(),0.4);
-
-    if(_ball.vel.length() > 0.2)
-    {
-        if((robotAreaNear.intersection(ballPath,&s1,&s2) != 0) && _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos())) >= 0)
-        {
-            return _ball.whenBallReachToPoint(_ball.pos.dist(_agent->pos()));
-        }
-
-
-        for(double i = 0 ; i < 3 ; i += 0.03)
-        {
-            ballPosInFuture = _ball.getPosInFuture(i);
-            finalPos = ballPosInFuture - (_target-ballPosInFuture).norm()*0.11;
-            if(CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf->VelMax,ourRelax,oppRelax,true,0.2,true)<= i+0.1)
-            {
-                //draw(finalPos,1,QColor(Qt::blue));
-                return i;
-            }
-        }
-
-    }
-
-    finalPos = _ball.pos - (_target - _ball.pos).norm() * 0.11;
-//    draw(finalPos);
-    return 100 - CSkillGotoPointAvoid::timeNeeded(_agent,finalPos,conf->VelMax,ourRelax,oppRelax,true,0.2,false);
-
 }
 
 void CSkillKick::findPosToGo()
@@ -1002,7 +966,7 @@ void CSkillKick::findPosToGo()
     }
     if(finalPos.x > wm->field->_FIELD_WIDTH)
     {
-        finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
+        finalPos = CKnowledge::getReflectPos(*wm->field, wm->field->oppGoal(), 3, wm->ball->pos);
     }
 
     if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
@@ -1083,7 +1047,7 @@ void CSkillKick::findPosToGoAlt()
 
     if(finalPos.x > wm->field->_FIELD_WIDTH)
     {
-        finalPos = CKnowledge::getReflectPos(wm->field->oppGoal(), 3, wm->ball->pos);
+        finalPos = CKnowledge::getReflectPos(*wm->field,wm->field->oppGoal(), 3, wm->ball->pos);
     }
 
     Vector2D finalDir;

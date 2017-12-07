@@ -1,4 +1,3 @@
-uint8 robot_id
 vector2D targetPos
 vector2D targetDir
 vector2D targetVel
@@ -12,3 +11,4 @@ bool slowMode
 bool penaltyKick
 bool diveMode
 bool smooth
+uint8 roller

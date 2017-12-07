@@ -8,6 +8,7 @@
 #include <parsian_util/action/action.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_kick.h>
+#include <list>
 
 class KickAction : public Action {
 
@@ -20,11 +21,10 @@ public:
     static QString getActionName();
 
 
-    SkillProperty(KickAction, quint8, Robot_Id, robot_id);
     SkillProperty(KickAction, double, Tolerance, tolerance);
     SkillProperty(KickAction, bool, Chip, chip);
-    SkillProperty(KickAction, qint32, Kickspeed, kickSpeed);
-    SkillProperty(KickAction, qint32, Spin, spin);
+    SkillProperty(KickAction, double, Kickspeed, kickSpeed);
+    SkillProperty(KickAction, int, Spin, spin);
     SkillProperty(KickAction, bool, Slow, slow);
     SkillProperty(KickAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
     SkillProperty(KickAction, bool, Avoidopppenaltyarea, avoidOppPenaltyArea);
@@ -40,6 +40,7 @@ public:
     SkillProperty(KickAction, bool, Kickwithcenterofdribbler, kickWithCenterOfDribbler);
     SkillProperty(KickAction, bool, Playmakemode, playMakeMode);
     SkillProperty(KickAction, Vector2D, Target, target);
+
 
 };
 
