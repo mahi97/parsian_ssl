@@ -17,16 +17,34 @@ RobotStatus::RobotStatus()
 
 void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
 {
-  n = getNodeHandle();
-  n_private = getPrivateNodeHandle();
+    n = getNodeHandle();
+    n_private = getPrivateNodeHandle();
   // create QWidget
-  statusWidget = new RobotStatusWidget(n);
-  statusWidget->setWindowTitle("RobotStatus");
+    scroll_widget = new QWidget;
+    scrollArea =new QScrollArea;
+    scrollArea_l = new QVBoxLayout;
+
+    scrollArea_l->setSizeConstraint(QLayout::SetMinimumSize);
+    scroll_widget->setLayout(scrollArea_l);
+
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWindowTitle("RobotStatus");
+    scrollArea->setFixedHeight(700);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scrollArea->setWidget(scroll_widget);
+
+    for(auto &i : statusWidget) {
+        i = new RobotStatusWidget(parsian_msgs::parsian_team_config::isYellow);
+        scrollArea_l->addWidget(i);
+    }
+
+
 
   // extend the widget with all attributes and children from UI file
 
   // add widget to the user interface
-  context.addWidget(statusWidget);
+
+    context.addWidget(scrollArea);
 }
 
 }  // namespace rqt_example_cpp

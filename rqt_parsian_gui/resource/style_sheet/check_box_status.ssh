@@ -4,7 +4,7 @@ QCheckBox::indicator {
 }
 QCheckBox::indicator:unchecked:disabled
 {
-  image: url(resource/images/Checkbox_unchecked_disabled.png);
+  image:;
 }
 
 QCheckBox::indicator:checked:disabled
