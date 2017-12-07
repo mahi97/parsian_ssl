@@ -1,3 +1,4 @@
+#include <parsian_ai/soccer.h>
 #include "parsian_ai/plays/playoff.h"
 
 
@@ -1176,7 +1177,7 @@ bool CPlayOff::isFinalShotDone() {
     // Plan hasn't a final shoot
     if (tLastState == -1 || tLastAgent == -1) return false;
 
-    CAgent* tAgent = soccer->agents[masterPlan -> common.matchedID[tLastAgent]];
+    Agent* tAgent = soccer->agents[masterPlan -> common.matchedID[tLastAgent]];
 
     Circle2D cir (tAgent->pos() + tAgent->dir().norm()*0.08, 0.16);
     Circle2D cir2(tAgent->pos() + tAgent->dir().norm()*0.20, 0.40);
@@ -1241,7 +1242,7 @@ void CPlayOff::passManager() {
 
     const int& i = masterPlan->common.matchedID.value(r.id);
 
-    CAgent* c    = soccer->agents[i];
+    Agent* c    = soccer->agents[i];
     if (positionAgent[r.id].stateNumber == r.state
             ||  positionAgent[r.id].stateNumber == r.state + 1) {
         DBUG(QString("RC : %1, %2").arg(r.id).arg(r.state), D_MAHI);
@@ -1829,7 +1830,7 @@ void CPlayOff::reset(){
     DBUG(QString("reset Plan"),D_MAHI);
 }
 
-void CPlayOff::init(const QList<CAgent*>& _agents){
+void CPlayOff::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
 

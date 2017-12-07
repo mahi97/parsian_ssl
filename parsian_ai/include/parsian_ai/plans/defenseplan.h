@@ -115,7 +115,7 @@ protected:
     ///////////////////////////////////////////////////
     void executeGoalKeeper();    
     Vector2D strictFollowBall(Vector2D _ballPos);    
-    Vector2D checkDefensePoint(CAgent* agent, const Vector2D& point);
+    Vector2D checkDefensePoint(Agent* agent, const Vector2D& point);
     rcsc::Vector2D avoidKicker(int i, int kicker);
     void announceClearing(bool state);
     int decideNumOfMarks();
@@ -164,8 +164,8 @@ protected:
 public:
     DefensePlan();
     void execute();
-    void initGoalKeeper(CAgent *_goalieAgent = NULL);
-    void initDefense(QList <CAgent*> _defenseAgents = QList<CAgent*>());
+    void initGoalKeeper(Agent *_goalieAgent = NULL);
+    void initDefense(QList <Agent*> _defenseAgents = QList<Agent*>());
     int getNumberofThreeDefense();
     bool isAnyDefenderMarking() const;    
     void fillDefencePositionsTo(Vector2D *poses);    
@@ -207,7 +207,7 @@ private:
     rcsc::Vector2D* getIntersectWithDefenseArea(const Segment2D& segment, const Vector2D& blockPoint);
     rcsc::Vector2D* getIntersectWithDefenseArea(const Circle2D& circle, bool upperPoint);
     rcsc::Vector2D getIntersexWithGoalieEllipse(rcsc::Segment2D seg1, rcsc::Segment2D seg2, bool isDefenseUpperThanGoalieAngle);
-    void assignSkill(CAgent *_agent , Action *_skill);
+    void assignSkill(Agent *_agent , Action *_skill);
     bool isValidPoint(const Vector2D& point);
     void initVars(float goalCircleRad = 0.9); // default is 0.8
     void preCalculate();
@@ -215,8 +215,8 @@ private:
     bool doubleMarking;
     bool isDefenseFastest;
     bool clearflag;
-    CAgent *goalKeeperAgent;
-    QList <CAgent *> defenseAgents;
+    Agent *goalKeeperAgent;
+    QList <Agent *> defenseAgents;
     int oneDefUpOrDown;
     int twoDefCurState;
     int lastStateOffPlay;

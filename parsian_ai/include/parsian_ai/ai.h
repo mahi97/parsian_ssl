@@ -10,7 +10,7 @@
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_util/core/worldmodel.h>
-#include <parsian_util/knowledge.h>
+#include <parsian_util/core/knowledge.h>
 #include <parsian_ai/soccer.h>
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_ai/config.h>

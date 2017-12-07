@@ -2,9 +2,7 @@
 #define Block_H
 
 #include <parsian_ai/roles/role.h>
-#include <parsian_util/core/agent.h>
-#include <parsian_ai/util/worldmodel.h>
-#include <parsian_ai/util/knowledge.h>
+
 
 class CRoleBlockInfo : public CRoleInfo
 {
@@ -21,7 +19,7 @@ protected:
     GotopointavoidAction* gotopoint;
     static CRoleBlockInfo* roleInfo;
 public:
-    CRoleBlock(CAgent *_agent);
+    CRoleBlock(Agent *_agent);
     ~CRoleBlock();
     void execute();
     double progress();

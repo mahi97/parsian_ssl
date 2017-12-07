@@ -95,7 +95,7 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
         src/${PROJECT_NAME}/coach.cpp
-)
+		include/parsian_ai/util/agent.h)
 
 add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/dynamicattack.cpp
@@ -133,7 +133,7 @@ add_library(${PROJECT_NAME}_util
 		src/parsian_ai/util/worldmodel.cpp
 		#		src/parsian_ai/util/planloader.cpp
 #		src/parsian_ai/util/loadplayoffjson.cpp
-		)
+		src/parsian_ai/util/agent.cpp)
 
 
 add_library(${PROJECT_NAME}_nodelet

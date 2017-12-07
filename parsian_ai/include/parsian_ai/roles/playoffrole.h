@@ -38,7 +38,7 @@ public:
     GotopointavoidAction *gotoPointAvoidSkill;
 
     ClassProperty(CRolePlayOff, int, AgentID, agentID, updated);
-    ClassProperty(CRolePlayOff, CAgent*, Agent, agent, updated);
+    ClassProperty(CRolePlayOff, Agent*, Agent, agent, updated);
     ClassProperty(CRolePlayOff, RoleSkill, SelectedSkill, selectedSkill, updated);
     ClassProperty(CRolePlayOff, Vector2D, Target, target, updated);
     ClassProperty(CRolePlayOff, Vector2D, TargetDir, targetDir, updated);

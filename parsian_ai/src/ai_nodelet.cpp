@@ -19,8 +19,8 @@ void AINodelet::onInit() {
     debugger = new Debugger();
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
-    robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, ai);
-    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, ai);
+    robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
+    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);

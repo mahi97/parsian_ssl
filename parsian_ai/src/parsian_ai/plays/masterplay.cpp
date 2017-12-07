@@ -1,6 +1,7 @@
 #include <parsian_ai/plays/masterplay.h>
 
 #include <utility>
+#include <parsian_ai/soccer.h>
 
 PositioningPlan CMasterPlay::positioningPlan;
 CMarkPlan CMasterPlay::markPlan;
@@ -41,7 +42,7 @@ bool CMasterPlay::canScore(){
 }
 
 
-void CMasterPlay::setAgentsID(const QList<CAgent*>& _agentsID){
+void CMasterPlay::setAgentsID(const QList<Agent*>& _agentsID){
     agentsID.clear();
     agentsID.append(_agentsID);
 }
@@ -66,9 +67,9 @@ void CMasterPlay::resetPlayMaker(){
 
 // This function is critical, any manipulation would
 // result in bad bugs!
-void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
+void CMasterPlay::appendRemainingsAgents(QList<Agent *> &_list){
 
-    QList <CAgent*> remainings;
+    QList <Agent*> remainings;
 
     for (auto i : agentsID) {
         remainings.append(i);
@@ -96,7 +97,7 @@ void CMasterPlay::appendRemainingsAgents(QList<CAgent *> &_list){
 
 void CMasterPlay::choosePlayMaker(){
     int playMakeID = -1;
-    QList <CAgent *> playAgents;
+    QList <Agent *> playAgents;
     playAgents.clear();
     for (auto i : agentsID) {
         playAgents.append(i);
@@ -106,7 +107,7 @@ void CMasterPlay::choosePlayMaker(){
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
 //        int id = knowledge->agentsWithIntention.at(i);
 //        if( agentsID.contains(id) ){
-//            CAgent *agnt = knowledge->getAgent(id);
+//            Agent *agnt = knowledge->getAgent(id);
 //            if( agnt->intention->M_type == "playmake" ){
 //                playMakeID = id;
 //            }
@@ -116,7 +117,7 @@ void CMasterPlay::choosePlayMaker(){
     if( playMakeID == -1 ){
 //        playMakeID = knowledge->newFastestSelector(playAgents);
 //        if( playMakeID != -1 ){
-//            CAgent *agnt = knowledge->getAgent(playMakeID);
+//            Agent *agnt = knowledge->getAgent(playMakeID);
 //            if( agnt != NULL ){
 //                agnt->playMakeIntent.assign(playMakeID , knowledge->frameCount);
 //                agnt->intention = &agnt->playMakeIntent;
@@ -136,7 +137,7 @@ void CMasterPlay::choosePlayMaker(){
 void CMasterPlay::chooseBlocker(){
 
     int blockID = -1;
-    QList <CAgent *> playAgents;
+    QList <Agent *> playAgents;
     playAgents.clear();
     for (auto i : agentsID) {
         playAgents.append(i);
@@ -145,7 +146,7 @@ void CMasterPlay::chooseBlocker(){
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
 //        int id = knowledge->agentsWithIntention.at(i);
 //        if( agentsID.contains(id) ){
-//            CAgent *agnt = knowledge->getAgent(id);
+//            Agent *agnt = knowledge->getAgent(id);
 //            if( agnt->intention->M_type == "block" ){
 //                blockID = id;
 //            }
@@ -155,7 +156,7 @@ void CMasterPlay::chooseBlocker(){
     if( blockID == -1 ){
 //        blockID = knowledge->newFastestSelector(playAgents);
 //        if( blockID != -1 ){
-//            CAgent *agnt = knowledge->getAgent(blockID);
+//            Agent *agnt = knowledge->getAgent(blockID);
 //            agnt->blockIntent.assign(blockID , knowledge->frameCount);
 //            agnt->intention = &agnt->blockIntent;
 //        }
@@ -167,7 +168,7 @@ void CMasterPlay::chooseBlocker(){
 }
 
 
-bool CMasterPlay::canOneTouch(QList<CAgent *> posAgents, CAgent *playMake){
+bool CMasterPlay::canOneTouch(QList<Agent *> posAgents, Agent *playMake){
     for (auto posAgent : posAgents) {
         QList<int> ourRelaxIDS,oppRelaxIDS;
         int positioner = posAgent->id();

@@ -1,7 +1,7 @@
 #include <parsian_ai/roles/block.h>
 
 
-CRoleBlock::CRoleBlock(CAgent *_agent) : CRole(_agent)
+CRoleBlock::CRoleBlock(Agent *_agent) : CRole(_agent)
 {
     gotopoint = new GotopointavoidAction();
 }
@@ -13,8 +13,7 @@ CRoleBlock::~CRoleBlock()
 
 void CRoleBlock::execute()
 {
-    gotopoint->setRobot_Id(static_cast<quint8>(agent->id()));
-	info()->findPos(blockGoal);
+    info()->findPos(blockGoal);
 
 	Vector2D dir, p;
 	p = agent->oneTouchCheck(info()->blockPosition, &dir);

@@ -3,7 +3,7 @@
 
 INIT_ROLE(CRoleMark, "mark");
 
-CRoleMark::CRoleMark(CAgent *_agent) : CRole(_agent)
+CRoleMark::CRoleMark(Agent *_agent) : CRole(_agent)
 {
 	gotopointavoid = new CSkillGotoPointAvoid(_agent);
 	shoot = new CBehaviourKick;
@@ -197,7 +197,7 @@ void CRoleMark::execute()
 	if( kickOffMode || knowledge->getGameState() == CKnowledge::TheirIndirectKick || knowledge->getGameState() == CKnowledge::TheirDirectKick )
 	{
 		int k=0;
-		CAgent* blocker;
+		Agent* blocker;
 		while( (blocker=info()->blocker(k)) != NULL )
 		{
 			if( (blocker->pos() - markPos).length() < CRobot::robot_radius_new*3.0 ){
@@ -244,7 +244,7 @@ CRoleMarkInfo::CRoleMarkInfo(QString _roleName) : CRoleInfo(_roleName)
 	mwbm.create(_MAX_NUM_PLAYERS , _MAX_NUM_PLAYERS);
 }
 
-CAgent* CRoleMarkInfo::blocker(int i)
+Agent* CRoleMarkInfo::blocker(int i)
 {
     int z = 0;
     for (int k=0;k<knowledge->agentCount();k++)
@@ -259,7 +259,7 @@ CAgent* CRoleMarkInfo::blocker(int i)
 }
 
 void CRoleMarkInfo::matching(){
-	QList <CAgent*> ourOffendersAgents;
+	QList <Agent*> ourOffendersAgents;
 	QList <int> oppOffenders;
 	QList <int> ourOffenders;
 

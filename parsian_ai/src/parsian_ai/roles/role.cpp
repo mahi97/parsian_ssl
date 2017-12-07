@@ -1,10 +1,9 @@
 #include <parsian_ai/roles/role.h>
+#include <parsian_ai/soccer.h>
 
-CRole::CRole()
-{
-}
+CRole::CRole() = default;
 
-CRole::CRole(CAgent* _agent)
+CRole::CRole(Agent* _agent)
 {
 }
 
@@ -13,7 +12,7 @@ CRole* CRole::fromString(QString roleName)
 }
 
 
-void CRole::assign(CAgent* _agent)
+void CRole::assign(Agent* _agent)
 {
 
     if (_agent!=NULL)
@@ -36,7 +35,7 @@ CRoleInfo::CRoleInfo(QString _roleName)
     InitVal(roleName);
 }
 
-CAgent* CRoleInfo::robot(int i)
+Agent* CRoleInfo::robot(int i)
 {
     int k=0;
     for (int j=0;j < _MAX_NUM_PLAYERS;j++)

@@ -26,13 +26,13 @@ enum class edgeMode {
 class holdingPoints
 {
 public:
-	CAgent *player;
+	Agent *player;
 	QList< Vector2D > points;
 	QList< int > cyclesToWait;
 	QList< double > escapeRadius;
 	QList<positioningType> dir;
 	holdingPoints(){}
-	holdingPoints( CAgent *_player, QList< Vector2D > _points, QList< int > _cyclesToWait, QList< double > _escapeRadius , QList<positioningType> _dir )
+	holdingPoints( Agent *_player, QList< Vector2D > _points, QList< int > _cyclesToWait, QList< double > _escapeRadius , QList<positioningType> _dir )
 	{
 		player = _player;
 		points.clear();
@@ -93,7 +93,7 @@ private:
 public:
     PositioningPlan();
 	void staticInit( QList< holdingPoints > &_staticPoints );
-    void init(const QList<CAgent*> & _agents , QString playMode );
+    void init(const QList<Agent*> & _agents , QString playMode );
 	void staticExec();
 	void execute();
     void reset();

@@ -7,7 +7,7 @@
 #include <QList>
 #include <vector>
 #include <QPair>
-#include <parsian_util/knowledge.h>
+#include <parsian_util/core/knowledge.h>
 
 using namespace std;
 
@@ -431,7 +431,7 @@ void DefensePlan::manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsT
             }
             else if(ourMarkAgentsSize - markPoses.size() > opponentAgentsToBeMarkPossition.size()){
                 for(i = 0 ; i < opponentAgentsToBeMarkPossition.size() ; i++){
-                    drawer->(opponentAgentsToBeMarkCircle.at(i),QColor(Qt::cyan));
+                    drawer->draw(opponentAgentsToBeMarkCircle.at(i),QColor(Qt::cyan));
                 }
                 for(i = 0 ; i < opponentAgentsToBeMarkPossition.size() ; i++){
                     if(!wm->field->isInOurPenaltyArea(opponentAgentsToBeMarkPossition.at(i))){
@@ -1075,7 +1075,7 @@ void DefensePlan::setGoalKeeperTargetPoint(){
     }
 }
 
-void DefensePlan::assignSkill(CAgent *_agent , Action *_skill){
+void DefensePlan::assignSkill(Agent *_agent , Action *_skill){
     //// For run any skill,for example: kick , we must initialize
     //// some main variables that are effective to run a skill.
     //// This function is called anywhere that we need to run a skill.
@@ -1086,7 +1086,7 @@ void DefensePlan::assignSkill(CAgent *_agent , Action *_skill){
 
 }
 
-void DefensePlan::initGoalKeeper(CAgent *_goalieAgent){
+void DefensePlan::initGoalKeeper(Agent *_goalieAgent){
     //// This function determines the goalkeeper agent. Actually this function
     //// is used in Coach.cpp && in "decideDefense"function to determine the
     //// goalkeeper agent.
@@ -1098,7 +1098,7 @@ void DefensePlan::initGoalKeeper(CAgent *_goalieAgent){
     }
 }
 
-void DefensePlan::initDefense(QList <CAgent*> _defenseAgents){
+void DefensePlan::initDefense(QList <Agent*> _defenseAgents){
     //// Just like the "initGoalKeeper" function , for inializing the defense
     //// agent , we have a function like this. :)
 
@@ -1256,7 +1256,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     //// our agents we have in defense plan. Then we run the "GotoPointAvoid"
     //// skill on the agents.
 
-    QList <CAgent*> ourAgents;
+    QList <Agent*> ourAgents;
     QList <Vector2D> matchPoints;
     QList <Vector2D> stuckPositions;
     QList <int> stuckIndexs;
@@ -2353,7 +2353,7 @@ void DefensePlan::setPointToKick(){
         }
         else{
             Vector2D *inter = getIntersectWithDefenseArea(Line2D(ballPos, midGoal), ballPos);
-            if(inter == NULL || !inter->valid()){
+            if(inter == nullptr || !inter->valid()){
                 pointForKick.invalidate();
                 return;
             }
@@ -2363,8 +2363,8 @@ void DefensePlan::setPointToKick(){
         oneToucherDir = (Vector2D::unitVector(CKnowledge::oneTouchAngle(pointForKick, Vector2D(0, 0), wm->ball->vel, //TODO: add action property
                                                                                 (pointForKick - ballPos).norm()
                                                                                 , wm->field->oppGoal()
-                                                                                , conf()->SkillsParams_KickOneTouch_Landa()
-                                                                                , conf()->SkillsParams_KickOneTouch_Gamma())));
+                                                                                , 0.2
+                                                                                , 0.9)));
         pointForKick -= oneToucherDir * (CRobot::center_from_kicker_new + CBall::radius);
     }
 }
@@ -2606,7 +2606,7 @@ void DefensePlan::checkDefenseExeptions(){
     }
 }
 
-Vector2D DefensePlan::checkDefensePoint(CAgent* agent, const Vector2D& point){
+Vector2D DefensePlan::checkDefensePoint(Agent* agent, const Vector2D& point){
     Vector2D agentPos = agent->pos();
     double distFromGoal = 1.6;
     if(agentPos.dist(midGoal) < distFromGoal){

@@ -34,7 +34,7 @@ public:
 
     bool inited;
     double playOnTime;
-    explicit CCoach(CAgent** _agents);
+    explicit CCoach(Agent** _agents);
     ~CCoach();
     void execute();
     void saveGoalie(); // TODO : Move To roles/Agent
@@ -51,10 +51,10 @@ private:
     Vector2D lastBallPos;
     double findMostPossible(Vector2D agentPos);
     States lastState;
-    CAgent *goalieAgent;
-    CAgent *exeptionPlayMake;
+    Agent *goalieAgent;
+    Agent *exeptionPlayMake;
     double exeptionPlayMakeThr;
-    QList<CAgent*> defenseAgents;
+    QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
     Vector2D defenseTargets[12];
@@ -85,7 +85,7 @@ private:
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
-    CAgent** agents;
+    Agent** agents;
     int lastAssignCycle;
 
     void checkRoleAssignments();
@@ -97,7 +97,7 @@ private:
     QList <int> missMatchIds;
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
-    QList <CAgent*> lastDefenseAgents;
+    QList <Agent*> lastDefenseAgents;
 
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);

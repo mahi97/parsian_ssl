@@ -2,7 +2,7 @@
 
 INIT_ROLE(CRoleWarmup, "warmup");
 
-CRoleWarmup::CRoleWarmup(CAgent *_agent) : CRole(_agent)
+CRoleWarmup::CRoleWarmup(Agent *_agent) : CRole(_agent)
 {
     gotopoint = new CSkillGotoPointAvoid(_agent);
 }

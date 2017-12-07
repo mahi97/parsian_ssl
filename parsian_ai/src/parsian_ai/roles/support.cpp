@@ -2,7 +2,7 @@
 
 INIT_ROLE(CRoleSupport, "support");
 
-CRoleSupport::CRoleSupport(CAgent *_agent) : CRole(_agent)
+CRoleSupport::CRoleSupport(Agent *_agent) : CRole(_agent)
 {
     gotopoint = new CSkillGotoPointAvoid(_agent);
     kick = new CSkillKick(_agent);

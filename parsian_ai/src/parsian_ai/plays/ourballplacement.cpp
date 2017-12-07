@@ -12,7 +12,7 @@ void COurBallPlacement::reset(){
 
 }
 
-void COurBallPlacement::init(QList<int> _agents){
+void COurBallPlacement::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
 

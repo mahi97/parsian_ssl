@@ -7,7 +7,7 @@
 
 QMap<QString, EditData*> CRolePosition::editData;
 
-CRolePosition::CRolePosition(CAgent *_agent) : CRole(_agent)
+CRolePosition::CRolePosition(Agent *_agent) : CRole(_agent)
 {
 	bool closing = false;
 	double t, t0=0;

@@ -33,7 +33,7 @@ PositioningPlan::PositioningPlan()
     }
 }
 
-void PositioningPlan::init(const QList<CAgent*> & _agents , QString playMode )
+void PositioningPlan::init(const QList<Agent*> & _agents , QString playMode )
 {
 
     dynamicPositioners.clear();
@@ -61,118 +61,12 @@ void PositioningPlan::init(const QList<CAgent*> & _agents , QString playMode )
 
 void PositioningPlan::staticExec()
 {
-    dynamicPositioners.clear();
-    staticPositioners.clear();
-    bool isStatic;
-
-//	for( int i=0 ; i<staticPoints.size() ; i++ ){
-//		QString pos;
-//		for( int j=0 ; j<staticPoints.at(i).points.size() ; j++ )
-//			pos += QString(" (%1 , %2) ").arg(staticPoints.at(i).points.at(j).x).arg(staticPoints.at(i).points.at(j).y);
-//		debug(QString("Position: ID=%1 , Points: %2").arg(staticPoints.at(i).player->self()->id).arg(pos) , D_MASOOD , "blue");
-//	}
-
-//	QString str;
-//	for( int i=0 ; i<staticPoints.size() ; i++ ){
-//		str += QString(" %1").arg(staticStateNo[staticPoints.at(i).player->id()]);
-//	}
-//	debug(QString("staticStateNo: %1").arg(str) , D_MASOOD , "blue");
-
-    for( int i=0 ; i<agents.size() ; i++ )
-    {
-        isStatic = false;
-        for( int j=0 ; j<positionStaticPoints.size() ; j++ )
-        {
-      if( agents.at(i)->id() == positionStaticPoints.at(j).player->id() )
-            {
-                int curID = agents.at(i)->id();
-                staticPositioners.append(i);
-
-                bool &sequenceDone = positionStaticPoints.at(j).player->positionIntent.positioningSequenceDone;
-
-                int sequenceSize = positionStaticPoints.at(j).points.size();
-                int &stateNumber = staticStateNo[curID];
-
-        if( stateNumber >= sequenceSize )
-          continue;
-
-                Vector2D curPoint = positionStaticPoints.at(j).points.at(stateNumber);
-                Vector2D agentPos = wm->our[curID]->pos;
-                positioningType curPosDir = positionStaticPoints.at(j).dir.at(stateNumber);
-                double curEscapeRadius = positionStaticPoints.at(j).escapeRadius.at(stateNumber);
-                int curExecCycles = positionStaticPoints.at(j).cyclesToWait.at(stateNumber);
-
-                if( sequenceDone == false ){
-                    if( curPoint.dist( agentPos ) < 0.05 + curEscapeRadius ){
-                        if( executedCycles[curID] < curExecCycles ){
-                            executedCycles[curID]++;
-                        }
-                        else{
-                            stateNumber++;
-                            executedCycles[curID] = 0;
-                            if( stateNumber == sequenceSize ){
-                                sequenceDone = true;
-//                debug(QString("PositionDone, ID: %1").arg(agents.at(i)->id()) , D_MASOOD , "blue");
-                                stateNumber--;
-                                agents.at(i)->waitHere();
-                                dynamicPositioners.append(i);
-                                staticPositioners.removeLast();
-                positionStaticPoints.removeAt(j);
-                j--;
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-//        debug(QString("ID(%1): %2 (%3,%4) ").arg(curID).arg(executedCycles[curID]).arg(curPoint.x).arg(curPoint.y) , D_MASOOD , "blue");
-
-        staticPositioningTargetsInput[curID] = curPoint;
-                staticPositioningFacePoints[curID] = findFacePoint(curPosDir);
-                staticEscapeRadius[curID] = curEscapeRadius;
-                lastStaticPositioningTargets[curID] = positionStaticPoints.at(j).points.last();
-                isStatic = true;
-                break;
-            }
-        }
-        if( !isStatic )
-        {
-            dynamicPositioners.append(i);
-        }
-    }
 
 }
 
 void PositioningPlan::staticInit( QList< holdingPoints > &_staticPoints )
 {
-    QString t;
-    // QString::sprintf adds 0x prefix
-    foreach( holdingPoints _hp, _staticPoints )
-    {
-//    This line prevent agents added to positioningplan after completation of  their sequence
-        if( _hp.player->positionIntent.positioningSequenceDone == false )
-    {
-            int i = 0;
-            for( i = 0 ; i < positionStaticPoints.count() ; i++ )
-            {
-        if( _hp.player->id() == positionStaticPoints.at(i).player->id() )
-                {
-          if( isDifferentSequence(_hp.points , positionStaticPoints.at(i).points) ){
-            positionStaticPoints.removeAt(i);
-            positionStaticPoints.append(_hp);
-            staticStateNo[_hp.player->id()] = 0;
-            executedCycles[_hp.player->id()] = 0;
-          }
-          break;
-                }
-            }
-            if( i == positionStaticPoints.count() ){
-                positionStaticPoints.append(_hp);
-        staticStateNo[_hp.player->id()] = 0;
-        executedCycles[_hp.player->id()] = 0;
-            }
-        }
-    }
+
 }
 
 bool PositioningPlan::isDifferentSequence(QList<Vector2D> first, QList<Vector2D> second){
@@ -432,10 +326,8 @@ bool PositioningPlan::isValidPoint( Vector2D target , bool callFromStaticPositio
     if( lowerbound > downPost && lowerbound < topPost )
         return false;
 
-    if( upperbound > downPost && upperbound < topPost )
-        return false;
+    return !(upperbound > downPost && upperbound < topPost);
 
-    return true;
 }
 
 

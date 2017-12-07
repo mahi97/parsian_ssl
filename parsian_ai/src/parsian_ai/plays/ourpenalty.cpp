@@ -9,7 +9,7 @@ void COurPenalty::reset(){
 	executedCycles = 0;
 }
 
-void COurPenalty::init(QList<CAgent*> _agents){
+void COurPenalty::init(const QList<Agent*>& _agents){
 	setAgentsID(_agents);
 	initMaster();
 

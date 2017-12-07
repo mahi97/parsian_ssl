@@ -12,7 +12,7 @@ void CTheirDirect::reset(){
 
 }
 
-void CTheirDirect::init(const QList<CAgent*>& _agents){
+void CTheirDirect::init(const QList<Agent*>& _agents){
 	setAgentsID(_agents);
 	initMaster();
 

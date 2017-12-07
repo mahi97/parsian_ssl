@@ -11,7 +11,7 @@
 
 
 //QMap<QString, EditData*> CCoach::editData;
-CCoach::CCoach(CAgent**_agents)
+CCoach::CCoach(Agent**_agents)
 {
     goalieTrappedUnderGoalNet = false;
     inited = false;
@@ -637,7 +637,7 @@ double CCoach::findMostPossible(Vector2D agentPos)
     }
     double prob,angle,biggestAngle;
 
-    CKnowledge::getEmptyAngle(agentPos-(wm->field->oppGoal()-agentPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field,agentPos-(wm->field->oppGoal()-agentPos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
 
 
     return prob;
@@ -867,8 +867,12 @@ void CCoach::decideAttack()
             return;
             break;
     }
+    QList<Agent*> ourAgents;
+    for(auto& ourPlayer : ourPlayers) {
+        ourAgents.append(agents[ourPlayer]);
+    }
 
-    selectedPlay->(ourPlayers);
+    selectedPlay->init(ourAgents);
     selectedPlay->execute();
     lastPlayers.clear();
     lastPlayers.append(ourPlayers);
@@ -1228,7 +1232,7 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
 
     QList<int> tempAgents;
     for (int i = 0; i < _ourPlayers.size(); i++) {
-        CAgent* tempAgent = agents[_ourPlayers.at(i)];
+        Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
             stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
         } else {
@@ -1356,7 +1360,7 @@ void CCoach::checkSensorShootFault() {
     QList<int> ourPlayers = wm->our.data->activeAgents;
     for (int i = 0; i < 12; i++) {
         if (ourPlayers.contains(i) != nullptr) {
-            CAgent* tempAgent = agents[i];
+            Agent* tempAgent = agents[i];
             if (tempAgent->shootSensor
                 &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm()*0.08) > 0.2) {
                 faultDetectionCounter[i]++;

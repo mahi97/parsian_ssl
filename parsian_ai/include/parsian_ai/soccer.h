@@ -7,7 +7,7 @@
 
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_util/base.h>
-#include <parsian_util/core/agent.h>
+#include <parsian_ai/util/agent.h>
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/coach.h>
 #include <parsian_ai/gamestate.h>
@@ -32,7 +32,7 @@ public:
 
     CWorldModel* wm;
 
-    CAgent **agents;
+    Agent **agents;
     CCoach *coach;
     clock_t realTimeTime;
     struct timeval t1, t2;

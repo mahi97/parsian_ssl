@@ -8,7 +8,7 @@ public:
 	CTheirIndirect();
 	~CTheirIndirect();
 	void execute_x();
-	void init(QList <CAgent*> _agents);
+	void init(const QList <Agent*>& _agents);
 private:
 	void reset();
 };

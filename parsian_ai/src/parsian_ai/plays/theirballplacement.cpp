@@ -12,7 +12,7 @@ void CTheirBallPlacement::reset(){
 
 }
 
-void CTheirBallPlacement::init(QList<CAgent*> _agents){
+void CTheirBallPlacement::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
 

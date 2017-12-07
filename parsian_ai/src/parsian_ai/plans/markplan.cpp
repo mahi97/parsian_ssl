@@ -908,10 +908,10 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
             for(int k = 0; k<sorted.count() - 1; k++)
             {
 
-                if(sorted[k]->danger < sorted[k+1]->danger) //todo : crobot
-                {
-                    sorted.swap(k, k+1);
-                }
+//                if(sorted[k]->danger < sorted[k+1]->danger) //todo : crobot
+//                {
+//                    sorted.swap(k, k+1);
+//                }
 
             }
 
@@ -988,7 +988,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
 
         Segment2D tempsegment;
 
-        // TODO : QList<CAgent*> defenseagents should be acquired
+        // TODO : QList<Agent*> defenseagents should be acquired
 //    if(knowledge->defenseAgents.count() == 0)
 //    {
 //        return Vector2D(-2, 0);
@@ -1494,7 +1494,7 @@ void CMarkPlan::manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBe
                         //markGPA[i]->init(markPoses[matchPoints[i]],markAngs[matchPoints[i]]);
 
                         markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
-                        markGPA[i]->setTargetdir(markAngs[matchPoints[i]);
+                        markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
 
                         markGPA[i]->setAvoidpenaltyarea(true);
                         //markGPA[i]->execute();

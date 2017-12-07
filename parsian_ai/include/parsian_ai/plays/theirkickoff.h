@@ -8,7 +8,7 @@ public:
 	CTheirKickOff();
 	~CTheirKickOff();
 	void execute_x();
-	void init(const QList <CAgent*>& _agents);
+	void init(const QList <Agent*>& _agents);
 private:
 	void reset();
 };

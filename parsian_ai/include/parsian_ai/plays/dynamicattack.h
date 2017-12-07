@@ -38,7 +38,7 @@ public:
     ~CDynamicAttack() override;
 
     void execute_x();
-    void init(QList <CAgent*> _agents);
+    void init(const QList <Agent*>& _agents);
 
     void setDefenseClear(bool _isDefenseClearing);
     void setDirectShot(bool _directShot);
@@ -46,13 +46,13 @@ public:
     void setWeHaveBall(bool _ballPoss);
     void setNoPlanException(bool _noPlanException);
     void setFast(bool _fast);
-    void setPlayMake(CAgent* _playMake);
+    void setPlayMake(Agent* _playMake);
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
 
     SDynamicPlan currentPlan;
 
-    CAgent* getMahiPlayMaker();
+    Agent* getMahiPlayMaker();
 
 private:
     double thrshDribble = 0;
@@ -145,16 +145,16 @@ private:
     bool passFlag,repeatFlag;
     int counter,passerID,lastPasserRoleIndex;
     long lastTime;
-    QList<CAgent*> activeAgents;
-    QList<CAgent*> mahiPoisitionAgents;
+    QList<Agent*> activeAgents;
+    QList<Agent*> mahiPoisitionAgents;
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
-    CAgent* mahiPlayMaker;
+    Agent* mahiPlayMaker;
     int mahiAgentsID[5];
     bool isBallInOurField;
 
     int playmakeID = -1;
-    CAgent* playmake;
+    Agent* playmake;
 
     Vector2D ballPos;
     Vector2D ballVel;

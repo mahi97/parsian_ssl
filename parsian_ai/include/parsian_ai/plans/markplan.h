@@ -25,7 +25,7 @@ public:
     //bool weOwnBall; del
     //bool stopMode; del
     int ourBallOwner, oppBallOwner;    //Agent Id del
-    CAgent* supporter;
+    Agent* supporter;
     int lastFrameInSupportMode;
     int lastFrameInClearingMode;
     int midFielder;
@@ -74,7 +74,7 @@ public:
     QList<CRobot*> oppAgentsToMark;
     QList<CRobot*> oppAgentsMarkedByDef;
     QList<CRobot*> ignoredOppAgents;
-    QList<CAgent*> offenseAgent;
+    QList<Agent*> offenseAgent;
     QList<Vector2D> markPoses;
     QList<Vector2D> oppAgentsToMarkPos;
     QList<Vector2D> markAngs;

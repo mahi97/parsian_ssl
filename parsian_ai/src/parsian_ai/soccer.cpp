@@ -5,10 +5,10 @@ CSoccer* soccer;
 CSoccer::CSoccer()
 {
     wm = new CWorldModel;
-    agents = new CAgent*[_MAX_NUM_PLAYERS];
+    agents = new Agent*[_MAX_NUM_PLAYERS];
     for(int i = 0; i < wm->our.activeAgentsCount(); i++ )
     {
-        agents[i] = new CAgent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
+        agents[i] = new Agent(wm->our.activeAgentID(i));// todo noOne says: is myChange is correct;
         agents[i]->self = *wm->our.active(i);
     }
 

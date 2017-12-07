@@ -142,11 +142,11 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
     bool inobs = false;
     int par = 0;
     bool tmp;
-    struct range tmpr;
+    CKnowledge::range tmpr;
     int count = 0;
     int i,j;
     d = 0;
-    struct range r[20];
+    CKnowledge::range r[20];
     bool flag[20];
     for (i = 0;i<20;i++)
         flag[i] = false;
@@ -501,7 +501,7 @@ Vector2D Knowledge::getEmptyPosOnGoal(Vector2D from, double &regionWidth, bool o
     return (goalL + goalR) / 2.0;
 }
 
-int Knowledge::Matching(const QList <CAgent*> robots, const QList <Vector2D> pointsToMatch, QList <int> &matchPoints){
+int Knowledge::Matching(const QList <Agent*> robots, const QList <Vector2D> pointsToMatch, QList <int> &matchPoints){
     QList <int> tempForMatch;
     tempForMatch.clear();
     for(int i = 0 ; i< robots.count() ; i++){
@@ -531,6 +531,66 @@ int Knowledge::Matching(const QList <CAgent*> robots, const QList <Vector2D> poi
         return -1;
     }
 
+}
+
+Vector2D Knowledge::getEmptyPosOnGoalForPenalty(double n, bool oppGoal, double th, Agent* ourAgent){
+
+    Vector2D target, goalieR, goalieL;
+    int goalieID;
+    CRobot* goalie;
+    double distanceR, distanceL;
+
+//    Line2D goalLine;
+
+    AngleDeg rightDeg, leftDeg;
+
+    if(oppGoal) {
+//        goalLine.assign(wm->field->oppGoalL(), wm->field->oppGoalR());
+        goalieID = wm->opp.data->goalieID;
+        goalie = wm->opp[goalieID];
+        goalieR = wm->field->oppGoalR();
+        goalieL = wm->field->oppGoalL();
+
+    } else {
+//        goalLine.assign(wm->field->ourGoalL(), wm->field->ourGoalR());
+        goalieID = wm->our.data->goalieID;
+        goalie = wm->our[goalieID];
+        goalieR = wm->field->ourGoalR();
+        goalieL = wm->field->ourGoalL();
+    }
+
+    distanceR = wm->opp[goalieID]->pos.dist(goalieR);
+    distanceL = wm->opp[goalieID]->pos.dist(goalieL);
+
+    if(ourAgent != NULL){
+
+        rightDeg = Vector2D::angleOf(wm->field->ourGoalR(), ourAgent->pos(), goalie->pos);
+        leftDeg = Vector2D::angleOf(wm->field->ourGoalL(), ourAgent->pos(), goalie->pos);
+
+        DBUG(QString("%1, %2").arg(rightDeg.abs()).arg(leftDeg.abs()), D_FATEME);
+
+        if(rightDeg.abs() > leftDeg.abs() && fabs(rightDeg.abs() - leftDeg.abs()) > th*15){
+            target = Vector2D(goalieR.x, goalieR.y + n);
+            drawer->draw(target, QColor(Qt::cyan));
+        } else {
+            target = Vector2D(goalieL.x, goalieL.y - n);
+            drawer->draw(target, QColor(Qt::cyan));
+        }
+    }
+    else{
+        if(distanceR > distanceL && fabs(distanceL - distanceR) > th) {
+            target = Vector2D(goalieR.x, goalieR.y + n*distanceR);
+            drawer->draw(target, QColor(Qt::black));
+            //        draw(Segment2D(target, Vector2D(((goalieL+goalieR)/2).x-1, ((goalieL+goalieR)/2).y)), QColor(Qt::darkCyan));
+        } else {
+            target = Vector2D(goalieL.x, goalieL.y - n*distanceL);
+            drawer->draw(target, QColor(Qt::black));
+            //        draw(Segment2D(target, Vector2D(((goalieL+goalieR)/2).x-1, ((goalieL+goalieR)/2).y)), QColor(Qt::darkRed));
+        }
+    }
+
+
+    return target;
 }
 
 
@@ -605,6 +665,192 @@ bool Knowledge::isPointClear(Vector2D point, Vector2D from, double radBig, doubl
     }
     return true;
 }
+
+
+NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList, const CWorldModel*& wm){
+    ////
+    ////Code By Sepehr
+    ////
+
+    // reset everything
+    NewFastestToBall result;
+    if(!wm->field->fieldRect().contains(wm->ball->pos))
+        return result;
+
+    double t = 0;
+    Vector2D ballPredict;
+
+    bool ourCalced[_MAX_NUM_PLAYERS];
+    bool oppCalced[_MAX_NUM_PLAYERS];
+    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
+        ourCalced[i] = false;
+        oppCalced[i] = false;
+    }
+
+    // use the correct Robot acceleration and maximum Velocity below :
+    double robotMaxVel;
+    ros::param::get("agent_node/VelMax", robotMaxVel);
+    double robotMAxAcc;
+    ros::param::get("agent_node/AccMaxForward", robotMAxAcc);
+
+    while ( t < 20 && (result.ourF.size() < ourList.size() || result.oppF.size() < oppList.size()) )
+    {
+        ballPredict = wm->ball->predict(t);
+
+        double tToVMax;
+        Vector2D center;
+        double radius;
+        for ( int i = 0; i < ourList.count(); i++ )
+        {
+            if ( ourCalced[i] )
+                continue;
+            center = wm->our[ourList[i]]->pos + wm->our[ourList[i]]->vel * t;
+            tToVMax = ( robotMaxVel - wm->our[ourList[i]]->vel.length()) / robotMAxAcc;
+            radius = 0;
+            if ( tToVMax > t)
+                radius = 0.5*robotMAxAcc*t*t + wm->our[ourList[i]]->vel.length() * t;
+            else if ( tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel)
+            {
+                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->our[ourList[i]]->vel.length()*tToVMax;
+                radius += ( t - tToVMax ) * robotMaxVel;
+            }
+            else
+                radius = t * wm->our[ourList[i]]->vel.length();
+            radius += CRobot::robot_radius_old;
+            Circle2D cir = Circle2D( center, radius);
+            Vector2D s0,s2;
+            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
+            {
+                result.ourF.append(std::pair<double,int>(t , ourList[i]));
+                ourCalced[i] = true;
+                if( result.catch_time > t ){
+                    result.catch_time = t;
+                    result.isFastestOurs = true;
+                }
+            }
+            //            draw( cir, 0 , 360, "red");
+        }
+        for ( int i = 0; i < oppList.count(); i++ )
+        {
+            if ( oppCalced[i] )
+                continue;
+            center = wm->opp[oppList[i]]->pos + wm->opp[oppList[i]]->vel * t;
+            tToVMax = ( robotMaxVel - wm->opp[oppList[i]]->vel.length()) / robotMAxAcc;
+            radius = 0;
+            if ( tToVMax > t)
+                radius = 0.5*robotMAxAcc*t*t + wm->opp[oppList[i]]->vel.length() * t;
+            else if ( tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel)
+            {
+                radius = 0.5*robotMAxAcc*tToVMax*tToVMax + wm->opp[oppList[i]]->vel.length()*tToVMax;
+                radius += ( t - tToVMax ) * robotMaxVel;
+            }
+            else
+                radius = t * wm->opp[oppList[i]]->vel.length();
+            radius += CRobot::robot_radius_old;
+            Circle2D cir = Circle2D( center, radius) ;
+            Vector2D s0,s2;
+            if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))
+            {
+                result.oppF.append(std::pair<double,int>(t , oppList[i]));
+                oppCalced[i] = true;
+                if( result.catch_time > t ){
+                    result.catch_time = t;
+                    result.isFastestOurs = false;
+                }
+            }
+            //            draw( cir, 0 , 360, "blue");
+        }
+        t += timeStep;
+    }
+    qSort(result.ourF.begin() , result.ourF.end());
+    qSort(result.oppF.begin() , result.oppF.end());
+    if( result.catch_time > 10 )
+        result.catch_time = 0;
+    return result;
+}
+
+FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppList, const CWorldModel*& wm)
+{
+    /////Extracted from DefensePlan
+    /////By Pooria
+    /////
+    FastestToBall f;
+    double time = 0.f;
+    f.catch_time = 1000;
+    while (true) {
+        Vector2D ballPos = wm->ball->predict(min(time, f.catch_time));
+        //            draw(ballPos, 1, "red");
+        if (wm->ball->vel.length() < 0.05)
+            ballPos = wm->ball->pos;
+        double rad = time * 0.6 + 0.2;
+        if (f.ourFastest == -1)
+            for (int i = 0; i < ourList.count(); i++) {
+                Vector2D playerPos = wm->our[ourList[i]]->pos;
+                if (playerPos.dist(ballPos) < rad) {
+                    f.ourFastest = ourList[i];
+                    f.ourFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                    break;
+                }
+            }
+
+        if (f.oppFastest == -1)
+            for (int i = 0; i < oppList.count(); i++) {
+                Vector2D playerPos = wm->opp[oppList[i]]->pos;
+                if (playerPos.dist(ballPos) < rad) {
+                    f.oppFastest = oppList[i];
+                    f.oppFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                    break;
+                }
+            }
+
+        if ((f.ourFastest > -1 || ourList.count() == 0) && (f.oppFastest > -1 || oppList.count() == 0)) {
+            //				LOG("FFFF: ", f.ourFastest);
+            break;
+        }
+        time += 0.1;
+        if (time > 20) {
+            if (wm->ball->vel.length() > 0.2) {
+                Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
+                if (f.ourFastest == -1 and ourList.count() > 0) {
+                    double min = 99999;
+                    for (int i = 0; i < ourList.count(); i++) {
+                        Vector2D playerPos = wm->our[ourList[i]]->pos;
+                        double dist = line.dist(playerPos);
+                        if (dist < min) {
+                            f.ourFastest = ourList[i];
+                            min = dist;
+                        }
+                    }
+                    f.ourFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                }
+                if (f.oppFastest == -1 and oppList.count() > 0) {
+                    double min = 99999;
+                    for (int i = 0; i < oppList.count(); i++) {
+                        Vector2D playerPos = wm->opp[oppList[i]]->pos;
+                        double dist = line.dist(playerPos);
+                        if (dist < min) {
+                            f.oppFastest = oppList[i];
+                            min = dist;
+                        }
+                    }
+                    f.oppFastestTime = time;
+                    if (time < f.catch_time)
+                        f.catch_time = time;
+                }
+            }
+            break;
+        }
+    }
+    f.catch_time = min(time, f.catch_time);
+    return f;
+}
+
 
 NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList, QList<int> oppList){
     ////
@@ -758,5 +1004,34 @@ int Knowledge::nearestOppToBall()
 {
     return getNearestOppToPoint(wm->ball->pos);
 }
+
+double Knowledge::chipGoalPropability(bool isOurChip){
+    double GoalDistanceToBall;
+    double GoalieDistanseToBall;
+    double GoalDistanceToGoalie;
+    Vector2D goal,goaliePos;
+    if(isOurChip){
+        goal=wm->field->oppGoal();
+        goaliePos = wm->opp[wm->opp.data->goalieID]->pos;
+
+    }
+    else{
+        goal= wm->field->ourGoal();
+        goaliePos = wm->our[wm->our.data->goalieID]->pos;
+    }
+
+    GoalDistanceToBall=wm->ball->pos.dist(goal)/1.9;
+    GoalieDistanseToBall=wm->ball->pos.dist(goaliePos);
+    GoalDistanceToGoalie=goaliePos.dist(goal);
+    if(goaliePos.dist(wm->ball->pos)<0.35
+       || wm->ball->pos.dist(goal)<1)
+        return 0;
+    else if(((GoalDistanceToBall-GoalieDistanseToBall)/GoalDistanceToGoalie)*2 >0)
+        return ((GoalDistanceToBall-GoalieDistanseToBall)/GoalDistanceToGoalie)*2;
+    else return 0;
+
+
+}
+
 
 Knowledge * know = new Knowledge();

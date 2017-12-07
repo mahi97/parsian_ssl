@@ -69,7 +69,7 @@ CDynamicAttack::~CDynamicAttack() {
 
 }
 
-void CDynamicAttack::init(QList<CAgent*> _agents){
+void CDynamicAttack::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
 
@@ -275,7 +275,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     }
 }
 
-CAgent* CDynamicAttack::getMahiPlayMaker() {
+Agent* CDynamicAttack::getMahiPlayMaker() {
     return mahiPlayMaker;
 }
 
@@ -1707,7 +1707,7 @@ void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
     }
 }
 
-void CDynamicAttack::setPlayMake(CAgent* _playMake) {
+void CDynamicAttack::setPlayMake(Agent* _playMake) {
     playmakeID = _playMake->id();
     playmake = _playMake;
 }

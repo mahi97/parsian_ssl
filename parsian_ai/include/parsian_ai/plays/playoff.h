@@ -312,7 +312,7 @@ public:
     virtual ~CPlayOff();
 
     void execute_x();
-    void init(const QList <CAgent*>& _agents);
+    void init(const QList <Agent*>& _agents);
     virtual QString whoami() {return "PlayOff";}
     bool deleted;
 
@@ -365,7 +365,7 @@ private:
 
     ////////////////////////////Blocker//////////////////////////////////
     bool BlockerExecute(int agentID);
-    CAgent* BlockerAgent;
+    Agent* BlockerAgent;
     GotopointavoidAction* blockergpa;
     enum BlockerStop{
         Diversion,
@@ -411,7 +411,7 @@ private:
     int kkAgentsID[6];
 
     SPlayOffPlan* currentPlan;
-    QList<CAgent*> activeAgents;
+    QList<Agent*> activeAgents;
     CRolePlayOff *roleAgent[6];
     CRolePlayOff *tempAgent;
     CRolePlayOff *newRoleAgent[6];

@@ -3,7 +3,7 @@
 
 const double StopRadius = 0.55;//0.70;//1.02;//0.78;
 CRoleStopInfo::CRoleStopInfo(QString _roleName)
-	: CRoleInfo(_roleName)
+		: CRoleInfo(_roleName)
 {
 	//	inCorner = -1;
 }
@@ -34,8 +34,8 @@ void CRoleStopInfo::findPositions()
 
 	double sRadius = StopRadius;
 	Vector2D c = wm->ball->pos;
-  const double radius = 1.8 + 2.0*CRobot::robot_radius_new;
-  const double MARGIN = 0.01;
+	const double radius = 1.8 + 2.0*CRobot::robot_radius_new;
+	const double MARGIN = 0.01;
 
 	TA = wm->field->ourGoal();
 	if((wm->ball->pos - wm->field->ourGoal()).length() < radius )
@@ -92,9 +92,10 @@ void CRoleStopInfo::findPositions()
 
 }
 
-CRoleStop::CRoleStop(CAgent *_agent) : CRole(_agent)
+CRoleStop::CRoleStop(Agent *_agent) : CRole(_agent)
 {
 	gotopoint = new GotopointavoidAction();
+	noAction  = new NoAction();
 }
 
 CRoleStop::~CRoleStop()
@@ -107,7 +108,7 @@ void CRoleStop::execute()
 
 	Vector2D target;
 	info()->findPositions();
-	int kkk;
+	int kkk = 0;
 	for (int k=0;k<info()->count();k++)
 	{
 		if (agent->id()==info()->robotId[k])
@@ -119,22 +120,22 @@ void CRoleStop::execute()
 
 
 	gotopoint->setSlowmode(true);
-	gotopoint->setRobot_Id(static_cast<quint8>(agent->id()));//gotopoint->setAgent(agent);
 	gotopoint->setMaxvelocity(2.0);
-	//gotopoint->setMaxVelocityNormal(1.0); todo: should be deleted?
-	if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {agent->waitHere();return;}
+	if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
+		noAction->setWaithere(true);
+		agent->action = noAction;
+		return;
+	}
 	info()->findPositions();
 	gotopoint->setTargetpos(target);
 	gotopoint->setTargetdir(Vector2D(1.0, 0.0));
 	gotopoint->setLookat(wm->ball->pos);
-	// gotopoint->setKeepLooking(true); todo: should be deleted?
 	gotopoint->setAvoidpenaltyarea(true);
 
-    gotopoint->setBallobstacleradius(0.50);
-    // gotopoint->setAvoidBall(true); todo: should be deleted?
+	gotopoint->setBallobstacleradius(0.50);
 	drawer->draw(Circle2D(target , 0.03) , "magenta" , true);
-    drawer->draw(QString("%1").arg(kkk) , target);
-    agent->action = gotopoint;
+	drawer->draw(QString("%1").arg(kkk) , target);
+	agent->action = gotopoint;
 }
 
 void CRoleStop::parse(QStringList params)
@@ -151,11 +152,6 @@ double CRoleStop::progress()
 	return 0.0;
 }
 
-void CRoleStop::generateFromConfig(CAgent *a)
-{
-	agent = a;
-}
-
 CRoleStopInfo* CRoleStop::info()
 {
 //	return (CRoleStopInfo*) CSkills::getInfo("stop");
@@ -169,26 +165,22 @@ CRoleHaltInfo::CRoleHaltInfo(QString _roleName) : CRoleInfo(_roleName)
 
 }
 
-CRoleHalt::CRoleHalt(CAgent *_agent) : CRole(_agent)
-{
-
+CRoleHalt::CRoleHalt(Agent *_agent) : CRole(_agent) {
+	noAction = new NoAction();
 }
 
 CRoleHalt::~CRoleHalt()
 {
+	delete noAction;
 }
 
 void CRoleHalt::execute()
 {
-  agent->waitHere();
+	noAction->setWaithere(true);
+	agent->action = noAction;
 }
 
 double CRoleHalt::progress()
 {
-  return 1.0;
-}
-
-void CRoleHalt::generateFromConfig(CAgent *a)
-{
-  agent = a;
+	return 1.0;
 }

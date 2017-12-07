@@ -10,7 +10,7 @@ void CTheirKickOff::reset(){
     executedCycles = 0;
 }
 
-void CTheirKickOff::init(const QList<CAgent*>& _agents){
+void CTheirKickOff::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
 

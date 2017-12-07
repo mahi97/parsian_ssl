@@ -9,94 +9,36 @@
 #include <parsian_ai/config.h>
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/util/knowledge.h>
+#include <parsian_ai/gamestate.h>
 
 
-#define PASS_BEHAVS 5
-
-enum PlayMakerKickModes{FixedPass , FixedShoot , NoMode};
+enum PlayMakerKickModes{FixedPass , FixedShoot};
 
 class CRolePlayMakeInfo : public CRoleInfo
 {
 public:
-    CRolePlayMakeInfo(QString _roleName);
-    CAgent* passReceiver(CAgent* self, int p, QList<int> passables);
-    CAgent* bestPassReceiver(bool indirect);
-    QList<int> oneToucher;
-    double oneToucherDist2Ball;
-    void reset(){}
+    explicit CRolePlayMakeInfo(QString _roleName);
+    void reset() override {}
 };
 
 class CRolePlayMake : public CRole
 {
-protected:
 public:
-    bool goalKeeperForward=false;
-//    Hyst ballTop;
-//    Hyst ballLeft;
-    int qqHist;
-    int rn;
     KickAction* kick;
-//    CSkillSpinBack* spin;
-//    CSkillGotoBall* gotoball;
     OnetouchAction* onetouch;
     GotopointavoidAction* gotopoint;
     NoAction* wait;
-//    CSkillHitTheBall* hitTheBall;
-//    CSkillTurn* turn;
-    int kickDecision;
-    int onetouching;
-    CAgent* lastAgent;
-    int lastPassReceiver;
-    bool startKicked;
-    int gameMode;
-    bool indirect, direct, kickoff;
-    int penaltyRand;
     Vector2D penaltyTarget;
     bool firstKick=true;
-    int penaltyCounter;
-    //decision making
-    QList<int> oppBlockers;
-    double w,ang,coming;
-    int nextPlayMaker;
-    bool stopped;//, clear;
     Vector2D target;
-    bool spinBack();
-    void passShootNew();
     void stopBehindBall(bool penalty = false);
-    int indirectPassRecverSelectedFrame;
-    int lastFrameCrowded;
-    bool spinside;
-    bool forceRedecide;
     Vector2D initialPoint;
-    CAgent* indirectRecver;
-    //    CBehaviourSpinPass spinPass;
-    QMap<int, double> passProbs;
-    QList<CAgent*> passreceivers;
-    //void checkPassSequences(QList<CAgent*> s);
-    double maxPassProbability;
-    QList<CAgent*> bestPassSequence;
-    int ballavoidanceState;
-    //CBehaviourPass* pass;
-//    CBehaviourKick* shoot;
-//    CBehaviourPass* fixedPass;
-//    CBehaviourPass* pass[PASS_BEHAVS];
-//    CBehaviourChipPass* chippass[PASS_BEHAVS];
-//    CBehaviourSpinPass* spinPass[PASS_BEHAVS];
-//    CBehaviourChipToGoal* chipToGoal;
-//    CBehaviourKickBetweenTheirDefenders *kickToDefense;
-//    CBehaviourKick* clear;
-    double lastDecisionTime;
-    int waitBeforePass;
-    int orderRushInPlenalty;
-    bool orderedRush;
     QTime changeDirPenaltyStrikerTime;
     bool timerStartFlag;
 
 public:
-    CRolePlayMake(CAgent *_agent);
+    explicit CRolePlayMake(Agent *_agent);
     ~CRolePlayMake();
-    void executeOurDirect();
-    void executeOurIndirect();
     void executeOurKickOff();
     void executeOurPenalty();
     void executeOurPenaltyShootout();
@@ -108,16 +50,12 @@ public:
     int getPenaltychipSpeed();
     double lastBounce();
     bool ShootPenalty();
-    void executeDefault();
     void parse(QStringList params);
-    double progress();
-    void generateFromConfig(CAgent *a);
     void resetOffPlays();
     void resetPlayMake();
-    bool canScoreGoal();
     void execute();
 
-    void kickPass( int kickSpeed );
+    void kickPass( double kickSpeed );
     enum KickPassMode{KickPassFirst , KickPassSecond};
     enum penaltyStrategy{pgoaheadShoot , pchipShoot , pshootDirect};
 
@@ -125,7 +63,6 @@ public:
     int kickPassCyclesWait;
     Vector2D finalTarget;
 
-    QList<QPair<int, QMap<double, int> > > lastBounceProfileData;
     QTextStream out;
     QFile lastBounceDataFile;
 

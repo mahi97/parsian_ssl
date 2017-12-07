@@ -5,13 +5,13 @@ Plan::Plan()
 
 }
 
-void Plan::init(const QList<CAgent*> & _agents)
+void Plan::init(const QList<Agent*> & _agents)
 {
     agents.clear();
     agents.append(_agents);
 }
 
-CAgent* Plan::agent(int i)
+Agent* Plan::agent(int i)
 {
     return agents[i];
 }

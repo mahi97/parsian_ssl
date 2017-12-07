@@ -15,7 +15,7 @@ void CStopPlay::reset(){
     executedCycles = 0;
 }
 
-void CStopPlay::init(const QList<CAgent*> &_agents){
+void CStopPlay::init(const QList<Agent*> &_agents){
     setAgentsID(_agents);
     initMaster();
 

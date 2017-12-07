@@ -14,7 +14,7 @@ void CTheirIndirect::reset(){
 	executedCycles = 0;
 }
 
-void CTheirIndirect::init(const QList<CAgent*>& _agents){
+void CTheirIndirect::init(const QList<Agent*>& _agents){
 	setAgentsID(_agents);
 	initMaster();
 

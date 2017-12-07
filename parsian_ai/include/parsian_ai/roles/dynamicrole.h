@@ -22,7 +22,7 @@ private:
     void update();
     bool updated;
 
-    SkillProperty(CRoleDynamic, CAgent*, Agent, agent);
+    SkillProperty(CRoleDynamic, Agent*, Agent, agent);
     SkillProperty(CRoleDynamic, DynamicEnums::DynamicSkill, SelectedSkill, selectedSkill);
     SkillProperty(CRoleDynamic, Vector2D, Target, target);
     SkillProperty(CRoleDynamic, Vector2D, TargetDir, targetDir);
