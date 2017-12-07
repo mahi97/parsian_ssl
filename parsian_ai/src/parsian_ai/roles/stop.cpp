@@ -34,7 +34,7 @@ void CRoleStopInfo::findPositions()
 
 	double sRadius = StopRadius;
 	Vector2D c = wm->ball->pos;
-	const double radius = 1.8 + 2.0*CRobot::robot_radius_new;
+	const double radius = 1.8 + 2.0*Robot::robot_radius_new;
 	const double MARGIN = 0.01;
 
 	TA = wm->field->ourGoal();
@@ -50,10 +50,10 @@ void CRoleStopInfo::findPositions()
 	Ps.clear();
 	int coef = 1;
 	if( count() > 0 ){
-		Ps.append( c + baseDirVec * (sRadius+CRobot::robot_radius_new));
+		Ps.append( c + baseDirVec * (sRadius+Robot::robot_radius_new));
 	}
 	for( int i=1 ; i<count() ; i++ ){
-		Ps.append( c + baseDirVec.rotatedVector((coef*((i+1)/2))*_RAD2DEG*0.2/0.6) * (sRadius+CRobot::robot_radius_new));
+		Ps.append( c + baseDirVec.rotatedVector((coef*((i+1)/2))*_RAD2DEG*0.2/0.6) * (sRadius+Robot::robot_radius_new));
 		coef *= -1;
 	}
 

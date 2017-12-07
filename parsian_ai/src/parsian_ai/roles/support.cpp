@@ -76,26 +76,26 @@ void CRoleSupportInfo::findPos( )
     Vector2D playmakerPos;
     if ( knowledge->getPlayMaker() == NULL)
     {
-        supportPosition = (( wm->field->ourGoal() - wm->ball->pos).norm() * (CRobot::robot_radius_old*3.0 + 0.3)) + wm->ball->pos;
+        supportPosition = (( wm->field->ourGoal() - wm->ball->pos).norm() * (Robot::robot_radius_old*3.0 + 0.3)) + wm->ball->pos;
         return;
     }
     playmakerPos = knowledge->getPlayMaker()->pos();
     if ( knowledge->getSupporPlaymaker() == CKnowledge::Back)
     {
         debug("supporting back",int(D_SEPEHR));
-        supportPosition = (( wm->field->ourGoal() - wm->ball->pos).norm() * (CRobot::robot_radius_old*4.5 + playmakerPos.dist(wm->ball->pos))) + wm->ball->pos;
+        supportPosition = (( wm->field->ourGoal() - wm->ball->pos).norm() * (Robot::robot_radius_old*4.5 + playmakerPos.dist(wm->ball->pos))) + wm->ball->pos;
         return;
     }
     if ( knowledge->getSupporPlaymaker() == CKnowledge::Left)
     {
         debug("supporting left",int(D_SEPEHR));
-		supportPosition.assign( playmakerPos.x-0.03, playmakerPos.y + CRobot::robot_radius_old*2+0.06);
+		supportPosition.assign( playmakerPos.x-0.03, playmakerPos.y + Robot::robot_radius_old*2+0.06);
         return;
     }
     if ( knowledge->getSupporPlaymaker() == CKnowledge::Right)
     {
         debug("supporting right",int(D_SEPEHR));
-		supportPosition.assign( playmakerPos.x-0.03, playmakerPos.y - CRobot::robot_radius_old*2-0.06);
+		supportPosition.assign( playmakerPos.x-0.03, playmakerPos.y - Robot::robot_radius_old*2-0.06);
         return;
     }
 	if ( knowledge->getSupporPlaymaker() == CKnowledge::Front)

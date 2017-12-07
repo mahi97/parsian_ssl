@@ -1,9 +1,7 @@
 #include <parsian_ai/plans/plan.h>
 
 Plan::Plan()
-{
-
-}
+= default;
 
 void Plan::init(const QList<Agent*> & _agents)
 {
@@ -53,7 +51,7 @@ QList<int> Plan::getAgentIdList()
 
 void Plan::debugAgents(QString text){
 	QString str;
-	for( int i=0 ; i<agents.size() ; i++ )
-		str += QString(" %1").arg(agents.at(i)->id());
+	for (auto agent : agents)
+        str += QString(" %1").arg(agent->id());
 	DBUG(QString("%1: Size: %2 --> (%3)").arg(text).arg(agents.size()).arg(str) , D_ERROR);
 }

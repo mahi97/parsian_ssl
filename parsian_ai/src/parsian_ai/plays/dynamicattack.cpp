@@ -553,7 +553,7 @@ bool CDynamicAttack::isPathClear(Vector2D _pos1,Vector2D _pos2,
     _poly.addVertex(sol1);
     sol3 = sol1;
     _poly.addVertex(sol2);
-    Circle2D(_pos1,CRobot::robot_radius_new + treshold).
+    Circle2D(_pos1,Robot::robot_radius_new + treshold).
             intersection(_path.perpendicular(_pos1),&sol1,&sol2);
 
     _poly.addVertex(sol2);

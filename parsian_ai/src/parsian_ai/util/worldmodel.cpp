@@ -1,7 +1,5 @@
 #include <parsian_ai/util/worldmodel.h>
 
-WorldModel * wm;
-
 WorldModel::WorldModel() : CWorldModel()
 {
 
@@ -12,9 +10,7 @@ WorldModel::WorldModel(const parsian_msgs::parsian_world_model &_pwm) : CWorldMo
 
 }
 
-WorldModel::~WorldModel() {
-
-}
+WorldModel::~WorldModel() = default;
 
 bool WorldModel::AHZIsInOurPenaltyArea(Vector2D point)
 {
@@ -45,7 +41,7 @@ QList<Vector2D> WorldModel::AHZOurPAreaIntersect(Segment2D segment, QString role
 {
     QList<Vector2D> results;
     results.clear();
-    double radius;
+    double radius = 0;
     if (role == "mark")
         radius = 1.150;
     else if (role == "goalKeeper")
@@ -121,3 +117,4 @@ QList<Vector2D> WorldModel::AHZOurPAreaIntersect(Segment2D segment, QString role
     return results;
 }
 
+WorldModel * wm;

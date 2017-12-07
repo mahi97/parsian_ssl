@@ -25,7 +25,7 @@ Vector2D CDefPos::getXYByAngle(double _angle, double _radius)
 
 double CDefPos::getRobotAngle(double _radius)
 {
-    return atan(CRobot::robot_radius_old/_radius)*2;
+    return atan(Robot::robot_radius_old/_radius)*2;
 }
 
 double CDefPos::getAngleByXY(Vector2D _point)
@@ -38,7 +38,7 @@ double CDefPos::getAngleByXY(Vector2D _point)
 
 kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
 {
-    kk2Angles tempAngles;
+    kk2Angles tempAngles{};
     Vector2D inter1, inter2, inter3;
     Circle2D tempCircle(wm->field->ourGoal()-Vector2D(penaltyAreaOffset, 0), _radius);
     if (tempCircle.contains(_ballPos)){
@@ -264,8 +264,8 @@ double CDefPos::findBestRadius(int _numOfDefs)
     Segment2D shorterBarSeg = (leftBarSeg.length() > rightBarSeg.length()) ? rightBarSeg : leftBarSeg;
     vatarKazeb = goalSeg.intersection(shorterBarSeg).dist(biggerBarSeg.nearestPoint(goalSeg.intersection(shorterBarSeg)));
     Line2D mainLine(goalSeg.intersection(shorterBarSeg),biggerBarSeg.nearestPoint(goalSeg.intersection(shorterBarSeg)));
-    if( vatarKazeb > (_numOfDefs) * 2 * CRobot::robot_radius_new )
-        mainLine = Line2D(Vector2D(BallPos.x-((_numOfDefs + 0.3) * 1.5 * CRobot::robot_radius_new*ballheight/vatarKazeb),BallPos.y),Vector2D(BallPos.x-((_numOfDefs + 0.3) * 1.5 * CRobot::robot_radius_new*ballheight/vatarKazeb),BallPos.y-0.1));
+    if( vatarKazeb > (_numOfDefs) * 2 * Robot::robot_radius_new )
+        mainLine = Line2D(Vector2D(BallPos.x-((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new*ballheight/vatarKazeb),BallPos.y),Vector2D(BallPos.x-((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new*ballheight/vatarKazeb),BallPos.y-0.1));
     if(biggerBarSeg.intersection(mainLine).valid()) {
         return biggerBarSeg.intersection(mainLine).dist(wm->field->ourGoal()) + penaltyAreaOffset;
     }

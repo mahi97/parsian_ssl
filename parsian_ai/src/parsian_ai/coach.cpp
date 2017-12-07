@@ -1219,7 +1219,6 @@ void CCoach::decideHalt(QList<int>& _ourPlayers) {
 }
 
 void CCoach::decideStop(QList<int> & _ourPlayers) {
-    CMasterPlay::positioningPlan.reset();
     firstTime = true;
     firstPlay = true;
     cyclesWaitAfterballMoved = 0;
@@ -1243,6 +1242,7 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     _ourPlayers.clear();
     _ourPlayers.append(tempAgents);
     selectedPlay = stopPlay;
+    selectedPlay->positioningPlan.reset();
 }
 
 void CCoach::decideOurKickOff(QList<int> &_ourPlayers) {

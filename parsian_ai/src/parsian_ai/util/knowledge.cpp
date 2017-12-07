@@ -2,15 +2,15 @@
 #include <parsian_ai/util/worldmodel.h>
 #include <ros/ros.h>
 
+#include <cmath>
+
 Knowledge::Knowledge() {
 
     initVariables();
 
 }
 
-Knowledge::~Knowledge() {
-
-}
+Knowledge::~Knowledge() = default;
 
 void Knowledge::initVariables()
 {
@@ -65,7 +65,7 @@ Vector2D Knowledge::getPointInDirection(Vector2D firstPoint, Vector2D secondPoin
 
 inline double getAngle(float x1, float y1, float x2, float y2)
 {
-    return atan2(y2-y1,x2-x1);
+    return std::atan2(y2-y1,x2-x1);
 }
 
 inline float normalang(float dir)
@@ -73,7 +73,7 @@ inline float normalang(float dir)
     const float _2PI = 2.0 * M_PI;
     if ( dir < -2.0*M_PI || 2.0*M_PI < dir )
     {
-        dir = fmod( dir, _2PI );
+        dir = std::fmod( dir, _2PI );
     }
     if ( dir < -M_PI)
     {
@@ -88,7 +88,7 @@ inline float normalang(float dir)
 
 inline float len(float x1,float y1,float x2,float y2)
 {
-    return hypot(x1-x2, y1-y2);
+    return std::hypot(x1-x2, y1-y2);
 }
 
 int factorial(int n)
@@ -142,7 +142,7 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
     bool inobs = false;
     int par = 0;
     bool tmp;
-    CKnowledge::range tmpr;
+    CKnowledge::range tmpr{};
     int count = 0;
     int i,j;
     d = 0;
@@ -195,7 +195,7 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
             if (normalang(a1-q2)>=0) a1 = q2;
             if (normalang(a2-q1)<=0) a2 = q1;
             if (normalang(a2-q2)>=0) a2 = q2;
-            if (fabs(normalang(a1-a2))>=0.001)
+            if (std::fabs(normalang(a1-a2))>=0.001)
             {
                 r[count].a = a1;
                 r[count].b = a2;
@@ -247,7 +247,7 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
 
                         }*/
                     else {
-                        float dist = fabs(normalang(r[i].a - lastBlockedDir));
+                        float dist = std::fabs(normalang(r[i].a - lastBlockedDir));
                         float bisect = normalang(normalang(r[i].a - lastBlockedDir) / 2.0 + lastBlockedDir);
                         if (dist >= biggestAngle)
                         {
@@ -282,7 +282,7 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
             }
             if (normalang(r[count-1].b - q2) <= 0)
             {
-                float dist = fabs(normalang(q2 - lastBlockedDir));
+                float dist = std::fabs(normalang(q2 - lastBlockedDir));
                 float bisect = normalang(normalang(q2 - lastBlockedDir) / 2.0 + lastBlockedDir);
                 if (dist >= biggestAngle)
                 {
@@ -321,11 +321,11 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
             }
         }
         openangle = d;
-        openangle = fabs(normalang(q2-q1)) - openangle;
-        d /= fabs(normalang(q2-q1));
+        openangle = std::fabs(normalang(q2-q1)) - openangle;
+        d /= std::fabs(normalang(q2-q1));
         d = 1-d;
         if (!changed || (d<0.001)){
-            if (count==0) biggestAngle = fabs(normalang(q2 - q1));
+            if (count==0) biggestAngle = std::fabs(normalang(q2 - q1));
             else biggestAngle = 0;
             mostOpenAngle = normalang(normalang(q2 - q1) / 2.0 + q1);
         }
@@ -372,14 +372,14 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2,
 double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circle2D> obs, double& percent, double &mostOpenAngle, double& biggestAngle)
 {
     QList<emptyAngleStruct> r;
-    emptyAngleStruct q1, q2;
+    emptyAngleStruct q1{}, q2{};
     q1.begin = false;
     q1.angle = (p1 - p).th().degree();
     q2.begin = true;
     q2.angle = (p2 - p).th().degree();
     if (q2 < q1)
     {
-        emptyAngleStruct tmp;
+        emptyAngleStruct tmp{};
         tmp = q1;
         q1 = q2;
         q2 = tmp;
@@ -395,7 +395,7 @@ double Knowledge::getEmptyAngle(Vector2D p,Vector2D p1, Vector2D p2, QList<Circl
         {
             double ang1 = (sol1 - p).th().degree();
             double ang2 = (sol2 - p).th().degree();
-            emptyAngleStruct s1, s2;
+            emptyAngleStruct s1{}, s2{};
             s1.begin = true;
             s2.begin = false;
             if (AngleDeg::normalize_angle(ang1-ang2) < 0)
@@ -562,7 +562,7 @@ Vector2D Knowledge::getEmptyPosOnGoalForPenalty(double n, bool oppGoal, double t
     distanceR = wm->opp[goalieID]->pos.dist(goalieR);
     distanceL = wm->opp[goalieID]->pos.dist(goalieL);
 
-    if(ourAgent != NULL){
+    if(ourAgent != nullptr){
 
         rightDeg = Vector2D::angleOf(wm->field->ourGoalR(), ourAgent->pos(), goalie->pos);
         leftDeg = Vector2D::angleOf(wm->field->ourGoalL(), ourAgent->pos(), goalie->pos);
@@ -716,7 +716,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             }
             else
                 radius = t * wm->our[ourList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
+            radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D( center, radius);
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
@@ -746,7 +746,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             }
             else
                 radius = t * wm->opp[oppList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
+            radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D( center, radius) ;
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))
@@ -903,7 +903,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             }
             else
                 radius = t * wm->our[ourList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
+            radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D( center, radius);
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2) )
@@ -933,7 +933,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             }
             else
                 radius = t * wm->opp[oppList[i]]->vel.length();
-            radius += CRobot::robot_radius_old;
+            radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D( center, radius) ;
             Vector2D s0,s2;
             if( cir.contains(ballPredict) || cir.intersection(Segment2D( wm->ball->pos, ballPredict), &s0, &s2))

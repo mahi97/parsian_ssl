@@ -10,10 +10,12 @@
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_ai/util/defpos.h>
 #include <QList>
+#include <parsian_ai/gamestate.h>
+#include <parsian_ai/config.h>
+
 //#define OLD_FASTEST 1
 
 #define LOOP_TIME_BYKK 0.016
-#define AGENT_SPEED_BYKK 1.5
 struct velAndAccByKK {
   double vel;
   double acc;

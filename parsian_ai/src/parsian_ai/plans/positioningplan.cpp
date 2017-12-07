@@ -279,13 +279,13 @@ bool PositioningPlan::isValidPoint( Vector2D target , bool callFromStaticPositio
 {
     if( (
           gameState->ourKickoff() ) &&
-            ( target.x > -CRobot::robot_radius_new || target.length() < 0.6 ) )
+            ( target.x > -Robot::robot_radius_new || target.length() < 0.6 ) )
         return false;
 
-    if( target.absX() > wm->field->_FIELD_WIDTH*0.5 -CRobot::robot_radius_new )
+    if( target.absX() > wm->field->_FIELD_WIDTH*0.5 -Robot::robot_radius_new )
         return false;
 
-    if( target.absY() > wm->field->_FIELD_WIDTH*0.5 -CRobot::robot_radius_new )
+    if( target.absY() > wm->field->_FIELD_WIDTH*0.5 -Robot::robot_radius_new )
         return false;
 
     Vector2D closerTarget = target + (wm->field->ourGoal() - target).norm()*0.2;
@@ -317,7 +317,7 @@ bool PositioningPlan::isValidPoint( Vector2D target , bool callFromStaticPositio
 
     double obsDeg = ( target - wm->ball->pos ).th().degree();
     double obsDist = target.dist(wm->ball->pos);
-    double obsAng = asin(CRobot::robot_radius_new / obsDist) * _RAD2DEG;
+    double obsAng = asin(Robot::robot_radius_new / obsDist) * _RAD2DEG;
     double lowerbound = obsDeg-obsAng;
     double upperbound = obsDeg+obsAng;
     double topPost = ( wm->field->oppGoalL() - wm->ball->pos ).th().degree();
@@ -475,7 +475,7 @@ double PositioningPlan::PositioningObject::target_to_goal_openness()
 {
     QList<int> ourRelaxIDS,oppRelaxIDS;
     ourRelaxIDS.push_back(positioner);
-    Vector2D pos = target + wm->our[positioner]->dir.setLengthVector(CRobot::center_from_kicker_new);
+    Vector2D pos = target + wm->our[positioner]->dir.setLengthVector(Robot::center_from_kicker_new);
     return getOpenness( pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS );
 }
 
@@ -483,7 +483,7 @@ double PositioningPlan::PositioningObject::target_to_ball_openness()
 {
     QList<int> ourRelaxIDS,oppRelaxIDS;
     ourRelaxIDS.push_back(positioner);
-    Vector2D pos = target + wm->our[positioner]->dir.setLengthVector(CRobot::center_from_kicker_new);
+    Vector2D pos = target + wm->our[positioner]->dir.setLengthVector(Robot::center_from_kicker_new);
     AngleDeg perp = (pos-wm->ball->pos).dir().degree() + 90.0;
     Vector2D goalL = pos + Vector2D::polar2vector(0.3,perp);
     Vector2D goalR = pos - Vector2D::polar2vector(0.3,perp);
@@ -536,7 +536,7 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
         {
             double obsDeg = ( wm->our.active(i)->pos - from ).th().degree();
             double obsDist = wm->our.active(i)->pos.dist(from);
-            double obsAng = asin(wm->our.active(i)->robot_radius_new / obsDist) * _RAD2DEG;
+            double obsAng = asin(Robot::robot_radius_new / obsDist) * _RAD2DEG;
             double lowerbound = obsDeg-obsAng;
             double upperbound = obsDeg+obsAng;
 
@@ -559,7 +559,7 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
         {
             double obsDeg = ( wm->opp.active(i)->pos - from ).th().degree();
             double obsDist = wm->opp.active(i)->pos.dist(from);
-            double obsAng = asin(wm->opp.active(i)->robot_radius_new / obsDist) * _RAD2DEG;
+            double obsAng = asin(Robot::robot_radius_new / obsDist) * _RAD2DEG;
             double lowerbound = obsDeg-obsAng;
             double upperbound = obsDeg+obsAng;
 

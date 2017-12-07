@@ -46,9 +46,9 @@ public:
     //////////////////////////////////////
     bool noPlanException;
 
-    static PositioningPlan positioningPlan;
-    static CMarkPlan markPlan;
-    static DefensePlan defensePlan;
+    /*static*/ PositioningPlan positioningPlan;
+    /*static*/ CMarkPlan markPlan;
+    /*static*/ DefensePlan defensePlan;
 
 private:
     void execPlay();
@@ -72,8 +72,8 @@ protected:
 
 
 
-    static CRolePlayMake playMakeRole;
-    static CRoleBlock blockRole;
+    /*static*/ CRolePlayMake playMakeRole;
+    /*static*/ CRoleBlock blockRole;
 
     void initMaster();
     void setAgentsID(const QList <Agent*>& _agentsID);

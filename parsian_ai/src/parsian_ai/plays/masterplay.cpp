@@ -1,15 +1,13 @@
+#include <parsian_ai/soccer.h>
 #include <parsian_ai/plays/masterplay.h>
 
-#include <utility>
-#include <parsian_ai/soccer.h>
+//PositioningPlan CMasterPlay::positioningPlan;
+//CMarkPlan CMasterPlay::markPlan;
+//DefensePlan CMasterPlay::defensePlan;
+//CRolePlayMake CMasterPlay::playMakeRole{nullptr};
+//CRoleBlock CMasterPlay::blockRole{nullptr};
 
-PositioningPlan CMasterPlay::positioningPlan;
-CMarkPlan CMasterPlay::markPlan;
-DefensePlan CMasterPlay::defensePlan;
-CRolePlayMake CMasterPlay::playMakeRole(nullptr);
-CRoleBlock CMasterPlay::blockRole(nullptr);
-
-CMasterPlay::CMasterPlay(){
+CMasterPlay::CMasterPlay() : playMakeRole(nullptr), blockRole(nullptr){
     executedCycles = 0;
     lockAgents = false;
     //defenseN = 2;
@@ -173,7 +171,7 @@ bool CMasterPlay::canOneTouch(QList<Agent *> posAgents, Agent *playMake){
         QList<int> ourRelaxIDS,oppRelaxIDS;
         int positioner = posAgent->id();
         ourRelaxIDS.push_back(positioner);
-        Vector2D pos = posAgent->pos() + posAgent->dir().setLengthVector(CRobot::center_from_kicker_new);
+        Vector2D pos = posAgent->pos() + posAgent->dir().setLengthVector(Robot::center_from_kicker_new);
         if( getOpenness( pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS ) > 0.8 )
             return true;
     }
@@ -196,7 +194,7 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
         {
             double obsDeg = ( wm->our.active(i)->pos - from ).th().degree();
             double obsDist = wm->our.active(i)->pos.dist(from);
-            double obsAng = asin(wm->our.active(i)->robot_radius_new / obsDist) * _RAD2DEG;
+            double obsAng = asin(Robot::robot_radius_new / obsDist) * _RAD2DEG;
             double lowerbound = obsDeg-obsAng;
             double upperbound = obsDeg+obsAng;
 
@@ -219,7 +217,7 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
         {
             double obsDeg = ( wm->opp.active(i)->pos - from ).th().degree();
             double obsDist = wm->opp.active(i)->pos.dist(from);
-            double obsAng = asin(wm->opp.active(i)->robot_radius_new / obsDist) * _RAD2DEG;
+            double obsAng = asin(Robot::robot_radius_new / obsDist) * _RAD2DEG;
             double lowerbound = obsDeg-obsAng;
             double upperbound = obsDeg+obsAng;
 

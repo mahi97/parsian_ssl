@@ -197,18 +197,20 @@ target_link_libraries(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}_plays
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
+		${PROJECT_NAME}_util
 		)
 
 target_link_libraries(${PROJECT_NAME}_plans
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
+		${PROJECT_NAME}_util
 		)
 
-#target_link_libraries(${PROJECT_NAME}_util
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		${QJSON_LIBRARIES}
-#		)
+target_link_libraries(${PROJECT_NAME}_util
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${QJSON_LIBRARIES}
+		)
 
 
 

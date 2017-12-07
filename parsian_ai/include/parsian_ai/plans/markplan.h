@@ -57,13 +57,13 @@ public:
     ~CMarkPlan();
     double segmentpershoot;
     double segmentperpass;
-    static GotopointavoidAction *markGPA[6];
+    GotopointavoidAction *markGPA[6];
     void execute();
     Vector2D posvel(CRobot* opp);
     void markPosesRefinePlayon();
     QList<Vector2D> ShootBlockRatio(double, Vector2D);
     QList<Vector2D> PassBlockRatio(double ratio, Vector2D opp);
-    static bool sortBy(const Vector2D &robot1,const Vector2D &robot2);
+    bool sortBy(const Vector2D &robot1,const Vector2D &robot2);
     QList<CRobot*> sortdanger(const QList<CRobot*> oppagent);
     QList<QPair<Vector2D, double> > sortdangerpassplayoff(QList<Vector2D> oppposdanger);
     QList<QPair<Vector2D, double> > sortdangerpassplayon(QList<Vector2D> oppposdanger);
