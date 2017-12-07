@@ -1,4 +1,3 @@
-uint8 robot_id
 vector2D target
 bool slow
 float64 receiveRadius

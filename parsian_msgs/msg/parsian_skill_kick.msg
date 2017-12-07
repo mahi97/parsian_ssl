@@ -1,4 +1,3 @@
-uint8 robot_id
 float64 tolerance
 bool chip
 float64 kickSpeed

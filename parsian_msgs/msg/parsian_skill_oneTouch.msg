@@ -1,4 +1,3 @@
-uint8 robot_id
 bool chip
 float64 kickSpeed
 vector2D waitPos
