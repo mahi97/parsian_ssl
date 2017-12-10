@@ -8,7 +8,7 @@
 namespace rqt_parsian_gui
 {
 
-    ModeChooser::ModeChooser() : rqt_gui_cpp::Plugin(), widget_(0)
+    ModeChooser::ModeChooser() : rqt_gui_cpp::Plugin()
     {
         setObjectName("noOne");
     }
@@ -18,13 +18,9 @@ namespace rqt_parsian_gui
 
         n = getNodeHandle();
         n_private = getPrivateNodeHandle();
-
-
         // create QWidget
-        widget_ = new QWidget();
-        widget_->setWindowTitle("noOne");
-        fieldWidget=new ModeChooserWidget(n);
-        context.addWidget(fieldWidget);
+        modeWidget=new ModeChooserWidget(n);
+        context.addWidget(modeWidget);
     }
 }
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::ModeChooser, rqt_gui_cpp::Plugin)

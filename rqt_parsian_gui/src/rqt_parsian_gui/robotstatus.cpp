@@ -3,62 +3,69 @@
 */
 
 #include "rqt_parsian_gui/robotstatus.h"
-#include <pluginlib/class_list_macros.h>
-#include <QStringList>
 
+class parsian_robot_status;
 namespace rqt_parsian_gui
 {
 
 RobotStatus::RobotStatus()
   : rqt_gui_cpp::Plugin()
-  , widget_(0)
 {
   // Constructor is called first before initPlugin function, needless to say.
-
   // give QObjects reasonable names
   setObjectName("RobotStatus");
 }
 
 void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
 {
-  // access standalone command line arguments
-  QStringList argv = context.argv();
+    n = getNodeHandle();
+    n_private = getPrivateNodeHandle();
+
+    rs_sub = n_private.subscribe("/robots_status",1000,&RobotStatus::rsCallback,this);
+    for (int j = 0; j < max_robot; ++j) {
+        QString sub_name = QString("/robot_command")+QString::number(j);
+        rc_sub[j] = n_private.subscribe(sub_name.toStdString(),1000,&RobotStatus::rcCallback,this);
+    }
+
   // create QWidget
-  widget_ = new QWidget();
-widget_->setWindowTitle("RobotStatus");
+    scroll_widget = new QWidget;
+    scrollArea =new QScrollArea;
+    scrollArea_l = new QVBoxLayout;
+
+    scrollArea_l->setSizeConstraint(QLayout::SetMinimumSize);
+    scroll_widget->setLayout(scrollArea_l);
+
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWindowTitle("RobotStatus");
+    scrollArea->setFixedHeight(700);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    scrollArea->setWidget(scroll_widget);
+
+    for(auto &i : statusWidget) {
+        i = new RobotStatusWidget(parsian_msgs::parsian_team_config::isYellow);
+        scrollArea_l->addWidget(i);
+    }
+
+
 
   // extend the widget with all attributes and children from UI file
 
   // add widget to the user interface
-  context.addWidget(widget_);
+
+    context.addWidget(scrollArea);
 }
+    void RobotStatus::rsCallback(const parsian_msgs::parsian_robots_statusConstPtr msg){
+        int counter=0;
+        for(auto &i : statusWidget) {
+            i->setMessage(msg->status[counter++]);
+            break;
+        }
+    }
 
-void RobotStatus::shutdownPlugin()
-{
-  // unregister all publishers here
-}
+    void RobotStatus::rcCallback(const parsian_msgs::parsian_robot_commandConstPtr msg){
 
-void RobotStatus::saveSettings(qt_gui_cpp::Settings& plugin_settings,
-    qt_gui_cpp::Settings& instance_settings) const
-{
-  // instance_settings.setValue(k, v)
-}
+            statusWidget[msg->robot_id]->setVel(*msg);
 
-void RobotStatus::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
-    const qt_gui_cpp::Settings& instance_settings)
-{
-  // v = instance_settings.value(k)
-}
-
-/*bool hasConfiguration() const
-{
-  return true;
-}
-
-void triggerConfiguration()
-{
-  // Usually used to open a dialog to offer the user a set of configuration
-}*/
-
+    }
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::RobotStatus, rqt_gui_cpp::Plugin)
