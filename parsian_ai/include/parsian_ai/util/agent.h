@@ -13,6 +13,8 @@ public:
     explicit Agent(int id);
     Vector2D oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection);
     QString roleName;
+    bool changeIsNeeded = false;
+    bool shootSensor = false;
 protected:
 private:
 };

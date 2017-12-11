@@ -28,5 +28,4 @@ private:
         public: skill* set##name(type val); \
         protected: type local
 
-
 #endif //PARSIAN_UTIL_ACTION_H

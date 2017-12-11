@@ -68,7 +68,7 @@ private:
 
     CPlayOff             *ourPlayOff;
     COurPenalty          *ourPenalty;
-    COurBallPlacement    *ourBallPlacement;
+//    COurBallPlacement    *ourBallPlacement;
 
     CTheirDirect         *theirDirect;
     CTheirPenalty        *theirPenalty;

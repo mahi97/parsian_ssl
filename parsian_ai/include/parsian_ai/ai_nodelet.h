@@ -23,7 +23,7 @@ namespace parsian_ai {
     class AINodelet : public nodelet::Nodelet {
 
     private:
-        AI *ai;
+        boost::shared_ptr<AI> ai;
         ros::Subscriber worldModelSub;
         ros::Subscriber robotStatusSub;
         ros::Subscriber refereeSub;

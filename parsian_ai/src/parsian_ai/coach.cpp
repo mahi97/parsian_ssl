@@ -9,8 +9,6 @@
 #include <parsian_ai/ai.h>
 #include <parsian_ai/config.h>
 
-
-//QMap<QString, EditData*> CCoach::editData;
 CCoach::CCoach(Agent**_agents)
 {
     goalieTrappedUnderGoalNet = false;
@@ -36,32 +34,28 @@ CCoach::CCoach(Agent**_agents)
     playMakeTh = 0.3;
 
 
-//    // Old Plays
-//    ourKickOff          = new COurKickOff;
-//    ourPenalty          = new COurPenalty;
-//    forceStart          = new CForceStart;
-//    ourIndirect         = new COurIndirect;
-//    theirDirect         = new CTheirDirect;
-//    theirKickOff        = new CTheirKickOff;
-//    theirPenalty        = new CTheirPenalty;
-//    theirIndirect       = new CTheirIndirect;
+    // Old Plays
+    ourPenalty          = new COurPenalty;
+    theirDirect         = new CTheirDirect;
+    theirKickOff        = new CTheirKickOff;
+    theirPenalty        = new CTheirPenalty;
+    theirIndirect       = new CTheirIndirect;
 //    ourBallPlacement    = new COurBallPlacement;
 //    halfTimeLineup    = new CHalftimeLineup;
-//    theirBallPlacement  = new CTheirBallPlacement;
-//    ourDoubleSizeDirect = new CDoubleSizeOurDirect;
-//
-//
-//    // New Plays
-//    ourPlayOff          = new CPlayOff;
-//    dynamicAttack       = new CDynamicAttack();
-//
-//    //Stop
-//    stopPlay            = new CStopPlay();
-//
-//    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-//        stopRoles[i] = new CRoleStop(knowledge->getAgent(i));
-//    }
-//
+    theirBallPlacement  = new CTheirBallPlacement;
+
+
+    // New Plays
+    ourPlayOff          = new CPlayOff;
+    dynamicAttack       = new CDynamicAttack();
+
+    //Stop
+    stopPlay            = new CStopPlay();
+
+    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
+        stopRoles[i] = new CRoleStop(agents[i]);
+    }
+
     lastDefenseAgents.clear();
 
     defenseTimeForVisionProblem[0].start();
@@ -78,12 +72,13 @@ CCoach::CCoach(Agent**_agents)
     firstIsFinished = false;
     preferedDefenseCounts = 2;
     overDefThr = 0;
-
+    selectedPlay = stopPlay;
     for (int &i : faultDetectionCounter) i = 0;
 }
 
 CCoach::~CCoach()
 {
+    delete stopPlay;
 //    savePostAssignment();
 //    saveLFUReapeatData(LFUList);
 }
@@ -524,7 +519,7 @@ void CCoach::assignDefenseAgents(int defenseCount){
     }
 
     selectedPlay->defensePlan.fillDefencePositionsTo(defenseTargets);
-    double nearestDist = 1000000;
+    double nearestDist;
     int nearestRobot = -1;
 
     defenseAgents.clear();
@@ -532,6 +527,7 @@ void CCoach::assignDefenseAgents(int defenseCount){
         nearestDist = 1000000;
         for(int j = 0 ; j < ids.count() ; j++) {
             if (!agents[ids[j]]->changeIsNeeded) {
+                wm->our[ids[j]]->pos;
                 if (wm->our[ids[j]]->pos.dist(defenseTargets[i]) < nearestDist) {
                     nearestDist = wm->our[ids[j]]->pos.dist(defenseTargets[i]);
                     nearestRobot =  ids[j];
@@ -605,7 +601,6 @@ void CCoach::virtualTheirPlayOffState()
 void CCoach::decideDefense(){
     assignGoalieAgent(preferedGoalieAgent);
     assignDefenseAgents(preferedDefenseCounts);
-
     if( gameState->theirPenaltyKick() ){
         defenseAgents.clear();
         selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
@@ -652,7 +647,12 @@ void CCoach::updateAttackState()
     double    critAng   = 30  ;
     CRobot    *oppNearest;
     if(wm->opp.activeAgentsCount() > 0) {
-        oppNearest = wm->opp[CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos)];
+//        int id = CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos);
+//        ROS_INFO_STREAM(id);
+//        oppNearest = wm->opp[id];
+        ourAttackState = SAFE;
+        return;
+
     }
     else
     {
@@ -683,6 +683,7 @@ void CCoach::updateAttackState()
             }
         }
     }
+    ROS_INFO_STREAM("Z");
 
 
     drawer->draw(robotCritArea,QColor(Qt::cyan));
@@ -764,8 +765,8 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
         playMakeIntention.restart();
         //Vector2D ballVel = wm->ball->vel;
         double nearest[10] = {};
-        for(int i = 0; i < ourPlayers.size(); i++)
-            nearest[ourPlayers[i]] = CKnowledge::kickTimeEstimation(agents[ourPlayers[i]], wm->field->oppGoal(), *wm->ball, 4,3,2,2); // TODO FIX
+        for (int ourPlayer : ourPlayers)
+            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball, 4,3,2,2); // TODO FIX
         if(lastPlayMake >= 0 && lastPlayMake <= 9)
             nearest[lastPlayMake] -= 0.2;
         double minT = 1e8;
@@ -786,6 +787,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
 void CCoach::decideAttack()
 {
     ballPState = isBallOurs();
+    ROS_INFO_STREAM("D");
     updateAttackState();
 
     lastBallPossesionState = ballPState;
@@ -800,13 +802,11 @@ void CCoach::decideAttack()
             ourPlayers.removeOne(defenseAgent->id());
         }
     }
-
     selectedPlay->defensePlan.debugAgents("DEF : ");
     QString str;
     for (int ourPlayer : ourPlayers)
         str += QString(" %1").arg(ourPlayer);
     debugger->debug(QString("%1: Size: %2 --> (%3)").arg("text :").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
-
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -1135,17 +1135,8 @@ void CCoach::setFirstPlay() {
     firstIsFinished = false;
 }
 
-void CCoach::setFastPlay() {
-    // TODO : Write Fast Play checker
-
-}
-
 void CCoach::execute()
 {
-
-    QTime timer;
-    timer.start();
-
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
     decidePreferedDefenseAgentsCountAndGoalieAgent();
@@ -1162,10 +1153,10 @@ void CCoach::execute()
         choosePlaymakeAndSupporter(false);
         decideDefense();
     }
-
+    ROS_INFO("SS");
     ////////////////////////////////////////////
-
     decideAttack();
+    ROS_INFO_STREAM("SSS");
     checkSensorShootFault();
     // checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
@@ -1180,7 +1171,12 @@ void CCoach::execute()
 //        }
 //    }
 
-    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
+//    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
+}
+
+void CCoach::setFastPlay() {
+    // TODO : Write Fast Play checker
+
 }
 
 void CCoach::checkRoleAssignments()
@@ -1315,7 +1311,7 @@ void CCoach::decideStart(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurBallPlacement(QList<int> &_ourPlayers) {
-    selectedPlay = ourBallPlacement;
+//    selectedPlay = ourBallPlacement;
 }
 
 void CCoach::decideTheirBallPlacement(QList<int> &_ourPlayers) {

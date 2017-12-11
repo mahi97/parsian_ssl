@@ -171,6 +171,7 @@ add_library(${PROJECT_NAME}_actions
         src/action/autogenerate/receivepassaction.cpp
         src/action/autogenerate/onetouchaction.cpp
         src/action/autogenerate/kickaction.cpp
+        src/action/autogenerate/noaction.cpp
         )
 
 add_library(${PROJECT_NAME}_core
