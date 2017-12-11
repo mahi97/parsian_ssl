@@ -35,6 +35,9 @@ public:
     clock_t realTimeTime;
     struct timeval t1, t2;
 private:
+    KickAction* kick ;
+    GotopointavoidAction* gtp ;
+
 
 };
 
