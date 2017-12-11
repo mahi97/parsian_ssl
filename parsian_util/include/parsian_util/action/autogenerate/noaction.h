@@ -18,7 +18,8 @@ public:
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(NoAction, bool, Waithere, waithere);

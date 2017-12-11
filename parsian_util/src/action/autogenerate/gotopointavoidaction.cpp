@@ -31,8 +31,11 @@ void* GotopointavoidAction::getMessage() {
 
 
 QString GotopointavoidAction::getActionName(){
-    static QString name("GotopointavoidAction");
-    return name;
+    return SActionName();
+}
+
+QString GotopointavoidAction::SActionName(){
+    return QString{"GotopointavoidAction"};
 }
 
 void GotopointavoidAction::clearOurrelax() {
