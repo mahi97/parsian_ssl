@@ -58,7 +58,6 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
         int counter=0;
         for(auto &i : statusWidget) {
             i->setMessage(msg->status[counter++]);
-            break;
         }
     }
 
