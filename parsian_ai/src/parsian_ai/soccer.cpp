@@ -57,7 +57,7 @@ void CSoccer::updateTask(){
 
 void CSoccer::customControl(bool &custom) {
     custom = false;
-    return;
     custom = true;
     updateTask();
+    return;
 }

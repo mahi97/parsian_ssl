@@ -522,18 +522,16 @@ void CCoach::assignDefenseAgents(int defenseCount){
     double nearestDist;
     int nearestRobot = -1;
 
-    ROS_INFO_STREAM(wm->our[2]->id);
     defenseAgents.clear();
     for(int i = 0 ; i < defenseCount ; i++) {
         nearestDist = 1000000;
         for(int j = 0 ; j < ids.count() ; j++) {
-                ROS_INFO_STREAM(j << " + " << wm->our[ids[j]]->id << " - " << ids[j]);
             if (!agents[ids[j]]->changeIsNeeded) {
-//                wm->our[ids[j]]->pos;
-//                if (wm->our[ids[j]]->pos.dist(defenseTargets[i]) < nearestDist) {
-//                    nearestDist = wm->our[ids[j]]->pos.dist(defenseTargets[i]);
-//                    nearestRobot =  ids[j];
-//                }
+                wm->our[ids[j]]->pos;
+                if (wm->our[ids[j]]->pos.dist(defenseTargets[i]) < nearestDist) {
+                    nearestDist = wm->our[ids[j]]->pos.dist(defenseTargets[i]);
+                    nearestRobot =  ids[j];
+                }
             }
         }
         if(nearestRobot>=0) {
@@ -601,7 +599,6 @@ void CCoach::virtualTheirPlayOffState()
 }
 
 void CCoach::decideDefense(){
-    ROS_INFO("M");
     assignGoalieAgent(preferedGoalieAgent);
     assignDefenseAgents(preferedDefenseCounts);
     if( gameState->theirPenaltyKick() ){
@@ -612,9 +609,7 @@ void CCoach::decideDefense(){
     } else {
         selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
         selectedPlay->defensePlan.initDefense(defenseAgents);
-        ROS_INFO("MM");
         selectedPlay->defensePlan.execute();
-        ROS_INFO("MMM");
         selectedPlay->defensePlan.debugAgents("Defense");
     }
 }
@@ -652,7 +647,12 @@ void CCoach::updateAttackState()
     double    critAng   = 30  ;
     CRobot    *oppNearest;
     if(wm->opp.activeAgentsCount() > 0) {
-        oppNearest = wm->opp[CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos)];
+//        int id = CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos);
+//        ROS_INFO_STREAM(id);
+//        oppNearest = wm->opp[id];
+        ourAttackState = SAFE;
+        return;
+
     }
     else
     {
@@ -683,6 +683,7 @@ void CCoach::updateAttackState()
             }
         }
     }
+    ROS_INFO_STREAM("Z");
 
 
     drawer->draw(robotCritArea,QColor(Qt::cyan));
@@ -764,8 +765,8 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
         playMakeIntention.restart();
         //Vector2D ballVel = wm->ball->vel;
         double nearest[10] = {};
-        for(int i = 0; i < ourPlayers.size(); i++)
-            nearest[ourPlayers[i]] = CKnowledge::kickTimeEstimation(agents[ourPlayers[i]], wm->field->oppGoal(), *wm->ball, 4,3,2,2); // TODO FIX
+        for (int ourPlayer : ourPlayers)
+            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball, 4,3,2,2); // TODO FIX
         if(lastPlayMake >= 0 && lastPlayMake <= 9)
             nearest[lastPlayMake] -= 0.2;
         double minT = 1e8;
@@ -786,6 +787,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
 void CCoach::decideAttack()
 {
     ballPState = isBallOurs();
+    ROS_INFO_STREAM("D");
     updateAttackState();
 
     lastBallPossesionState = ballPState;
@@ -800,13 +802,11 @@ void CCoach::decideAttack()
             ourPlayers.removeOne(defenseAgent->id());
         }
     }
-
     selectedPlay->defensePlan.debugAgents("DEF : ");
     QString str;
     for (int ourPlayer : ourPlayers)
         str += QString(" %1").arg(ourPlayer);
     debugger->debug(QString("%1: Size: %2 --> (%3)").arg("text :").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
-
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -1135,14 +1135,8 @@ void CCoach::setFirstPlay() {
     firstIsFinished = false;
 }
 
-void CCoach::setFastPlay() {
-    // TODO : Write Fast Play checker
-
-}
-
 void CCoach::execute()
 {
-    ROS_INFO("S");
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
     decidePreferedDefenseAgentsCountAndGoalieAgent();
@@ -1157,13 +1151,12 @@ void CCoach::execute()
         choosePlaymakeAndSupporter(true);
     } else {
         choosePlaymakeAndSupporter(false);
-        ROS_INFO("SSS");
         decideDefense();
     }
-    ////////////////////////////////////////////
-
-    decideAttack();
     ROS_INFO("SS");
+    ////////////////////////////////////////////
+    decideAttack();
+    ROS_INFO_STREAM("SSS");
     checkSensorShootFault();
     // checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
@@ -1179,6 +1172,11 @@ void CCoach::execute()
 //    }
 
 //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
+}
+
+void CCoach::setFastPlay() {
+    // TODO : Write Fast Play checker
+
 }
 
 void CCoach::checkRoleAssignments()
