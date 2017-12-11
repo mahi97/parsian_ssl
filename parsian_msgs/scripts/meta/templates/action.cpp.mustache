@@ -33,8 +33,11 @@ void* {{action_name}}::getMessage() {
 
 
 QString {{action_name}}::getActionName(){
-    static QString name("{{action_name}}");
-    return name;
+    return SActionName();
+}
+
+QString {{action_name}}::SActionName(){
+    return QString{"{{action_name}}"};
 }
 
 {{#list_properties}}
