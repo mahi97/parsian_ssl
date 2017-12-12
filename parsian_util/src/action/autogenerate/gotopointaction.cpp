@@ -43,7 +43,10 @@ void* GotopointAction::getMessage() {
 
 
 QString GotopointAction::getActionName(){
-    static QString name("GotopointAction");
-    return name;
+    return SActionName();
+}
+
+QString GotopointAction::SActionName(){
+    return QString{"GotopointAction"};
 }
 

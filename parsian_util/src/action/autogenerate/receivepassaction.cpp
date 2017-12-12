@@ -25,7 +25,10 @@ void* ReceivepassAction::getMessage() {
 
 
 QString ReceivepassAction::getActionName(){
-    static QString name("ReceivepassAction");
-    return name;
+    return SActionName();
+}
+
+QString ReceivepassAction::SActionName(){
+    return QString{"ReceivepassAction"};
 }
 

@@ -17,7 +17,10 @@ void* NoAction::getMessage() {
 
 
 QString NoAction::getActionName(){
-    static QString name("NoAction");
-    return name;
+    return SActionName();
+}
+
+QString NoAction::SActionName(){
+    return QString{"NoAction"};
 }
 

@@ -24,7 +24,7 @@ void AgentNodelet::onInit(){
     string publishName{"robot_command"};
     subscribeName.append(std::to_string(agent.get()->id()));
     publishName.append(std::to_string(agent.get()->id()));
-    common_config_sub = nh.subscribe("/com_agent/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
+    common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
     robot_task_sub  = nh.subscribe(subscribeName.data(), 10000, &AgentNodelet::rtCb, this);
 

@@ -18,7 +18,8 @@ public:
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);

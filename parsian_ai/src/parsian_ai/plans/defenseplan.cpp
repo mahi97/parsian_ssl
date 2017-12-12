@@ -2159,7 +2159,8 @@ bool DefensePlan::isValidPoint(const Vector2D& point){
 }
 
 void DefensePlan::initVars(float goalCircleRad){
-    fastestToBall = know->newFastestToBall(0.016 , wm->our.data->activeAgents , wm->opp.data->activeAgents);
+
+//    fastestToBall = know->newFastestToBall(0.016 , wm->our.data->activeAgents , wm->opp.data->activeAgents);
     int ourFastest = fastestToBall.ourFastest();
     catch_time = fastestToBall.catch_time;
     isDefenseFastest = false;
@@ -2220,11 +2221,11 @@ void DefensePlan::initVars(float goalCircleRad){
                 if (dist < minDist)
                 {
                     ballPos = vec;
-                    minDist = dist;
+                    minDist = static_cast<float>(dist);
                 }
             }
     }
-    clearDistanceForGoalie = ourGoalAreaCircleRad + 0.365;
+    clearDistanceForGoalie = static_cast<float>(ourGoalAreaCircleRad + 0.365);
     if (ballPos.dist(midGoal) < clearDistanceForGoalie)
         ballPos = midGoal + Vector2D().setPolar(clearDistanceForGoalie, (ballPos - midGoal).th().degree());
 
@@ -2478,13 +2479,9 @@ bool DefensePlan::defenseClearOrNot(){
         return true;
     }
 
-#ifndef OLD_FASTEST
     double ourF = fastestToBall.ourFastestTime();
     double oppF = fastestToBall.oppFastestTime();
-#else
-    double ourF = fastestToBall.ourFastestTime;
-    double oppF = fastestToBall.oppFastestTime;
-#endif
+
     if(oppF != -1 && ourF == -1){
         isOurAgentNearestToTheBall = false;
     }

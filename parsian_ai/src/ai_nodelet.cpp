@@ -8,8 +8,8 @@ void AINodelet::onInit() {
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
+    ai.reset(new AI());
     ROS_INFO("inited");
-    ai = new AI();
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
         std::string topic("robot_task_"+std::to_string(i));
@@ -24,13 +24,14 @@ void AINodelet::onInit() {
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
+//    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
     f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
+    ROS_INFO("MAHI");
 
 }
 
@@ -49,9 +50,10 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ROS_INFO("wm updated");
     ai->execute();
 
-    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
+//    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
+        ROS_INFO("SEND");
         robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
-    }
+//    }
 
 }
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {

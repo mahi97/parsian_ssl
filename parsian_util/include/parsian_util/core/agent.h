@@ -18,8 +18,6 @@ public:
 
     Action* action;
     CRobot self;
-    bool changeIsNeeded;
-    bool shootSensor;
 };
 
 #endif // AGENT_H
