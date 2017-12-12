@@ -50,20 +50,18 @@ namespace rqt_parsian_gui
     {
 
 
+
+        centralPoint.x=400+cameraX*50;
+        centralPoint.y=280+cameraY*50;
         if( event->delta() > 0 ){
             if(scaleFactor > 3)
                 return;
 
-            centralPoint.x=400+cameraX*50;
-            centralPoint.y=280+cameraY*50;
 
             scaleFactor+=0.1;
             cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(50.0*scaleFactor);
             cameraY=(1-scaleFactor)*((double)event->pos().y()-centralPoint.y)/(50.0*scaleFactor);
 
-
-            ROS_INFO("cc:_%f_",scaleFactor);
-            ROS_INFO_STREAM("mpx"<<event->pos().x()<<"offX"<<cameraX);
 
         }
         else{
@@ -72,9 +70,6 @@ namespace rqt_parsian_gui
 //
             if(scaleFactor <0.5)
                 return;
-
-            centralPoint.x=400+cameraX*70;
-            centralPoint.y=280+cameraY*70;
 
             scaleFactor-=0.1;
             cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(70.0*scaleFactor);
@@ -350,8 +345,8 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX,
-                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY,
+        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*70,
+                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*70,
                          text);
         painter.end();
     }
