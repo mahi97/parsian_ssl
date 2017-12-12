@@ -63,7 +63,6 @@ namespace rqt_parsian_gui
 
         drawer=new CguiDrawer();
 
-        ROS_INFO("__%d__",drawer->robotBuffer.length());
         if(mywm->isYellow){
             ourCol = QColor("yellow");
             oppCol = QColor("blue");

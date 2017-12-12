@@ -11,6 +11,7 @@
 #include <qopenglwidget.h>
 #include <QGridLayout>
 #include <QtOpenGL/qgl.h>
+#include <GL/glu.h>
 #include <parsian_util/core/field.h>
 
 
@@ -46,15 +47,20 @@ namespace rqt_parsian_gui
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
         Vector2D mousePressPos;
+        int getViewportWidth();
     protected:
 
 
-
         void initializeGL();
+
         void paintGL();
+        double cameraX,cameraY;
+
+        double scaleFactor=1;
         void resizeGL(int width, int height);
         QPainter painter;
         void mousePressEvent(QMouseEvent *event);
+        void wheelEvent(QWheelEvent *event);
 
 
     private:
@@ -69,6 +75,9 @@ namespace rqt_parsian_gui
         QColor fieldGreen;
         double viewportWidth;
         double WH_RATIO;
+        Vector2D centralPoint;
+
+
 
         void qglClearColor(QColor clearColor);
         void setViewportWidth(int width);
