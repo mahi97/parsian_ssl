@@ -11,6 +11,7 @@
 #include <qopenglwidget.h>
 #include <QGridLayout>
 #include <QtOpenGL/qgl.h>
+#include <GL/glu.h>
 #include <parsian_util/core/field.h>
 
 
@@ -53,6 +54,9 @@ namespace rqt_parsian_gui
         void initializeGL();
 
         void paintGL();
+        double cameraX,cameraY;
+
+        double scaleFactor=1;
         void resizeGL(int width, int height);
         QPainter painter;
         void mousePressEvent(QMouseEvent *event);
@@ -71,6 +75,9 @@ namespace rqt_parsian_gui
         QColor fieldGreen;
         double viewportWidth;
         double WH_RATIO;
+        Vector2D centralPoint;
+
+
 
         void qglClearColor(QColor clearColor);
         void setViewportWidth(int width);
