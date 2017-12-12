@@ -5,8 +5,10 @@
 #ifndef PARSIAN_AGENT_CONFIG_H
 #define PARSIAN_AGENT_CONFIG_H
 
-#include <parsian_agent/commonconfigConfig.h>
-
-extern agent_common_config::commonconfigConfig *conf;
-
+#include <parsian_agent/agentConfig.h>
+#include <dynamic_reconfigure/Config.h>
+#include <parsian_util/core/worldmodel.h>
+extern agent_common::agentConfig *conf;
+extern CWorldModel* wm;
 #endif //PARSIAN_AGENT_CONFIG_H
+

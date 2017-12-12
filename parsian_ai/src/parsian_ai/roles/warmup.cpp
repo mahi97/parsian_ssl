@@ -2,7 +2,7 @@
 
 INIT_ROLE(CRoleWarmup, "warmup");
 
-CRoleWarmup::CRoleWarmup(CAgent *_agent) : CRole(_agent)
+CRoleWarmup::CRoleWarmup(Agent *_agent) : CRole(_agent)
 {
     gotopoint = new CSkillGotoPointAvoid(_agent);
 }
@@ -131,7 +131,7 @@ void CRoleWarmupInfo::findPos2()
     if ( fabs(cent.y) > 1.5 )
         sy *= -1;
 wm->ball->setReplace(cent - Vector2D(sx, sy)*0.1,Vector2D(0,0));
-    cent.x += ( rad + CRobot::robot_radius_old)* 0.25 * _DEG2RAD * sx;
-cent.y += ( rad + CRobot::robot_radius_old)* 0.25 * _DEG2RAD * sy;
+    cent.x += ( rad + Robot::robot_radius_old)* 0.25 * _DEG2RAD * sx;
+cent.y += ( rad + Robot::robot_radius_old)* 0.25 * _DEG2RAD * sy;
 
 }

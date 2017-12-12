@@ -15,34 +15,34 @@ int GameState::getTheirScore(){ return theirScore;}
 void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
     ///////////////////// when we are ready any command means force start
-    if(isReady && state!=PlayOn){
-        state=PlayOn;
+    if(isReady && state != States::PlayOn){
+        state = States::PlayOn;
         return;
     }
 
     switch (ref_wrapper->stage.stage) {
     case ssl_refree_stage::NORMAL_HALF_TIME:
     case ssl_refree_stage::EXTRA_HALF_TIME:
-        state=HalfTime;
+        state = States::HalfTime;
         return;
 
     case ssl_refree_stage::POST_GAME:
-        state=PostGame;
+        state = States::PostGame;
         return;
     }
 
     switch (ref_wrapper->command.command) {
     case ssl_refree_command::FORCE_START:
-        state=PlayOn;
+        state = States::PlayOn;
         isReady=true;
         return;
     case ssl_refree_command::HALT:
-        state=Halt;
+        state = States::Halt;
         isReady=false;
         return;
 
     case ssl_refree_command::STOP:
-        state=PlayOff;
+        state = States::PlayOff;
         isReady=false;
         return;
 
@@ -53,20 +53,20 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
         //####################################################
     case ssl_refree_command::BALL_PLACEMENT_THEM:
         isReady=true;
-        state=TheirBallPlacement;
+        state = States::TheirBallPlacement;
         return;
     case ssl_refree_command::BALL_PLACEMENT_US:
         isReady=true;
-        state=OurBallPlacement;
+        state = States::OurBallPlacement;
         return;
 
     case ssl_refree_command::DIRECT_FREE_THEM:
         isReady=true;
-        state=TheirDirectKick;
+        state = States::TheirDirectKick;
         return;
     case ssl_refree_command::DIRECT_FREE_US:
         isReady=true;
-        state=OurDirectKick;
+        state = States::OurDirectKick;
         return;
 
     case ssl_refree_command::GOAL_THEM:
@@ -78,79 +78,79 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
     case ssl_refree_command::INDIRECT_FREE_THEM:
         isReady=true;
-        state=TheirIndirectKick;
+        state = States::TheirIndirectKick;
         return;
     case ssl_refree_command::INDIRECT_FREE_US:
         isReady=true;
-        state=OurIndirectKick;
+        state = States::OurIndirectKick;
         return;
 
     case ssl_refree_command::PREPARE_KICKOFF_THEM:
         isReady=false;
-        state=TheirKickOff;
+        state = States::TheirKickOff;
         return;
     case ssl_refree_command::PREPARE_KICKOFF_US:
         isReady=false;
-        state=OurKickOff;
+        state = States::OurKickOff;
         return;
 
     case ssl_refree_command::PREPARE_PENALTY_THEM:
         isReady=false;
         state= ((ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
-                    TheirPenaltyShootOut:TheirPenaltyKick);
+                States::TheirPenaltyShootOut : States::TheirPenaltyKick);
         return;
     case ssl_refree_command::PREPARE_PENALTY_US:
         isReady=false;
         state= (ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
-                    OurPenaltyShootOut:OurPenaltyKick;
+               States::OurPenaltyShootOut : States::OurPenaltyKick;
         return;
     }
 }
 
-bool GameState::isPlayOn() { return (state == PlayOn); }
-bool GameState::isPlayOff(){ return state==PlayOff;}
-bool GameState::canMove() { return (state != Halt); }
+bool GameState::isPlayOn() { return state == States::PlayOn; }
+bool GameState::isPlayOff(){ return state == States::PlayOff;}
+bool GameState::canMove()  { return state != States::Halt; }
 
 bool GameState::allowedNearBall() {return isPlayOn() || ourRestart(); }
 bool GameState::canKickBall() {return isPlayOn() || (ourRestart() && isReady); }
 
-bool GameState::restart() { return (state>=OurBallPlacement ); }
-bool GameState::ourRestart() { return restart() &&  state< TheirBallPlacement ;}
-bool GameState::theirRestart() { return state>= TheirBallPlacement; }
+bool GameState::restart() { return (state >= States::OurBallPlacement ); }
+bool GameState::ourRestart() { return restart() &&  state< States::TheirBallPlacement ;}
+bool GameState::theirRestart() { return state>= States::TheirBallPlacement; }
 
 bool GameState::kickoff() { return (ourKickoff() || theirKickoff()); }
-bool GameState::ourKickoff() { return (state==OurKickOff); }
-bool GameState::theirKickoff() { return (state==TheirKickOff); }
+bool GameState::ourKickoff() { return (state == States::OurKickOff); }
+bool GameState::theirKickoff() { return (state == States::TheirKickOff); }
 
 bool GameState::penaltyKick() { return ourPenaltyKick()|| theirPenaltyKick(); }
-bool GameState::ourPenaltyKick() { return (state==OurPenaltyKick); }
-bool GameState::theirPenaltyKick() { return (state==TheirPenaltyKick); }
+bool GameState::ourPenaltyKick() { return (state==States::OurPenaltyKick); }
+bool GameState::theirPenaltyKick() { return (state==States::TheirPenaltyKick); }
 
 bool GameState::directKick() { return (ourDirectKick() || theirDirectKick()); }
-bool GameState::ourDirectKick() { return (state == OurDirectKick); }
-bool GameState::theirDirectKick() { return (state== TheirDirectKick); }
+bool GameState::ourDirectKick() { return (state == States::OurDirectKick); }
+bool GameState::theirDirectKick() { return (state== States::TheirDirectKick); }
 
 bool GameState::indirectKick() { return ourIndirectKick() || theirIndirectKick(); }
-bool GameState::ourIndirectKick() { return (state == OurIndirectKick) ;}
-bool GameState::theirIndirectKick() { return (state == TheirIndirectKick); }
+bool GameState::ourIndirectKick() { return (state == States::OurIndirectKick) ;}
+bool GameState::theirIndirectKick() { return (state == States::TheirIndirectKick); }
 
 bool GameState::freeKick() { return directKick() || indirectKick(); }
 bool GameState::ourFreeKick() { return ourDirectKick() || ourIndirectKick(); }
 bool GameState::theirFreeKick() { return theirDirectKick() || theirIndirectKick(); }
 
 bool GameState::ballPlacement() { return (ourBallPlacement() || theirBallPlacement()); }
-bool GameState::ourBallPlacement() { return (state == OurBallPlacement); }
-bool GameState::theirBallPlacement() { return (state == TheirBallPlacement); }
+bool GameState::ourBallPlacement() { return (state == States::OurBallPlacement); }
+bool GameState::theirBallPlacement() { return (state == States::TheirBallPlacement); }
 
-bool GameState::halfTimeLineUp(){return state == HalfTime;}
+bool GameState::halfTimeLineUp(){return state == States::HalfTime;}
 
 bool GameState::penaltyShootout() {return ourPenaltyShootout()|| theirPenaltyShootout();}
-bool GameState::ourPenaltyShootout(){return state == OurPenaltyShootOut;}
-bool GameState::theirPenaltyShootout(){return state == TheirPenaltyShootOut;}
+bool GameState::ourPenaltyShootout(){return state == States::OurPenaltyShootOut;}
+bool GameState::theirPenaltyShootout(){return state == States::TheirPenaltyShootOut;}
 bool GameState::ready(){
     return isReady;
 }
 /////
-enum States GameState::getState(){
+States GameState::getState(){
     return state;
 }

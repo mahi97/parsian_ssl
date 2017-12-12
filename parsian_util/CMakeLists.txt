@@ -119,12 +119,7 @@ add_definitions(${QT_DEFINITIONS})
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
         INCLUDE_DIRS include
-        LIBRARIES 
-		${PROJECT_NAME}_geom 
-		${PROJECT_NAME}_tools 
-		${PROJECT_NAME}_core 
-		${PROJECT_NAME}_math 
-		${PROJECT_NAME}_actions
+        LIBRARIES ${PROJECT_NAME}_geom ${PROJECT_NAME}_tools ${PROJECT_NAME}_core ${PROJECT_NAME}_math ${PROJECT_NAME}_actions
         CATKIN_DEPENDS parsian_msgs
 	#        DEPENDS QT
 )
@@ -185,7 +180,7 @@ add_library(${PROJECT_NAME}_core
         src/core/ball.cpp
         src/core/team.cpp
         src/core/robot.cpp
-#        src/knowledge.cpp
+        src/core/knowledge.cpp
         src/core/movingobject.cpp
         )
 

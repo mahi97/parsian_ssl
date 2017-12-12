@@ -87,7 +87,7 @@ Vector2D CSkillKickOneTouch::findMostPossible()
     }
     double prob,angle,biggestAngle;
 
-    CKnowledge::getEmptyAngle(wm->ball->pos-(wm->field->oppGoal()-wm->ball->pos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field, wm->ball->pos-(wm->field->oppGoal()-wm->ball->pos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
     DEBUG(QString("prob: %1 , angle :%2, biggest:%3").arg(prob).arg(angle).arg(biggestAngle),D_MHMMD);
 
     Segment2D goalSeg(wm->field->oppGoalL(),wm->field->oppGoalR());

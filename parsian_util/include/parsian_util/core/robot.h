@@ -10,21 +10,22 @@
 #include "parsian_util/core/movingobject.h"
 #include "parsian_util/base.h"
 
+namespace Robot {
+    constexpr double robot_radius_old = 0.090;
+    constexpr double robot_radius_new = 0.0890;
+    constexpr double center_from_kicker_old = 0.075;
+    constexpr double center_from_kicker_new = 0.06;
+    constexpr double kicker_width_old = 0.074;
+    constexpr double kicker_width_new = 0.082;
+    constexpr double wheel_rad_old = 0.035;
+    constexpr double wheel_rad_new = 0.027;
+};
+
+using namespace Robot;
+
 class CRobot : public CMovingObject {
 public:
 
-    static constexpr double robot_radius_old = 0.090;
-//static const double CRobot::robot_radius_new = 0.080;
-    static constexpr double robot_radius_new = 0.0890;
-    static constexpr double center_from_kicker_old = 0.075;
-//static const double CRobot::center_from_kicker_new = 0.070;
-    static constexpr double center_from_kicker_new = 0.06;
-    static constexpr double kicker_width_old = 0.074;
-//static const double CRobot::kicker_width_new = 0.080;
-    static constexpr double kicker_width_new = 0.082;
-    static constexpr double wheel_rad_old = 0.035;
-//static const double CRobot::wheel_rad_new = 0.03;
-    static constexpr double wheel_rad_new = 0.027;
     CRobot(int id);
     CRobot(const parsian_msgs::parsian_robot& _robot);
 
@@ -62,6 +63,12 @@ public:
     {
         return (newRobot) ? wheel_rad_new : wheel_rad_old;
     }
+
+    Vector2D getKickerPos(double margin = 0)
+    {
+    	return pos + dir*(centerFromKicker()+margin);
+    }
+
 
 
 

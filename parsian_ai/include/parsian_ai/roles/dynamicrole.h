@@ -1,59 +1,53 @@
 #ifndef DYNAMICROLE_H
 #define DYNAMICROLE_H
 
-#include "role.h"
+#include <parsian_util/base.h>
+#include <parsian_util/core/agent.h>
+#include <parsian_ai/roles/role.h>
 
 class CRoleDynamic
 {
 public:
     CRoleDynamic();
     ~CRoleDynamic();
-
-    void setUpdated(bool _updated);
-    bool getUpdated();
-
-
     void execute();
 
 private:
-    CSkillKick           *shotSkill;
-    CSkillDribble        *dribbleSkill;
-    CSkillKeep           *keepSkill;
-    CSkillNewPass        *passSkill;
-    CSkillReceivePass    *receiveSkill;
-    CSkillGotoPointAvoid *moveSkill;
-    CSkillKickOneTouch   *oneTouchSkill;
+    KickAction           *shotSkill;
+    ReceivepassAction    *receiveSkill;
+    GotopointavoidAction *moveSkill;
+    OnetouchAction       *oneTouchSkill;
     // CSKill "KEEP"
 
     void update();
     bool updated;
 
-    ClassProperty(CRoleDynamic, CAgent*, Agent, agent, updated);
-    ClassProperty(CRoleDynamic, DynamicEnums::DynamicSkill, SelectedSkill, selectedSkill, updated);
-    ClassProperty(CRoleDynamic, Vector2D, Target, target, updated);
-    ClassProperty(CRoleDynamic, Vector2D, TargetDir, targetDir, updated);
-    ClassProperty(CRoleDynamic, bool, AvoidPenaltyArea, avoidPenaltyArea, updated);
-    ClassProperty(CRoleDynamic, double, Tolerance, tolerance, updated);
-    ClassProperty(CRoleDynamic, bool, Chip, chip, updated);
-    ClassProperty(CRoleDynamic, int, KickSpeed, kickSpeed, updated);
-    ClassProperty(CRoleDynamic, float, ReceiveRadius, receiveRadius, updated);
-    ClassProperty(CRoleDynamic, Vector2D, WaitPos, waitPos, updated);
-    ClassProperty(CRoleDynamic, bool, VeryFine, veryFine, updated);
-    ClassProperty(CRoleDynamic, bool, EmptySpot, emptySpot, updated);
-    ClassProperty(CRoleDynamic, bool, NoKick, noKick, updated);
-    ClassProperty(CRoleDynamic, int, AgentID, agentID, updated);
+    SkillProperty(CRoleDynamic, Agent*, Agent, agent);
+    SkillProperty(CRoleDynamic, DynamicEnums::DynamicSkill, SelectedSkill, selectedSkill);
+    SkillProperty(CRoleDynamic, Vector2D, Target, target);
+    SkillProperty(CRoleDynamic, Vector2D, TargetDir, targetDir);
+    SkillProperty(CRoleDynamic, bool, AvoidPenaltyArea, avoidPenaltyArea);
+    SkillProperty(CRoleDynamic, double, Tolerance, tolerance);
+    SkillProperty(CRoleDynamic, bool, Chip, chip);
+    SkillProperty(CRoleDynamic, int, KickSpeed, kickSpeed);
+    SkillProperty(CRoleDynamic, double, ReceiveRadius, receiveRadius);
+    SkillProperty(CRoleDynamic, Vector2D, WaitPos, waitPos);
+    SkillProperty(CRoleDynamic, bool, VeryFine, veryFine);
+    SkillProperty(CRoleDynamic, bool, EmptySpot, emptySpot);
+    SkillProperty(CRoleDynamic, bool, NoKick, noKick);
+    SkillProperty(CRoleDynamic, int, AgentID, agentID);
 
 public:
     CRoleDynamic* setKickRealSpeed(double val) {
-        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
-        debug(QString("setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
+//        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
+        DBUG(QString("setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
         updated = true;
         return this;
     }
 
 
     CRoleDynamic* setAddKickRealSpeed(double val) {
-        kickSpeed = knowledge -> getProfile(agent->id(), agent->pos().dist(target) + val, !chip, false);
+//        kickSpeed = knowledge -> getProfile(agent->id(), agent->pos().dist(target) + val, !chip, false);
         updated = true;
         return this;
     }

@@ -3,5 +3,5 @@
 //
 #include <parsian_agent/config.h>
 
-agent_common_config::commonconfigConfig *conf = new agent_common_config::commonconfigConfig();
-
+agent_common::agentConfig *conf = new agent_common::agentConfig();
+CWorldModel* wm = new CWorldModel();

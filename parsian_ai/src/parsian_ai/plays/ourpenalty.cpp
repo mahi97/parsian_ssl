@@ -1,33 +1,28 @@
-#include "plays/ourpenalty.h"
-#include "roles/playmake.h"
-#include "soccer.h"
+#include <parsian_ai/plays/ourpenalty.h>
 
-COurPenalty::COurPenalty(){
-}
+COurPenalty::COurPenalty() = default;
 
-COurPenalty::~COurPenalty(){
-
-}
+COurPenalty::~COurPenalty() = default;
 
 void COurPenalty::reset(){
-	position.reset();
+	positioningPlan.reset();
 	executedCycles = 0;
 }
 
-void COurPenalty::init(QList<int> _agents , QMap<QString , EditData*> *_editData){
+void COurPenalty::init(const QList<Agent*>& _agents){
 	setAgentsID(_agents);
-	setEditData(_editData);
 	initMaster();
 
-	if( knowledge->getLastPlayExecuted() != OurPenaltyPlay ){
-		reset();
-	}
-	knowledge->setLastPlayExecuted(OurPenaltyPlay);
+    // TODO : Last Play seems important!
+//	if( knowledge->getLastPlayExecuted() != OurPenaltyPlay ){
+//		reset();
+//	}
+//	knowledge->setLastPlayExecuted(OurPenaltyPlay);
 }
 
 void COurPenalty::penaltyKick(){
     executedCycles++;
-    if (wm->gs->penalty_shootout()) {
+    if (gameState->penaltyShootout()) {
         playOnFlag = false;
     }
     choosePlayMaker();
@@ -38,30 +33,7 @@ void COurPenalty::penaltyKick(){
 
 }
 
-void COurPenalty::execute_0(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_1(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_2(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_3(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_4(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_5(){
-    penaltyKick();
-}
-
-void COurPenalty::execute_6(){
+void COurPenalty::execute_x(){
+    if (agentsID.empty()) return;
     penaltyKick();
 }

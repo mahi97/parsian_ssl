@@ -14,7 +14,7 @@ class CRoleTemplate : public CRole
 {
 public:
     DEF_ROLE(CRoleTemplate);
-    virtual void generateFromConfig(CAgent *a);
+    virtual void generateFromConfig(Agent *a);
     virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
 };
 

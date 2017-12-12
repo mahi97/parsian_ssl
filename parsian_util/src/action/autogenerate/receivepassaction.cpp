@@ -4,7 +4,6 @@
 
 void ReceivepassAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_receivePass msg = *((parsian_msgs::parsian_skill_receivePass*)_msg);
-        robot_id = msg.robot_id;
         slow = msg.slow;
         receiveRadius = msg.receiveRadius;
         ignoreAngle = msg.ignoreAngle;
@@ -15,7 +14,6 @@ void ReceivepassAction::setMessage(const void* _msg) {
 
 void* ReceivepassAction::getMessage() {
     parsian_msgs::parsian_skill_receivePass* _msg = new parsian_msgs::parsian_skill_receivePass;
-    _msg->robot_id = robot_id;
     _msg->slow = slow;
     _msg->receiveRadius = receiveRadius;
     _msg->ignoreAngle = ignoreAngle;
@@ -30,3 +28,4 @@ QString ReceivepassAction::getActionName(){
     static QString name("ReceivepassAction");
     return name;
 }
+

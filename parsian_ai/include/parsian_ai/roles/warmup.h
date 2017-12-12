@@ -22,7 +22,7 @@ protected:
     CSkillGotoPointAvoid* gotopoint;
 public:
     DEF_ROLE(CRoleWarmup);
-    virtual void generateFromConfig(CAgent *a);
+    virtual void generateFromConfig(Agent *a);
     virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
     virtual void parse(QStringList params);
 

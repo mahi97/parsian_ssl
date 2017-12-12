@@ -27,7 +27,7 @@ ModeChooserWidget::ModeChooserWidget(ros::NodeHandle & n)
     modeStr[SIMULATION]="SIMULATION";
     modeStr[!SIMULATION]="REAL";
 
-    this->setFixedSize(75,100);
+    this->setFixedSize(90,110);
 
     mainLayout=new QGridLayout;
 

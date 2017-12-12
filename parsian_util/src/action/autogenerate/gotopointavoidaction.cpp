@@ -34,3 +34,30 @@ QString GotopointavoidAction::getActionName(){
     static QString name("GotopointavoidAction");
     return name;
 }
+
+void GotopointavoidAction::clearOurrelax() {
+    ourrelax.clear();
+}
+
+void GotopointavoidAction::addOurrelax(unsigned char _t) {
+    ourrelax.push_back(_t);
+}
+void GotopointavoidAction::removeOurrelax(unsigned char _t) {
+    ourrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getOurrelax() {
+    return ourrelax;
+}
+void GotopointavoidAction::clearTheirrelax() {
+    theirrelax.clear();
+}
+
+void GotopointavoidAction::addTheirrelax(unsigned char _t) {
+    theirrelax.push_back(_t);
+}
+void GotopointavoidAction::removeTheirrelax(unsigned char _t) {
+    theirrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getTheirrelax() {
+    return theirrelax;
+}

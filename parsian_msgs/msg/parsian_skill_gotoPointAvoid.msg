@@ -6,3 +6,5 @@ bool avoidCenterCircle
 float32 ballObstacleRadius
 bool drawPath
 bool diveMode
+uint8[] ourrelax
+uint8[] theirrelax

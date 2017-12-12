@@ -1,7 +1,7 @@
 #ifndef PLAYOFF_H
 #define PLAYOFF_H
 
-#include "masterplay.h"
+#include "parsian_ai/plays/masterplay.h"
 
 #include <QtSql/QtSql>
 #include <QtSql/QSqlDatabase>
@@ -113,7 +113,7 @@ struct SPlayOffPlan {
 
     QList<playOffRobot> AgentPlan[6];
     POMODE planMode;
-    int agentSize;
+    int agentSize{};
     POInitPos initPos;
     SPlanConfig config;
     QString tags;
@@ -148,7 +148,7 @@ struct SPositioningAgent {
 
         } else {
 
-            debug(QString("getArgs : wrong arg %1 < %2").arg(positionArg.size()).arg(_state + stateNumber), D_ERROR);
+            DBUG(QString("getArgs : wrong arg %1 < %2").arg(positionArg.size()).arg(_state + stateNumber), D_ERROR);
             qWarning() << QString("getArgs : wrong arg %1 < %2").arg(positionArg.size()).arg(_state + stateNumber);
             SPositioningArg null;
             return null;
@@ -162,8 +162,7 @@ struct SPositioningAgent {
 
        } else {
 
-            debug(QString("getArgs : wrong absarg %1 < %2").arg(positionArg.size()).arg(_state), D_ERROR);
-            qWarning() << QString("getArgs : wrong absarg %1 < %2").arg(positionArg.size()).arg(_state);
+            DBUG(QString("getArgs : wrong absarg %1 < %2").arg(positionArg.size()).arg(_state), D_ERROR);
             SPositioningArg null;
             return null;
 
@@ -206,7 +205,7 @@ struct SFail {
     bool fail;
     int agentID, roleID, planID, taskID;
     EMode mode;
-    roleSkill::ESkill skill;
+    RoleSkill skill;
     int succesRate;
 };
 
@@ -312,14 +311,8 @@ public:
     CPlayOff();
     virtual ~CPlayOff();
 
-    void execute_0();
-    void execute_1();
-    void execute_2();
-    void execute_3();
-    void execute_4();
-    void execute_5();
-    void execute_6();
-    void init(QList <int> _agents , QMap<QString , EditData*> *_editData);
+    void execute_x();
+    void init(const QList <Agent*>& _agents);
     virtual QString whoami() {return "PlayOff";}
     bool deleted;
 
@@ -337,7 +330,7 @@ private:
 
     // Critical Play
     bool criticalPlay();
-    CSkillKick* criticalKick;
+    KickAction* criticalKick;
     bool criticalInit;
 
     bool initial;
@@ -372,8 +365,8 @@ private:
 
     ////////////////////////////Blocker//////////////////////////////////
     bool BlockerExecute(int agentID);
-    CAgent* BlockerAgent;
-    CSkillGotoPointAvoid* blockergpa;
+    Agent* BlockerAgent;
+    GotopointavoidAction* blockergpa;
     enum BlockerStop{
         Diversion,
         BlockStop,
@@ -418,7 +411,7 @@ private:
     int kkAgentsID[6];
 
     SPlayOffPlan* currentPlan;
-    QList<CAgent*> activeAgents;
+    QList<Agent*> activeAgents;
     CRolePlayOff *roleAgent[6];
     CRolePlayOff *tempAgent;
     CRolePlayOff *newRoleAgent[6];
