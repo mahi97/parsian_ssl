@@ -13,7 +13,7 @@
 class KickAction : public Action {
 
 public:
-
+    KickAction();
     void setMessage(const void* _msg);
 
     void* getMessage();

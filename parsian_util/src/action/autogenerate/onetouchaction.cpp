@@ -2,6 +2,12 @@
 
 #include <parsian_util/action/autogenerate/onetouchaction.h>
 
+OnetouchAction::OnetouchAction() {
+       chip = false;
+       kickSpeed = 0.0;
+       shotToEmptySpot = false;
+}
+
 void OnetouchAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_oneTouch msg = *((parsian_msgs::parsian_skill_oneTouch*)_msg);
         chip = msg.chip;

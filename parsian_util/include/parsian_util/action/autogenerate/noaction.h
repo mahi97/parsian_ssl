@@ -13,7 +13,7 @@
 class NoAction : public Action {
 
 public:
-
+    NoAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
