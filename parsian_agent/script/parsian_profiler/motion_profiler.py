@@ -84,7 +84,7 @@ class MotionProfiler:
         if self.__wating_mode:
             if time.time() - self.__wait_time > .3:
                 self.__wating_mode = False
-                self.__getTask()
+                self.__updateTask()
 
         self.__task_pub.publish(self.__current_task)
 
@@ -126,7 +126,7 @@ class MotionProfiler:
         else:
             self.__current_dist_step += 1
 
-    def __getTask(self):
+    def __updateTask(self):
         task = parsian_skill_gotoPointAvoid()
         task.noAvoid = True
         task.base.robot_id = self.__robot_id
@@ -192,8 +192,11 @@ class MotionProfiler:
         self.__current_value = []
         self.__current_key = ()
 
-    def setRobotId(self, robot_id):
+    def set_robot_id(self, robot_id):
         self.__robot_id = robot_id
 
     def set_robot_command(self, robot_commaand):
         self.__robot_command = robot_commaand
+
+    def get_task(self):
+        return self.__current_task
