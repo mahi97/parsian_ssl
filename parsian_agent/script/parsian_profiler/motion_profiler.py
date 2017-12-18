@@ -1,9 +1,8 @@
 import time
 import math
-import point
+from point import Point
 import rospy
 from os import path
-import sys
 from parsian_msgs.msg import parsian_skill_gotoPointAvoid
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import parsian_world_model
@@ -14,9 +13,10 @@ log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.profi
 
 move_type = {"going": False, "coming_back": True}
 
+
 class MotionProfiler:
     def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
-        # type: (int, point.Point, point.Point,float, float, float, float) -> object
+        # type: (int, Point, Point,float, float, float, float) -> object
         self.__init_phase = init_phase
         self.__last_move_type = move_type["coming_back"]
         self.__ang_step = ang_step
@@ -26,8 +26,8 @@ class MotionProfiler:
         self.__robot_id = robot_id
         self.__max_vel = max_vel
         self.__result = dict()
-#        self.__result["max_vel"] = max_vel
-#        self.__result["robot_id"] = robot_id
+        #        self.__result["max_vel"] = max_vel
+        #        self.__result["robot_id"] = robot_id
         self.__current_key = ()
         self.__current_value = []
         self.__current_ang_step = 0
@@ -35,9 +35,6 @@ class MotionProfiler:
         self.__start_time = time.time()
         self.__path_angle = self.__start_pos.angle(self.__end_pos)
         self.__robot_command = parsian_robot_command()
-        self.__wm_sub = rospy.Subscriber('world_model', parsian_world_model, self.wmCallback,queue_size=1, buff_size=2**24)
-        self.__rbt_cmd_sub = rospy.Subscriber('robot_command' + str(robot_id), parsian_robot_command, self.rcCallback,queue_size=1, buff_size=2**24)
-        self.__task_pub = rospy.Publisher('robot_task_'+str(self.__robot_id), parsian_robot_task, queue_size=1, latch=True)
         self.__current_task = parsian_robot_task()
         self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
         self.__wait_time = 0.0
@@ -46,9 +43,6 @@ class MotionProfiler:
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
-
-    def rcCallback(self, data):
-        self.__robot_command = data
 
     def wmCallback(self, data):
         # type:(parsian_world_model)
@@ -72,12 +66,12 @@ class MotionProfiler:
                 my_robot = robot
 
         if my_robot.id == -1:
-            rospy.loginfo("robot "+str(self.__robot_id)+" losted!")
+            rospy.loginfo("robot " + str(self.__robot_id) + " losted!")
             return
 
-        dis = point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
-                        self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
-            point.Point(my_robot.pos.x, my_robot.pos.y)
+        dis = Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
+                    self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
+            Point(my_robot.pos.x, my_robot.pos.y)
         )
 
         vel = math.hypot(my_robot.vel.x, my_robot.vel.y)
@@ -87,7 +81,7 @@ class MotionProfiler:
             self.__wating_mode = True
             self.__wait_time = time.time()
 
-        if self.__wating_mode :
+        if self.__wating_mode:
             if time.time() - self.__wait_time > .3:
                 self.__wating_mode = False
                 self.__getTask()
@@ -96,7 +90,6 @@ class MotionProfiler:
 
     def doProfiling(self, world_model):
         # type: (parsian_world_model) -> null
-
 
         my_robot = parsian_robot()
         my_robot.id = -1
@@ -110,14 +103,13 @@ class MotionProfiler:
 
         vel_F = math.fabs(my_robot.vel.x * math.cos(self.__path_angle) + my_robot.vel.y * math.sin(self.__path_angle))
 
-        dis = point.Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
-                        self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
-            point.Point(my_robot.pos.x, my_robot.pos.y)
-        )
+        dis = Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
+                    self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
+                    Point(my_robot.pos.x, my_robot.pos.y))
         data = {
             "remain_dist": dis,
             "world_model": vel_F,
-            "robot_command": math.hypot(self.__robot_command.vel_F ,self.__robot_command.vel_N),
+            "robot_command": math.hypot(self.__robot_command.vel_F, self.__robot_command.vel_N),
             "time": time.time() - self.__task_start_time
         }
 
@@ -129,11 +121,10 @@ class MotionProfiler:
 
     def __nextStep(self):
         if self.__current_dist_step == self.__dist_step:
-                self.__current_dist_step = 0
-                self.__current_ang_step += 1
+            self.__current_dist_step = 0
+            self.__current_ang_step += 1
         else:
             self.__current_dist_step += 1
-
 
     def __getTask(self):
         task = parsian_skill_gotoPointAvoid()
@@ -171,13 +162,12 @@ class MotionProfiler:
                 if self.__current_ang_step == self.__ang_step - 1 and self.__current_dist_step == self.__dist_step:
                     self.__tasksAreFinished = True
             if len(self.__current_key) is not 0:
-                    self.__addValueToKey()
-                    rospy.loginfo("done in "+str(time.time() - self.__task_start_time)+" s")
+                self.__addValueToKey()
+                rospy.loginfo("done in " + str(time.time() - self.__task_start_time) + " s")
 
             if not self.__isSaved and self.__current_dist_step != 0:
-                    self.__addNewKey()
-                    self.__doProfiling = True
-
+                self.__addNewKey()
+                self.__doProfiling = True
 
         self.__current_task.gotoPointAvoidTask = task
 
@@ -187,13 +177,23 @@ class MotionProfiler:
 
     def __addNewKey(self):
         if self.__last_move_type == move_type["going"]:
-            self.__current_key = (self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step , self.__getPhase(),"raft")
+            self.__current_key = (
+            self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step, self.__getPhase(),
+            "raft")
         else:
             self.__current_key = (
-            self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step, math.pi - self.__getPhase(),"brghasht")
+                self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step,
+                math.pi - self.__getPhase(), "brghasht")
 
     def __addValueToKey(self):
-        self.__result[self.__current_key] = {"data": self.__current_value, "total_time": self.__current_value[-1]["time"]}
+        self.__result[self.__current_key] = {"data": self.__current_value,
+                                             "total_time": self.__current_value[-1]["time"]}
         rospy.loginfo(self.__current_key)
         self.__current_value = []
         self.__current_key = ()
+
+    def setRobotId(self, robot_id):
+        self.__robot_id = robot_id
+
+    def set_robot_command(self, robot_commaand):
+        self.__robot_command = robot_commaand
