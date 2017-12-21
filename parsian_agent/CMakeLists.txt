@@ -40,7 +40,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -109,7 +109,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-cfg/agent.cfg
+    cfg/agent.cfg
+    cfg/motion_pro.cfg
 )
 
 ###################################
@@ -289,7 +290,7 @@ install(FILES
         )
 
 
-catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
+catkin_install_python(PROGRAMS script/parsian_profiler/motion_profiler_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
