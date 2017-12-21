@@ -9,13 +9,41 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_robot_command
 
-log_file = open(path.realpath("parsian_agent/profiler_data/motion_profiler.profile"), "w+")
+log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
 
 move_type = {"going": False, "coming_back": True}
 
 
 class MotionProfiler:
-    def __init__(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
+    def __init__(self):
+        self.__init_phase = 0
+        self.__last_move_type = move_type["coming_back"]
+        self.__ang_step = 0
+        self.__dist_step = 0
+        self.__start_pos = Point(0, 0)
+        self.__end_pos = Point(0, 0)
+        self.__robot_id = 0
+        self.__max_vel = 0
+        self.__result = dict()
+        #        self.__result["max_vel"] = max_vel
+        #        self.__result["robot_id"] = robot_id
+        self.__current_key = ()
+        self.__current_value = []
+        self.__current_ang_step = 0
+        self.__current_dist_step = -2
+        self.__start_time = time.time()
+        self.__path_angle = self.__start_pos.angle(self.__end_pos)
+        self.__robot_command = parsian_robot_command()
+        self.__current_task = parsian_robot_task()
+        self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
+        self.__wait_time = 0.0
+        self.__task_start_time = 0.0
+        self.__waiting_mode = False
+        self.__isSaved = False
+        self.__tasksAreFinished = False
+        self.__doProfiling = False
+
+    def reset(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
         # type: (int, Point, Point,float, float, float, float) -> object
         self.__init_phase = init_phase
         self.__last_move_type = move_type["coming_back"]
@@ -39,7 +67,7 @@ class MotionProfiler:
         self.__current_task.select = parsian_robot_task.GOTOPOINTAVOID
         self.__wait_time = 0.0
         self.__task_start_time = 0.0
-        self.__wating_mode = False
+        self.__waiting_mode = False
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
@@ -76,17 +104,15 @@ class MotionProfiler:
 
         vel = math.hypot(my_robot.vel.x, my_robot.vel.y)
 
-        if dis < .03 and vel < .1 and not self.__wating_mode:
+        if dis < .03 and vel < .1 and not self.__waiting_mode:
             self.__doProfiling = False
-            self.__wating_mode = True
+            self.__waiting_mode = True
             self.__wait_time = time.time()
 
-        if self.__wating_mode:
+        if self.__waiting_mode:
             if time.time() - self.__wait_time > .3:
-                self.__wating_mode = False
+                self.__waiting_mode = False
                 self.__updateTask()
-
-        self.__task_pub.publish(self.__current_task)
 
     def doProfiling(self, world_model):
         # type: (parsian_world_model) -> null
