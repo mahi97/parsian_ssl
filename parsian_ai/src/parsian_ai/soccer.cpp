@@ -8,6 +8,7 @@ CSoccer::CSoccer()
     for(int i = 0; i < _MAX_NUM_PLAYERS; i++ )
     {
         agents[i] = new Agent(i);
+        agents[i]->action = nullptr;
     }
     coach = new CCoach(agents);
     kick = new KickAction;
@@ -76,7 +77,7 @@ void CSoccer::updateTask(){
 
 void CSoccer::customControl(bool &custom) {
     custom = false;
+    return;
     custom = true;
     updateTask();
-    return;
 }

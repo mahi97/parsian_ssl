@@ -926,17 +926,8 @@ void Agent::setGyroZero()
 void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                         const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                         const double &_ballObstacleRadius){
-    //  timer.start();
     planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
     getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
-    //ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-
-//    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
-//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-//    this->plannerAverageDir=planner.getAverageDir().norm();
-//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-
-    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
 }
 
 void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {

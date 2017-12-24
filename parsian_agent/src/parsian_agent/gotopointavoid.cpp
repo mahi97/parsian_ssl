@@ -133,7 +133,7 @@ void CSkillGotoPointAvoid::execute()
         targetDir = (lookAt - agentPos).norm();
     }
 
-    if(noAvoid )
+    if(noAvoid)
     {
         result.clear();
     }

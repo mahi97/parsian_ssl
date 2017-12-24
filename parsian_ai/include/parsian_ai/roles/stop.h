@@ -6,7 +6,7 @@
 class CRoleStopInfo : public CRoleInfo
 {
 public:
-    CRoleStopInfo(QString _roleName);
+    explicit CRoleStopInfo(QString _roleName);
     void findPositions();
 	int inCorner;
     Vector2D TA;
@@ -14,7 +14,7 @@ public:
     QList <double> thR;
     QList <double> thP;
     QList <int> robotId;
-    void reset(){}
+    void reset() override {}
 };
 
 class CRoleStop : public CRole
@@ -25,12 +25,16 @@ protected:
 	bool switchAgent;
 public:
 	virtual void parse(QStringList params);
-	CRoleStop(Agent *_agent);
-	~CRoleStop();
-	void execute();
 
+    explicit CRoleStop(Agent *_agent);
+	~CRoleStop();
+    void assign(Agent* agent);
+	void execute();
     CRoleStopInfo* info();
-    double progress();
+	double progress();
+
+private:
+    static CRoleStopInfo* m_info;
 };
 
 
@@ -38,13 +42,13 @@ public:
 class CRoleHaltInfo : public CRoleInfo
 {
 public:
-    CRoleHaltInfo(QString _roleName);
+    explicit CRoleHaltInfo(QString _roleName);
 };
 
 class CRoleHalt : public CRole
 {
 public:
-    CRoleHalt(Agent *_agent);
+    explicit CRoleHalt(Agent *_agent);
     ~CRoleHalt();
     void execute();
     double progress();

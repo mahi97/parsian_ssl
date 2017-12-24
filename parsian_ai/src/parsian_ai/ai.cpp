@@ -1,7 +1,3 @@
-//
-// Created by parsian-ai on 9/22/17.
-//
-
 #include <parsian_ai/ai.h>
 
 AI::AI() {
@@ -22,6 +18,7 @@ void AI::execute() {
 
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
     if (wm->our.data->activeAgents.contains(robotID)) {
+        ROS_INFO_STREAM("HEY" << robotID);
         if (soccer->agents[robotID]->action != nullptr) {
             if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
@@ -56,7 +53,7 @@ parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
         } else {
             // TODO : No Action
         }
-        ROS_INFO_STREAM("MAHI : " << robotID << soccer->agents[robotID]->action->getActionName().toStdString());
+//        ROS_INFO_STREAM("MAHI : " << robotID << soccer->agents[robotID]->action->getActionName().toStdString());
     }
 
     return robotsTask[robotID];
@@ -67,7 +64,6 @@ void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 }
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
-
     wm->update(_wm);
 
 }

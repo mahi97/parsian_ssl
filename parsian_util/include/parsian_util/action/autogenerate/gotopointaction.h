@@ -13,7 +13,11 @@
 class GotopointAction : public Action {
 
 public:
+    GotopointAction():dynamicStart(false), maxAcceleration(0), maxDeceleration(0), maxVelocity(0), oneTouchMode(false),
+                      slowMode(false), penaltyKick(false), diveMode(false), smooth(false), roller(0),
+                      targetPos(5000,5000), targetDir(5000, 5000), targetVel(5000,5000), lookAt(5000,5000) {
 
+    }
     void setMessage(const void* _msg);
 
     void* getMessage();

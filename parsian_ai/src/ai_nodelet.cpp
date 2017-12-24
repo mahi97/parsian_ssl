@@ -20,7 +20,7 @@ void AINodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
-    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
+    refereeSub = nh.subscribe("/refbox/referee", 1000,  &AINodelet::refereeCallBack, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -50,10 +50,10 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ROS_INFO("wm updated");
     ai->execute();
 
-//    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
-        ROS_INFO("SEND");
-        robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
-//    }
+    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
+//        ROS_INFO("SEND");
+        robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
+    }
 
 }
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {

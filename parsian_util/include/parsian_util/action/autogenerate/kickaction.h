@@ -13,7 +13,12 @@
 class KickAction : public Action {
 
 public:
+    KickAction():tolerance(0.0), chip(false), spin(0), slow(false), avoidPenaltyArea(false), avoidOppPenaltyArea(false),
+                 interceptMode(false), dontKick(false), sagMode(false), penaltyKick(false), shotEmptySpot(false), passProfiler(false),
+                 veryFine(false), goalieMode(false), kickAngTol(0.0), kickWithCenterOfDribbler(false), playMakeMode(false),
+                 target(0, 0) {
 
+    }
     void setMessage(const void* _msg);
 
     void* getMessage();

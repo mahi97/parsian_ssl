@@ -29,6 +29,7 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
     case ssl_refree_stage::POST_GAME:
         state = States::PostGame;
         return;
+        default:break;
     }
 
     switch (ref_wrapper->command.command) {
@@ -104,6 +105,7 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
         state= (ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
                States::OurPenaltyShootOut : States::OurPenaltyKick;
         return;
+        default:break;
     }
 }
 

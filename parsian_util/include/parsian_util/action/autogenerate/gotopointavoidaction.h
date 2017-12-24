@@ -14,6 +14,10 @@ class GotopointavoidAction : public GotopointAction  {
 
 public:
 
+    GotopointavoidAction():GotopointAction(), avoidPenaltyArea(false), noAvoid(false), avoidCenterCircle(false), ballObstacleRadius(0.1), drawPath(false), addVel(0,0) {
+
+    }
+
     void setMessage(const void* _msg);
 
     void* getMessage();

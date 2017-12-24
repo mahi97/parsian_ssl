@@ -3,11 +3,7 @@
 ////
 
 #include <parsian_ai/coach.h>
-#include <parsian_util/tools/drawer.h>
-#include <parsian_util/tools/debuger.h>
-#include <parsian_util/base.h>
-#include <parsian_ai/ai.h>
-#include <parsian_ai/config.h>
+
 
 CCoach::CCoach(Agent**_agents)
 {
@@ -590,8 +586,8 @@ void CCoach::virtualTheirPlayOffState()
         transientFlag = false;
     }
 
-    if(isBallcollide() ){ // TODO : till we fix function && 0
-        // transientFlag = false;
+    if(isBallcollide() && 0){ // TODO : till we fix function && 0
+         transientFlag = false;
     }
     PDEBUG("TS flag:", transientFlag, D_AHZ);
     lastState  = currentState;
@@ -787,7 +783,6 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
 void CCoach::decideAttack()
 {
     ballPState = isBallOurs();
-    ROS_INFO_STREAM("D");
     updateAttackState();
 
     lastBallPossesionState = ballPState;
@@ -804,8 +799,9 @@ void CCoach::decideAttack()
     }
     selectedPlay->defensePlan.debugAgents("DEF : ");
     QString str;
-    for (int ourPlayer : ourPlayers)
+    for (int ourPlayer : ourPlayers) {
         str += QString(" %1").arg(ourPlayer);
+    }
     debugger->debug(QString("%1: Size: %2 --> (%3)").arg("text :").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
 
     switch (gameState->getState()) { // GAMESTATE
@@ -814,7 +810,6 @@ void CCoach::decideAttack()
             decideHalt(ourPlayers);
             return;
             break;
-
         case States::PlayOff:
             decideStop(ourPlayers);
             break;
@@ -1140,9 +1135,7 @@ void CCoach::execute()
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
     decidePreferedDefenseAgentsCountAndGoalieAgent();
-    DBUG(QString("TS : %1").arg(transientFlag), D_GAME);
-    //    draw(QString("TS : %1").arg(transientFlag), Vector2D(2,-3));
-    /////////////////////////////////////// choose playmake
+    /////////////////////////////////////// choose play maker
     double critAreaRadius = 1.6;
     Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
     playmakeId = -1;
@@ -1153,23 +1146,24 @@ void CCoach::execute()
         choosePlaymakeAndSupporter(false);
         decideDefense();
     }
-    ROS_INFO("SS");
+    ROS_INFO_STREAM("M : " << preferedDefenseCounts);
+    ROS_INFO_STREAM("PM :" << playmakeId);
+    ROS_INFO_STREAM("GAMESTATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
     decideAttack();
-    ROS_INFO_STREAM("SSS");
     checkSensorShootFault();
     // checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
     // Old Role Base Execution -- used for block, old_playmaker
     checkRoleAssignments();
-// TODO : SKILL HANDLE IN MSG
-//    for (int i=0;i<_NUM_PLAYERS;i++) {
-//        if (agents[i]->isVisible() && agents[i]->idle == false) {
-//            if (agents[i]->skill != NULL) {
-//                agents[i]->skill->execute();
-//            }
-//        }
-//    }
+
+    //// Handle Roles Here
+    for (auto &stopRole : stopRoles) {
+        if (stopRole->agent != nullptr) {
+            stopRole->execute();
+            ROS_INFO_STREAM("DD " << stopRole->agent->id());
+        }
+    }
 
 //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
 }
@@ -1229,8 +1223,10 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     for (int i = 0; i < _ourPlayers.size(); i++) {
         Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
+            ROS_INFO_STREAM("D " << i);
             stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
         } else {
+            stopRoles[i]->assign(nullptr);
             tempAgents.append(tempAgent->id());
         }
     }
