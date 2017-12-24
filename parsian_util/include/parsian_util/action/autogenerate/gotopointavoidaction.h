@@ -13,7 +13,7 @@
 class GotopointavoidAction : public GotopointAction  {
 
 public:
-
+    GotopointavoidAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
