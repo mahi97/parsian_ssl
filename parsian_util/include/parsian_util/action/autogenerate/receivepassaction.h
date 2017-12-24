@@ -13,7 +13,7 @@
 class ReceivepassAction : public Action {
 
 public:
-
+    ReceivepassAction();
     void setMessage(const void* _msg);
 
     void* getMessage();

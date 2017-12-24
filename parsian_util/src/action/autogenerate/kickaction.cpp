@@ -2,6 +2,27 @@
 
 #include <parsian_util/action/autogenerate/kickaction.h>
 
+KickAction::KickAction() {
+       tolerance = 0.0;
+       chip = false;
+       kickSpeed = 0.0;
+       spin = 0;
+       slow = false;
+       avoidPenaltyArea = false;
+       avoidOppPenaltyArea = false;
+       interceptMode = false;
+       dontKick = false;
+       sagMode = false;
+       penaltyKick = false;
+       shotEmptySpot = false;
+       passProfiler = false;
+       veryFine = false;
+       goalieMode = false;
+       kickAngTol = 0.0;
+       kickWithCenterOfDribbler = false;
+       playMakeMode = false;
+}
+
 void KickAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_kick msg = *((parsian_msgs::parsian_skill_kick*)_msg);
         tolerance = msg.tolerance;

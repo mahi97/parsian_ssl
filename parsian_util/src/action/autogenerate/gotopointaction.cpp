@@ -2,6 +2,19 @@
 
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
+GotopointAction::GotopointAction() {
+       dynamicStart = false;
+       maxAcceleration = 0.0;
+       maxDeceleration = 0.0;
+       maxVelocity = 0.0;
+       oneTouchMode = false;
+       slowMode = false;
+       penaltyKick = false;
+       diveMode = false;
+       smooth = false;
+       roller = 0;
+}
+
 void GotopointAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPoint msg = *((parsian_msgs::parsian_skill_gotoPoint*)_msg);
         dynamicStart = msg.dynamicStart;

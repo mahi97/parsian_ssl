@@ -24,8 +24,24 @@ PARSIAN_TYPE_MAP = {
     "parsian_msgs/parsian_skill_gotoPoint": 'gotoPoint'
 }
 
-PARSIAN_PROPERTIES_LIST = ["Vector2D",]
+PARSIAN_DEFAULT_VALUE_MAP = {
+    "bool": " = false",
+    "unsigned char": " = 0",
+    "char": " = 0",
+    "unsigned short": " = 0",
+    "short": " = 0",
+    "unsigned int": " = 0",
+    "int": " = 0",
+    "unsigned long": " = 0",
+    "long": " = 0",
+    "float": " = 0.0",
+    "double": " = 0.0",
+    "std::string": " = \"\"",
+    "enum": " = 0",
+    "Vector2D": ".assign(5000,5000)"
+}
 
+PARSIAN_PROPERTIES_LIST = ["Vector2D"]
 
 min_max_regex = re.compile('\[([0-9\.\-]+)\:([0-9\.\-]+)\]')
 rend = pystache.Renderer()
@@ -52,7 +68,6 @@ def convert_property(ros_property):
 
 
 def get_fulldict(file, properties_list):
-
     action_name = file.split('.')[0].split('_')
     if len(action_name):
         action_name = cap_word(action_name[len(action_name) - 1]) + 'Action'
@@ -64,7 +79,7 @@ def get_fulldict(file, properties_list):
                 "base_message": '',
                 "properties": [],
                 "parsian_properties": [],
-                "list_properties" : [],
+                "list_properties": [],
                 "message": file.split('.')[0],
                 "file_name": action_name.lower()
                 }
@@ -78,6 +93,8 @@ def get_fulldict(file, properties_list):
             new_dict["base_message"] = "parsian_skill_" + str(m_property[0].replace('parsian_msgs/', ''))
         else:
             p = {"type": m_property[0], "name": m_property[1].title(), "local": m_property[1]}
+            if m_property[0] in PARSIAN_DEFAULT_VALUE_MAP.keys():
+                p["default_value"] = PARSIAN_DEFAULT_VALUE_MAP[m_property[0]]
             if m_property[0] in PARSIAN_PROPERTIES_LIST:
                 new_dict['parsian_properties'].append(p)
             elif m_property[0].endswith('>'):
@@ -90,7 +107,6 @@ def get_fulldict(file, properties_list):
 
 
 def generate_actions(folder):
-
     # Clean Out Folder
     if os.path.isdir(os.getcwd() + os.sep + 'out'):
         for f in os.listdir(os.path.join(os.getcwd(), 'out')):
@@ -101,23 +117,22 @@ def generate_actions(folder):
     for m_file in os.listdir(folder):
 
         if m_file.startswith('parsian_skill_'):
-            action_dict = {}
             ros_property_list = []
-            parsian_property_list = []
             with open(os.path.join(folder, m_file)) as msg:
                 for line in msg.readlines():
                     line = line.replace("\n", '')
                     ros_property_list.append(tuple(line.split(' ')))
-                parsian_property_list = [convert_property(ros_property) for ros_property in ros_property_list if len(ros_property) is 2]
-                dict = get_fulldict(m_file, parsian_property_list)
+                parsian_property_list = [convert_property(ros_property) for ros_property in ros_property_list if
+                                         len(ros_property) is 2]
+                parsian_dict = get_fulldict(m_file, parsian_property_list)
 
-            with open("out/" + dict['action_name'].lower() + '.h', "w") as f:
-                f.write(rend.render_path('templates/action.h.mustache', dict))
+            with open("out/" + parsian_dict['action_name'].lower() + '.h', "w") as f:
+                f.write(rend.render_path('templates/action.h.mustache', parsian_dict))
 
-            with open("out/" + dict['action_name'].lower() + '.cpp', "w") as f:
-                f.write(rend.render_path('templates/action.cpp.mustache', dict))
-            # print(rend.render_path('templates/action.h.mustache', dict))
-            # print(file)
+            with open("out/" + parsian_dict['action_name'].lower() + '.cpp', "w") as f:
+                f.write(rend.render_path('templates/action.cpp.mustache', parsian_dict))
+                # print(rend.render_path('templates/action.h.mustache', parsian_dict))
+                # print(file)
 
 
 def main():
