@@ -7,4 +7,3 @@ void CommonConfig::onInit(){
     private_nh = getPrivateNodeHandle();
     server.reset(new dynamic_reconfigure::Server<agent_common::agentConfig>(private_nh));
 }
-

@@ -21,23 +21,25 @@ namespace rqt_parsian_gui
         leftPenalty.setRect(-_FIELD_WIDTH/2.0, - _PENALTY_WIDTH/2.0, _GOAL_RAD, _PENALTY_WIDTH);
         rightPenalty.setRect(_FIELD_WIDTH/2.0 - _GOAL_RAD, -_PENALTY_WIDTH/2.0, _GOAL_RAD, _PENALTY_WIDTH);
         this->setMouseTracking(true);
-
         stadiumGreen = QColor::fromRgbF(0.34,0.78,0.18,1.0);//QColor::fromRgbF(0.50,0.25,0.0,1.0);//
         fieldGreen = QColor::fromRgbF(0.27,0.76,0.10,1.0);
         stadiumSize.setWidth((_STADIUM_WIDTH));
         stadiumSize.setHeight((_STADIUM_HEIGHT));
+        WH_RATIO= (double)stadiumSize.width()/(double)stadiumSize.height();
         setViewportWidth(800);
         drawerBuffer=new CguiDrawer();
-        centralPoint=Vector2D(400,300);
         cameraX=0.0;
         cameraY=0.0;
-        centralPoint=Vector2D(400,280);
+        scaleFactor=1;
+        coeff=viewportSize.width()/stadiumSize.width();
+        centralPoint=Vector2D(viewportSize.width()/2,(viewportSize.width()/2)/WH_RATIO);
+        monitor_pub = n.advertise<parsian_msgs::vector2D>("/mousePos", 1000);
+        mousePos.reset(new parsian_msgs::vector2D);
+
     }
     void MonitorWidget::setViewportWidth(int width)
     {
         viewportWidth = width;
-        WH_RATIO= (double)stadiumSize.width()/(double)stadiumSize.height();
-        viewportSize.setWidth(viewportWidth);
         viewportSize.setHeight(double(viewportWidth / WH_RATIO));
         resizeGL(viewportWidth, ((double) viewportWidth)/WH_RATIO); //Dont care inputs
         setFixedSize(viewportSize.width(), viewportSize.height());
@@ -46,24 +48,32 @@ namespace rqt_parsian_gui
     {
         return viewportWidth;
     }
+
+
+    void MonitorWidget::mousePressEvent(QMouseEvent *event)
+    {
+
+        mousePos->x=(double(event->pos().x())- centralPoint.x)/coeff/scaleFactor;
+        mousePos->y=(double(event->pos().y()) - centralPoint.y)/coeff/scaleFactor;
+        monitor_pub.publish(*mousePos);
+    }
+
     void MonitorWidget::wheelEvent(QWheelEvent *event)
     {
 
 
+
+        centralPoint.x=400+cameraX*coeff;
+        centralPoint.y=400/WH_RATIO+cameraY*coeff;
         if( event->delta() > 0 ){
             if(scaleFactor > 3)
                 return;
 
-            centralPoint.x=400+cameraX*50;
-            centralPoint.y=280+cameraY*50;
 
             scaleFactor+=0.1;
-            cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(50.0*scaleFactor);
-            cameraY=(1-scaleFactor)*((double)event->pos().y()-centralPoint.y)/(50.0*scaleFactor);
+            cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(coeff*scaleFactor);
+            cameraY=(1-scaleFactor)*((double)event->pos().y()-centralPoint.y)/(coeff*scaleFactor);
 
-
-            ROS_INFO("cc:_%f_",scaleFactor);
-            ROS_INFO_STREAM("mpx"<<event->pos().x()<<"offX"<<cameraX);
 
         }
         else{
@@ -73,12 +83,9 @@ namespace rqt_parsian_gui
             if(scaleFactor <0.5)
                 return;
 
-            centralPoint.x=400+cameraX*70;
-            centralPoint.y=280+cameraY*70;
-
             scaleFactor-=0.1;
-            cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(70.0*scaleFactor);
-            cameraY=(1-scaleFactor)*((double)event->pos().y()-centralPoint.y)/(70.0*scaleFactor);
+            cameraX=(1-scaleFactor)*((double)event->pos().x()-centralPoint.x)/(coeff*scaleFactor);
+            cameraY=(1-scaleFactor)*((double)event->pos().y()-centralPoint.y)/(coeff*scaleFactor);
 
 
         }
@@ -350,8 +357,8 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX,
-                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY,
+        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*coeff,
+                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*coeff,
                          text);
         painter.end();
     }
@@ -378,13 +385,6 @@ namespace rqt_parsian_gui
         glCallList(drawLine(field.right(), - _GOAL_WIDTH / 2.0, field.right() , _GOAL_WIDTH / 2.0, QColor("black")));
     }
 
-    void MonitorWidget::mousePressEvent(QMouseEvent *event)
-    {
-//        QPoint tempMousePressPos = event->pos();
-//        mousePressPos.x = ( ((double(tempMousePressPos.x()) / double(viewportSize.width())) * double(stadiumSize.width())) - (double(stadiumSize.width())/2.0));
-//        mousePressPos.y = (-1.0*(((double(tempMousePressPos.y()) / double(viewportSize.height())) * double(stadiumSize.height())) - (double(stadiumSize.height())/2.0)));
-//        ROS_INFO("__%f__%f__",mousePressPos.x ,mousePressPos.y);
-    }
 
 }  // namespace rqt_example_cpp
 
