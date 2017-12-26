@@ -40,6 +40,7 @@ class MotionProfilerNode:
     def wmCallback(self, data):
         if self.config["start"]:
             self.profiler.wmCallback(data)
+            rospy.loginfo(self.config["robot_id"])
             self.task_pub[self.config["robot_id"]].publish(self.profiler.get_task())
 
     def cfg_callback(self, config, level):

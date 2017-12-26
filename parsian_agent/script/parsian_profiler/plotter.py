@@ -7,9 +7,9 @@ command = []
 world_model = []
 remain_dist = []
 time =[]
-with open("motion_profiler.profile") as file :
+with open("profiler_data/motion_profiler.profile") as file:
     f = eval(file.read())
-    for (dist,phi,khab) in f:
+    for (dist, phi, khab) in f:
         for point in f[(dist, phi, khab)]['data']:
             command.append(point['robot_command'])
             world_model.append(point['world_model'])
