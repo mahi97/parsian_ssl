@@ -40,15 +40,14 @@ class MotionProfilerNode:
     def wmCallback(self, data):
         if self.config["start"]:
             self.profiler.wmCallback(data)
-            rospy.loginfo(self.config["robot_id"])
             self.task_pub[self.config["robot_id"]].publish(self.profiler.get_task())
 
     def cfg_callback(self, config, level):
         self.config = config
         self.profiler.reset(config["robot_id"], Point(config["start_x"], config["start_y"]),
-                            Point(config["end_x"], config["end_y"]), config["init_phase"],
-                            config["dist_step"], config["ang_step"])
-        return config
+                            Point(config["end_x"], config["end_y"]),init_phase =  config["init_phase"],
+                            dist_step = config["dist_step"],ang_step = config["ang_step"])
+	return config
 
 
 if __name__ == '__main__':

@@ -9,7 +9,8 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_robot_command
 
-log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
+log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
+#log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
 
 move_type = {"going": False, "coming_back": True}
 
@@ -42,17 +43,36 @@ class MotionProfiler:
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
+	self.__updateTask()
 
-    def reset(self, robot_id, start_pos, end_pos, init_phase=0, dist_step=2.0, ang_step=4.0, max_vel=4.5):
-        # type: (int, Point, Point,float, float, float, float) -> object
-        self.__init_phase = init_phase
-        self.__last_move_type = move_type["coming_back"]
-        self.__ang_step = ang_step
-        self.__dist_step = dist_step
+    def reset(self, robot_id, start_pos, end_pos, **kw):
+        # type: (int, Point, Point) -> object
+        
+	if 'init_phase' in kw.keys():
+		self.__init_phase = kw['init_phase']
+	else: 
+		self.__init_phase = 0
+        
+	if 'dist_step' in kw.keys():
+                self.__dist_step = kw['dist_step']
+        else: 
+                self.__dist_step = 2
+
+	if 'ang_step' in kw.keys():
+                self.__ang_step = kw['ang_step']
+        else: 
+                self.__ang_step= 4
+
+	if 'max_vel' in kw.keys():
+                self.__max_vel = kw['max_vel']
+        else: 
+                self.__max_vel = 4.5
+
+
+	self.__last_move_type = move_type["coming_back"] 
         self.__start_pos = start_pos
         self.__end_pos = end_pos
         self.__robot_id = robot_id
-        self.__max_vel = max_vel
         self.__result = dict()
         #        self.__result["max_vel"] = max_vel
         #        self.__result["robot_id"] = robot_id
@@ -71,7 +91,7 @@ class MotionProfiler:
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
-
+	self.__updateTask()
     def wmCallback(self, data):
         # type:(parsian_world_model)
         if self.__tasksAreFinished and not self.__doProfiling:
@@ -155,7 +175,6 @@ class MotionProfiler:
     def __updateTask(self):
         task = parsian_skill_gotoPointAvoid()
         task.noAvoid = True
-        task.base.robot_id = self.__robot_id
         task.base.lookAt.x = 5000
         task.base.lookAt.y = 5000
         task.base.maxVelocity = self.__max_vel
