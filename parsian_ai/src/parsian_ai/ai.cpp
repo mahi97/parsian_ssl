@@ -18,7 +18,6 @@ void AI::execute() {
 
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
     if (wm->our.data->activeAgents.contains(robotID)) {
-        ROS_INFO_STREAM("HEY" << robotID);
         if (soccer->agents[robotID]->action != nullptr) {
             if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
@@ -49,11 +48,20 @@ parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
                 task = reinterpret_cast<parsian_skill_oneTouch *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].oneTouchTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].ONETOUCH;
+
+            } else if (soccer->agents[robotID]->action->getActionName() == NoAction::SActionName()) {
+                parsian_msgs::parsian_skill_no *task;
+                task = reinterpret_cast<parsian_skill_no*>(soccer->agents[robotID]->action->getMessage());
+                robotsTask[robotID].noTask = *task;
+                robotsTask[robotID].select = robotsTask[robotID].NOTASK;
             }
         } else {
-            // TODO : No Action
+            auto *task = new parsian_skill_no;
+            task->waithere = static_cast<unsigned char>(false);
+            robotsTask[robotID].noTask = *task;
+            robotsTask[robotID].select = robotsTask[robotID].NOTASK;
+
         }
-//        ROS_INFO_STREAM("MAHI : " << robotID << soccer->agents[robotID]->action->getActionName().toStdString());
     }
 
     return robotsTask[robotID];
