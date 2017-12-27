@@ -7,10 +7,10 @@ command = []
 world_model = []
 remain_dist = []
 time =[]
-with open("motion_profiler.profile") as file :
+with open("../../profiler_data/motion_profiler.profile") as file:
     f = eval(file.read())
-    for (dist,phi,khab) in f:
-        for point in f[(dist, phi,khab)]['data']:
+    for (dist, phi, khab) in f:
+        for point in f[(dist, phi, khab)]['data']:
             command.append(point['robot_command'])
             world_model.append(point['world_model'])
             remain_dist.append(point['remain_dist'])
@@ -29,7 +29,7 @@ with open("motion_profiler.profile") as file :
         plt.legend(bbox_to_anchor=(1, 1),
                    bbox_transform=plt.gcf().transFigure)
         plt.grid(True)
-        plt.savefig(os.path.join(os.getcwd(), str((dist,phi,khab))+'.pdf'))
+        plt.savefig(os.path.join("../../profiler_data", str((round(dist,2),round(180*phi/pi,2),khab))+'.png'))
         plt.clf()
         time.clear()
         remain_dist.clear()
