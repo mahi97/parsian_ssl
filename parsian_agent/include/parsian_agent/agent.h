@@ -161,7 +161,7 @@ private:
     double lastVf,lastVn;
     short int selfID;
     const double Gravity= 9.8;
-    double getVar( double data[] );
+    double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
 
 public:

@@ -81,37 +81,40 @@ void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_t
 CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_task) {
     CSkill *skill = nullptr;
     switch (_task->select){
-        case parsian_msgs::parsian_robot_task::GOTOPOINT: {
+        case parsian_msgs::parsian_robot_task::GOTOPOINT:
             gotoPoint->setMessage(&_task->gotoPointTask);
             skill = gotoPoint;
            // ROS_INFO("GOTOPOINT executed!");
-        }
             break;
-        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
+        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID:
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
             //ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
-        }
             break;
-        case parsian_msgs::parsian_robot_task::KICK: {
+        case parsian_msgs::parsian_robot_task::KICK:
             skillKick->setMessage(&_task->kickTask);
             skill = skillKick;
             //ROS_INFO("KICK executed!");
             break;
-        }
-        case parsian_msgs::parsian_robot_task::ONETOUCH: {
+        case parsian_msgs::parsian_robot_task::ONETOUCH:
             oneTouch->setMessage(&_task->oneTouchTask);
             skill = oneTouch;
             //ROS_INFO("ONETOUCH executed!");
-        }
             break;
-        case parsian_msgs::parsian_robot_task::RECIVEPASS: {
+        case parsian_msgs::parsian_robot_task::RECIVEPASS:
             receivePass->setMessage(&_task->receivePassTask);
             skill = receivePass;
             //ROS_INFO("RECIVEPASS executed!");
-        }
             break;
-
+        case parsian_msgs::parsian_robot_task::NOTASK:
+            if (_task->noTask.waithere) {
+                agent->waitHere();
+            } else {
+                // TODO : Release Agent
+                agent->waitHere();
+            }
+            skill = nullptr;
+            break;
         default:
             break;
     }
