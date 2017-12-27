@@ -9,14 +9,14 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_robot_command
 
-log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
-#log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
+# log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
 
 move_type = {"going": False, "coming_back": True}
 
 
 class MotionProfiler:
     def __init__(self):
+        self.__log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
         self.__init_phase = 0
         self.__last_move_type = move_type["coming_back"]
         self.__ang_step = 0
@@ -43,33 +43,34 @@ class MotionProfiler:
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
-	self.__updateTask()
+        self.__updateTask()
 
     def reset(self, robot_id, start_pos, end_pos, **kw):
         # type: (int, Point, Point) -> object
-        
-	if 'init_phase' in kw.keys():
-		self.__init_phase = kw['init_phase']
-	else: 
-		self.__init_phase = 0
-        
-	if 'dist_step' in kw.keys():
-                self.__dist_step = kw['dist_step']
-        else: 
-                self.__dist_step = 2
 
-	if 'ang_step' in kw.keys():
-                self.__ang_step = kw['ang_step']
-        else: 
-                self.__ang_step= 4
+        self.__log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
 
-	if 'max_vel' in kw.keys():
-                self.__max_vel = kw['max_vel']
-        else: 
-                self.__max_vel = 4.5
+        if 'init_phase' in kw.keys():
+            self.__init_phase = kw['init_phase']
+        else:
+            self.__init_phase = 0
 
+        if 'dist_step' in kw.keys():
+            self.__dist_step = kw['dist_step']
+        else:
+            self.__dist_step = 2
 
-	self.__last_move_type = move_type["coming_back"] 
+        if 'ang_step' in kw.keys():
+            self.__ang_step = kw['ang_step']
+        else:
+            self.__ang_step = 4
+
+        if 'max_vel' in kw.keys():
+            self.__max_vel = kw['max_vel']
+        else:
+            self.__max_vel = 4.5
+
+        self.__last_move_type = move_type["coming_back"]
         self.__start_pos = start_pos
         self.__end_pos = end_pos
         self.__robot_id = robot_id
@@ -91,7 +92,8 @@ class MotionProfiler:
         self.__isSaved = False
         self.__tasksAreFinished = False
         self.__doProfiling = False
-	self.__updateTask()
+        self.__updateTask()
+
     def wmCallback(self, data):
         # type:(parsian_world_model)
         if self.__tasksAreFinished and not self.__doProfiling:
@@ -151,7 +153,7 @@ class MotionProfiler:
 
         dis = Point(self.__current_task.gotoPointAvoidTask.base.targetPos.x,
                     self.__current_task.gotoPointAvoidTask.base.targetPos.y).distance(
-                    Point(my_robot.pos.x, my_robot.pos.y))
+            Point(my_robot.pos.x, my_robot.pos.y))
         data = {
             "remain_dist": dis,
             "world_model": vel_F,
@@ -162,8 +164,8 @@ class MotionProfiler:
         self.__current_value.append(data)
 
     def __saveResult(self):
-        log_file.write(str(self.__result))
-        log_file.close()
+        self.__log_file.write(str(self.__result))
+        self.__log_file.close()
 
     def __nextStep(self):
         if self.__current_dist_step == self.__dist_step:
@@ -192,8 +194,8 @@ class MotionProfiler:
                     self.__end_pos) * self.__current_dist_step / float(self.__dist_step)
                 task.base.targetPos.y = self.__start_pos.y + self.__start_pos.difY(
                     self.__end_pos) * self.__current_dist_step / float(self.__dist_step)
-                task.base.targetDir.x = math.cos(self.__getPhase())
-                task.base.targetDir.y = math.sin(self.__getPhase())
+                task.base.targetDir.x = math.cos(self.__getTaskPhase())
+                task.base.targetDir.y = math.sin(self.__getTaskPhase())
                 self.__last_move_type = move_type["going"]
                 if len(self.__current_key) is not 0:
                     self.__addValueToKey()
@@ -201,8 +203,8 @@ class MotionProfiler:
             else:  # "COMING BACK"
                 task.base.targetPos.x = self.__start_pos.x
                 task.base.targetPos.y = self.__start_pos.y
-                task.base.targetDir.x = math.cos(self.__getPhase())
-                task.base.targetDir.y = math.sin(self.__getPhase())
+                task.base.targetDir.x = math.cos(self.__getTaskPhase())
+                task.base.targetDir.y = math.sin(self.__getTaskPhase())
                 self.__last_move_type = move_type["coming_back"]
                 if self.__current_ang_step == self.__ang_step - 1 and self.__current_dist_step == self.__dist_step:
                     self.__tasksAreFinished = True
@@ -218,17 +220,20 @@ class MotionProfiler:
 
     def __getPhase(self):
         return math.pi * (self.__current_ang_step * 2 / float(self.__ang_step) + self.__init_phase / 180.0) \
-               + self.__path_angle
+
+    def __getTaskPhase(self):
+        return self.__getPhase() - self.__path_angle
 
     def __addNewKey(self):
         if self.__last_move_type == move_type["going"]:
             self.__current_key = (
-            self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step, self.__getPhase(),
-            "raft")
+                self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step,
+                self.__getPhase(),
+                "raft")
         else:
             self.__current_key = (
                 self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step,
-                math.pi - self.__getPhase(), "brghasht")
+                math.pi + self.__getPhase() -(0 if math.pi + self.__getPhase() < 2*math.pi else  2*math.pi ), "brghasht")
 
     def __addValueToKey(self):
         self.__result[self.__current_key] = {"data": self.__current_value,
