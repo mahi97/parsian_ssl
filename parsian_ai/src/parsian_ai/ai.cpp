@@ -1,7 +1,3 @@
-//
-// Created by parsian-ai on 9/22/17.
-//
-
 #include <parsian_ai/ai.h>
 
 AI::AI() {
@@ -52,11 +48,20 @@ parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
                 task = reinterpret_cast<parsian_skill_oneTouch *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].oneTouchTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].ONETOUCH;
+
+            } else if (soccer->agents[robotID]->action->getActionName() == NoAction::SActionName()) {
+                parsian_msgs::parsian_skill_no *task;
+                task = reinterpret_cast<parsian_skill_no*>(soccer->agents[robotID]->action->getMessage());
+                robotsTask[robotID].noTask = *task;
+                robotsTask[robotID].select = robotsTask[robotID].NOTASK;
             }
         } else {
-            // TODO : No Action
+            auto *task = new parsian_skill_no;
+            task->waithere = static_cast<unsigned char>(false);
+            robotsTask[robotID].noTask = *task;
+            robotsTask[robotID].select = robotsTask[robotID].NOTASK;
+
         }
-        ROS_INFO_STREAM("MAHI : " << robotID << soccer->agents[robotID]->action->getActionName().toStdString());
     }
 
     return robotsTask[robotID];
@@ -67,7 +72,6 @@ void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 }
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
-
     wm->update(_wm);
 
 }

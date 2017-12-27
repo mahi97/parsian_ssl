@@ -58,6 +58,7 @@ namespace parsian_agent {
         CSkillKick* skillKick;
         CSkillKickOneTouch* oneTouch;
         CSkillReceivePass* receivePass;
+        bool finished = true;
 
 
     };

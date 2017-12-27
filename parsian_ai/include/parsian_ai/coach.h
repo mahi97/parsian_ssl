@@ -37,7 +37,6 @@ public:
     explicit CCoach(Agent** _agents);
     ~CCoach();
     void execute();
-    void saveGoalie(); // TODO : Move To roles/Agent
     DefensePlan& getDefense();
     BallPossesion lastBallPossesionState;
     BallPossesion isBallOurs();

@@ -1,5 +1,4 @@
 #include "mark.h"
-#include <QDebug>
 
 INIT_ROLE(CRoleMark, "mark");
 

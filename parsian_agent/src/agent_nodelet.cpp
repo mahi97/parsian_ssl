@@ -13,7 +13,7 @@ void AgentNodelet::onInit(){
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size()-2)).toInt()));
+    agent.reset(new Agent(5));
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -44,11 +44,12 @@ void AgentNodelet::commonConfigCb(const dynamic_reconfigure::ConfigConstPtr &_cn
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
    // ROS_INFO("agent nodelet::updated");
     wm->update(_wm);
-    if (agent->skill != nullptr) {
-       // ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
+    if (agent->skill != nullptr && finished) {
+        finished = false;
+        // ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
         agent->execute();
         parsian_robot_command_pub.publish(agent->getCommand());
-
+        finished = true;
     }
 //    ROS_INFO_STREAM("ADDA : " << _wm);
 //
@@ -80,37 +81,40 @@ void AgentNodelet::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_t
 CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_task) {
     CSkill *skill = nullptr;
     switch (_task->select){
-        case parsian_msgs::parsian_robot_task::GOTOPOINT: {
+        case parsian_msgs::parsian_robot_task::GOTOPOINT:
             gotoPoint->setMessage(&_task->gotoPointTask);
             skill = gotoPoint;
            // ROS_INFO("GOTOPOINT executed!");
-        }
             break;
-        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID: {
+        case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID:
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
             //ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
-        }
             break;
-        case parsian_msgs::parsian_robot_task::KICK: {
+        case parsian_msgs::parsian_robot_task::KICK:
             skillKick->setMessage(&_task->kickTask);
             skill = skillKick;
             //ROS_INFO("KICK executed!");
             break;
-        }
-        case parsian_msgs::parsian_robot_task::ONETOUCH: {
+        case parsian_msgs::parsian_robot_task::ONETOUCH:
             oneTouch->setMessage(&_task->oneTouchTask);
             skill = oneTouch;
             //ROS_INFO("ONETOUCH executed!");
-        }
             break;
-        case parsian_msgs::parsian_robot_task::RECIVEPASS: {
+        case parsian_msgs::parsian_robot_task::RECIVEPASS:
             receivePass->setMessage(&_task->receivePassTask);
             skill = receivePass;
             //ROS_INFO("RECIVEPASS executed!");
-        }
             break;
-
+        case parsian_msgs::parsian_robot_task::NOTASK:
+            if (_task->noTask.waithere) {
+                agent->waitHere();
+            } else {
+                // TODO : Release Agent
+                agent->waitHere();
+            }
+            skill = nullptr;
+            break;
         default:
             break;
     }

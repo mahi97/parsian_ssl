@@ -7,7 +7,7 @@ CPlayOff::CPlayOff() : CMasterPlay()
     blockerState=0;
     blockerID=-1;
     blockerStopStates=Diversion;
-    qDebug() << "Bring yourself back online playoff";
+    ROS_INFO("Bring yourself back online playoff");
 
     decidePlan = true;
     agentSize = 1;
@@ -1828,6 +1828,7 @@ void CPlayOff::reset(){
     blockerStep = S0;
 
     DBUG(QString("reset Plan"),D_MAHI);
+    ROS_INFO("reset Plan");
 }
 
 void CPlayOff::init(const QList<Agent*>& _agents){
