@@ -24,6 +24,7 @@ public:
 
     RobotStatus();
     virtual void initPlugin(qt_gui_cpp::PluginContext& context);
+    virtual void shutdownPlugin();
 
 private:
     ros::NodeHandle n;
