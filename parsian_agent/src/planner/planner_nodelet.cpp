@@ -1,4 +1,5 @@
 #include <planner/planner_nodelet.h>
+#include <QtCore/QVector>
 
 
 PLUGINLIB_EXPORT_CLASS(parsian_agent::PlannerNodelet, nodelet::Nodelet);
@@ -8,12 +9,14 @@ using namespace parsian_agent;
 void PlannerNodelet::onInit(){
     ROS_INFO("%s oninit", getName().c_str());
 
+    nh = getNodeHandle();
+    private_nh = getPrivateNodeHandle();
+
     debugger = new Debugger;
     drawer   = new Drawer;
     wm = new CWorldModel;
-    planner.reset(new CPlanner(QString::fromStdString(getName().substr(getName().size() - 2)).toInt()));
-    nh = getNodeHandle();
-    private_nh = getPrivateNodeHandle();
+
+    planner.reset(new CPlanner(QString::fromStdString(getName().substr(getName().size() - 2)).toInt(), private_nh));
 
     common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
@@ -48,6 +51,10 @@ void PlannerNodelet::timerCb(const ros::TimerEvent& event){
     }
 }
 
-void PlannerNodelet::plannerCb(const parsian_msgs::parsian_get_planConstPtr &) {
-
+void PlannerNodelet::plannerCb(const parsian_msgs::parsian_get_planConstPtr & _plan) {
+    QList<int> ourRL;
+    QList<int> oppRL;
+    for (const auto& id : _plan->ourRelaxList) ourRL.append(id);
+    for (const auto& id : _plan->oppRelaxList) oppRL.append(id);
+    planner->initPathPlanner(Vector2D(_plan->goal), ourRL, oppRL, _plan->avoidPenaltyArea, _plan->avoidCenterCircle, _plan->ballObstacleRadius);
 }
