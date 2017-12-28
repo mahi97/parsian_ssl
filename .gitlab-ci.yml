@@ -7,6 +7,7 @@ before_script:
  - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git
  - source ros_gitlab_ci/gitlab-ci.bash
  - apt-get install --assume-yes libqt4-dev libqjson-dev protobuf-compiler libprotobuf-dev curl > /dev/null
+ - MAHI=`pwd`
  - cd /builds/ParsianSoftware/parsian_ssl/parsian_communication/script/
  - git clone https://github.com/qextserialport/qextserialport.git temp
  - cd temp
@@ -17,7 +18,7 @@ before_script:
  - echo "Installed"
  - cd ..
  - rm -rf ./temp
- - cd /
+ - cd $MAHI
  
 cache:
   paths:
