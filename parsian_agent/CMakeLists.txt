@@ -163,7 +163,7 @@ add_library(${PROJECT_NAME}_planner
 add_library(${PROJECT_NAME}_planner_nodelet
         src/planner/planner_nodelet.cpp
         )
-add_library(${PROJECT_NAME}_planner_node
+add_executable(${PROJECT_NAME}_planner_node
         src/planner/planner_node.cpp
         )
 
@@ -209,6 +209,8 @@ target_link_libraries(${PROJECT_NAME}_planner
 target_link_libraries(${PROJECT_NAME}_planner_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_planner
         )
 
 target_link_libraries(${PROJECT_NAME}_planner_node
@@ -251,11 +253,15 @@ add_dependencies(${PROJECT_NAME}_planner
 add_dependencies(${PROJECT_NAME}_planner_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+
         )
 
 add_dependencies(${PROJECT_NAME}_planner_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+
         )
 
 

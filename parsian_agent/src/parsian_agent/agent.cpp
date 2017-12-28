@@ -164,7 +164,7 @@ Agent::Agent(int _ID, ros::NodeHandle& _node)
     agentStopTime.start();
 
     changeIsNeeded = false;
-    planner_pub = _node.advertise<parsian_msgs::parsian_get_plan>("get_plan", 1000);
+    planner_pub = _node.advertise<parsian_msgs::parsian_get_plan>("get_plan", 5);
 
 }
 
@@ -928,14 +928,17 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
     plan->avoidPenaltyArea = _avoidPenaltyArea;
     // TODO : Add Virtual Obstacle to This
     planner_pub.publish(plan);
+    ROS_INFO_STREAM("PUBLISHED");
     // TODO : remove below kindly
 //    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
 //    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
 }
 
 void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {
+    pathPlannerResult.clear();
     pathPlannerResult.assign(_result.begin() , _result.end());
     plannerAverageDir = _averageDir.norm();
+    ROS_INFO_STREAM("SUBS");
 }
 
 void Agent::execute() {

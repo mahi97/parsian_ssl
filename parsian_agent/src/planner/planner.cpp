@@ -185,7 +185,7 @@ void C2DTree::drawBranch(state *first , state* second , QColor color){
 //    CPlanner class implementation
 //====================================================================//
 
-CPlanner::CPlanner(int _ID, ros::NodeHandle& _node)
+CPlanner::CPlanner(int _ID)
 {
     obst.clear();
     threshold = conf->Target_Distance_Threshold;
@@ -200,7 +200,6 @@ CPlanner::CPlanner(int _ID, ros::NodeHandle& _node)
     qRegisterMetaType< vector<Vector2D> >("vector<Vector2D>");
     qRegisterMetaType< Vector2D >("Vector2D");
     qRegisterMetaType< QList<int> >("QList<int>");
-    path_pub = _node.advertise<parsian_msgs::parsian_path>("path", 1000);
 }
 
 CPlanner::~CPlanner() = default;
