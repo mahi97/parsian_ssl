@@ -6,8 +6,9 @@ variables:
 before_script:
  - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git
  - source ros_gitlab_ci/gitlab-ci.bash
- - apt-get install --assume-yes libqt4-dev > /dev/null 
-
+ - apt-get install --assume-yes libqt4-dev libqjson-dev protobuf-compiler libprotobuf-dev curl > /dev/null
+ - ./parsian_msgs/scripts/meta/install_deps.sh
+ - ./parsian_communication/script/install_dep.sh
 cache:
   paths:
     - ccache/
