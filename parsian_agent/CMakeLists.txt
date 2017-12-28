@@ -144,7 +144,6 @@ include_directories(
 )
 
 ## Declare a C++ library
-
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
@@ -154,9 +153,18 @@ add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/onetouch.cpp
         src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
-        src/planner/obstacle.cpp
-        src/planner/planner.cpp
         src/config.cpp
+        )
+
+add_library(${PROJECT_NAME}_planner
+        src/planner/planner.cpp
+        src/planner/obstacle.cpp
+        )
+add_library(${PROJECT_NAME}_planner_nodelet
+        src/planner/planner_nodelet.cpp
+        )
+add_library(${PROJECT_NAME}_planner_node
+        src/planner/planner_node.cpp
         )
 
 add_library(${PROJECT_NAME}_nodelet
@@ -193,6 +201,20 @@ target_link_libraries(${PROJECT_NAME}_nodelet
         ${QT_LIBRARIES}
         )
 
+target_link_libraries(${PROJECT_NAME}_planner
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_planner_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_planner_node
+        ${catkin_LIBRARIES}
+        )
+
 target_link_libraries(${PROJECT_NAME}_commonconfig_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
@@ -219,6 +241,25 @@ add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         )
+
+add_dependencies(${PROJECT_NAME}_planner
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(${PROJECT_NAME}_planner_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(${PROJECT_NAME}_planner_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+
+
 #
 add_dependencies(${PROJECT_NAME}_commonconfig_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}

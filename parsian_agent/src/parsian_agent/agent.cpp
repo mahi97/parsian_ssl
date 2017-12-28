@@ -111,7 +111,7 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(int _ID) : planner(_ID)
+Agent::Agent(int _ID, ros::NodeHandle& _node)
 {
     srand48(time(nullptr));
     packetNum = 0;
@@ -164,7 +164,7 @@ Agent::Agent(int _ID) : planner(_ID)
     agentStopTime.start();
 
     changeIsNeeded = false;
-
+    planner_pub = _node.advertise<parsian_msgs::parsian_get_plan>("get_plan", 1000);
 
 }
 
@@ -730,17 +730,7 @@ Agent::Status::Status() {
 
 double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
 {
-    //todo
-    //if (wm->getIsSimulMode())
-    {
-        return value;
-    }
-    //else
-    {
-        int sp = spinner?1:0;
-        int v = static_cast<int>(round(value));
-        return shotProfile[v][sp];
-    }
+    return value; // TODO : fix
 }
 
 double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
@@ -922,9 +912,25 @@ void Agent::setGyroZero()
 }
 void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                         const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
-                        const double &_ballObstacleRadius){
-    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
+                        const double &_ballObstacleRadius) {
+    parsian_msgs::parsian_get_planPtr plan{new parsian_msgs::parsian_get_plan};
+    plan->robotID = this->id();
+    plan->goal = _target.toParsianMessage();
+    plan->start = this->pos().toParsianMessage();
+    Q_FOREACH(const int &id, _ourRelaxList) {
+            plan->ourRelaxList.push_back(id);
+        }
+    Q_FOREACH(const int&id, _oppRelaxList) {
+            plan->oppRelaxList.push_back(id);
+        }
+    plan->avoidCenterCircle = _avoidCenterCircle;
+    plan->ballObstacleRadius = _ballObstacleRadius;
+    plan->avoidPenaltyArea = _avoidPenaltyArea;
+    // TODO : Add Virtual Obstacle to This
+    planner_pub.publish(plan);
+    // TODO : remove below kindly
+//    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+//    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
 }
 
 void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {
