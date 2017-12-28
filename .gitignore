@@ -31,6 +31,13 @@
 *.out
 *.app
 
+# profiling results
+profiler_data/*.png
+profiler_data/*.profile
+
+# idea temp files
+*.idea
+
 build/
 bin/
 lib/
