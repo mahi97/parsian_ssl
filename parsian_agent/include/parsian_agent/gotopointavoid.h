@@ -36,6 +36,7 @@ public:
     CSkillGotoPointAvoid* setTargetLook(Vector2D finalPos, Vector2D lookAtPoint);
     CSkillGotoPointAvoid* setTarget(Vector2D finalPos, Vector2D finalDir);
     QList<Vector2D> result;
+
 };
 
 #endif //PARSIAN_SKILLS_GOTOPOINTAVOID_H

@@ -139,6 +139,7 @@ void CSkillGotoPointAvoid::execute()
     }
     else
     {
+        /*********** PLANNER ***************/
 
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
