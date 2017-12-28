@@ -11,12 +11,13 @@ void PlannerNodelet::onInit(){
     debugger = new Debugger;
     drawer   = new Drawer;
     wm = new CWorldModel;
-
+    planner.reset(new CPlanner(QString::fromStdString(getName().substr(getName().size() - 2)).toInt()));
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
     common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
-    world_model_sub = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
+    world_model_sub   = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
+    planner_sub       = nh.subscribe(QString("/planner%1").arg(planner->getID()).toStdString(), 1000, &PlannerNodelet::plannerCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
@@ -45,4 +46,8 @@ void PlannerNodelet::timerCb(const ros::TimerEvent& event){
         drawer->draws.vectors.clear();
         drawer->draws.rects.clear();
     }
+}
+
+void PlannerNodelet::plannerCb(const parsian_msgs::parsian_get_planConstPtr &) {
+
 }

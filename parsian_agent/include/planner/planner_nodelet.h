@@ -9,8 +9,10 @@
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
-#include <parsian_agent/agent.h>
+#include <planner/planner.h>
 #include <parsian_agent/config.h>
+#include <parsian_msgs/parsian_get_plan.h>
+#include <parsian_msgs/parsian_path.h>
 
 
 namespace parsian_agent {
@@ -25,14 +27,11 @@ namespace parsian_agent {
         ros::NodeHandle private_nh;
 
         ros::Subscriber world_model_sub;
-        ros::Subscriber ai_sub;
-        ros::Subscriber robot_task_sub;
-        ros::Subscriber robot_status_sub;
         ros::Subscriber common_config_sub;
+        ros::Subscriber planner_sub;
 
         ros::Publisher debug_pub;
         ros::Publisher draw_pub;
-        ros::Publisher parsian_robot_command_pub;
 
         ros::Timer timer_;
 
@@ -40,8 +39,9 @@ namespace parsian_agent {
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 
+        void plannerCb(const parsian_msgs::parsian_get_planConstPtr &);
 
-        boost::shared_ptr<Agent> agent;
+        boost::shared_ptr<CPlanner> planner;
 
     };
 }

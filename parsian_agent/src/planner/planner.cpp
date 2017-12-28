@@ -916,3 +916,7 @@ Vector2D CPlanner::getAverageDir(){
     return  averageDir;
 }
 
+int CPlanner::getID() {
+    return ID;
+}
+
