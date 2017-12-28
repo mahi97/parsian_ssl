@@ -9,14 +9,12 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_robot_command
 
-# log_file = open(path.abspath(path.join(path.pardir, path.join(path.pardir, "profiler_data/motion_profiler.profile"))), "w+")
-
 move_type = {"going": False, "coming_back": True}
 
 
 class MotionProfiler:
     def __init__(self):
-        self.__log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
+
         self.__init_phase = 0
         self.__last_move_type = move_type["coming_back"]
         self.__ang_step = 0
@@ -47,8 +45,6 @@ class MotionProfiler:
 
     def reset(self, robot_id, start_pos, end_pos, **kw):
         # type: (int, Point, Point) -> object
-
-        self.__log_file = open(path.abspath("../../profiler_data/motion_profiler.profile"), "w+")
 
         if 'init_phase' in kw.keys():
             self.__init_phase = kw['init_phase']
@@ -164,8 +160,10 @@ class MotionProfiler:
         self.__current_value.append(data)
 
     def __saveResult(self):
-        self.__log_file.write(str(self.__result))
-        self.__log_file.close()
+        __log_file = open(path.abspath("../../profiler_data/" + str(self.__robot_id) + "_" +
+                                       str(int(round(time.time()/10))) + "_motion.profile"), "w+")
+        __log_file.write(str(self.__result))
+        __log_file.close()
 
     def __nextStep(self):
         if self.__current_dist_step == self.__dist_step:
@@ -222,18 +220,18 @@ class MotionProfiler:
         return math.pi * (self.__current_ang_step * 2 / float(self.__ang_step) + self.__init_phase / 180.0) \
 
     def __getTaskPhase(self):
-        return self.__getPhase() - self.__path_angle
+        return self.__getPhase() + self.__path_angle
 
     def __addNewKey(self):
         if self.__last_move_type == move_type["going"]:
             self.__current_key = (
                 self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step,
-                self.__getPhase(),
-                "raft")
+                self.__getPhase(), self.__path_angle)
         else:
             self.__current_key = (
                 self.__end_pos.distance(self.__start_pos) * self.__current_dist_step / self.__dist_step,
-                math.pi + self.__getPhase() -(0 if math.pi + self.__getPhase() < 2*math.pi else  2*math.pi ), "brghasht")
+                math.pi + self.__getPhase() - (0 if math.pi + self.__getPhase() < 2*math.pi else 2*math.pi),
+                math.pi + self.__path_angle - (0 if math.pi + self.__path_angle < 2*math.pi else 2*math.pi))
 
     def __addValueToKey(self):
         self.__result[self.__current_key] = {"data": self.__current_value,
