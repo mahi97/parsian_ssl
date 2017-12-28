@@ -32,8 +32,8 @@
 *.app
 
 # profiling results
-profiler_data/*.png
-profiler_data/*.profile
+*/profiler_data/*.png
+*/profiler_data/*.profile
 
 # idea temp files
 *.idea
