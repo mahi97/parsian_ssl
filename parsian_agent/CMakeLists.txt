@@ -13,10 +13,7 @@ add_custom_target(headers SOURCES ${LibFiles})
 find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         nodelet
-        parsian_msgs
         parsian_util
-        roscpp
-        rospy
         )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
@@ -126,7 +123,12 @@ catkin_package(
         INCLUDE_DIRS
         include
         LIBRARIES
-        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_nodelet
+        ${PROJECT_NAME}_node
+        ${PROJECT_NAME}_commonconfig_nodelet
+        ${PROJECT_NAME}_commonconfig_node
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_util
         #  DEPENDS
 )
 
