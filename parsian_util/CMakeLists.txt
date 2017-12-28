@@ -120,8 +120,8 @@ add_definitions(${QT_DEFINITIONS})
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}_geom ${PROJECT_NAME}_tools ${PROJECT_NAME}_core ${PROJECT_NAME}_math ${PROJECT_NAME}_actions
-        CATKIN_DEPENDS parsian_msgs
-	#        DEPENDS QT
+        CATKIN_DEPENDS parsian_msgs roscpp rospy
+		DEPENDS QT
 )
 
 ###########

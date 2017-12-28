@@ -13,7 +13,7 @@ void AgentNodelet::onInit(){
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    agent.reset(new Agent(5));
+    agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size() - 2)).toInt()));
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -42,19 +42,14 @@ void AgentNodelet::commonConfigCb(const dynamic_reconfigure::ConfigConstPtr &_cn
 }
 
 void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
-   // ROS_INFO("agent nodelet::updated");
     wm->update(_wm);
     if (agent->skill != nullptr && finished) {
         finished = false;
-        // ROS_INFO_STREAM("active size::  "<<wm->our.activeAgentsCount());
         agent->execute();
         parsian_robot_command_pub.publish(agent->getCommand());
         finished = true;
     }
-//    ROS_INFO_STREAM("ADDA : " << _wm);
-//
-//    NODELET_INFO_STREAM("lag : " << ros::Time::now() - _wm->Header.stamp);
-// ROS_INFO(QString::number(wm->our.active(0)).toStdString().data());
+
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event){
@@ -109,9 +104,14 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         case parsian_msgs::parsian_robot_task::NOTASK:
             if (_task->noTask.waithere) {
                 agent->waitHere();
+                parsian_robot_command_pub.publish(agent->getCommand());
             } else {
                 // TODO : Release Agent
                 agent->waitHere();
+                parsian_msgs::parsian_robot_commandPtr a = agent->getCommand();
+                a->release = static_cast<unsigned char>(true);
+                parsian_robot_command_pub.publish(a);
+
             }
             skill = nullptr;
             break;

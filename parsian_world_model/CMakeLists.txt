@@ -9,10 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
 		dynamic_reconfigure
-		parsian_msgs
 		parsian_util
-		roscpp
-		rospy
 		nodelet
 		)
 
@@ -67,7 +64,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
 		INCLUDE_DIRS include
 		LIBRARIES ${PROJECT_NAME} ${PROJECT_NAME}_util ${PROJECT_NAME}_nodelet
-		CATKIN_DEPENDS dynamic_reconfigure parsian_msgs roscpp rospy nodelet parsian_util
+		CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_util
 		#  DEPENDS system_lib
 )
 

@@ -13,10 +13,7 @@ add_custom_target(headers SOURCES ${LibFiles})
 find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         nodelet
-        parsian_msgs
         parsian_util
-        roscpp
-        rospy
         )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
@@ -109,7 +106,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-cfg/agent.cfg
+        cfg/agent.cfg
 )
 
 ###################################
@@ -125,7 +122,12 @@ catkin_package(
         INCLUDE_DIRS
         include
         LIBRARIES
-        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_nodelet
+        ${PROJECT_NAME}_node
+        ${PROJECT_NAME}_commonconfig_nodelet
+        ${PROJECT_NAME}_commonconfig_node
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_util
         #  DEPENDS
 )
 
@@ -290,7 +292,7 @@ install(FILES
 
 
 catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############
