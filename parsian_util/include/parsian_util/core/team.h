@@ -6,7 +6,7 @@
 #define PARSIAN_UTIL_TEAM_H
 
 #include "parsian_util/core/agent.h"
-
+#include <QMutex>
 #define _MAX_NUM_PLAYERS 12
 
 struct CTeamData

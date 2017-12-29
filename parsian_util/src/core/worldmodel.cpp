@@ -19,7 +19,9 @@ opp{!_pwm.isYellow, !_pwm.isLeft, _pwm.opp}
 }
 
 void CWorldModel::update(const parsian_msgs::parsian_world_modelConstPtr& _newWM) {
+
     this->ball->update(_newWM->ball);
+
     this->our.updateRobot(_newWM->our);
     this->our.setColor(_newWM->isYellow);
     this->our.setSide(_newWM->isLeft);
