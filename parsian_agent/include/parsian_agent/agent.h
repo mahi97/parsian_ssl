@@ -71,7 +71,7 @@ public:
     QTime agentStopTime;
     bool timerReset;
 
-    explicit Agent(int _ID, ros::NodeHandle& _node);
+    explicit Agent(int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;

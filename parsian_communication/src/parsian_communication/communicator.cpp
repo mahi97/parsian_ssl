@@ -12,22 +12,19 @@ CBaseCommunicator::CBaseCommunicator()
     error      = false;
     p = new CMySerialPort();
     p->serial_port = nullptr;
-    PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF,40};
+//    PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF,40};
 //    recTime = new QTimer;
 //    recTime->setInterval(100);
 //    recTime->start();
     recDataFlow.clear();
-    for(int i = 0 ; i < 16 ; i++)
-    {
-        for(int j = 0 ; j < 13 ; j ++)
-        {
-            robotPacket[i][j]=0;
+    for (auto &i : robotPacket) {
+        for (unsigned char &j : i) {
+            j = 0;
         }
     }
 
-    for(int i = 0 ; i < 12 ; i++)
-    {
-        onlineRobotsTimer[i].start();
+    for (auto &i : onlineRobotsTimer) {
+        i.start();
     }
 }
 
@@ -100,7 +97,7 @@ void CBaseCommunicator::readData()
 //    debug(QString("id : %1").arg((int)robotPacket[4][1]), D_MHMMD);
 //
     for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
-        robotStat[i].id = i;
+        robotStat[i].id                    = static_cast<unsigned char>(i);
         robotStat[i].shootSensor           = static_cast<unsigned char>(robotPacket[i][1] & 0x01);
         robotStat[i].battery               = static_cast<unsigned char>((robotPacket[i][1] & 0b11111100) >> 2);
         robotStat[i].capCharge             = static_cast<unsigned char>(robotPacket[i][2] & 0b00111111);
@@ -121,8 +118,8 @@ void CBaseCommunicator::readData()
         robotStat[i].boardId               = static_cast<unsigned char>(robotPacket[i][3] & 0b00011111);
     }
     robotsStat.reset(new parsian_msgs::parsian_robots_status);
-    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
-        robotsStat->status.push_back(robotStat[i]);
+    for (const auto &i : robotStat) {
+        robotsStat->status.push_back(i);
     }
 }
 
@@ -203,7 +200,6 @@ void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &
 
 void CCommunicator::sendString(const char* s,int len)
 {
-    bool flag = false;
 
     for(int i = 0 ; i < len ; i++)
     {

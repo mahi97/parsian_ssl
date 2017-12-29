@@ -111,7 +111,7 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(int _ID, ros::NodeHandle& _node)
+Agent::Agent(int _ID)
 {
     srand48(time(nullptr));
     packetNum = 0;

@@ -6,7 +6,7 @@ PLUGINLIB_EXPORT_CLASS(parsian_agent::PlannerNodelet, nodelet::Nodelet);
 using namespace parsian_agent;
 
 void PlannerNodelet::onInit(){
-    ROS_INFO("%s oninit", getName().c_str());
+    ROS_INFO("%s onInit", getName().c_str());
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
@@ -15,12 +15,11 @@ void PlannerNodelet::onInit(){
     drawer   = new Drawer;
     wm = new CWorldModel;
 
-    QString name;
-    name.fromStdString(getName());
+    QString name(getName().c_str());
 
     planner.reset(new CPlanner(name.split('_').at(1).toInt()));
 
-    common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
+    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
     planner_sub       = nh.subscribe(QString("agent_%1/plan").arg(planner->getID()).toStdString(), 5, &PlannerNodelet::plannerCb, this);
 

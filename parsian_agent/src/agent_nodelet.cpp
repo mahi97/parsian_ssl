@@ -12,9 +12,8 @@ void AgentNodelet::onInit(){
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
-    QString name;
-    name.fromStdString(getName());
-    agent.reset(new Agent(name.split('_').at(1).toInt(), nh));
+    QString name(getName().c_str());
+    agent.reset(new Agent(name.split('_').at(1).toInt()));
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -22,10 +21,10 @@ void AgentNodelet::onInit(){
     oneTouch = new CSkillKickOneTouch(agent.get());
     receivePass = new CSkillReceivePass(agent.get());
 
-    common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
+    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
     robot_task_sub    = private_nh.subscribe("task", 10, &AgentNodelet::rtCb, this);
-    planner_sub       = private_nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
+    planner_sub       = nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
