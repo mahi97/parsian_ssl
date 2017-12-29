@@ -159,7 +159,8 @@ add_library(${PROJECT_NAME}
 add_library(${PROJECT_NAME}_planner
         src/planner/planner.cpp
         src/planner/obstacle.cpp
-        )
+        src/planner/c2dtree.cpp)
+
 add_library(${PROJECT_NAME}_planner_nodelet
         src/planner/planner_nodelet.cpp
         )
