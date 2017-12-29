@@ -1,7 +1,7 @@
 #include "parsian_util/core/team.h"
 #include <ros/ros.h>
 
-QMutex wmMutex;
+//QMutex wmMutex;
 
 
 CTeam::CTeam(const bool isYellow, const bool isLeft)
@@ -26,21 +26,15 @@ CTeam::~CTeam()
 }
 
 void CTeam::updateRobot(const std::vector<parsian_msgs::parsian_robot> &_robots) {
-   for( int i = 0; i < _MAX_NUM_PLAYERS; i++ ){
-       data->teamMembers[i]->setActive(false);
-       update();
-//        ROS_INFO_STREAM("aftr falsing "<<i);
-//        for(int j=0;j< _MAX_NUM_PLAYERS; j++ )
-//             ROS_INFO_STREAM(" active "<<j<<" __--->"<< this->data->teamMembers[j]->getActive());
-
+   for (auto &teamMember : data->teamMembers) {
+       teamMember->setActive(false);
    }
 
    for(auto& robot : _robots) {
-      // ROS_INFO_STREAM(static_cast<int>(robot.id));
-       data->teamMembers[static_cast<int>(robot.id)]->update(robot);
-       data->teamMembers[static_cast<int>(robot.id)]->setActive(true);
+       data->teamMembers[robot.id]->update(robot);
+       data->teamMembers[robot.id]->setActive(true);
    }
-   //update();
+   update();
 
 }
 
@@ -51,18 +45,15 @@ int CTeam::activeAgentsCount()
 
 void CTeam::update()
 {
-    wmMutex.lock();
+//    wmMutex.lock();
     data->activeAgents.clear();
-    for( int i = 0; i < _MAX_NUM_PLAYERS; i++ )
-    {
-        if( data->teamMembers[i]->getActive() )
-           // if (!data->activeAgents.contains(i))
-            {
+    for( int i = 0; i < _MAX_NUM_PLAYERS; i++ ) {
+        if( data->teamMembers[i]->getActive() ) {
                 data->activeAgents.push_back(i);
-               // ROS_INFO_STREAM("sadasdasd    " << i <<"   "<<data->activeAgents.size());
-            }
+        }
     }
-    wmMutex.unlock();
+    ROS_INFO_STREAM("ACT : " << data->activeAgents.size());
+//    wmMutex.unlock();
 }
 
 int CTeam::activeAgentID(int i)
