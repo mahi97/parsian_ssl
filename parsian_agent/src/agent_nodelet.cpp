@@ -13,7 +13,7 @@ void AgentNodelet::onInit(){
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size() - 2)).toInt(), private_nh));
+    agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size() - 2)).toInt(), nh));
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
@@ -27,7 +27,7 @@ void AgentNodelet::onInit(){
     common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
     robot_task_sub    = nh.subscribe(subscribeName.data(), 10, &AgentNodelet::rtCb, this);
-    planner_sub       = private_nh.subscribe(QString("/planner_node/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
+    planner_sub       = nh.subscribe(QString("/path%1").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);

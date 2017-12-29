@@ -19,11 +19,11 @@ void PlannerNodelet::onInit(){
 
     common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
-    planner_sub       = nh.subscribe(QString("/agent_node/get_plan").arg(planner->getID()).toStdString(), 5, &PlannerNodelet::plannerCb, this);
+    planner_sub       = nh.subscribe(QString("/get_plan%1").arg(planner->getID()).toStdString(), 5, &PlannerNodelet::plannerCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
-    planner->path_pub = private_nh.advertise<parsian_msgs::parsian_path>("path", 5);
+    planner->path_pub = nh.advertise<parsian_msgs::parsian_path>(QString("/path%1").arg(planner->getID()).toStdString(), 5);
 
 
     timer_ = nh.createTimer(ros::Duration(0.01), &PlannerNodelet::timerCb, this);

@@ -218,6 +218,7 @@ target_link_libraries(${PROJECT_NAME}_planner_node
 target_link_libraries(${PROJECT_NAME}_commonconfig_nodelet
         ${catkin_LIBRARIES}
         ${QT_LIBRARIES}
+        ${PROJECT_NAME}
         )
 
 target_link_libraries(${PROJECT_NAME}_commonconfig_node
@@ -259,7 +260,6 @@ add_dependencies(${PROJECT_NAME}_planner_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
         ${PROJECT_NAME}_gencfg
-
         )
 
 
@@ -317,7 +317,7 @@ add_dependencies(${PROJECT_NAME}_commonconfig_node
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node ${PROJECT_NAME}_commonconfig_node ${PROJECT_NAME}_planner_node ${PROJECT_NAME}_commonconfig_nodelet ${PROJECT_NAME}_planner_nodelet
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
