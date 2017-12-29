@@ -1,189 +1,4 @@
 #include <planner/planner.h>
-///////////////////////////////
-////////IMPORTANT TODOs////////
-///////////////////////////////
-
-
-//global functions
-void quicksort( state *a[] , int lo , int hi , int k)
-{
-    int i = lo , j = hi;
-    double x = a[(lo + hi)/2]->pos[k];
-    do
-    {
-        while ( a[i]->pos[k] < x ) i++;
-        while ( a[j]->pos[k] > x ) j--;
-        if ( i <= j )
-        {
-            swap( a[i] , a[j] );
-            i++; j--;
-        }
-    }while ( i < j );
-
-
-    if ( lo < j ) quicksort(a , lo , j , k);
-    if ( i < hi ) quicksort(a , i , hi , k);
-}
-
-//====================================================================//
-//    C2DTree class implementation
-//====================================================================//
-
-C2DTree::C2DTree(){
-    head = first = nullptr;
-    cnt = 0;
-    mod = 5;
-}
-
-C2DTree::~C2DTree(){
-    removeAll();
-}
-
-int C2DTree::size(){
-    return cnt;
-}
-
-void C2DTree::removeAll(){
-    cnt = 0;
-    mod = 5;
-    if( head == nullptr )
-        return;
-    removeBranch(head);
-    head = first = nullptr;
-}
-
-void C2DTree::removeBranch(state *node){
-    if( node ){
-        removeBranch(node->left);
-        removeBranch(node->right);
-        delete node;
-    }
-}
-
-void C2DTree::add(state * newState){
-    allNodes[cnt++] = newState;
-
-    //	if( head == nullptr )
-    //		head = newState;
-    //	return;
-
-    if( cnt % 33 == 0 )
-        mod++;
-
-    if( cnt % mod ){
-        addNode(newState , head , 0);
-    }
-    else{
-        int hi = cnt-1;
-        int lo = 0;
-        head = makeBalanced(allNodes , 0 , lo , hi);
-    }
-}
-
-
-void C2DTree::addNode( state * const &newState , state *&node , int depth){
-    if( node == nullptr){
-        node = newState;
-    }
-    else{
-        k = depth % 2;
-        if( newState->pos[k] < node->pos[k] )
-            addNode(newState , node->left , depth+1);
-        else
-            addNode(newState , node->right , depth+1);
-    }
-}
-
-state* C2DTree::makeBalanced(state *all[] , int depth , int lo , int hi){
-    if( lo > hi )
-        return nullptr;
-    k = depth%2;
-    if( lo < hi )
-        quicksort(all , lo , hi , k);
-    int mid = (lo+hi)/2;
-
-    all[mid]->left = makeBalanced(all , depth+1 , lo , mid-1);
-    all[mid]->right = makeBalanced(all , depth+1 , mid+1 , hi);
-    return all[mid];
-}
-
-
-state *C2DTree::findNearest(Vector2D point){
-    //	double mn = 10000;
-    //	state *node;
-    //	for( int i=0 ; i<cnt ; i++)
-    //		if( allNodes[i]->pos.dist(point) < mn ){
-    //			mn = allNodes[i]->pos.dist(point);
-    //			node = allNodes[i];
-    //		}
-    //	return node;
-
-    if( head ){
-        return findNearestNode(point , head , 0);
-    }
-    else
-        return nullptr;
-}
-
-
-state *C2DTree::findNearestNode(Vector2D &point , state * const &node , int depth){
-    k = depth % 2;
-    state *best , *otherSideBest;
-    if( point[k] < node->pos[k] ){
-        if( node->left ){
-            best = findNearestNode(point , node->left , depth+1);
-            if( node->pos.dist(point) < best->pos.dist(point) )
-                best = node;
-            if( node->right && fabs(node->pos[k] - point[k]) < point.dist(best->pos) ){
-                otherSideBest = findNearestNode(point , node->right , depth+1);
-                if( point.dist(otherSideBest->pos) < point.dist(best->pos) )
-                    best = otherSideBest;
-            }
-        }
-        else{
-            best = node;
-            if( node->right && fabs(node->pos[k] - point[k]) < point.dist(best->pos)  ){
-                otherSideBest = findNearestNode(point , node->right , depth+1);
-                if( point.dist(otherSideBest->pos) < point.dist(best->pos) )
-                    best = otherSideBest;
-            }
-        }
-    }
-    else{
-        if( node->right ){
-            best = findNearestNode(point , node->right , depth+1);
-            if( node->pos.dist(point) < best->pos.dist(point) )
-                best = node;
-            if( node->left && fabs(node->pos[k] - point[k]) < point.dist(best->pos)  ){
-                otherSideBest = findNearestNode(point , node->left , depth+1);
-                if( point.dist(otherSideBest->pos) < point.dist(best->pos) )
-                    best = otherSideBest;
-            }
-        }
-        else{
-            best = node;
-            if( node->left && fabs(node->pos[k] - point[k]) < point.dist(best->pos)  ){
-                otherSideBest = findNearestNode(point , node->left , depth+1);
-                if( point.dist(otherSideBest->pos) < point.dist(best->pos) )
-                    best = otherSideBest;
-            }
-        }
-    }
-    return best;
-}
-
-void C2DTree::drawBranch(state *first , state* second , QColor color){
-    if(second == nullptr)
-        return;
-    drawer->draw(Segment2D(first->pos , second->pos) , color);
-    drawBranch(second , second->parent , color);
-}
-
-
-
-//====================================================================//
-//    CPlanner class implementation
-//====================================================================//
 
 CPlanner::CPlanner(int _ID)
 {
@@ -427,7 +242,7 @@ void CPlanner::runPlanner(){
                 }
             }
         }
-        if( std::fabs(mn - 1000.0) > EPSILON ){
+        if( std::fabs(mn - 1000.0) > EPSILON && one != nullptr && two != nullptr){
             auto num = static_cast<int>((one->pos.dist(two->pos)) / stepSize);
             for( int i=1 ; i<num ; i++ ){
                 two = new state(two->pos + (one->pos-two->pos).norm()*stepSize , two , result);
@@ -528,7 +343,7 @@ void CPlanner::runPlanner(){
                 static_cast<int>(255 / (resultModified.size() / (double)j)),
                 static_cast<int>(255 / (resultModified.size() / (double)j)),
                 static_cast<int>(255 / (resultModified.size() / (double)j))));
-//            drawer->draw(result[j]);
+            drawer->draw(result[j]);
     }
     Draw();
     obst.draw();
@@ -638,7 +453,7 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int>& _ourRelaxList,co
     Rnodes.add(Rnodes.first);
     counter++;
 
-    generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius,ID,goal);
+    generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius, goal);
     runPlanner();
     emitPlan(getResultModified(), getAverageDir());
 
@@ -701,15 +516,13 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
     else
     {
         obstaclePath.assign(_pos,_pos+_vel.norm()*10);
-        intersectPoint =agentPath.intersection(obstaclePath);
+        intersectPoint = agentPath.intersection(obstaclePath);
         if(intersectPoint.isValid())
         {
-            ////should remove this draws
-            /// TOOD: must have better time Est
-            timeForObs= timeEstimator(agentPos,agentVel,agentDir,agentGoal);
+            timeForObs  = timeEstimator(agentPos,agentVel,agentDir,agentGoal);
             timeForObs *= agentPos.dist(intersectPoint)/agentPos.dist(agentGoal);
-            timeForObs *=1;
-            timeForObs = min(maxTime,timeForObs);
+            timeForObs *= 1;
+            timeForObs  = min(maxTime,timeForObs);
             for(double i = 0;i< maxTime ; i+=0.05)
             {
 
@@ -724,7 +537,6 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
                 if(timeForObs >=0)
                 {
                     obs.add_circle(_center.x , _center.y , _rad , 0 , 0);
-//                    draw(Circle2D(_center,_rad),QColor(Qt::blue),true);
                 }
             }
         }
@@ -736,35 +548,18 @@ void CPlanner::createObstacleProb(CObstacles &obs,Vector2D _pos, Vector2D _vel, 
     }
 
     obs.add_circle(_center.x , _center.y , _rad , 0 , 0);
-//    draw(Circle2D(_center,_rad),QColor(Qt::blue),true);
 }
 
-void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id,Vector2D agentGoal){
+void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius,Vector2D agentGoal){
     obs.clear();
     obs.targetPosition = goal;
-
-    bool isValid = false;
 
     Vector2D agentPos;
 
     Vector2D agentVel;
-
-    // TODO : SELF
-//    for(int i = 0; i < wm->our.activeAgentsCount() ; i ++)
-//    {
-//        if(wm->our[i]->id == id)
-//        {
-    isValid = true;
     agentPos = wm->our[ID]->pos;
     agentVel = wm->our[ID]->vel;
     obs.agentPos = agentPos;
-
-//            break;
-//        }
-//    }
-//    if(!isValid)
-//        return;
-
 
 
 
@@ -777,24 +572,10 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         {
 
             createObstacleProb(obs,wm->our.active(j)->pos,wm->our.active(j)->vel, Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
-
-
-            double obstVelFactor = 0.15;
-
-            //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
-
-//            if(1 || Circle2D(wm->our[j]->pos,Robot::robot_radius_new+0.07).intersection(agentPath,&dummy1,&dummy2) > 1)
-//            {
-//            drawer->draw(Circle2D(wm->our.active(j)->pos,0.1),QColor(Qt::red),true);
-
-            double obsRad = std::min(wm->our.active(j)->pos.dist(wm->our[ID]->pos)-0.02,0.2);
             obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.17 , 0 , 0);
 
-//            }
         }
     }
-    // ROS_INFO_STREAM("active opp: "<<wm->opp.activeAgentsCount());
-    // ROS_INFO_STREAM("active our: "<<wm->our.activeAgentsCount());
 
     for (int j=0;j<wm->opp.activeAgentsCount();j++)
     {
@@ -802,12 +583,9 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         {
 
             createObstacleProb(obs,wm->opp.active(j)->pos,wm->opp.active(j)->vel,Vector2D(0,0),_center,rad,agentPos,agentVel,agentGoal,Vector2D(1,1));
-            double obstVelFactor = 0.15;
-            //obs.add_circle(_center.x , _center.y , rad , 0 , 0);
             double obsRad = std::min(wm->opp.active(j)->pos.dist(wm->our[ID]->pos)-0.02,0.2);
             DBUG(QString("obsRad : %1 ID : %2").arg(obsRad).arg(j),D_MHMMD);
             obs.add_circle(wm->opp.active(j)->pos.x , wm->opp.active(j)->pos.y , 0.17 , 0 , 0);
-//            drawer->draw(Circle2D(wm->opp.active(j)->pos,0.1),QColor(Qt::red),true);
         }
     }
 

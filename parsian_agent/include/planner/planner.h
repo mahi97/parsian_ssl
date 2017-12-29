@@ -17,37 +17,12 @@
 #include "ros/ros.h"
 #include "parsian_agent/config.h"
 #include "planner/state.h"
-
+#include <planner/c2dtree.h>
 #define _PLANNER_EXTEND_POINT_LIMIT 150
 #define _PLANNER_EXTEND_MAX_ATTEMPT 200
 
 #define _MAX_NUM_PLAYERS 12         //TODO must be get from somewhere else
 
-
-using namespace std;
-
-class C2DTree{
-public:
-    C2DTree();
-    ~C2DTree();
-    void add(state*);
-    void removeAll();
-    state *findNearest(Vector2D);
-    void drawBranch(state* , state* , QColor );
-    int size();
-    state* makeBalanced(state** , int , int , int);
-
-    state *head , *first;
-    int k;
-    state *allNodes[1000];
-
-private:
-    void addNode(state* const & , state*& , int);
-    state *findNearestNode( Vector2D & , state * const & , int);
-    void removeBranch(state *);
-
-    int cnt , mod;
-};
 
 
 class CPlanner
@@ -88,7 +63,7 @@ private:
     double drawTimer;
     bool isRandomState;
     Segment2D agentPath;
-    void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id, Vector2D agentGoal);
+    void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, Vector2D agentGoal);
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
     void emitPlan(const vector<Vector2D>& _resultModified, const Vector2D& averageDir);
