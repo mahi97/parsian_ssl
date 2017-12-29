@@ -12,33 +12,32 @@ void AgentNodelet::onInit(){
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
-
-    agent.reset(new Agent(QString::fromStdString(getName().substr(getName().size() - 2)).toInt(), nh));
+    QString name;
+    name.fromStdString(getName());
+    agent.reset(new Agent(name.split('_').at(1).toInt(), nh));
 
     gotoPoint = new CSkillGotoPoint(agent.get());
     gotoPointAvoid = new CSkillGotoPointAvoid(agent.get());
     skillKick = new CSkillKick(agent.get());
     oneTouch = new CSkillKickOneTouch(agent.get());
     receivePass = new CSkillReceivePass(agent.get());
-    string subscribeName{"robot_task_"};
-    string publishName{"robot_command"};
-    subscribeName.append(std::to_string(agent->id()));
-    publishName.append(std::to_string(agent->id()));
+
     common_config_sub = nh.subscribe("/common_config_node/parameter_updates", 1000, &AgentNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10000, &AgentNodelet::wmCb, this);
-    robot_task_sub    = nh.subscribe(subscribeName.data(), 10, &AgentNodelet::rtCb, this);
-    planner_sub       = nh.subscribe(QString("/path%1").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
+    robot_task_sub    = private_nh.subscribe("task", 10, &AgentNodelet::rtCb, this);
+    planner_sub       = private_nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
 
     debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
 
-    parsian_robot_command_pub = nh.advertise<parsian_msgs::parsian_robot_command>(publishName, 1000);
+    parsian_robot_command_pub = private_nh.advertise<parsian_msgs::parsian_robot_command>("command", 1000);
+    agent->planner_pub = private_nh.advertise<parsian_msgs::parsian_get_plan>("plan", 5);
 
     timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
 }
 
 void AgentNodelet::commonConfigCb(const dynamic_reconfigure::ConfigConstPtr &_cnf) {
-    dynamic_reconfigure::Config* a = const_cast<dynamic_reconfigure::Config*>(_cnf.get());
+    auto * a = const_cast<dynamic_reconfigure::Config*>(_cnf.get());
     conf->__fromMessage__(*a);
 }
 
@@ -125,7 +124,7 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
 void AgentNodelet::plannerCb(const parsian_msgs::parsian_pathConstPtr & _path) {
     std::vector<Vector2D> path;
     for (const auto& p : _path->results){
-        path.push_back(Vector2D(p));
+        path.emplace_back(p);
     }
     agent->getPathPlannerResult(path, Vector2D(_path->averageDir));
 }

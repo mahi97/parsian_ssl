@@ -2,7 +2,7 @@
 #include "nodelet/loader.h"
 
 int main(int argc, char **argv){
-    ros::init(argc, argv, "planner_node");
+    ros::init(argc, argv, "planner_0");
     nodelet::Loader nodelet;
     const nodelet::M_string &remap(ros::names::getRemappings());
     nodelet::V_string nargv;

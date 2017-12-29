@@ -1,4 +1,4 @@
-#include <common_config_nodelet.h>
+#include <commonconfig/common_config_nodelet.h>
 PLUGINLIB_DECLARE_CLASS(parsian_agent, CommonConfig, CommonConfig, nodelet::Nodelet);
 
 void CommonConfig::onInit(){

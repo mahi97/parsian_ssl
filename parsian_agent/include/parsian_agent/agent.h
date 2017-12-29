@@ -163,9 +163,9 @@ private:
     const double Gravity= 9.8;
     double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
-    ros::Publisher planner_pub;
-
 public:
+
+    ros::Publisher planner_pub;
     void initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                      const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                      const double &_ballObstacleRadius);

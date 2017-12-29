@@ -164,7 +164,6 @@ Agent::Agent(int _ID, ros::NodeHandle& _node)
     agentStopTime.start();
 
     changeIsNeeded = false;
-    planner_pub = _node.advertise<parsian_msgs::parsian_get_plan>(QString("/get_plan%1").arg(id()).toStdString(), 5);
 
 }
 
