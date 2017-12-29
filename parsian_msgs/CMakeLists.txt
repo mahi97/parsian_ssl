@@ -64,9 +64,9 @@ message(STATUS "All srv files: ${SRVS}")
 
 ## Generate services in the 'srv' folder
 add_service_files (
-		DIRECTORY srv
-		FILES
-		${SRVS}
+  DIRECTORY srv
+  FILES
+  ${SRVS}
 )
 
 #file(GLOB ACTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/action action/*.action)
@@ -114,8 +114,8 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#		INCLUDE_DIRS include
-#		LIBRARIES parsian_msgs
+		#  INCLUDE_DIRS include
+		#  LIBRARIES parsian_msgs
 		CATKIN_DEPENDS message_runtime std_msgs
 		#  DEPENDS system_lib
 )
@@ -171,11 +171,11 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
-		scripts/meta/install.sh
-		scripts/meta/install_deps.sh
-		scripts/meta/autogenerate.py
-		DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-		)
+  scripts/meta/install.sh
+  scripts/meta/install_deps.sh
+  scripts/meta/autogenerate.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
