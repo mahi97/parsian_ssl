@@ -21,7 +21,7 @@ namespace parsian_agent {
     class AgentNodelet : public nodelet::Nodelet {
     private:
 
-        virtual void onInit();
+        void onInit() override;
 
         void timerCb(const ros::TimerEvent &event);
 
@@ -33,6 +33,7 @@ namespace parsian_agent {
         ros::Subscriber robot_task_sub;
         ros::Subscriber robot_status_sub;
         ros::Subscriber common_config_sub;
+        ros::Subscriber planner_sub;
 
         ros::Publisher debug_pub;
         ros::Publisher draw_pub;
@@ -48,6 +49,7 @@ namespace parsian_agent {
 
         void aiCb(const parsian_msgs::parsian_ai_statusConstPtr &);
 
+        void plannerCb(const parsian_msgs::parsian_pathConstPtr&);
 
         boost::shared_ptr<Agent> agent;
 
