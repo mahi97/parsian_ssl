@@ -4,15 +4,12 @@
 
 #include "rqt_parsian_gui/playoffWidget.h"
 
-PlayOffWidget::PlayOffWidget(CLoadPlayOffJson* _loader, QWidget *parent) : QWidget(parent) {
 
-
-    m_loader = _loader;
-    m_loader->setAutoUpdate(true);
+PlayOffWidget::PlayOffWidget(QWidget *parent) : QWidget(parent) {
     m_plans.clear();
-    m_plans.append(_loader->getPlans());
+  //  m_plans.append(_loader->getPlans());
 
-    m_choosen = NULL;
+    choosen = NULL;
 
     mode     = new QPushButton("Debug Mode", this);
     update   = new QPushButton("Update (Don't Worry! it will work fine :)", this);
@@ -81,7 +78,7 @@ PlayOffWidget::PlayOffWidget(CLoadPlayOffJson* _loader, QWidget *parent) : QWidg
     connect(model    , SIGNAL(itemChanged(QStandardItem*)), this, SLOT(slt_edit(QStandardItem*)));
     connect(selection, SIGNAL(selectionChanged (const QItemSelection &, const QItemSelection &)),
             this, SLOT(slt_selectionChanged(QItemSelection,QItemSelection)));
-    connect(m_loader, SIGNAL(plansUpdated()), this, SLOT(updateModel()));
+    //connect(m_loader, SIGNAL(plansUpdated()), this, SLOT(updateModel()));
 
     setLayout(main);
 }
@@ -98,13 +95,13 @@ void PlayOffWidget::updateModel() {
     int pkgCounter  = 0;
     int fileCounter = 0;
     int planCounter = 0;
-    NGameOff::SGUI* lastGui = new NGameOff::SGUI;
+    SGUI* lastGui = new SGUI;
     for (size_t i = 0;i < m_plans.size();i++) {
         m_plans[i]->gui.index[0] = pkgCounter;
         m_plans[i]->gui.index[1] = fileCounter;
         m_plans[i]->gui.index[2] = planCounter;
 
-        NGameOff::SGUI& guiPlan = m_plans.at(i)->gui;
+        SGUI& guiPlan = m_plans.at(i)->gui;
         if (lastGui->package != guiPlan.package) {
             pkgCounter++;
             fileCounter++;
@@ -161,9 +158,9 @@ void PlayOffWidget::updateBtn(bool _debug) {
 
 void PlayOffWidget::slt_updatePlans() {
 
-    m_loader->loadAll();
+    //m_loader->loadAll();
     m_plans.clear();
-    m_plans.append(m_loader->getPlans());
+    //m_plans.append(m_loader->getPlans());
     updateModel();
 }
 
@@ -311,12 +308,12 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection & selected, const 
 
                 details[0]->setText(QString("Type       : Plan"));
                 details[1]->setText(QString("Agent Size : %1").arg(m_choosen->common.agentSize));
-                details[2]->setText(QString("Plan Mode  : %1").arg(m_loader->getModeStr(m_choosen->common.planMode)));
+//                details[2]->setText(QString("Plan Mode  : %1").arg(m_loader->getModeStr(m_choosen->common.planMode)));
                 details[3]->setText(QString("Chance     : %1").arg(m_choosen->common.chance));
                 details[4]->setText(QString("Last Dist  : %1").arg(m_choosen->common.lastDist));
                 details[5]->setText(QString("Tags       : %1").arg(m_choosen->common.tags.join(" - ")));
                 details[6]->setText(QString("ShotPos    : (%1, %2)").arg(m_choosen->matching.shotPos.x).arg(m_choosen->matching.shotPos.y));
-                details[7]->setText(QString("ShotZone   : %1").arg(CCoach::getShotSpot(m_choosen->matching.initPos.ball, m_choosen->matching.shotPos)));
+//                details[7]->setText(QString("ShotZone   : %1").arg(CCoach::getShotSpot(m_choosen->matching.initPos.ball, m_choosen->matching.shotPos)));
 
                 active   -> setEnabled(!m_choosen->gui.active);
                 deactive -> setEnabled(m_choosen->gui.active);

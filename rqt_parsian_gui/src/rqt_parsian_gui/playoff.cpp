@@ -1,8 +1,6 @@
-//
-// Created by parsian-ai on 12/31/17.
-//
 
-#include "rqt_parsian_gui/playoff.h"
+#include <rqt_parsian_gui/playoff.h>
+
 class parsian_robot_status;
 
 namespace rqt_parsian_gui {
@@ -18,13 +16,13 @@ namespace rqt_parsian_gui {
         n = getNodeHandle();
         n_private = getPrivateNodeHandle();
 
-
+        playOffWidget = new PlayOffWidget();
 
         // extend the widget with all attributes and children from UI file
 
         // add widget to the user interface
 
-        //context.addWidget(scrollArea);
+        context.addWidget(playOffWidget);
     }
 
 

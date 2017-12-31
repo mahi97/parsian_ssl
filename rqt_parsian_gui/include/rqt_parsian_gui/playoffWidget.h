@@ -5,71 +5,21 @@
 #ifndef RQT_PARSIAN_GUI_PLAYOFF_H
 #define RQT_PARSIAN_GUI_PLAYOFF_H
 
-#include <QDockWidget>
-#include <QLabel>
-#include <QGridLayout>
-#include <QTableWidget>
-#include <QItemDelegate>
-#include <QMetaType>
-#include <QPointF>
-#include <QVector>
-#include <QWidget>
-#include <QFocusEvent>
-#include <QPainter>
-#include <QToolButton>
-#include <QPushButton>
-#include <QLCDNumber>
-#include <QComboBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QFrame>
-#include <QSize>
-#include <QPoint>
-#include <QRect>
-#include <QString>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QTabWidget>
-#include <QTextEdit>
 #include <QVBoxLayout>
-#include <QColor>
-#include <QTextDocument>
-#include <QTime>
-#include <QComboBox>
-#include <QStackedWidget>
-#include <QCheckBox>
-#include <QLineEdit>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QButtonGroup>
-#include <QProgressBar>
-#include <QDockWidget>
-#include <QFile>
-#include <QTextStream>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QTime>
-#include <QColorDialog>
-#include <QPaintEvent>
-#include <QLabel>
-#include <QSize>
-#include <QPoint>
-#include <QRect>
-#include <QString>
-#include <QSpacerItem>
-#include <QSlider>
-#include <QTreeView>
-#include <QScrollBar>
-#include <QMessageBox>
-#include <QFrame>
-#include <QMenuBar>
+#include <QPushButton>
 #include <QColumnView>
+#include <QList>
 #include <QStandardItemModel>
+#include <parsian_msgs/parsian_update_plans.h>
+
 class PlayOffWidget : public QWidget {
 
     Q_OBJECT
 
 public:
-    PlayOffWidget(CLoadPlayOffJson* _loader, QWidget *parent = 0);
+    PlayOffWidget(QWidget *parent = 0);
     ~PlayOffWidget();
 
 protected:
@@ -92,13 +42,13 @@ protected:
     QList<QStandardItem> *fileList;
     QList<QStandardItem> *planList;
 
-    QList<NGameOff::SPlan*> m_plans;
+    QList<SPlan *> m_plans;
     QList< QList< SPlayOffPlan*> >plans;
-    CLoadPlayOffJson* m_loader;
 
     QLabel *details[8];
 
-    NGameOff::SPlan* m_choosen;
+    parsian_msgs::parsian_update_plans choosen;
+
     QItemSelection m_itemSelected;
 private slots:
 

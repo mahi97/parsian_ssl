@@ -4,11 +4,13 @@
 
 #ifndef RQT_PARSIAN_GUI_PLAYOFF_H
 #define RQT_PARSIAN_GUI_PLAYOFF_H
-
 #include <rqt_gui_cpp/plugin.h>
-#include <rqt_parsian_gui/robotstatus_widget.h>
+#include <rqt_parsian_gui/playoffWidget.h>
 #include <pluginlib/class_list_macros.h>
+
 namespace rqt_parsian_gui{
+
+
 class PlayOff : public rqt_gui_cpp::Plugin {
     Q_OBJECT
     public:
@@ -20,7 +22,7 @@ class PlayOff : public rqt_gui_cpp::Plugin {
     private:
         ros::NodeHandle n;
         ros::NodeHandle n_private;
-
+        PlayOffWidget *playOffWidget;
     };
 }  // namespace rqt_example_cpp
 
