@@ -9,10 +9,10 @@ void AINodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
     ai.reset(new AI());
-    ROS_INFO("inited");
+    ROS_INFO("initedd");
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
-        std::string topic("robot_task_"+std::to_string(i));
+        std::string topic(QString("/agent_%1/task").arg(i).toStdString());
         robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
     }
     drawer = new Drawer();
