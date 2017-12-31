@@ -2,8 +2,8 @@
 // Created by parsian-ai on 12/31/17.
 //
 
-#ifndef RQT_PARSIAN_GUI_PLAYOFF_H
-#define RQT_PARSIAN_GUI_PLAYOFF_H
+#ifndef RQT_PARSIAN_GUI_PLAYOFF_WIDGET_H
+#define RQT_PARSIAN_GUI_PLAYOFF_WIDGET_H
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -13,57 +13,69 @@
 #include <QList>
 #include <QStandardItemModel>
 #include <parsian_msgs/parsian_update_plans.h>
-
-class PlayOffWidget : public QWidget {
+#include <QWidget>
+namespace rqt_parsian_gui {
+    class PlayOffWidget : public QWidget {
 
     Q_OBJECT
 
-public:
-    PlayOffWidget(QWidget *parent = 0);
-    ~PlayOffWidget();
+    public:
+        PlayOffWidget(QWidget *parent = 0);
 
-protected:
+        ~PlayOffWidget();
 
-    QPushButton *mode;
-    QPushButton *active;
-    QPushButton *update;
-    QPushButton *master;
-    QPushButton *deactive;
+    protected:
 
-    QColumnView *columns;
+        QPushButton *mode;
+        QPushButton *active;
+        QPushButton *update;
+        QPushButton *master;
+        QPushButton *deactive;
 
-    bool debugMode = false;
-    QList< QList<bool> > activeGUI;
-    QList< QList<bool> > masterGUI;
+        QColumnView *columns;
 
-    QStandardItemModel *model;
-    QItemSelectionModel *selection;
+        bool debugMode = false;
+        QList<QList<bool> > activeGUI;
+        QList<QList<bool> > masterGUI;
 
-    QList<QStandardItem> *fileList;
-    QList<QStandardItem> *planList;
+        QStandardItemModel *model;
+        QItemSelectionModel *selection;
 
-    QList<SPlan *> m_plans;
-    QList< QList< SPlayOffPlan*> >plans;
+        QList<QStandardItem> *fileList;
+        QList<QStandardItem> *planList;
 
-    QLabel *details[8];
+        parsian_msgs::parsian_update_plans *theplans;
 
-    parsian_msgs::parsian_update_plans choosen;
+       // QList<QList<SPlayOffPlan *> > plans;
 
-    QItemSelection m_itemSelected;
-private slots:
+        QLabel *details[8];
 
-    void updateModel();
-    void updateBtn(bool _debug);
+        parsian_msgs::parsian_update_plans *choosen;
 
-public slots:
-    void slt_changeMode();
-    void slt_updatePlans();
-    void slt_active();
-    void slt_deactive();
-    void slt_edit(QStandardItem*);
-    void slt_master();
-    void slt_selectionChanged(const QItemSelection &, const QItemSelection &);
+        QItemSelection m_itemSelected;
+    private slots:
 
-};
+        void updateModel();
 
+        void updateBtn(bool _debug);
+
+    public slots:
+
+        void slt_changeMode();
+
+        void slt_updatePlans();
+
+        void slt_active();
+
+        void slt_deactive();
+
+        void slt_edit(QStandardItem *);
+
+        void slt_master();
+
+        void slt_selectionChanged(const QItemSelection &, const QItemSelection &);
+
+    };
+
+}
 #endif //RQT_PARSIAN_GUI_PLAYOFF_H
