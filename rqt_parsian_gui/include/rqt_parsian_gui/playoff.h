@@ -25,7 +25,7 @@ class PlayOff : public rqt_gui_cpp::Plugin {
         ros::NodeHandle n;
         ros::NodeHandle n_private;
         PlayOffWidget* playOffWidget;
-        ros::ServiceClient client ;
+
     };
 }  // namespace rqt_example_cpp
 

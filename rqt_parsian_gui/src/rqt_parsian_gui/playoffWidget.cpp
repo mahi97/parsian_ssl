@@ -6,12 +6,13 @@
 
 using namespace rqt_parsian_gui;
 
-PlayOffWidget::PlayOffWidget(QWidget *parent) : QWidget(parent) {
+PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(parent) {
 
+    client = n.serviceClient<parsian_msgs::parsian_update_plans> ("update_plans");
     theplans = new parsian_msgs::parsian_update_plans();
 
     //plans.clear();
-    //  m_plans.append(_loader->getPlans());
+    //  theplans->response.allPlans.append(_loader->getPlans());
 
     choosen = NULL;
 
@@ -89,11 +90,57 @@ PlayOffWidget::PlayOffWidget(QWidget *parent) : QWidget(parent) {
 }
 
 PlayOffWidget::~PlayOffWidget() {
+
 }
 
 void PlayOffWidget::updateModel() {
 
+    model->clear();
+    QStandardItem *pkg;
+    QStandardItem *file;
+    QStandardItem *plan;
+    int pkgCounter  = 0;
+    int fileCounter = 0;
+    int planCounter = 0;
 
+    for (size_t i = 0;i < theplans->response.allPlans.size();i++) {
+        theplans->response.allPlans[i].index[0] = static_cast<uint32_t>(pkgCounter);
+        theplans->response.allPlans[i].index[1] = static_cast<uint32_t>(fileCounter);
+        theplans->response.allPlans[i].index[2] = static_cast<uint32_t>(planCounter);
+
+        
+        if (lastPlan->package != theplans->response.allPlans[i].package ) {
+            pkgCounter++;
+            fileCounter++;
+            qDebug() << "PKG";
+            pkg = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].package));
+            model->appendRow(pkg);
+            qDebug() << "FILE";
+            file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
+            QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
+            file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
+                             QString::fromStdString(theplans->response.allPlans[i].planFile) + ".png" +"/></html>");
+            pkg->appendRow(file);
+        }
+        else if (lastPlan->planFile != theplans->response.allPlans[i].planFile) {
+            fileCounter++;
+            qDebug() << "PLAN";
+            file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
+            QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
+            file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
+                             QString::fromStdString(theplans->response.allPlans[i].planFile) + ".png" +"/></html>");
+            pkg->appendRow(file);
+        }
+        planCounter++;
+        plan = new QStandardItem(QString("%1").arg(i));
+        file->appendRow(plan);
+
+        file->setEditable(false);
+        plan->setEditable(false);
+        pkg->setEditable(false);
+        lastPlan = &theplans->response.allPlans.at(i);
+
+    }
 }
 
 void PlayOffWidget::slt_changeMode() {
@@ -119,10 +166,9 @@ void PlayOffWidget::updateBtn(bool _debug) {
 }
 
 void PlayOffWidget::slt_updatePlans() {
-
-
     theplans->response.allPlans.clear();
-
+    theplans->request.newPlans.clear();
+    client.call(theplans);
     updateModel();
 }
 
@@ -134,8 +180,8 @@ void PlayOffWidget::slt_active() {
                 while (model.child(++i, 0).data().toString() != "") {
                     int j = -1;
                     while (model.child(i, 0).child(++j, 0).data().toString() != "") {
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = true;
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = true;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = true;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = true;
 
                     }
                 }
@@ -143,15 +189,15 @@ void PlayOffWidget::slt_active() {
                 details[0]->setText(QString("Type : File"));
                 int i = -1;
                 while (model.child(++i, 0).data().toString() != "") {
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.active = true;
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.master = false;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.active = true;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.master = false;
 
                 }
             } else if (model.parent().parent().parent().row() == -1) {
 
                 int planIndex = model.data().toInt();
 
-//                m_choosen = m_plans.at(planIndex);
+//                m_choosen = theplans->response.allPlans.at(planIndex);
 //                m_choosen->gui.active = true;
 //                m_choosen->gui.master = false;
 
@@ -172,22 +218,22 @@ void PlayOffWidget::slt_deactive() {
                 while (model.child(++i, 0).data().toString() != "") {
                     int j = -1;
                     while (model.child(i, 0).child(++j, 0).data().toString() != "") {
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = false;
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = false;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = false;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = false;
                     }
                 }
             } else if (model.parent().parent().row() == -1) {
                 details[0]->setText(QString("Type : File"));
                 int i = -1;
                 while (model.child(++i, 0).data().toString() != "") {
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.master = false;
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.active = false;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.master = false;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.active = false;
                 }
             } else if (model.parent().parent().parent().row() == -1) {
 
                 int planIndex = model.data().toInt();
 //
-//                m_choosen = m_plans.at(planIndex);
+//                m_choosen = theplans->response.allPlans.at(planIndex);
 //                m_choosen->gui.active = false;
 //                m_choosen->gui.master = false;
             }
@@ -207,22 +253,22 @@ void PlayOffWidget::slt_master() {
 //                while (model.child(++i, 0).data().toString() != "") {
 //                    int j = -1;
 //                    while (model.child(i, 0).child(++j, 0).data().toString() != "") {
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = true;
-//                        m_plans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = true;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = true;
+//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = true;
 //                    }
 //                }
 //            } else if (model.parent().parent().row() == -1) {
 //                details[0]->setText(QString("Type : File"));
 //                int i = -1;
 //                while (model.child(++i, 0).data().toString() != "") {
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.master = true;
-//                    m_plans.at(model.child(i, 0).data().toInt())->gui.active = true;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.master = true;
+//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.active = true;
 //                }
 //            } else if (model.parent().parent().parent().row() == -1) {
 //
 //                int planIndex = model.data().toInt();
 //
-//                m_choosen = m_plans.at(planIndex);
+//                m_choosen = theplans->response.allPlans.at(planIndex);
 //                m_choosen->gui.active = true;
 //                m_choosen->gui.master = true;
 //            }
@@ -265,7 +311,7 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const Q
 
                 int planIndex = model.data().toInt();
 
-//                m_choosen = m_plans.at(planIndex);
+//                m_choosen = theplans->response.allPlans.at(planIndex);
 
                 details[0]->setText(QString("Type       : Plan"));
 //                details[1]->setText(QString("Agent Size : %1").arg(m_choosen->common.agentSize));

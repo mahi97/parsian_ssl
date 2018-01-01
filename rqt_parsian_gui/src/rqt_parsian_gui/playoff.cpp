@@ -13,9 +13,9 @@ namespace rqt_parsian_gui {
     void PlayOff::initPlugin(qt_gui_cpp::PluginContext &context) {
         n = getNodeHandle();
         n_private = getPrivateNodeHandle();
-        client = n.serviceClient<parsian_msgs::parsian_update_plans> ("update_plans");
 
-        playOffWidget = new PlayOffWidget();
+
+        playOffWidget = new PlayOffWidget(n);
 
         // extend the widget with all attributes and children from UI file
 
