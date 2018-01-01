@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 2.8.3)
 project(parsian_agent)
 
@@ -289,7 +290,9 @@ install(FILES
         )
 
 
-catkin_install_python(PROGRAMS src/parsian_profiler/motion_profiler_node.py
+catkin_install_python(
+	PROGRAMS src/parsian_profiler/motion_profiler_node.py
+	 src/parsian_profiler/kick_profiler_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
