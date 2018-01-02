@@ -12,7 +12,7 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(pare
     theplans = new parsian_msgs::parsian_update_plans();
     theplans->response.allPlans.clear();
     theplans->request.newPlans.clear();
-    client.call(theplans);
+    client.call(*theplans);
 
 
     choosen = nullptr;
@@ -169,7 +169,7 @@ void PlayOffWidget::updateBtn(bool _debug) {
 void PlayOffWidget::slt_updatePlans() {
     theplans->response.allPlans.clear();
     theplans->request.newPlans.clear();
-    client.call(theplans);
+    client.call(*theplans);
     updateModel();
 }
 
