@@ -13,6 +13,7 @@
 #include <QList>
 #include <QStandardItemModel>
 #include <parsian_msgs/parsian_update_plans.h>
+#include <parsian_util/tools/debuger.h>
 #include <QWidget>
 #include <ros/ros.h>
 namespace rqt_parsian_gui {
@@ -47,12 +48,11 @@ namespace rqt_parsian_gui {
         parsian_msgs::parsian_update_plans *theplans;
         ros::ServiceClient client ;
 
-        QList<QList<SPlayOffPlan *> > plans;
         QLabel *details[8];
 
         parsian_msgs::parsian_plan *lastPlan;
-        parsian_msgs::parsian_update_plans *choosen;
-        QItemSelection m_itemSelected;
+        parsian_msgs::parsian_plan *choosen;
+        QItemSelection itemSelected;
 
     private slots:
         void updateModel();
