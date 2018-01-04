@@ -77,7 +77,7 @@ namespace rqt_parsian_gui
 
         //########################################### load image
 
-        color = (team_color == parsian_msgs::parsian_team_config::isYellow) ? 'y' : 'b';
+        color = (team_color == parsian_msgs::parsian_team_config::YELLOW) ? 'y' : 'b';
         draw_dir(0);
         //############################################################### progress bars
 

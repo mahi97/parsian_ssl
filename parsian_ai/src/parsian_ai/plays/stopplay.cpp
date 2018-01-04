@@ -37,18 +37,17 @@ void CStopPlay::stopPosition() {
 //            rolePosition[i] = Vector2D(0.25*i-0.5, - wm->field->_FIELD_HEIGHT/2);
 //
 //        } else if(conf.LineUpPosition == "parsian") {
-////            if (conf()->LocalSettings_OurTeamSide == "Left") {
+            if (teamConfig.side == teamConfig.LEFT) {
 //                rolePosition[i] = Vector2D(0.25*i-1, - wm->field->_FIELD_HEIGHT/2);
-////
-////            } else {
+
+            } else {
 ////                rolePosition[i] = Vector2D((-0.25*i+1), - wm->field->_FIELD_HEIGHT/2);
-////
-////            }
+            }
 //        }
 
     }
 
-    for(int i = 0; i < agentsID.size(); i++) {
+    for(auto i = 0; i < agentsID.size(); i++) {
         gpa[i]->setTargetpos(rolePosition[i]);
         gpa[i]->setTargetdir(wm->field->oppGoal());
         agentsID[i]->action = gpa[i];

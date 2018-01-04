@@ -39,7 +39,7 @@ namespace rqt_parsian_gui {
         scrollArea->setWidget(scroll_widget);
 
         for (auto &i : statusWidget) {
-            i = new RobotStatusWidget(parsian_msgs::parsian_team_config::isYellow);
+            i = new RobotStatusWidget(parsian_msgs::parsian_team_config::YELLOW);
             scrollArea_l->addWidget(i);
         }
 
