@@ -1,10 +1,9 @@
 #include "parsian_util/core/team.h"
 #include <ros/ros.h>
 
-//QMutex wmMutex;
 
 
-CTeam::CTeam(const bool isYellow, const bool isLeft)
+CTeam::CTeam(const bool& isYellow, const bool& isLeft)
 {
     data = new CTeamData;
     for (int i=0;i< _MAX_NUM_PLAYERS;i++)data->teamMembers[i]=new CRobot(i);
@@ -13,7 +12,7 @@ CTeam::CTeam(const bool isYellow, const bool isLeft)
 
 }
 
-CTeam::CTeam(const  bool isYellow, const bool isLeft, const std::vector<parsian_msgs::parsian_robot> & _robots) :
+CTeam::CTeam(const  bool& isYellow, const bool& isLeft, const std::vector<parsian_msgs::parsian_robot> & _robots) :
         CTeam(isYellow, isLeft) {
     updateRobot(_robots);
 }
@@ -45,15 +44,15 @@ int CTeam::activeAgentsCount()
 
 void CTeam::update()
 {
-//    wmMutex.lock();
+    wmMutex.lock();
     data->activeAgents.clear();
     for( int i = 0; i < _MAX_NUM_PLAYERS; i++ ) {
         if( data->teamMembers[i]->getActive() ) {
                 data->activeAgents.push_back(i);
         }
     }
-    ROS_INFO_STREAM("ACT : " << data->activeAgents.size());
-//    wmMutex.unlock();
+    ROS_INFO_STREAM("ACTs : " << data->activeAgents.size());
+    wmMutex.unlock();
 }
 
 int CTeam::activeAgentID(int i)
@@ -69,14 +68,14 @@ int CTeam::activeAgentID(int i)
     return -1;
 
 }
-CRobot* CTeam::operator [](const int i) const
+CRobot* CTeam::operator [](const int& i) const
 {
     if (i>=0 && i<_MAX_NUM_PLAYERS) return data->teamMembers[i];
     PDEBUG("id out of range", i, D_ERROR);
     return nullptr;
 }
 
-CRobot* CTeam::active(const int i) const
+CRobot* CTeam::active(const int& i) const
 {
     if((i<data->activeAgents.size())&&(i>=0))
     {
