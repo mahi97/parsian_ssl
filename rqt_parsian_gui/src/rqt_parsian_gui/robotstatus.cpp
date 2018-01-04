@@ -21,8 +21,7 @@ namespace rqt_parsian_gui {
 
         rs_sub = n_private.subscribe("/robots_status", 1000, &RobotStatus::rsCallback, this);
         for (int j = 0; j < max_robot; ++j) {
-            QString sub_name = QString("/robot_command") + QString::number(j);
-            rc_sub[j] = n_private.subscribe(sub_name.toStdString(), 1000, &RobotStatus::rcCallback, this);
+            rc_sub[j] = n_private.subscribe(QString("/agent_%1/command").arg(j).toStdString(), 1000, &RobotStatus::rcCallback, this);
         }
 
         // create QWidget
@@ -40,7 +39,7 @@ namespace rqt_parsian_gui {
         scrollArea->setWidget(scroll_widget);
 
         for (auto &i : statusWidget) {
-            i = new RobotStatusWidget(parsian_msgs::parsian_team_config::isYellow);
+            i = new RobotStatusWidget(parsian_msgs::parsian_team_config::YELLOW);
             scrollArea_l->addWidget(i);
         }
 

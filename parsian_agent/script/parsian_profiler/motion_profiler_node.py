@@ -25,10 +25,10 @@ class MotionProfilerNode:
         self.rbt_cmd_sub = []
         self.task_pub = []
         for i in range(0, 12):
-            self.rbt_cmd_sub.append(rospy.Subscriber('robot_command' + str(i), parsian_robot_command,
+            self.rbt_cmd_sub.append(rospy.Subscriber('/agent_' + str(i) + '/command', parsian_robot_command,
                                                      self.rcCallback, queue_size=1, buff_size=2 ** 24))
 
-            self.task_pub.append(rospy.Publisher('robot_task_' + str(i), parsian_robot_task, queue_size=1, latch=True))
+            self.task_pub.append(rospy.Publisher('/agent_' + str(i) + '/task', parsian_robot_task, queue_size=1, latch=True))
 
 
         rospy.spin()

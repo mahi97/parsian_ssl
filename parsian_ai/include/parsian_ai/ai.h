@@ -5,7 +5,7 @@
 #ifndef PARSIAN_AI_AI_H
 #define PARSIAN_AI_AI_H
 
-//#include <parsian_msgs/parsian_world_model.h>
+#include <parsian_msgs/parsian_team_config.h>
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_msgs/parsian_robot.h>
@@ -31,9 +31,6 @@ public:
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
-    
-
-
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 

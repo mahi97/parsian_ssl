@@ -71,7 +71,7 @@ public:
     QTime agentStopTime;
     bool timerReset;
 
-    explicit Agent(int _ID, ros::NodeHandle& _node);
+    explicit Agent(int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;
@@ -163,9 +163,9 @@ private:
     const double Gravity= 9.8;
     double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
-    ros::Publisher planner_pub;
-
 public:
+
+    ros::Publisher planner_pub;
     void initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                      const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                      const double &_ballObstacleRadius);

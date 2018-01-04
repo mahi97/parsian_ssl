@@ -111,7 +111,7 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(int _ID, ros::NodeHandle& _node)
+Agent::Agent(int _ID)
 {
     srand48(time(nullptr));
     packetNum = 0;
@@ -164,7 +164,6 @@ Agent::Agent(int _ID, ros::NodeHandle& _node)
     agentStopTime.start();
 
     changeIsNeeded = false;
-    planner_pub = _node.advertise<parsian_msgs::parsian_get_plan>("get_plan", 5);
 
 }
 
