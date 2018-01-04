@@ -21,8 +21,7 @@ namespace rqt_parsian_gui {
 
         rs_sub = n_private.subscribe("/robots_status", 1000, &RobotStatus::rsCallback, this);
         for (int j = 0; j < max_robot; ++j) {
-            QString sub_name = QString("/robot_command") + QString::number(j);
-            rc_sub[j] = n_private.subscribe(sub_name.toStdString(), 1000, &RobotStatus::rcCallback, this);
+            rc_sub[j] = n_private.subscribe(QString("/agent_%1/command").arg(j).toStdString(), 1000, &RobotStatus::rcCallback, this);
         }
 
         // create QWidget
