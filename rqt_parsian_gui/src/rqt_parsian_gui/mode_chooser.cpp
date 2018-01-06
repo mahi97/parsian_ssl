@@ -1,6 +1,3 @@
-/*
-  Copyright 2016 Lucas Walter
-*/
 #include <rqt_parsian_gui/mode_chooser.h>
 
 
@@ -19,8 +16,18 @@ namespace rqt_parsian_gui
         n = getNodeHandle();
         n_private = getPrivateNodeHandle();
         // create QWidget
-        modeWidget=new ModeChooserWidget(n);
+
+        modeWidget = new ModeChooserWidget(n);
         context.addWidget(modeWidget);
+
     }
+
+    void ModeChooser::shutdownPlugin() {
+        ROS_INFO("Sddf");
+        modeWidget->saveTeamConfig();
+
+    }
+
 }
+
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::ModeChooser, rqt_gui_cpp::Plugin)

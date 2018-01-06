@@ -3,7 +3,7 @@
     <node pkg="nodelet" type="nodelet" name="all_nodelet"  args="manager" output="screen"/>
     <!--<node pkg="nodelet" type="nodelet" name="ai" 	   args="load parsian_ai/AINodelet                 all_nodelet" output="screen"/>-->
 
-    <node pkg="nodelet" type="nodelet" name="common_config"   args="load parsian_agent/CommonConfig            all_nodelet" output="screen"/> 
+    <node pkg="nodelet" type="nodelet" name="commonconfig"   args="load parsian_agent/CommonConfig            all_nodelet" output="screen"/> 
 
     <node pkg="nodelet" type="nodelet" name="agent_0"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="agent_1"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>

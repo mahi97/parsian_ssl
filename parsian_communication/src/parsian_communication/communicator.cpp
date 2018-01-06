@@ -49,7 +49,7 @@ void CBaseCommunicator::readData()
     {
 
         for(int i = 0 ; i < recDataFlow.size() ; i++) {
-            if(recDataFlow[i] == 0x99)
+            if(recDataFlow[i] == static_cast<unsigned char>(0x99))
             {
 
                 if(i >= 12)

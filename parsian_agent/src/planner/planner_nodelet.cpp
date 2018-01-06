@@ -6,7 +6,7 @@ PLUGINLIB_EXPORT_CLASS(parsian_agent::PlannerNodelet, nodelet::Nodelet);
 using namespace parsian_agent;
 
 void PlannerNodelet::onInit(){
-    ROS_INFO("%s onInit", getName().c_str());
+    ROS_INFO("%s onInits", getName().c_str());
 
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
@@ -44,13 +44,16 @@ void PlannerNodelet::timerCb(const ros::TimerEvent& event){
     if (debugger != nullptr) debug_pub.publish(debugger->debugs);
     if (drawer   != nullptr) {
         draw_pub.publish(drawer->draws);
-        drawer->draws.texts.clear();
-
-        drawer->draws.circles.clear();
-        drawer->draws.segments.clear();
-        drawer->draws.vectors.clear();
-        drawer->draws.rects.clear();
+        cleanDraws();
     }
+}
+
+void PlannerNodelet::cleanDraws() const {
+    drawer->draws.texts.clear();
+    drawer->draws.circles.clear();
+    drawer->draws.segments.clear();
+    drawer->draws.vectors.clear();
+    drawer->draws.rects.clear();
 }
 
 void PlannerNodelet::plannerCb(const parsian_msgs::parsian_get_planConstPtr & _plan) {

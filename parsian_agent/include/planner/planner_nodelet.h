@@ -43,6 +43,7 @@ namespace parsian_agent {
 
         boost::shared_ptr<CPlanner> planner;
 
+        void cleanDraws() const;
     };
 }
 
