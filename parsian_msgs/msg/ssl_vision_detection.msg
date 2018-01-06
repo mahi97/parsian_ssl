@@ -1,4 +1,4 @@
-std_msgs/Header Header
+Header Header
 uint32 frame_number
 float64 t_capture
 float64 t_sent
