@@ -388,17 +388,15 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 void CDynamicAttack::playMake() {
 
     drawer->draw(Circle2D(mahiPlayMaker->pos(), 0.1),QColor(Qt::red),true);
-//    if(wm->getTeamColor() == _COLOR_BLUE) {
+    if(teamConfig.color == teamConfig.BLUE) {
         drawer->draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::blue),true);
-//    } else {
-//        draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::yellow),true);
-//    }
+    } else {
+        drawer->draw(Circle2D(mahiPlayMaker->pos() + mahiPlayMaker->dir()*0.08,0.06),QColor(Qt::yellow),true);
+    }
 
     roleAgentPM->setAgent(mahiPlayMaker);
     roleAgentPM->setAgentID(mahiAgentsID[0]);
     roleAgentPM->setAvoidPenaltyArea(true);
-
-    bool flagT = false;
 
     Vector2D og = wm->ball->pos - wm->field->ourGoal();
 

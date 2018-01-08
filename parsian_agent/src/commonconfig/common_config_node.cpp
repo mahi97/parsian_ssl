@@ -6,11 +6,11 @@
 #include "nodelet/loader.h"
 
 int main(int argc, char **argv){
-    ros::init(argc, argv, "common_config_node");
+    ros::init(argc, argv, "commonconfig");
     nodelet::Loader nodelet;
-    nodelet::M_string remap(ros::names::getRemappings());
+    const nodelet::M_string &remap(ros::names::getRemappings());
     nodelet::V_string nargv;
-    std::string nodelet_name = ros::this_node::getName();
+    const std::string &nodelet_name = ros::this_node::getName();
     nodelet.load(nodelet_name, "parsian_agent/CommonConfig", remap, nargv);
     ros::spin();
     return 0;

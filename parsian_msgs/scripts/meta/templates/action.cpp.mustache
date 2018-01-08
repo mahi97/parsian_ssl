@@ -2,6 +2,12 @@
 
 #include <parsian_util/action/autogenerate/{{file_name}}.h>
 
+{{action_name}}::{{action_name}}() {
+{{#properties}}
+       {{local}}{{default_value}};
+{{/properties}}
+}
+
 void {{action_name}}::setMessage(const void* _msg) {
     parsian_msgs::{{message}} msg = *((parsian_msgs::{{message}}*)_msg);
     {{#properties}}

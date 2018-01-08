@@ -2,6 +2,8 @@
 
 
 const double StopRadius = 0.55;//0.70;//1.02;//0.78;
+CRoleStopInfo* CRoleStop::m_info = new CRoleStopInfo("stop");
+
 CRoleStopInfo::CRoleStopInfo(QString _roleName)
 		: CRoleInfo(_roleName)
 {
@@ -10,32 +12,10 @@ CRoleStopInfo::CRoleStopInfo(QString _roleName)
 
 void CRoleStopInfo::findPositions()
 {
-	//	if (inCorner == -1)
-	//	{
-	//        if ((wm->ball->pos.x < -_FIELD_WIDTH/2.0 + 0.7) && (fabs(wm->ball->pos.y) > _FIELD_HEIGHT/2.0 - 0.5))
-	//		{
-	//			inCorner = 1;
-	//		}
-	//		else inCorner = -1;
-	//	}
-	//	else {
-	//		if ((wm->ball->pos.x < -_FIELD_WIDTH/2.0 + 0.6) && (fabs(wm->ball->pos.y) > _FIELD_HEIGHT/2.0 - 0.6))
-	//		{
-	//			inCorner = 1;
-	//		}
-	//		else if ((wm->ball->pos.x > -_FIELD_WIDTH/2.0 + 0.8) && (fabs(wm->ball->pos.y) > _FIELD_HEIGHT/2.0 - 0.4))
-	//		{
-	//			inCorner = 0;
-	//		}
-	//	}
-
-	//	if (inCorner == 1)
-	//		draw("Trapped in corner, now what?", Vector2D(-1.2, 0.0), "red");
 
 	double sRadius = StopRadius;
 	Vector2D c = wm->ball->pos;
 	const double radius = 1.8 + 2.0*Robot::robot_radius_new;
-	const double MARGIN = 0.01;
 
 	TA = wm->field->ourGoal();
 	if((wm->ball->pos - wm->field->ourGoal()).length() < radius )
@@ -101,6 +81,7 @@ CRoleStop::CRoleStop(Agent *_agent) : CRole(_agent)
 CRoleStop::~CRoleStop()
 {
 	delete gotopoint;
+    delete noAction;
 }
 
 void CRoleStop::execute()
@@ -109,7 +90,7 @@ void CRoleStop::execute()
 	Vector2D target;
 	info()->findPositions();
 	int kkk = 0;
-	for (int k=0;k<info()->count();k++)
+	for (int k=0;k < info()->count();k++)
 	{
 		if (agent->id()==info()->robotId[k])
 		{
@@ -120,7 +101,6 @@ void CRoleStop::execute()
 
 
 	gotopoint->setSlowmode(true);
-	gotopoint->setMaxvelocity(2.0);
 	if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
 		noAction->setWaithere(true);
 		agent->action = noAction;
@@ -135,6 +115,7 @@ void CRoleStop::execute()
 	gotopoint->setBallobstacleradius(0.50);
 	drawer->draw(Circle2D(target , 0.03) , "magenta" , true);
 	drawer->draw(QString("%1").arg(kkk) , target);
+    ROS_INFO_STREAM("DDD " << agent->id());
 	agent->action = gotopoint;
 }
 
@@ -154,7 +135,13 @@ double CRoleStop::progress()
 
 CRoleStopInfo* CRoleStop::info()
 {
-//	return (CRoleStopInfo*) CSkills::getInfo("stop");
+	return m_info;
+}
+
+void CRoleStop::assign(Agent *agent) {
+    CRole::assign(agent);
+    agent->roleName = m_info->getRoleName();
+    m_info->addAgent(agent);
 }
 
 

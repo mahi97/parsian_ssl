@@ -9,10 +9,10 @@ void AINodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
     ai.reset(new AI());
-    ROS_INFO("inited");
+    ROS_INFO("init");
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
-        std::string topic("robot_task_"+std::to_string(i));
+        std::string topic(QString("/agent_%1/task").arg(i).toStdString());
         robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
     }
     drawer = new Drawer();
@@ -20,7 +20,8 @@ void AINodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
-    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
+    refereeSub = nh.subscribe("/refbox/referee", 1000,  &AINodelet::refereeCallBack, this);
+    teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -31,8 +32,11 @@ void AINodelet::onInit() {
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
     f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
-    ROS_INFO("MAHI");
 
+}
+
+void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf) {
+    teamConfig = *_conf;
 }
 
 void AINodelet::timerCb(const ros::TimerEvent& event) {
@@ -50,10 +54,10 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ROS_INFO("wm updated");
     ai->execute();
 
-//    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
-        ROS_INFO("SEND");
-        robTask[wm->our.activeAgentID(0)].publish(ai->getTask(wm->our.activeAgentID(0)));
-//    }
+    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
+//        ROS_INFO("SEND");
+        robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
+    }
 
 }
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {

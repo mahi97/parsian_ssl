@@ -77,7 +77,7 @@ namespace rqt_parsian_gui
 
         //########################################### load image
 
-        color = (team_color == parsian_msgs::parsian_team_config::isYellow) ? 'y' : 'b';
+        color = (team_color == parsian_msgs::parsian_team_config::YELLOW) ? 'y' : 'b';
         draw_dir(0);
         //############################################################### progress bars
 
@@ -204,9 +204,6 @@ namespace rqt_parsian_gui
     void RobotStatusWidget::draw_dir(double ang){
         agent_i = new QPixmap(QPixmap::fromImage(QImage(getFileName())));
         agent_p = new QPainter(agent_i);
-        QBrush *b = new QBrush();
-        b->setColor(Qt::red);
-        agent_p->setBrush(*b);
         agent_p->drawLine(25, 25, static_cast<int>(25 * (1 + std::cos(ang))),
                           static_cast<int>(25 * (1 - std::sin(ang))));
         vel_dir->setPixmap(*agent_i);

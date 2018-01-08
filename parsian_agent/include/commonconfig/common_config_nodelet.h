@@ -6,17 +6,17 @@
 #include <pluginlib/class_list_macros.h>
 #include <dynamic_reconfigure/server.h>
 #include <parsian_agent/agentConfig.h>
+#include <parsian_agent/config.h>
+
 
     class CommonConfig : public nodelet::Nodelet {
     private:
 
-        virtual void onInit();
+        void onInit() override;
 
         ros::NodeHandle private_nh;
 
         boost::shared_ptr<dynamic_reconfigure::Server<agent_common::agentConfig>> server;
-
-
 
     };
 

@@ -13,7 +13,7 @@
 class GotopointAction : public Action {
 
 public:
-
+    GotopointAction();
     void setMessage(const void* _msg);
 
     void* getMessage();

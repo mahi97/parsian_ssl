@@ -1,27 +1,23 @@
+#ifndef PLANNER_H
+#define PLANNER_H
+
 #include <vector>
 #include <string>
 #include <QList>
-#include <string.h>
-//#include <QThread>
-//#include <QMutex>
+#include <cstring>
 #include <QMetaType>
-
-////////////////////////////////
-//////search for kian///////////
-////////////////////////////////
-
+#include <parsian_msgs/parsian_path.h>
 #include <parsian_util/core/field.h>
-#include "parsian_util/tools/drawer.h"                      //TODO must be newd in node
+#include "parsian_util/tools/drawer.h"                      //TODO must be new in node
 #include "parsian_util/tools/debuger.h"
 #include "parsian_util/core/agent.h"
 #include "parsian_util/geom/geom.h"
 #include "parsian_util/core/worldmodel.h"
-//#include "parsian_msgs/pass_plannerResponse.h"
 #include "planner/obstacle.h"
 #include "ros/ros.h"
 #include "parsian_agent/config.h"
 #include "planner/state.h"
-
+#include <planner/c2dtree.h>
 #define _PLANNER_EXTEND_POINT_LIMIT 150
 #define _PLANNER_EXTEND_MAX_ATTEMPT 200
 
@@ -29,46 +25,16 @@
 
 
 
-using namespace std;
-
-class C2DTree{
-public:
-    C2DTree();
-    ~C2DTree();
-    void add(state* const);
-    void removeAll();
-    state *findNearest(Vector2D);
-    void drawBranch(state* , state* , QColor );
-    int size();
-    state* makeBalanced(state** , int , int , int);
-
-    state *head , *first;
-    int k;
-    state *allNodes[1000];
-
-private:
-    void addNode(state* const & , state*& , int);
-    state *findNearestNode( Vector2D & , state * const & , int);
-    void removeBranch(state *);
-
-    int cnt , mod;
-};
-
-#ifndef PLANNER_H
-#define PLANNER_H
-
-
 class CPlanner
 {
 public:
     ///////////////////////////////////////////////////////////////////
-    CPlanner(int _ID);
+    explicit CPlanner(int _ID);
     ~CPlanner();
     void runPlanner();
     void resetPlanner(Vector2D);
-    void pathPlannerResult(vector<Vector2D> _resultModified , Vector2D _averageDir);
-    void initPathPlanner(Vector2D _goal,const QList<int> _ourRelaxList,const QList<int> _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
-
+    void initPathPlanner(Vector2D _goal,const QList<int>& _ourRelaxList,const QList<int>& _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
+    int getID();
     vector<Vector2D> getResultModified ();
     Vector2D getAverageDir();
 private:
@@ -97,10 +63,13 @@ private:
     double drawTimer;
     bool isRandomState;
     Segment2D agentPath;
-    void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, int id, Vector2D agentGoal);
+    void generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, QList<int> &oppRelaxList, bool avoidPenaltyArea, bool avoidCenterCircle , double ballObstacleRadius, Vector2D agentGoal);
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
+    void emitPlan(const vector<Vector2D>& _resultModified, const Vector2D& averageDir);
 
+public:
+    ros::Publisher path_pub;
 };
 
 #endif // PLANNER_H
