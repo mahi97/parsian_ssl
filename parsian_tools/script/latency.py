@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from parsian_msgs.msg import parsian_robot_command
 from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot_task
@@ -6,12 +7,9 @@ from parsian_msgs.msg import parsian_packets
 from parsian_msgs.msg import parsian_path
 import rospy
 
-
-
-
-
 class Latency:
     def __init__(self):
+        self.queue = []
         rospy.init_node('latency', anonymous=True)
         rospy.Subscriber('/agent_0/command', parsian_robot_command,
                          self.rcCallback, queue_size=1, buff_size=2 ** 24)
@@ -28,9 +26,15 @@ class Latency:
         rospy.spin()
 
     def rcCallback(self, data):
-        pass
+       pass
+
     def wmCallback(self, data):
-        pass
+        # type: (parsian_world_model) -> null
+
+        self.queue.append((rospy.get_rostime() - data.Header.stamp).nsecs)
+        if len(self.queue) > 500:
+            self.queue.pop(0)
+        rospy.loginfo(sum(self.queue) / len(self.queue))
     def rtCallback(self, data):
         pass
     def packetCallback(self, data):

@@ -981,6 +981,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     else
         command->kickspeedz=0;
     command->spinner= static_cast<unsigned char>(false);
-
+    command->Header.stamp = ros::Time::now();
     return command;
 }
