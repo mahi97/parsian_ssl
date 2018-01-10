@@ -14,12 +14,16 @@ void Latency::onInit(){
     private_nh = getPrivateNodeHandle();
 
 
-    world_model_sub   = nh.subscribe("/world_model", 10000, &Latency::wmCb, this);
-    robot_task_sub    = nh.subscribe("/agent_0/task", 10, &Latency::rtCb, this);
-    robot_command_sub = nh.subscribe("/agent_0/command", 10, &Latency::rcCb, this);
-    planner_sub       = nh.subscribe("/planner_0/path", 5, &Latency::plannerCb, this);
+    world_model_sub   = nh.subscribe("/world_model", 20, &Latency::wmCb, this);
+    robot_task_sub    = nh.subscribe("/agent_0/task", 20, &Latency::rtCb, this);
+    robot_command_sub = nh.subscribe("/agent_0/command", 20, &Latency::rcCb, this);
+    planner_sub       = nh.subscribe("/planner_0/path",20, &Latency::plannerCb, this);
+    vision_sub        = nh.subscribe("/vision_detection",20,&Latency::visionCb,this);
 
-    wm_sum = 0;
+    wm_sum = vision_sum = task_sum = 0;
+    wm_max = vision_max = task_max = 0;
+    wm_min = vision_min = task_min = 0xffffffff;
+
 }
 
 void Latency::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
@@ -28,9 +32,15 @@ void Latency::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
     wm_sum += latency;
     wm_latency_queue.push_back(latency);
 
+    if (latency > wm_max)
+        wm_max = latency;
+    if (latency < wm_min)
+        wm_min = latency;
+
     if(wm_latency_queue.length() > buffSize) {
         wm_sum -= wm_latency_queue.dequeue();
-        ROS_INFO_STREAM("world model delay: " <<wm_sum / buffSize);
+        ROS_INFO_STREAM("world model delay: min: " <<vision_min <<
+                                                  "    mid: "<< wm_sum / buffSize<< "    max: "<<vision_max);
     }
 }
 
@@ -39,9 +49,15 @@ void Latency::rtCb(const parsian_msgs::parsian_robot_taskConstPtr& _robot_task){
     task_sum += latency;
     task_latency_queue.push_back(latency);
 
+    if (latency > task_max)
+        task_max = latency;
+    if (latency < task_min)
+        task_min = latency;
+
     if(wm_latency_queue.length() > buffSize) {
-        task_sum -= wm_latency_queue.dequeue();
-        ROS_INFO_STREAM("robot task delay: " << task_sum / buffSize);
+        task_sum -= task_latency_queue.dequeue();
+        ROS_INFO_STREAM("robot task delay: min: " <<vision_min <<
+                                                     "    mid: "<< task_sum / buffSize<< "    max: "<<vision_max);
     }
 }
 
@@ -53,8 +69,31 @@ void Latency::rcCb(const parsian_msgs::parsian_robot_commandConstPtr & _robot_co
     rc_sum += latency;
     rc_latency_queue.push_back(latency);
 
+    if (latency > rc_max)
+        rc_max = latency;
+    if (latency < rc_min)
+        rc_min = latency;
+
     if(rc_latency_queue.length() > buffSize) {
         rc_sum -= rc_latency_queue.dequeue();
-        ROS_INFO_STREAM("robot command delay: " << rc_sum / buffSize);
+        ROS_INFO_STREAM("robot command delay: min: " <<vision_min <<
+                                              "    mid: "<< rc_sum / buffSize<< "    max: "<<vision_max);
+    }
+}
+
+void Latency::visionCb(const parsian_msgs::ssl_vision_detectionConstPtr & _vision_detection) {
+    int latency = (ros::Time::now() - _vision_detection->Header.stamp).nsec;
+    vision_sum += latency;
+    vision_latency_queue.push_back(latency);
+
+    if (latency > vision_max)
+        vision_max = latency;
+    if (latency < vision_min)
+        vision_min = latency;
+
+    if(vision_latency_queue.length() > buffSize) {
+        vision_sum -= vision_latency_queue.dequeue();
+        ROS_INFO_STREAM("vision delay: min: " <<vision_min <<
+                                   "    mid: "<< vision_sum / buffSize<< "    max: "<<vision_max);
     }
 }

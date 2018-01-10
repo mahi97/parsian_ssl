@@ -12,10 +12,9 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_robot_command.h>
-#include <parsian_msgs/parsian_ai_status.h>
-#include <parsian_msgs/parsian_debugs.h>
-#include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_path.h>
+#include <parsian_msgs/parsian_packets.h>
+#include <parsian_msgs/ssl_vision_detection.h>
 #include <QQueue>
 
 #define buffSize 800
@@ -34,10 +33,13 @@ namespace parsian_tools {
         ros::Subscriber robot_task_sub;
         ros::Subscriber robot_command_sub;
         ros::Subscriber planner_sub;
+        ros::Subscriber vision_sub;
 
 
-        QQueue <int> wm_latency_queue,rc_latency_queue,task_latency_queue;
-        int wm_sum,rc_sum,task_sum;
+        QQueue <int> wm_latency_queue,rc_latency_queue,task_latency_queue,vision_latency_queue;
+        int wm_sum,rc_sum,task_sum,vision_sum;
+        int wm_max,rc_max,task_max,vision_max;
+        int wm_min,rc_min,task_min,vision_min;
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr &);
 
@@ -45,9 +47,9 @@ namespace parsian_tools {
 
         void rcCb(const parsian_msgs::parsian_robot_commandConstPtr &);
 
-        void aiCb(const parsian_msgs::parsian_ai_statusConstPtr &);
-
         void plannerCb(const parsian_msgs::parsian_pathConstPtr&);
+
+        void visionCb(const parsian_msgs::ssl_vision_detectionConstPtr&);
 
     };
 }
