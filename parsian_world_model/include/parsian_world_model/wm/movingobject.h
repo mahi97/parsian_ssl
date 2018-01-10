@@ -11,7 +11,7 @@
 
 class CRawObject;
 
-class CMovingObject
+class MovingObject
 {
 protected:
     int vanishedCounter;
@@ -24,7 +24,7 @@ protected:
 	QList<Vector2D> lastSpeeds;
 	QList<double> lastAngularSpeeds;
 public:    		
-    CMovingObject(bool resetToZero=true);
+    MovingObject(bool resetToZero=true);
     CRawObject* observation;
     QQueue<CRawObject*> hist;
 
@@ -64,7 +64,7 @@ public:
     void updateDelayTime(double newDelayTime);
 
     void update(CRawObject raw);
-    void update(CMovingObject* obj);
+    void update(MovingObject* obj);
     void findModel(double dt);
     void kalmanFilter();
     Vector2D predict(double time);

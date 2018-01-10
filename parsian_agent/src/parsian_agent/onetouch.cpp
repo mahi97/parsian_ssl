@@ -38,20 +38,19 @@ double CSkillKickOneTouch::oneTouchAngle(Vector2D pos,
                                          double landa,
                                          double gamma)
 {
-    const double &ang1 = (-ballDir).th().degree();
-    const double &ang2 = (goal - pos).th().degree();
-    double theta = AngleDeg::normalize_angle(ang2 - ang1);
-    double th = fabs(theta) * _DEG2RAD;
+    float ang1 = (-ballDir).th().degree();
+    float ang2 = (goal - pos).th().degree();
+    float theta = AngleDeg::normalize_angle(ang2 - ang1);
+    float th = fabs(theta)*_DEG2RAD;
     float vkick = 8; // agent->self()->kickValueSpeed(kickSpeed, false);// + Vector2D::unitVector(self().pos.d).innerProduct(self().vel);
-    double v = (ballVel - vel).length();
-    double th1;
-    double fmin=1e10;
-    double f;
-    double th1best = 0;
+    float v = (ballVel - vel).length();
+    float th1 = th*0.5;
+    float f,fmin=1e10;
+    float th1best;
     for (int k=0;k<6000;k++)
     {
         th1 = ((float)k/6000.0)*th;
-        f  = gamma*v*(1.0/ std::tan(th-th1))*sin(th1)-landa*v*cos(th1)-vkick;
+        f  = gamma*v*(1.0/tan(th-th1))*sin(th1)-landa*v*cos(th1)-vkick;
         if (fabs(f)<fmin)
         {
             fmin = fabs(f);
@@ -61,13 +60,14 @@ double CSkillKickOneTouch::oneTouchAngle(Vector2D pos,
     th1 = th1best;
     th1 *= _RAD2DEG;
     AngleDeg::normalize_angle(th1);
-//    th  *= _RAD2DEG;
-    double ang = 0;
+    th  *= _RAD2DEG;
+    float ang = 0;
     if (theta>0) ang = ang1 + th1;
     else ang = ang1 - th1;
 
     return ang;
 }
+
 
 Vector2D CSkillKickOneTouch::findMostPossible()
 {
@@ -125,13 +125,13 @@ void CSkillKickOneTouch::execute()
 
 
     Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf->Landa, conf->Gamma));
-
-    drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
+    drawer->draw(QString("vball :%1").arg(conf->Landa),Vector2D(0,0));
+    //drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
 
     Vector2D addVec = (agentPos - target).norm()*stopParam;
     Vector2D intersectPos;
     Vector2D sol1,sol2;
-    double onetouchRad =0.5;
+    double onetouchRad =1.5;
     double onetouchKickRad = 0.5;
     Circle2D oneTouchArea;
     Circle2D oppPenaltyArea(wm->field->oppGoal() + Vector2D(0.15,0),1.45);
@@ -171,7 +171,7 @@ void CSkillKickOneTouch::execute()
 
         gotopointavoid->init(intersectPos +addVec,oneTouchDir);
         gotopointavoid->setNoavoid(true);
-        gotopointavoid->setOnetouchmode(true);
+        gotopointavoid->setOnetouchmode(false);
         gotopointavoid->execute();
         drawer->draw(intersectPos);
         if(agentPos.dist(ballPos) < 1)

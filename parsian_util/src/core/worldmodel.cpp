@@ -8,6 +8,7 @@
 CWorldModel::CWorldModel() : our{false, false}, opp{true, true}{
     field = new CField();
     ball  = new CBall();
+    ROS_INFO("WM_UTIL");
 }
 
 CWorldModel::CWorldModel(const parsian_msgs::parsian_world_model &_pwm) :
