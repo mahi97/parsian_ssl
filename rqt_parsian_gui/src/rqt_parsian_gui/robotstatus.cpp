@@ -53,10 +53,9 @@ namespace rqt_parsian_gui {
     }
 
     void RobotStatus::rsCallback(const parsian_msgs::parsian_robots_statusConstPtr msg) {
-        int counter = 0;
-        for (auto &i : statusWidget) {
-            i->setMessage(msg->status[counter++]);
-        }
+
+        for (int i=0; i< msg->status.size(); i++ )
+            statusWidget[i]->setMessage(msg->status[i]);
     }
 
     void RobotStatus::rcCallback(const parsian_msgs::parsian_robot_commandConstPtr msg) {
