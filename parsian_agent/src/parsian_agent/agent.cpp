@@ -925,6 +925,7 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
     plan->avoidCenterCircle = _avoidCenterCircle;
     plan->ballObstacleRadius = _ballObstacleRadius;
     plan->avoidPenaltyArea = _avoidPenaltyArea;
+    plan->header.stamp = ros::Time::now();
     // TODO : Add Virtual Obstacle to This
     planner_pub.publish(plan);
     ROS_INFO_STREAM("PUBLISHED");
@@ -981,6 +982,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     else
         command->kickspeedz=0;
     command->spinner= static_cast<unsigned char>(false);
-    command->Header.stamp = ros::Time::now();
+    command->header.stamp = ros::Time::now();
     return command;
 }
