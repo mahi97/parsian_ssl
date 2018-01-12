@@ -11,10 +11,10 @@ add_custom_target(headers SOURCES ${LibFiles})
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-        nodelet
-        parsian_msgs
         roscpp
         rospy
+        nodelet
+        parsian_msgs
         )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
@@ -56,7 +56,7 @@ catkin_python_setup()
 catkin_package(
         INCLUDE_DIRS
         include
-        LIBRARIES
+        LIBRARIES ${PROJECT_NAME} ${PROJECT_NAME}_nodelet
         CATKIN_DEPENDS nodelet parsian_msgs roscpp rospy
         #  DEPENDS
 )
@@ -90,12 +90,13 @@ target_link_libraries(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}_nodelet
+
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
-        ${catkin_LIBRARIES}
+		${catkin_LIBRARIES}
         ${QT_LIBRARIES}
-	${PROJECT_NAME}
+        ${PROJECT_NAME}
 	)
 
 # dependencies
@@ -108,8 +109,14 @@ add_dependencies(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}
         )
 
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}
+        )
 
 #############
 ## Install ##
@@ -126,7 +133,7 @@ add_dependencies(${PROJECT_NAME}_node
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

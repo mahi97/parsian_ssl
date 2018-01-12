@@ -13,22 +13,26 @@
 
 
 
+
 namespace parsian_tools {
-    using namespace parsian_msgs;
+
     class Latency : public nodelet::Nodelet {
     private:
         void onInit() override;
 
-        LatencyInfo<parsian_world_model  > *world_model  ;
-        LatencyInfo<parsian_robot_command> *robot_command;
-        LatencyInfo<ssl_vision_detection > *vision       ;
-        LatencyInfo<parsian_get_plan     > *plan         ;
-        LatencyInfo<parsian_robot_task   > *robot_task   ;
-        LatencyInfo<parsian_path         > *path         ;
-        LatencyInfo<parsian_packets      > *packet       ;
-
         ros::NodeHandle nh;
+
+        LatencyInfo<parsian_msgs::parsian_world_modelConstPtr  > *world_model  ;
+        LatencyInfo<parsian_msgs::parsian_robot_commandConstPtr> *robot_command;
+        LatencyInfo<parsian_msgs::ssl_vision_detectionConstPtr > *vision       ;
+        LatencyInfo<parsian_msgs::parsian_get_planConstPtr     > *plan         ;
+        LatencyInfo<parsian_msgs::parsian_robot_taskConstPtr   > *robot_task   ;
+        LatencyInfo<parsian_msgs::parsian_pathConstPtr         > *path         ;
+        LatencyInfo<parsian_msgs::parsian_packetsConstPtr      > *packet       ;
+
+
     };
 }
+
 
 #endif //PARSIAN_TOOLS_LATENCY_NODELET_H
