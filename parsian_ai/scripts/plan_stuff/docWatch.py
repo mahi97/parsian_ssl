@@ -4,12 +4,15 @@ import os
 import re
 import json
 
+import random
+
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 final_list = []
 ignore = []
+shuffleCount = 0
 
 
 class Watcher:
@@ -152,6 +155,10 @@ def ignore_plans(file_list, ignore_list):
     return last
 
 
+def shuffle_indexing(alist):
+    random.shuffle(alist)
+
+
 def read_plan(plan_path):
     print "opening plan "+str(plan_path).split("/plans")[1]
     with open(str(plan_path)) as json_data:
@@ -197,6 +204,16 @@ def read_plan(plan_path):
             print plan_i["ballInitPos"]["y"]
 
 
+def choose_plan(alist):
+    global shuffleCount
+    if len(alist) > shuffleCount:
+        shuffleCount += 1
+        return alist[shuffleCount-1]
+    else:
+        shuffleCount = 1
+        return alist[shuffleCount - 1]
+
+
 if __name__ == '__main__':
     p = os.getcwd().rsplit('/', 1)[0]
     p = p.rsplit('/', 1)[0]
@@ -204,7 +221,16 @@ if __name__ == '__main__':
 
     f = list_valid_plans(p)
 
-    read_plan(f[5])
+    # read_plan(f[5])
 
+    shuffle_indexing(f)  # call once
+
+    print len(f)
+
+    global shuffleCount
+
+    print shuffleCount
+    print choose_plan(f)
+    
     # w = Watcher(p)
     # w.run()
