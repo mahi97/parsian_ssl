@@ -6,7 +6,7 @@
 #define PARSIAN_UTIL_TEAM_H
 
 #include "parsian_util/core/agent.h"
-
+#include <QMutex>
 #define _MAX_NUM_PLAYERS 12
 
 struct CTeamData
@@ -22,11 +22,11 @@ class CTeam
 {
 public:
     CTeamData *data;
-    CTeam(const bool isYellow, const bool isLeft);
-    CTeam(const bool isYellow, const bool isLeft, const std::vector<parsian_msgs::parsian_robot>&);
+    CTeam(const bool& isYellow, const bool& isLeft);
+    CTeam(const bool& isYellow, const bool& isLeft, const std::vector<parsian_msgs::parsian_robot>&);
     ~CTeam();
-    CRobot* operator [](const int i);
-    CRobot* active(const int i);
+    CRobot* operator [](const int& i) const;
+    CRobot* active(const int& i) const;
     int activeAgentsCount();
     int activeAgentID(int i);
     void update();
@@ -35,6 +35,9 @@ public:
     void setColor(const bool& isYellow);
     void setSide(const bool& isLeft);
     void updateGoaliID(int id);
+
+private:
+    QMutex wmMutex;
 
 };
 

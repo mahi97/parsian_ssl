@@ -8,30 +8,42 @@
 
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
+#include <list>
 
 class GotopointavoidAction : public GotopointAction  {
 
 public:
-
+    GotopointavoidAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
-    SkillProperty(GotopointavoidAction, bool, Keeplooking, keeplooking);
-    SkillProperty(GotopointavoidAction, float, Extendstep, extendStep);
-    SkillProperty(GotopointavoidAction, bool, Plan2, plan2);
     SkillProperty(GotopointavoidAction, bool, Noavoid, noAvoid);
     SkillProperty(GotopointavoidAction, bool, Avoidcentercircle, avoidCenterCircle);
     SkillProperty(GotopointavoidAction, float, Ballobstacleradius, ballObstacleRadius);
-    SkillProperty(GotopointavoidAction, bool, Avoidball, avoidBall);
-    SkillProperty(GotopointavoidAction, bool, Avoidgoalposts, avoidGoalPosts);
     SkillProperty(GotopointavoidAction, bool, Drawpath, drawPath);
+    SkillProperty(GotopointavoidAction, bool, Divemode, diveMode);
     SkillProperty(GotopointavoidAction, Vector2D, Addvel, addVel);
-    SkillProperty(GotopointavoidAction, Vector2D, Nextpos, nextPos);
+protected:
+    std::list<unsigned char> ourrelax;
+public:
+    void clearOurrelax();
+    void addOurrelax(unsigned char);
+    void removeOurrelax(unsigned char);
+    std::list<unsigned char> getOurrelax();
+protected:
+    std::list<unsigned char> theirrelax;
+public:
+    void clearTheirrelax();
+    void addTheirrelax(unsigned char);
+    void removeTheirrelax(unsigned char);
+    std::list<unsigned char> getTheirrelax();
+
 
 };
 

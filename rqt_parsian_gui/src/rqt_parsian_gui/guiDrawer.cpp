@@ -7,6 +7,9 @@ CguiDrawer::CguiDrawer()
 {
 
 }
+CguiDrawer::~CguiDrawer() {
+
+}
 
 
 

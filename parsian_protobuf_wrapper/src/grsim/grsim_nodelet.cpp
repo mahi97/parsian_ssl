@@ -20,19 +20,6 @@ void GrsimNodelet::GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstP
     GrsimRobotCommand->set_spinner(msg->spinner != 0u);
     GrsimRobotCommand->set_wheelsspeed(msg->wheelsspeed != 0u);
 
-//    GrsimRobotCommand->set_id(msg->id);
-//    GrsimRobotCommand->set_kickspeedx(msg->kickspeedx);
-//    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz);
-//    GrsimRobotCommand->set_veltangent(msg->veltangent);
-//    GrsimRobotCommand->set_velnormal(msg->velnormal);
-//    GrsimRobotCommand->set_velangular(msg->velangular);
-//    GrsimRobotCommand->set_wheel1(msg->wheel1);
-//    GrsimRobotCommand->set_wheel2(msg->wheel2);
-//    GrsimRobotCommand->set_wheel3(msg->wheel3);
-//    GrsimRobotCommand->set_wheel4(msg->wheel4);
-//    GrsimRobotCommand->set_spinner(msg->spinner != 0u);
-//    GrsimRobotCommand->set_wheelsspeed(msg->wheelsspeed != 0u);
-
 }
 
 
@@ -122,20 +109,22 @@ void GrsimNodelet::onInit()
 {
     NODELET_INFO("grsim_nodelet onInit");
     udp = new UDPSend(ip, port);
+
+    GrsimCommand = new grSim_Commands;
+    GrsimReplacement = new grSim_Replacement;
+
+    std::string col;
+    ros::param::get("team_color", color);
+    color = (col == "yellow");          //check if it is true!
+//    color = false;
     n = getNodeHandle();
     pn = getPrivateNodeHandle();
-//    sub0 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd0", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub1 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd1", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub2 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd2", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub3 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd3", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub4 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd4", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-//    sub5 = n.subscribe<parsian_msgs::grsim_robot_command>("GrsimBotCmd5", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub0 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command0", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub1 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command1", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub2 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command2", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub3 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command3", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub4 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command4", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    sub5 = n.subscribe<parsian_msgs::parsian_robot_command>("robot_command5", 1000, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub0 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_0/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub1 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_1/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub2 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_2/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub3 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_3/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub4 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_4/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    sub5 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_5/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
 
 
     service0 = n.advertiseService<parsian_msgs::grsim_robot_replacementRequest,
@@ -152,16 +141,8 @@ void GrsimNodelet::onInit()
     vision_sub= n.subscribe<parsian_msgs::ssl_vision_detection>("vision_detection",1000,boost::bind(& GrsimNodelet::visionCB, this, _1));
     //timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
 
-    GrsimCommand = new grSim_Commands;
-    GrsimReplacement = new grSim_Replacement;
-
-    std::string col;
-    ros::param::get("team_color", color);
-    color = ! (col == "yellow");          //check if it is true!
-
 }
 
 
 
 PLUGINLIB_DECLARE_CLASS(parsian_protobuf_wrapper, GrsimNodelet, GrsimNodelet, nodelet::Nodelet);
-//PLUGINLIB_EXPORT_CLASS(Server, nodelet::Nodelet)

@@ -19,7 +19,7 @@ protected:
     CSkillKick* kick;
 public:
     DEF_ROLE(CRoleSupport);
-    virtual void generateFromConfig(CAgent *a);
+    virtual void generateFromConfig(Agent *a);
     virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
     virtual void parse(QStringList params);    
 };

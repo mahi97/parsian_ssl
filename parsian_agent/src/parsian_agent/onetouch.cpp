@@ -13,16 +13,9 @@ CSkillKickOneTouch::CSkillKickOneTouch(Agent *_agent) : CSkill(_agent)
     kick = new CSkillKick(_agent);
     timeAfterForceKick = new QTime();
     timeAfterForceKick->start();
-    forceKicked = false;
     waitPos.invalidate();
     kickSpeed = 800;
-    distToBallLine = 0.0;
-    velocityToBallLine = 0.0;
     chip = false;
-    oneTouched = false;
-    p_area_avoidance_state = -1;
-    moveTowardTheBall = false;
-    cirThresh = 0;
 }
 
 CSkillKickOneTouch::~CSkillKickOneTouch()
@@ -76,17 +69,6 @@ double CSkillKickOneTouch::oneTouchAngle(Vector2D pos,
     return ang;
 }
 
-kkOTMode CSkillKickOneTouch::decideMode()
-{
-    Circle2D tempCircle(waitPos, 1 + cirThresh);
-    Circle2D tempCircle2(waitPos, 1.5);
-    drawer->draw(tempCircle, QColor(Qt::cyan));
-
-    return OTWAITPOS;
-
-}
-
-
 Vector2D CSkillKickOneTouch::findMostPossible()
 {
 
@@ -105,7 +87,7 @@ Vector2D CSkillKickOneTouch::findMostPossible()
     }
     double prob,angle,biggestAngle;
 
-    CKnowledge::getEmptyAngle(wm->ball->pos-(wm->field->oppGoal()-wm->ball->pos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field, wm->ball->pos-(wm->field->oppGoal()-wm->ball->pos).norm()*0.15,wm->field->oppGoalL(),wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
     DEBUG(QString("prob: %1 , angle :%2, biggest:%3").arg(prob).arg(angle).arg(biggestAngle),D_MHMMD);
 
     Segment2D goalSeg(wm->field->oppGoalL(),wm->field->oppGoalR());
@@ -119,7 +101,6 @@ Vector2D CSkillKickOneTouch::findMostPossible()
 
 void CSkillKickOneTouch::execute()
 {
-    ballRealVel = wm->ball->vel.length();
     gotopointavoid->setAgent(agent);
     gotopointavoid->setOnetouchmode(false);
     gotopointavoid->setNoavoid(false);
@@ -132,7 +113,6 @@ void CSkillKickOneTouch::execute()
 
     Vector2D ballPos = wm->ball->pos;
     Vector2D agentPos = agent->pos();
-    oneTouchMode = decideMode();
 
     Segment2D ballPath;
     double stopParam = 0.08;
@@ -143,9 +123,8 @@ void CSkillKickOneTouch::execute()
     Vector2D kickerPoint = agentPos + agent->dir().norm()*stopParam;
 
 
-// TODO : Configs
-//    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf()->SkillsParams_KickOneTouch_Landa(), conf()->SkillsParams_KickOneTouch_Gamma()));
-    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, 1, 1));
+
+    Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf->Landa, conf->Gamma));
 
     drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
 
@@ -171,6 +150,7 @@ void CSkillKickOneTouch::execute()
             waitPos = agentPos;
         gotopointavoid->init(waitPos,oneTouchDir);
         gotopointavoid->execute();
+        agent->setRoller(0);
     }
     else if((oneTouchArea.intersection(ballPath,&sol1,&sol2) != 0) && wm->ball->vel.length() > 0.1)
     {
@@ -222,7 +202,4 @@ void CSkillKickOneTouch::execute()
         gotopointavoid->init(waitPos, oneTouchDir);
         gotopointavoid->execute();
     }
-
-
 }
-

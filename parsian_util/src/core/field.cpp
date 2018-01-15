@@ -50,102 +50,108 @@ CField::CField()
 CField::~CField()
 = default;
 
-Vector2D CField::center()
+Vector2D CField::center() const
 {
     return fCenter;
 }
-Vector2D CField::ourGoal()
+Vector2D CField::ourGoal() const
 {
     return fOurGoal;
 }
-Vector2D CField::oppGoal()
+Vector2D CField::oppGoal() const
 {
     return fOppGoal;
 }
-Vector2D CField::ourCornerL()
+Vector2D CField::ourCornerL() const
 {
     return fOurCornerL;
 }
-Vector2D CField::ourCornerR()
+Vector2D CField::ourCornerR() const
 {
     return fOurCornerR;
 }
-Vector2D CField::oppCornerL()
+Vector2D CField::oppCornerL() const
 {
     return fOppCornerL;
 }
-Vector2D CField::oppCornerR()
+Vector2D CField::oppCornerR() const
 {
     return fOppCornerR;
 }
-Vector2D CField::ourPenalty()
+Vector2D CField::ourPenalty() const
 {
     return fOurPenalty;
 }
-Vector2D CField::oppPenalty()
+Vector2D CField::oppPenalty() const
 {
     return fOppPenalty;
 }
 
-Vector2D CField::ourGoalL() {
+Vector2D CField::ourGoalL() const
+{
     return fOurGoalL;
 }
 
-Vector2D CField::ourGoalR() {
+Vector2D CField::ourGoalR() const
+{
     return fOurGoalR;
 }
 
-Vector2D CField::oppGoalL() {
+Vector2D CField::oppGoalL() const
+{
     return fOppGoalL;
 }
 
-Vector2D CField::oppGoalR() {
+Vector2D CField::oppGoalR() const
+{
     return fOppGoalR;
 }
 
-Rect2D   CField::fieldRect() {
+Rect2D CField::fieldRect() const
+{
     return fFieldRect;
 }
 
-Rect2D   CField::marginedField(){
+Rect2D CField::marginedField() const{
     return fMarginedFieldRect;
 }
 
-bool     CField::isInField(Vector2D point){
+bool CField::isInField(Vector2D point) const
+{
     return fFieldRect.contains(point);
 }
 
-Rect2D   CField::ourPenaltyRect()
+Rect2D CField::ourPenaltyRect() const
 {
     return fOurPenaltyRect;
 }
 
-Rect2D   CField::oppPenaltyRect()
+Rect2D CField::oppPenaltyRect() const
 {
     return fOppPenaltyRect;
 }
 
-Vector2D CField::ourOneThirdL()
+Vector2D CField::ourOneThirdL() const
 {
     return fOurOneThirdL;
 }
 
-Vector2D CField::ourOneThirdR()
+Vector2D CField::ourOneThirdR() const
 {
     return fOurOneThirdR;
 }
 
-Vector2D CField::oppOneThirdL()
+Vector2D CField::oppOneThirdL() const
 {
     return fOppOneThirdL;
 }
 
-Vector2D CField::oppOneThirdR()
+Vector2D CField::oppOneThirdR() const
 {
     return fOppOneThirdR;
 }
 
-QList<Vector2D> CField::ourPAreaIntersect(Line2D line)
+QList<Vector2D> CField::ourPAreaIntersect(Line2D line) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -219,7 +225,7 @@ QList<Vector2D> CField::ourPAreaIntersect(Line2D line)
     return results;
 }
 
-QList<Vector2D> CField::ourBigPAreaIntersect(Line2D line, double scale, float bias)
+QList<Vector2D> CField::ourBigPAreaIntersect(Line2D line, double scale, float bias) const
 {
     if (scale < 0)
         scale = (0.975+0.16) / 0.975;
@@ -299,7 +305,7 @@ QList<Vector2D> CField::ourBigPAreaIntersect(Line2D line, double scale, float bi
 
 
 
-QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment)
+QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -374,7 +380,7 @@ QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment)
     return results;
 }
 
-QList<Vector2D> CField::ourPAreaIntersect(Circle2D circle)
+QList<Vector2D> CField::ourPAreaIntersect(Circle2D circle) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -454,7 +460,7 @@ QList<Vector2D> CField::ourPAreaIntersect(Circle2D circle)
     return results;
 }
 
-bool CField::isInOurPenaltyArea(Vector2D point)
+bool CField::isInOurPenaltyArea(Vector2D point) const
 {
     Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
     Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
@@ -479,7 +485,7 @@ bool CField::isInOurPenaltyArea(Vector2D point)
     return false;
 }
 
-QList<Vector2D> CField::oppPAreaIntersect(Line2D line)
+QList<Vector2D> CField::oppPAreaIntersect(Line2D line) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -556,7 +562,7 @@ QList<Vector2D> CField::oppPAreaIntersect(Line2D line)
 
 
 
-QList<Vector2D> CField::oppPAreaIntersect(Segment2D segment)
+QList<Vector2D> CField::oppPAreaIntersect(Segment2D segment) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -631,7 +637,7 @@ QList<Vector2D> CField::oppPAreaIntersect(Segment2D segment)
     return results;
 }
 
-QList<Vector2D> CField::oppPAreaIntersect(Circle2D circle)
+QList<Vector2D> CField::oppPAreaIntersect(Circle2D circle) const
 {
     QList<Vector2D> results;
     results.clear();
@@ -711,7 +717,7 @@ QList<Vector2D> CField::oppPAreaIntersect(Circle2D circle)
     return results;
 }
 
-bool CField::isInOppPenaltyArea(Vector2D point)
+bool CField::isInOppPenaltyArea(Vector2D point) const
 {
     Circle2D c1(fOppGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
     Circle2D c2(fOppGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
@@ -739,7 +745,7 @@ bool CField::isInOppPenaltyArea(Vector2D point)
     return Back.contains(point);
 }
 
-Rect2D   CField::getRegion(Region region, double k)
+Rect2D   CField::getRegion(Region region, double k) const
 {
     Rect2D tmp;
     k *= 0.5;
@@ -848,7 +854,7 @@ Rect2D   CField::getRegion(Region region, double k)
     return Rect2D(Vector2D::INVALIDATED,Vector2D::INVALIDATED);
 }
 
-Rect2D  CField::getCircleRegion(int n, int i)
+Rect2D  CField::getCircleRegion(int n, int i) const
 {
     double theta = 45;
 //	if (knowledge->variables.contains("circle.radius")) rad = knowledge->variables["circle.radius"].toDouble();
@@ -877,7 +883,7 @@ Rect2D  CField::getCircleRegion(int n, int i)
     return Rect2D{Vector2D(s-diam), Vector2D(s+diam)};
 }
 
-Rect2D  CField::getRegion(QString name, double k)
+Rect2D  CField::getRegion(QString name, double k) const
 {
     Region r = Region::OppField;
     if      (name=="ourcornertop")              r=Region::OurCornerTop;
@@ -994,7 +1000,7 @@ Rect2D  CField::getRegion(QString name, double k)
 }
 
 
-Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpoint)
+Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpoint) const
 {
     Line2D l(fOurGoal, AngleDeg(angle));
     Vector2D p = fOurGoal + Vector2D::unitVector(angle)*2.0;
@@ -1107,7 +1113,7 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
 
 }
 
-double CField::ourPAreaPos(double angle)
+double CField::ourPAreaPos(double angle) const
 {
     Vector2D p, n;
     n = ourPAreaPerpendicularVector(angle, p);

@@ -2,7 +2,7 @@
 #include "nodelet/loader.h"
 
 int main(int argc, char **argv){
-    ros::init(argc, argv, "agent_node");
+    ros::init(argc, argv, "agent_0");
     nodelet::Loader nodelet;
     nodelet::M_string remap(ros::names::getRemappings());
     nodelet::V_string nargv;

@@ -16,7 +16,6 @@ angularVel(_pr.angularVel),
 cam_id(_pr.camera_id),
 inSight(_pr.inSight),
 obstacleRadius(_pr.obstacleRadius)
-
 {}
 
 Vector2D CMovingObject::predict(double time)
@@ -90,5 +89,13 @@ double CMovingObject::whenIsAtVel(double L)
 }
 
 void CMovingObject::update(const parsian_msgs::parsian_robot &_newMO) {
-    *this = _newMO;
+    pos.assign(_newMO.pos.x,_newMO.pos.y);
+    vel.assign(_newMO.vel.x,_newMO.vel.y);
+    dir.assign(_newMO.dir.x,_newMO.dir.y);
+    acc.assign(_newMO.acc.x,_newMO.acc.y);
+    angularVel=_newMO.angularVel;
+    cam_id=_newMO.camera_id;
+    inSight=_newMO.inSight;
+    obstacleRadius=_newMO.obstacleRadius;
+
 }

@@ -1,93 +1,44 @@
 #ifndef PlayMake_H
 #define PlayMake_H
 
-#include <role.h>
-#include <behaviours/offensive.h>
+#include <parsian_ai/roles/role.h>
 #include <QMap>
+#include <QtCore/QTextStream>
+#include <QtCore/QFile>
+#include <QtCore/QTime>
+#include <parsian_ai/config.h>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/util/knowledge.h>
+#include <parsian_ai/gamestate.h>
 
-#define PASS_BEHAVS 5
 
-enum PlayMakerKickModes{FixedPass , FixedShoot , NoMode};
+enum PlayMakerKickModes{FixedPass , FixedShoot};
 
 class CRolePlayMakeInfo : public CRoleInfo
 {
 public:
-    CRolePlayMakeInfo(QString _roleName);
-    CAgent* passReceiver(CAgent* self, int p, QList<int> passables);
-    CAgent* bestPassReceiver(bool indirect);
-    QList<int> oneToucher;
-    double oneToucherDist2Ball;
-    void reset(){}
+    explicit CRolePlayMakeInfo(QString _roleName);
+    void reset() override {}
 };
 
 class CRolePlayMake : public CRole
 {
-protected:
-    bool goalKeeperForward=false;
-    Hyst ballTop;
-    Hyst ballLeft;
-    int qqHist;
-    int rn;
-    CSkillKick* kick;
-    CSkillSpinBack* spin;
-    CSkillGotoBall* gotoball;
-    CSkillKickOneTouch* onetouch;
-    CSkillGotoPointAvoid* gotopoint;
-    CSkillHitTheBall* hitTheBall;
-    CSkillTurn* turn;
-    int kickDecision;
-    int onetouching;
-    CAgent* lastAgent;
-    int lastPassReceiver;
-    bool startKicked;
-    int gameMode;
-    bool indirect, direct, kickoff;
-    int penaltyRand;
+public:
+    KickAction* kick;
+    OnetouchAction* onetouch;
+    GotopointavoidAction* gotopoint;
+    NoAction* wait;
     Vector2D penaltyTarget;
     bool firstKick=true;
-    int penaltyCounter;
-    //decision making
-    QList<int> oppBlockers;
-    double w,ang,coming;
-    int nextPlayMaker;
-    bool stopped;//, clear;
     Vector2D target;
-    bool spinBack();
-    void passShootNew();
     void stopBehindBall(bool penalty = false);
-    int indirectPassRecverSelectedFrame;
-    int lastFrameCrowded;
-    bool spinside;
-    bool forceRedecide;
     Vector2D initialPoint;
-    CAgent* indirectRecver;
-    //    CBehaviourSpinPass spinPass;
-    QMap<int, double> passProbs;
-    QList<CAgent*> passreceivers;
-    //void checkPassSequences(QList<CAgent*> s);
-    double maxPassProbability;
-    QList<CAgent*> bestPassSequence;
-    int ballavoidanceState;
-    //CBehaviourPass* pass;
-    CBehaviourKick* shoot;
-    CBehaviourPass* fixedPass;
-    CBehaviourPass* pass[PASS_BEHAVS];
-    CBehaviourChipPass* chippass[PASS_BEHAVS];
-    CBehaviourSpinPass* spinPass[PASS_BEHAVS];
-    CBehaviourChipToGoal* chipToGoal;
-    CBehaviourKickBetweenTheirDefenders *kickToDefense;
-    CBehaviourKick* clear;
-    double lastDecisionTime;
-    int waitBeforePass;
-    int orderRushInPlenalty;
-    bool orderedRush;
     QTime changeDirPenaltyStrikerTime;
     bool timerStartFlag;
 
 public:
-    DEF_ROLE(CRolePlayMake)
-    void executeOurDirect();
-    void executeOurIndirect();
+    explicit CRolePlayMake(Agent *_agent);
+    ~CRolePlayMake();
     void executeOurKickOff();
     void executeOurPenalty();
     void executeOurPenaltyShootout();
@@ -99,11 +50,12 @@ public:
     int getPenaltychipSpeed();
     double lastBounce();
     bool ShootPenalty();
-    void executeDefault();
+    void parse(QStringList params);
     void resetOffPlays();
     void resetPlayMake();
-    bool canScoreGoal();
-    void kickPass( int kickSpeed );
+    void execute();
+
+    void kickPass( double kickSpeed );
     enum KickPassMode{KickPassFirst , KickPassSecond};
     enum penaltyStrategy{pgoaheadShoot , pchipShoot , pshootDirect};
 
@@ -111,13 +63,9 @@ public:
     int kickPassCyclesWait;
     Vector2D finalTarget;
 
-    QList<QPair<int, QMap<double, int> > > lastBounceProfileData;
     QTextStream out;
     QFile lastBounceDataFile;
 
-    virtual void generateFromConfig(CAgent *a);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
-    virtual void parse(QStringList params);
 
     SkillProperty(CRolePlayMake, Vector2D, PointToPass, pointToPass);
     SkillProperty(CRolePlayMake, Vector2D, PointToShoot, pointToShoot);

@@ -1,9 +1,8 @@
 #include "mark.h"
-#include <QDebug>
 
 INIT_ROLE(CRoleMark, "mark");
 
-CRoleMark::CRoleMark(CAgent *_agent) : CRole(_agent)
+CRoleMark::CRoleMark(Agent *_agent) : CRole(_agent)
 {
 	gotopointavoid = new CSkillGotoPointAvoid(_agent);
 	shoot = new CBehaviourKick;
@@ -109,7 +108,7 @@ void CRoleMark::execute()
 			nextPos = wm->opp[toBeMarkedID]->pos;
 		}
 		//this may result in push (when it enters the above else)
-		markPos = ((wm->ball->pos - nextPos).norm()* (2*CRobot::robot_radius_new)) + nextPos;
+		markPos = ((wm->ball->pos - nextPos).norm()* (2*Robot::robot_radius_new)) + nextPos;
 	}
 	else if( toBeMarkedID != -1 && info()->markedOpp.contains(toBeMarkedID) == true ){
 		Vector2D nextPos;
@@ -120,7 +119,7 @@ void CRoleMark::execute()
 			nextPos = wm->opp[toBeMarkedID]->pos;
 		}
 		//this may result in push (when it enters the above else)
-		markPos = ((wm->ball->pos - nextPos).norm()* (2*CRobot::robot_radius_new)) + nextPos;
+		markPos = ((wm->ball->pos - nextPos).norm()* (2*Robot::robot_radius_new)) + nextPos;
 	}
 	else{
 		bool markFailed = false;
@@ -143,7 +142,7 @@ void CRoleMark::execute()
 			else{
 				nextPos = wm->opp[toBeMarkedID]->pos;
 			}
-			markPos = ((wm->field->ourGoal() - nextPos).norm()*(2*CRobot::robot_radius_new)) + nextPos;
+			markPos = ((wm->field->ourGoal() - nextPos).norm()*(2*Robot::robot_radius_new)) + nextPos;
 		}
 	}
 
@@ -165,8 +164,8 @@ void CRoleMark::execute()
               }
 
 	if( kickOffMode ){
-		if( markPos.length() < 0.600 || markPos.x > -CRobot::robot_radius_new  ){
-			for( int i=0 ; i<1000 && (markPos.x > -CRobot::robot_radius_new || markPos.length() < 0.700) ; i++ ){
+		if( markPos.length() < 0.600 || markPos.x > -Robot::robot_radius_new  ){
+			for( int i=0 ; i<1000 && (markPos.x > -Robot::robot_radius_new || markPos.length() < 0.700) ; i++ ){
 				markPos = ((wm->field->ourGoal() - markPos).norm()*0.01) + markPos;
 			}
 		}
@@ -197,11 +196,11 @@ void CRoleMark::execute()
 	if( kickOffMode || knowledge->getGameState() == CKnowledge::TheirIndirectKick || knowledge->getGameState() == CKnowledge::TheirDirectKick )
 	{
 		int k=0;
-		CAgent* blocker;
+		Agent* blocker;
 		while( (blocker=info()->blocker(k)) != NULL )
 		{
-			if( (blocker->pos() - markPos).length() < CRobot::robot_radius_new*3.0 ){
-				for( int i=0 ; i<1000 && ((blocker->pos() - markPos).length() < CRobot::robot_radius_new*3.0) ; i++ ){
+			if( (blocker->pos() - markPos).length() < Robot::robot_radius_new*3.0 ){
+				for( int i=0 ; i<1000 && ((blocker->pos() - markPos).length() < Robot::robot_radius_new*3.0) ; i++ ){
 					markPos = ((wm->field->ourGoal() - markPos).norm()*0.01) + markPos;
 				}
 			}
@@ -244,7 +243,7 @@ CRoleMarkInfo::CRoleMarkInfo(QString _roleName) : CRoleInfo(_roleName)
 	mwbm.create(_MAX_NUM_PLAYERS , _MAX_NUM_PLAYERS);
 }
 
-CAgent* CRoleMarkInfo::blocker(int i)
+Agent* CRoleMarkInfo::blocker(int i)
 {
     int z = 0;
     for (int k=0;k<knowledge->agentCount();k++)
@@ -259,7 +258,7 @@ CAgent* CRoleMarkInfo::blocker(int i)
 }
 
 void CRoleMarkInfo::matching(){
-	QList <CAgent*> ourOffendersAgents;
+	QList <Agent*> ourOffendersAgents;
 	QList <int> oppOffenders;
 	QList <int> ourOffenders;
 

@@ -1,12 +1,12 @@
 #ifndef STOP_H
 #define STOP_H
 
-#include <role.h>
+#include <parsian_ai/roles/role.h>
 
 class CRoleStopInfo : public CRoleInfo
 {
 public:
-    CRoleStopInfo(QString _roleName);
+    explicit CRoleStopInfo(QString _roleName);
     void findPositions();
 	int inCorner;
     Vector2D TA;
@@ -14,33 +14,47 @@ public:
     QList <double> thR;
     QList <double> thP;
     QList <int> robotId;
-    void reset(){}
+    void reset() override {}
 };
 
 class CRoleStop : public CRole
 {
 protected:
-    CSkillGotoPointAvoid* gotopoint;
+    GotopointavoidAction* gotopoint;
+	NoAction*			  noAction;
 	bool switchAgent;
 public:
-    DEF_ROLE(CRoleStop);
-    virtual void generateFromConfig(CAgent *a);
 	virtual void parse(QStringList params);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
+
+    explicit CRoleStop(Agent *_agent);
+	~CRoleStop();
+    void assign(Agent* agent);
+	void execute();
+    CRoleStopInfo* info();
+	double progress();
+
+private:
+    static CRoleStopInfo* m_info;
 };
+
+
 
 class CRoleHaltInfo : public CRoleInfo
 {
 public:
-    CRoleHaltInfo(QString _roleName);
+    explicit CRoleHaltInfo(QString _roleName);
 };
 
 class CRoleHalt : public CRole
 {
 public:
-    DEF_ROLE(CRoleHalt);
-    virtual void generateFromConfig(CAgent *a);
-    virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
+    explicit CRoleHalt(Agent *_agent);
+    ~CRoleHalt();
+    void execute();
+    double progress();
+
+private:
+	NoAction* noAction;
 };
 
 #endif // STOP_H

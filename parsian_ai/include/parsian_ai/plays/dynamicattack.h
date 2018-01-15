@@ -1,7 +1,7 @@
 #ifndef DYNAMICATTACK_H
 #define DYNAMICATTACK_H
 
-#include"masterplay.h"
+#include <parsian_ai/plays/masterplay.h>
 
 //#define _MAX_REGION 7
 
@@ -35,17 +35,10 @@ public:
 
 
     CDynamicAttack();
-    ~CDynamicAttack();
+    ~CDynamicAttack() override;
 
-    void execute_0();
-    void execute_1();
-    void execute_2();
-    void execute_3();
-    void execute_4();
-    void execute_5();
-    void execute_6();
-    void init(QList <int> _agents ,
-              QMap<QString , EditData*> *_editData);
+    void execute_x();
+    void init(const QList <Agent*>& _agents);
 
     void setDefenseClear(bool _isDefenseClearing);
     void setDirectShot(bool _directShot);
@@ -53,13 +46,13 @@ public:
     void setWeHaveBall(bool _ballPoss);
     void setNoPlanException(bool _noPlanException);
     void setFast(bool _fast);
-    void setPlayMake(int _playMake);
+    void setPlayMake(Agent* _playMake);
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
 
     SDynamicPlan currentPlan;
 
-    CAgent* getMahiPlayMaker();
+    Agent* getMahiPlayMaker();
 
 private:
     double thrshDribble = 0;
@@ -83,7 +76,6 @@ private:
     void makePlan(int agentSize);
     void assignId();
     void assignTasks();
-    void checkPlanner();
     ///////////////////////30em 2015
 
     //[RegionCount][RegionIndex]
@@ -153,15 +145,16 @@ private:
     bool passFlag,repeatFlag;
     int counter,passerID,lastPasserRoleIndex;
     long lastTime;
-    QList<CAgent*> activeAgents;
-    QList<CAgent*> mahiPoisitionAgents;
+    QList<Agent*> activeAgents;
+    QList<Agent*> mahiPoisitionAgents;
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
-    CAgent* mahiPlayMaker;
+    Agent* mahiPlayMaker;
     int mahiAgentsID[5];
     bool isBallInOurField;
 
     int playmakeID = -1;
+    Agent* playmake;
 
     Vector2D ballPos;
     Vector2D ballVel;
@@ -178,7 +171,7 @@ private:
 
 
 protected:
-    void reset();
+    void reset() override;
 
 
 };

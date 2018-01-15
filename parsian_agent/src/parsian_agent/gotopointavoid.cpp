@@ -13,21 +13,13 @@ CSkillGotoPointAvoid::CSkillGotoPointAvoid(Agent *_agent) : CSkill(_agent)
 {
     counter = 0;
     avoidPenaltyArea = static_cast<unsigned char>(true);
-    inited = false;
-    keeplooking = static_cast<unsigned char>(false);
-    extendStep = static_cast<float>(-1.0);
     gotopoint = new CSkillGotoPoint(_agent);
     bangBang = new CNewBangBang();
     dynamicStart = static_cast<unsigned char>(true);
-    plan2 = static_cast<unsigned char>(false);
     noAvoid = false;
     avoidCenterCircle = false;
-    avoidGoalPosts = true;
-    stucked = -1;
-    counting = 0; // SGP
     averageDir.assign(0, 0);
     addVel.assign(0, 0);
-    nextPos.invalidate();
     diveMode = false;
     oneTouchMode = false;
     drawPath = false;
@@ -60,48 +52,41 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element)
 void CSkillGotoPointAvoid::execute()
 {
 
+    //drawer->draw(Circle2D(Vector2D(1,0),0.1),QColor(Qt::red),true);
     if(agent == nullptr)
         return;
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx,dVy,dW;
-    bangBang->setDecMax(conf.groups.bang_bang.DecMax);
+    bangBang->setDecMax(conf->DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
-    if(slowMode || slowShot)
-    {
+    if(slowMode) {
         bangBang->setVelMax(1.4);
         bangBang->setSlow(true);
-    }
-    else
-    {
+    } else {
         bangBang->setSlow(false);
-        bangBang->setVelMax(conf.groups.bang_bang.VelMax);
+        bangBang->setVelMax(conf->VelMax);
     }
-    if (!Vector2D(targetPos).valid())
-    {
+
+    if (!Vector2D(targetPos).valid()) {
         agent->waitHere();
         return;
     }
+
     if (!targetVel.valid())
         targetVel.assign(0,0);
 
-    if(drawPath)
-    {
-        if(agentVel.length() < 0.1)
-        {
+    if(drawPath) {
+        if(agentVel.length() < 0.1) {
             pathPoints.clear();
-        }
-        else
-        {
+        } else {
             pathPoints.append(agentPos);
             for (auto pathPoint : pathPoints) {
-                drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true);
+                //    drawer->draw(Circle2D(pathPoint ,0.02),QColor(Qt::blue),true); // TODO : should uncommented
             }
         }
-    }
-    else
-    {
+    } else {
         pathPoints.clear();
     }
 
@@ -113,8 +98,7 @@ void CSkillGotoPointAvoid::execute()
 //    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
 
 
-    if (lookAt.valid())
-    {
+    if (lookAt.valid()) {
         targetDir = (lookAt - agentPos).norm();
     }
 
@@ -149,30 +133,22 @@ void CSkillGotoPointAvoid::execute()
         targetDir = (lookAt - agentPos).norm();
     }
 
-    if(noAvoid )
+    if(noAvoid)
     {
         result.clear();
     }
     else
     {
-
-        ROS_INFO_STREAM("Target: " << targetPos.x << targetPos.y);
-        ROS_INFO_STREAM("ourRel: " << ourRelaxList.size());
-        ROS_INFO_STREAM("oppRel: " << oppRelaxList.size());
-        ROS_INFO_STREAM("apa: " << avoidPenaltyArea);
-        ROS_INFO_STREAM("acc: " << avoidCenterCircle);
-        ROS_INFO_STREAM("bor: " << ballObstacleRadius);
-        ROS_INFO_STREAM("ff: " << wm->field->_FIELD_WIDTH);
-        ROS_INFO_STREAM("dd: " << wm->field->_FIELD_HEIGHT);
+        /*********** PLANNER ***************/
 
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();
         for(long i = agent->pathPlannerResult.size()-1 ; i >= 0 ; i-- )
         {
-            ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
+           // ROS_INFO_STREAM("POS : " << agent->pathPlannerResult[i].x << " , " << agent->pathPlannerResult[i].y);
             result.append(agent->pathPlannerResult[i]);
 //            drawer->draw(Circle2D(agent->pathPlannerResult[i],0.01),QColor(Qt::red));
-             }
+        }
     }
 
 
@@ -219,7 +195,8 @@ void CSkillGotoPointAvoid::execute()
         alpha = fabs(Vector2D::angleBetween(result[1] - result[0] , result[2] - result[1]).degree());
         DEBUG(QString("alpha : %1").arg(alpha),D_MHMMD);
         lllll = result[1];
-        vf = -2 * log(alpha) + 9;
+
+        vf = -1.8 * log(alpha) + 11.5 - (agentVel.length())*1;
         vf = max(vf , 0.5);
         vf = min (vf,4);
     }
@@ -228,24 +205,19 @@ void CSkillGotoPointAvoid::execute()
         vf = 0;
         lllll = targetPos;
     }
-
+//    drawer->draw(QString("vf : %1").arg(vf),Vector2D(1,0));
     ////////////////////// avoid goal posts
     Segment2D goalPostL,goalPostR;
     goalPostL.assign(wm->field->ourGoalL() - Vector2D(0.2,0),wm->field->ourGoalL() + Vector2D(0.1,0));
     goalPostR.assign(wm->field->ourGoalR() - Vector2D(0.2,0),wm->field->ourGoalR() + Vector2D(0.1,0));
-    avoidGoalPosts = true;
     Segment2D agenPath(agent->pos(),lllll);
-    if(avoidGoalPosts)
+    if(agenPath.intersection(goalPostL).isValid())
     {
-        if(agenPath.intersection(goalPostL).isValid())
-        {
-            lllll = wm->field->ourGoalL() + Vector2D(0.12,0);
-        }
-        else if(agenPath.intersection(goalPostR).isValid())
-        {
-            lllll = wm->field->ourGoalR() + Vector2D(0.12,0);
-        }
-
+        lllll = wm->field->ourGoalL() + Vector2D(0.12,0);
+    }
+    else if(agenPath.intersection(goalPostR).isValid())
+    {
+        lllll = wm->field->ourGoalR() + Vector2D(0.12,0);
     }
     /////////////////////
 
@@ -258,10 +230,9 @@ void CSkillGotoPointAvoid::execute()
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
-//    agent->setRobotVel(2,2,10);
-        agent->accelerationLimiter(vf,oneTouchMode);
-    ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
-    ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
+    agent->accelerationLimiter(vf,oneTouchMode);
+   // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
+   // ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
 
     counter ++;
 }
@@ -281,7 +252,6 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTargetLook(Vector2D finalPos, Vec
     setTargetdir(Vector2D{1.0, 0.0});
     setTargetvel(Vector2D(0.0, 0.0));
     setLookat(lookAtPoint);
-    setKeeplooking(true);
     return this;
 }
 
@@ -291,7 +261,6 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::setTarget(Vector2D finalPos, Vector2
     setTargetdir(finalDir);
     setTargetvel(Vector2D(0.0, 0.0));
     setLookat(Vector2D::INVALIDATED);
-    setKeeplooking(false);
     return this;
 }
 
@@ -306,8 +275,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
 {
 
     double _x3;
-    double acc = conf.groups.bang_bang.AccMaxForward;
-    double dec = conf.groups.bang_bang.DecMax;
+    double acc = conf->AccMaxForward;
+    double dec = conf->DecMax;
     double xSat;
     Vector2D tAgentVel = _agentT->vel();
     Vector2D tAgentDir = _agentT->dir();
@@ -349,37 +318,31 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         distEffect = std::max(1.0, distEffect);
     }
 
-    if(tAgentVel.length() < 0.2)
-    {
-        acc = (conf.groups.bang_bang.AccMaxForward + conf.groups.bang_bang.AccMaxNormal)/2;
+    if(tAgentVel.length() < 0.2) {
+        acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
 
+    } else {
+        acc =conf->AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf->AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
-    else
-    {
-        acc =conf.groups.bang_bang.AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf.groups.bang_bang.AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
-    }
-
-
 
     double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length()*tAgentVel.length()/2*acc))*2*acc*dec)/(acc+dec));
     vMaxReal = min(vMaxReal, 4);
     vMax = min(vMax, vMaxReal);
     xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = ( -1* tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf.groups.bang_bang.DecMax)) ;
+    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf->DecMax)) ;
 
     if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ conf.groups.bang_bang.DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
+        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
     }
-    if(tAgentVel.length() < (vMax)){
-        if(_agentT->pos().dist(posT) > xSat)
-        {
+
+    if(tAgentVel.length() < (vMax)) {
+        if(_agentT->pos().dist(posT) > xSat) {
             return std::max(0.0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
         }
         return std::max(0.0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
 
-    }
-    else
-    {
+    } else {
         return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
     }
 

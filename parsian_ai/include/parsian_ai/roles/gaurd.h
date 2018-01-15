@@ -16,7 +16,7 @@ protected:
     CSkillGotoPointAvoid* gotopoint;
 public:
     DEF_ROLE(CRoleGaurd);
-    virtual void generateFromConfig(CAgent *a);
+    virtual void generateFromConfig(Agent *a);
     virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
     virtual void parse(QStringList params);
 	SkillProperty(CRoleGaurd, bool, Opposite, opposite);

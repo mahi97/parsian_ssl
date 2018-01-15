@@ -6,11 +6,10 @@
 #include <parsian_util/core/ball.h>
 #include <parsian_util/core/movingobject.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
-#include <parsian_util/knowledge.h>
+#include <parsian_util/core/knowledge.h>
 
 #define vRobotTemp 1
 
-#define penaltyAreaAvoidanceRadius (0.9)
 
 enum kckMode {
     KDIRECT = 0,
@@ -31,7 +30,6 @@ enum kckMode {
 class CSkillKick : public CSkill, public KickAction
 {
 private:
-    double kkRadLimit;
     kckMode decideMode();
     kckMode kickMode;
     _PID *angPid;

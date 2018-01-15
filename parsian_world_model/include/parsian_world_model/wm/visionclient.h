@@ -16,7 +16,7 @@
 
 #include <parsian_world_model/wm/visionbelief.h>
 
-#include "parsian_world_model/world_modelConfig.h"
+//#include "parsian_world_model/world_modelConfig.h"
 
 
 
@@ -40,7 +40,7 @@ public:
     CVisionClient();
     ~CVisionClient();
 
-    void parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet, world_model_config::world_modelConfig & config );
+    void parse(const parsian_msgs::ssl_vision_detectionConstPtr& packet);
 	void merge(int camera_count=CAMERA_NUM);
 };
 

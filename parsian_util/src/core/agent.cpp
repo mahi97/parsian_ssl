@@ -4,7 +4,11 @@
 #include "parsian_util/core/agent.h"
 
 CAgent::CAgent(const parsian_msgs::parsian_agent &_agent)  : self(_agent.self) {
+    action = nullptr;
+}
 
+CAgent::CAgent(int id):self(id) {
+    action = nullptr;
 }
 
 Vector2D CAgent::pos() { return self.pos; }

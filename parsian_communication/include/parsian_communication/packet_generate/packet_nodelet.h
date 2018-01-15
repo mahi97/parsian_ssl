@@ -17,7 +17,7 @@
 #include "parsian_msgs/parsian_packets.h"
 #include <parsian_communication/packet_generate/packet.h>
 #include "parsian_msgs/ssl_vision_detection.h"
-
+#include "parsian_msgs/parsian_world_model.h"
 namespace parsian_packet {
     class PacketNodelet : public nodelet::Nodelet {
 
@@ -32,23 +32,12 @@ namespace parsian_packet {
         ros::Publisher  packetPub;
         ros::Timer      timer;
 
-        ros::Subscriber robotPacketSub0 ;
-        ros::Subscriber robotPacketSub1 ;
-        ros::Subscriber robotPacketSub2 ;
-        ros::Subscriber robotPacketSub3 ;
-        ros::Subscriber robotPacketSub4 ;
-        ros::Subscriber robotPacketSub5 ;
-        ros::Subscriber robotPacketSub6 ;
-        ros::Subscriber robotPacketSub7 ;
-        ros::Subscriber robotPacketSub8 ;
-        ros::Subscriber robotPacketSub9 ;
-        ros::Subscriber robotPacketSub10;
-        ros::Subscriber robotPacketSub11;
+        ros::Subscriber robotPacketSub[_MAX_ROBOT_NUM];
 
 
         ros::Subscriber visinSub;
         void callBack(const parsian_msgs::parsian_robot_commandConstPtr& _packet);
-        void syncData(const parsian_msgs::ssl_vision_detectionConstPtr& _packet);
+        void syncData(const parsian_msgs::parsian_world_modelConstPtr& _packet);
 
         unsigned char robotPackets[_MAX_ROBOT_NUM][_ROBOT_PACKET_SIZE];
         unsigned char visionCounter;

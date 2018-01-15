@@ -1,31 +1,31 @@
 #ifndef __MIDDLE_PLAN_H_
 #define __MIDDLE_PLAN_H_
 
-#include "plan.h"
+#include <parsian_ai/plans/plan.h>
 #include <vector>
-#include <roles.h>
+#include <QList>
+#include <parsian_ai/roles/roles.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_ai/config.h>
 
 class CMarkPlan : public Plan
 {
 public:
     ////////////////////////////// AHZ ///////////////////
-    Vector2D getPointInDirection(Vector2D firstPoint , Vector2D secondPoint , double proportion);
     Line2D getBisectorLine(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
-    Segment2D getBisectorSegment(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);    
+    Segment2D getBisectorSegment(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     void manToManMarkInPlayOnBlockPass(QList<Vector2D> opponentAgentsToBeMarkePossition , int ourMarkAgentsSize , double proportionOfDistance);
-    void manToManMarkInPlayOffBlockShot(QList<Vector2D> opponentAgentsToBeMarkePossition , int ourMarkAgentsSize , double proportionOfDistance);
     bool isInIndirectArea(Vector2D aPoint);
-    int angleDegreeThr = 0;
-    int angleDegreeThrNotStop = 0;
-    int angleDegreeThrNotStopAHZ = 0;
     QList <QString> markRoles;
+    void findOppAgentsToMark();
+
     double ballCircleR = 0.5;
-    bool stopMode;
     ///////////////////////////////////////////////////
     ////Filtered Variables
-    bool weOwnBall;
-    int ourBallOwner, oppBallOwner;    //Agent Id
-    CAgent* supporter;
+    //bool weOwnBall; del
+    //bool stopMode; del
+    int ourBallOwner, oppBallOwner;    //Agent Id del
+    Agent* supporter;
     int lastFrameInSupportMode;
     int lastFrameInClearingMode;
     int midFielder;
@@ -57,16 +57,13 @@ public:
     ~CMarkPlan();
     double segmentpershoot;
     double segmentperpass;
-    CSkillGotoPointAvoid *markGPA[6];
+    GotopointavoidAction *markGPA[6];
     void execute();
-    void extractGameSituation();
     Vector2D posvel(CRobot* opp);
-    void findOppAgentsToMark();
-    void findBallOwnership();
     void markPosesRefinePlayon();
     QList<Vector2D> ShootBlockRatio(double, Vector2D);
     QList<Vector2D> PassBlockRatio(double ratio, Vector2D opp);
-    static bool sortBy(const Vector2D &robot1,const Vector2D &robot2);
+    bool sortBy(const Vector2D &robot1,const Vector2D &robot2);
     QList<CRobot*> sortdanger(const QList<CRobot*> oppagent);
     QList<QPair<Vector2D, double> > sortdangerpassplayoff(QList<Vector2D> oppposdanger);
     QList<QPair<Vector2D, double> > sortdangerpassplayon(QList<Vector2D> oppposdanger);
@@ -77,7 +74,7 @@ public:
     QList<CRobot*> oppAgentsToMark;
     QList<CRobot*> oppAgentsMarkedByDef;
     QList<CRobot*> ignoredOppAgents;
-    QList<CAgent*> offenseAgent;
+    QList<Agent*> offenseAgent;
     QList<Vector2D> markPoses;
     QList<Vector2D> oppAgentsToMarkPos;
     QList<Vector2D> markAngs;
@@ -91,7 +88,7 @@ public:
     int numberOfMarkers;
 
 protected:
-    CRoleMark *oldMark[_MAX_NUM_PLAYERS];
+//    CRoleMark *oldMark[_MAX_NUM_PLAYERS]; // TODO : FIX THIS DASTAN
 };
 
 #endif // __MIDDLE_PLAN_H_

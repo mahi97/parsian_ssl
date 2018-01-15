@@ -2,20 +2,24 @@
 
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
+GotopointavoidAction::GotopointavoidAction() {
+       avoidPenaltyArea = false;
+       noAvoid = false;
+       avoidCenterCircle = false;
+       ballObstacleRadius = 0.0;
+       drawPath = false;
+       diveMode = false;
+}
+
 void GotopointavoidAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPointAvoid msg = *((parsian_msgs::parsian_skill_gotoPointAvoid*)_msg);
         avoidPenaltyArea = msg.avoidPenaltyArea;
-        keeplooking = msg.keeplooking;
-        extendStep = msg.extendStep;
-        plan2 = msg.plan2;
         noAvoid = msg.noAvoid;
         avoidCenterCircle = msg.avoidCenterCircle;
         ballObstacleRadius = msg.ballObstacleRadius;
-        avoidBall = msg.avoidBall;
-        avoidGoalPosts = msg.avoidGoalPosts;
         drawPath = msg.drawPath;
+        diveMode = msg.diveMode;
         addVel = msg.addVel;
-        nextPos = msg.nextPos;
 
         GotopointAction::setMessage(&msg.base);
 }
@@ -24,23 +28,48 @@ void* GotopointavoidAction::getMessage() {
     parsian_msgs::parsian_skill_gotoPointAvoid* _msg = new parsian_msgs::parsian_skill_gotoPointAvoid;
     _msg->base = *((parsian_msgs::parsian_skill_gotoPoint*) GotopointAction::getMessage());
     _msg->avoidPenaltyArea = avoidPenaltyArea;
-    _msg->keeplooking = keeplooking;
-    _msg->extendStep = extendStep;
-    _msg->plan2 = plan2;
     _msg->noAvoid = noAvoid;
     _msg->avoidCenterCircle = avoidCenterCircle;
     _msg->ballObstacleRadius = ballObstacleRadius;
-    _msg->avoidBall = avoidBall;
-    _msg->avoidGoalPosts = avoidGoalPosts;
     _msg->drawPath = drawPath;
+    _msg->diveMode = diveMode;
     _msg->addVel = addVel.toParsianMessage();
-    _msg->nextPos = nextPos.toParsianMessage();
     return _msg;
 
 }
 
 
 QString GotopointavoidAction::getActionName(){
-    static QString name("GotopointavoidAction");
-    return name;
+    return SActionName();
+}
+
+QString GotopointavoidAction::SActionName(){
+    return QString{"GotopointavoidAction"};
+}
+
+void GotopointavoidAction::clearOurrelax() {
+    ourrelax.clear();
+}
+
+void GotopointavoidAction::addOurrelax(unsigned char _t) {
+    ourrelax.push_back(_t);
+}
+void GotopointavoidAction::removeOurrelax(unsigned char _t) {
+    ourrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getOurrelax() {
+    return ourrelax;
+}
+void GotopointavoidAction::clearTheirrelax() {
+    theirrelax.clear();
+}
+
+void GotopointavoidAction::addTheirrelax(unsigned char _t) {
+    theirrelax.push_back(_t);
+}
+void GotopointavoidAction::removeTheirrelax(unsigned char _t) {
+    theirrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getTheirrelax() {
+    return theirrelax;
 }

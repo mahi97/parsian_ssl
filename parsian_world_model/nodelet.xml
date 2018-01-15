@@ -1,4 +1,4 @@
-<library path="lib/libworldmodel_nodelet_lib">
+<library path="lib/libparsian_world_model_nodelet">
     <class name="parsian_world_model/WMNodelet" type="parsian_world_model::WMNodelet" base_class_type="nodelet::Nodelet">
         <description>
             nothing!!!!

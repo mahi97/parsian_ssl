@@ -18,6 +18,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+file(GLOB_RECURSE LibFiles "include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -40,57 +43,6 @@ find_package(QJSON REQUIRED)
 #catkin_python_setup()
 
 ################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
-##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   parsian_msgs
-# )
-
-################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
 
@@ -106,8 +58,8 @@ find_package(QJSON REQUIRED)
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-   cfg/ai.cfg
- )
+		cfg/ai.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -119,10 +71,10 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include
-	LIBRARIES ai_nodelet
-	CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
-	#  DEPENDS system_lib
+		INCLUDE_DIRS include
+		LIBRARIES ${PROJECT_NAME}_nodelet ${PROJECT_NAME}
+		CATKIN_DEPENDS dynamic_reconfigure parsian_msgs parsian_util roscpp rospy nodelet
+		#  DEPENDS system_lib
 )
 
 ###########
@@ -136,68 +88,63 @@ include_directories(
 		${catkin_INCLUDE_DIRS}
 )
 
-## show include dir in qt
-#FILE(GLOB_RECURSE LibFiles "include/parsian_ai/*.h")
-#add_custom_target(headers SOURCES ${LibFiles})
-
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/ai.cpp
 		src/${PROJECT_NAME}/soccer.cpp
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
-#	       src/${PROJECT_NAME}/coach.cpp
 
-        src/plan_server/planselector.cpp
-        )
+		src/${PROJECT_NAME}/coach.cpp
+		)
 
-#add_library(${PROJECT_NAME}_plays
-#		src/parsian_ai/plays/dynamicattack.cpp
-#		src/parsian_ai/plays/masterplay.cpp
-#		src/parsian_ai/plays/ourballplacement.cpp
-#		src/parsian_ai/plays/playoff.cpp
-#		src/parsian_ai/plays/ourpenalty.cpp
-#		src/parsian_ai/plays/theirpenalty.cpp
-#		src/parsian_ai/plays/theirkickoff.cpp
-#		src/parsian_ai/plays/theirindirect.cpp
-#		src/parsian_ai/plays/theirdirect.cpp
-#		src/parsian_ai/plays/theirballplacement.cpp
-#		src/parsian_ai/plays/stopplay.cpp
-#		)
-#
-#add_library(${PROJECT_NAME}_plans
-#		src/parsian_ai/plans/defenseplan.cpp
-#		src/parsian_ai/plans/markplan.cpp
-#		src/parsian_ai/plans/plan.cpp
-#		src/parsian_ai/plans/positioningplan.cpp
-#		)
+add_library(${PROJECT_NAME}_plays
+		src/parsian_ai/plays/dynamicattack.cpp
+		src/parsian_ai/plays/masterplay.cpp
+		#		src/parsian_ai/plays/ourballplacement.cpp
+		src/parsian_ai/plays/playoff.cpp
+		src/parsian_ai/plays/ourpenalty.cpp
+		src/parsian_ai/plays/theirpenalty.cpp
+		src/parsian_ai/plays/theirkickoff.cpp
+		src/parsian_ai/plays/theirindirect.cpp
+		src/parsian_ai/plays/theirdirect.cpp
+		src/parsian_ai/plays/theirballplacement.cpp
+		src/parsian_ai/plays/stopplay.cpp
+		)
+
+add_library(${PROJECT_NAME}_plans
+		src/parsian_ai/plans/defenseplan.cpp
+		src/parsian_ai/plans/markplan.cpp
+		src/parsian_ai/plans/plan.cpp
+		src/parsian_ai/plans/positioningplan.cpp
+		)
+
+add_library(${PROJECT_NAME}_roles
+		src/parsian_ai/roles/role.cpp
+		src/parsian_ai/roles/block.cpp
+		src/parsian_ai/roles/playoffrole.cpp
+		src/parsian_ai/roles/stop.cpp
+		src/parsian_ai/roles/dynamicrole.cpp
+		src/parsian_ai/roles/playmake.cpp
+		)
 
 add_library(${PROJECT_NAME}_util
-		src/plan_server/util/planloader.cpp
-		src/plan_server/util/loadplayoffjson.cpp
-		)
+		src/parsian_ai/util/defpos.cpp
+		src/parsian_ai/util/knowledge.cpp
+		src/parsian_ai/util/worldmodel.cpp
+		#		src/parsian_ai/util/planloader.cpp
+		#		src/parsian_ai/util/loadplayoffjson.cpp
+		src/parsian_ai/util/agent.cpp)
 
 
 add_library(${PROJECT_NAME}_nodelet
-        src/parsian_ai/ai_nodelet.cpp
+		src/parsian_ai/ai_nodelet.cpp
 		)
-
-add_library(${PROJECT_NAME}_plan_server_nodelet
-		src/plan_server/plan_server_nodelet.cpp
-		)
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-add_executable(${PROJECT_NAME}_plan_server_node
-		src/plan_server/plan_server_node.cpp
-		)
 
 add_executable(${PROJECT_NAME}_node
 		src/parsian_ai/ai_node.cpp
@@ -215,78 +162,91 @@ add_dependencies(${PROJECT_NAME}_node
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
 		${PROJECT_NAME}_gencfg
-
 		)
+
 add_dependencies(${PROJECT_NAME}_nodelet
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
-
-        )
-
-add_dependencies(${PROJECT_NAME}_plan_server_node
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
 		${PROJECT_NAME}_gencfg
-
 		)
-add_dependencies(${PROJECT_NAME}_plan_server_nodelet
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-		${PROJECT_NAME}_gencfg
 
-		)
 ## Specify libraries to link a library or executable target against
 
 target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
-		${QT_LIBRARIES})
-
-target_link_libraries(${PROJECT_NAME}_plan_server_nodelet
-		${catkin_LIBRARIES}
-		${PROJECT_NAME}
-		${QT_LIBRARIES})
-
+		${QT_LIBRARIES}
+		)
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
-        ${PROJECT_NAME}
-        ${QT_LIBRARIES}
-#		${PROJECT_NAME}_plays
-#		${PROJECT_NAME}_plans
-        )
-
-target_link_libraries(${PROJECT_NAME}_plan_server_node
-		${catkin_LIBRARIES}
 		${PROJECT_NAME}
+		${PROJECT_NAME}_nodelet
 		${QT_LIBRARIES}
 		)
 
 add_dependencies(${PROJECT_NAME}
-                ${${PROJECT_NAME}_EXPORTED_TARGETS}
-                ${catkin_EXPORTED_TARGETS}
-                ${PROJECT_NAME}_gencfg
-                )
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
+
+add_dependencies(${PROJECT_NAME}_plans
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
+
+add_dependencies(${PROJECT_NAME}_plays
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
+
+add_dependencies(${PROJECT_NAME}_util
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
+
+add_dependencies(${PROJECT_NAME}_roles
+		${${PROJECT_NAME}_EXPORTED_TARGETS}
+		${catkin_EXPORTED_TARGETS}
+		${PROJECT_NAME}_gencfg
+		)
 
 target_link_libraries(${PROJECT_NAME}
 		${catkin_LIBRARIES}
 		${QT_LIBRARIES}
+		${PROJECT_NAME}_plays
+		${PROJECT_NAME}_plans
+		${PROJECT_NAME}_roles
+		${PROJECT_NAME}_util
 		)
 
-#target_link_libraries(${PROJECT_NAME}_plays
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
 
-#target_link_libraries(${PROJECT_NAME}_plans
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		)
-#target_link_libraries(${PROJECT_NAME}_util
-#		${QT_LIBRARIES}
-#		${catkin_LIBRARIES}
-#		${QJSON_LIBRARIES}
-#		)
+target_link_libraries(${PROJECT_NAME}_plays
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}_util
+		)
+
+target_link_libraries(${PROJECT_NAME}_plans
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${PROJECT_NAME}_util
+		)
+
+target_link_libraries(${PROJECT_NAME}_util
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${QJSON_LIBRARIES}
+		)
+
+target_link_libraries(${PROJECT_NAME}_roles
+		${QT_LIBRARIES}
+		${catkin_LIBRARIES}
+		${QJSON_LIBRARIES}
+		)
 
 
 
@@ -307,23 +267,23 @@ install(PROGRAMS
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+		)
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-)
+		DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+		FILES_MATCHING PATTERN "*.h"
+		#   PATTERN ".svn" EXCLUDE
+		)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+		nodelet.xml
+		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+		)
 
 #############
 ## Testing ##

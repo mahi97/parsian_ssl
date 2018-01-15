@@ -11,14 +11,13 @@ add_custom_target(headers SOURCES ${LibFiles})
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  nodelet
-  parsian_msgs
-  parsian_util
-  roscpp
-  rospy
-  std_msgs
-)
+        dynamic_reconfigure
+        nodelet
+        parsian_msgs
+        parsian_util
+        roscpp
+        rospy
+        )
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -41,77 +40,14 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
-##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   parsian_msgs#   std_msgs
-# )
-
-################################################
-## Declare ROS dynamic reconfigure parameters ##
-################################################
-
-## To declare and build dynamic reconfigure parameters within this
-## package, follow these steps:
-## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
-## * In this file (CMakeLists.txt):
-##   * add "dynamic_reconfigure" to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * uncomment the "generate_dynamic_reconfigure_options" section below
-##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
-  cfg/agent.cfg
- )
+    cfg/agent.cfg
+    cfg/motion_pro.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -123,29 +59,21 @@ generate_dynamic_reconfigure_options(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS
-  include
-  LIBRARIES ${PROJECT_NAME}_nodelet
-  CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy std_msgs
-#  DEPENDS 
+        INCLUDE_DIRS
+        include
+        LIBRARIES
+        CATKIN_DEPENDS dynamic_reconfigure nodelet parsian_msgs parsian_util roscpp rospy
+        #  DEPENDS
 )
-
-###########
-## Build ##
-###########
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_nodelet
-        src/agent_nodelet.cpp
-        )
-
 add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/agent.cpp
         src/${PROJECT_NAME}/gotopoint.cpp
@@ -155,21 +83,38 @@ add_library(${PROJECT_NAME}
         src/${PROJECT_NAME}/onetouch.cpp
         src/${PROJECT_NAME}/receivepass.cpp
         src/${PROJECT_NAME}/skill.cpp
-        src/planner/obstacle.cpp
-        src/planner/planner.cpp
         src/config.cpp
+        )
+
+add_library(${PROJECT_NAME}_planner
+        src/planner/planner.cpp
+        src/planner/obstacle.cpp
+        src/planner/c2dtree.cpp)
+
+add_library(${PROJECT_NAME}_planner_nodelet
+        src/planner/planner_nodelet.cpp
+        )
+add_executable(${PROJECT_NAME}_planner_node
+        src/planner/planner_node.cpp
+        )
+
+add_library(${PROJECT_NAME}_nodelet
+        src/agent_nodelet.cpp
+        )
+
+add_library(${PROJECT_NAME}_commonconfig_nodelet
+        src/commonconfig/common_config_nodelet.cpp
         )
 
 add_executable(${PROJECT_NAME}_node
         src/agent_node.cpp
         )
 
-add_dependencies(${PROJECT_NAME}_node
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-	    ${PROJECT_NAME}_gencfg
+add_executable(${PROJECT_NAME}_commonconfig_node
+        src/commonconfig/common_config_node.cpp
         )
 
+# target link libraries
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
@@ -178,16 +123,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
-        )
-
-add_dependencies(${PROJECT_NAME}
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        )
-add_dependencies(${PROJECT_NAME}_nodelet
-        ${${PROJECT_NAME}_EXPORTED_TARGETS}
-        ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}_gencfg
+        ${PROJECT_NAME}_nodelet
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
@@ -196,8 +132,82 @@ target_link_libraries(${PROJECT_NAME}_nodelet
         ${QT_LIBRARIES}
         )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
+target_link_libraries(${PROJECT_NAME}_planner
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_planner_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        ${PROJECT_NAME}_planner
+        )
+
+target_link_libraries(${PROJECT_NAME}_planner_node
+        ${catkin_LIBRARIES}
+        )
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_nodelet
+        ${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+        ${PROJECT_NAME}
+        )
+
+target_link_libraries(${PROJECT_NAME}_commonconfig_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_commonconfig_nodelet
+        )
+
+# dependencies
+
+add_dependencies(${PROJECT_NAME}
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+#
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${PROJECT_NAME}_gencfg
+        )
+
+
+add_dependencies(${PROJECT_NAME}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+add_dependencies(${PROJECT_NAME}_planner
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(${PROJECT_NAME}_planner_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+
+        )
+
+add_dependencies(${PROJECT_NAME}_planner_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(${PROJECT_NAME}_commonconfig_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        ${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(${PROJECT_NAME}_commonconfig_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+
+# Add cmake target dependencies of the library
+# as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -236,25 +246,28 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node ${PROJECT_NAME}_commonconfig_node ${PROJECT_NAME}_planner_node ${PROJECT_NAME}_commonconfig_nodelet ${PROJECT_NAME}_planner_nodelet
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#  PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        #  PATTERN ".svn" EXCLUDE
+        )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  nodelet.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+        nodelet.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
+
+catkin_install_python(PROGRAMS script/parsian_profiler/motion_profiler_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############
@@ -267,3 +280,4 @@ install(FILES
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+

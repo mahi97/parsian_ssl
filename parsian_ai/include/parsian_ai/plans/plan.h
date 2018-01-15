@@ -2,25 +2,28 @@
 #define PLAN_H
 
 #include <QList>
-#include <agent.h>
-#include <skills.h>
+#include "parsian_util/mathtools.h"
+#include <parsian_util/action/action.h>
+#include <parsian_ai/util/knowledge.h>
+#include <parsian_ai/util/agent.h>
+//#include <skills.h> // TODO : Actions
 
 class Plan
 {
 protected:
-    QList<CAgent*> agents;
+    QList<Agent*> agents;
 public:
     Plan();
-    CAgent* agent(int i);
+    Agent* agent(int i);
     int count();
-    void init(const QList<CAgent*> & _agents);
-    void assignSkill(int i, CSkill* skill);
+    void init(const QList<Agent*> & _agents);
+    void assignSkill(int i, Action* skill);
     int agentById(int id);
     QList<int> getAgentIdList();
 	void debugAgents(QString text);
 
 //abstract functions
-    virtual void execute()=0;
+    virtual void execute() = 0;
 };
 
 #endif // PLAN_H

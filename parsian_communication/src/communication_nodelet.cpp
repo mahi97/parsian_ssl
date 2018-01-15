@@ -14,17 +14,21 @@ void CommunicationNodelet::onInit() {
     ros::NodeHandle& n = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
-    timer = n.createTimer(ros::Duration(.062), boost::bind(&CommunicationNodelet::timerCb, this, _1));
+    timer = n.createTimer(ros::Duration(.016), boost::bind(&CommunicationNodelet::timerCb, this, _1));
+    recTimer = n.createTimer(ros::Duration(.02), boost::bind(&CommunicationNodelet::recTimerCb, this, _1));
 
     drawer = new Drawer();
     debugger = new Debugger();
 
     drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws",1000);
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
-    robotPacketSub   = n.subscribe("/packets" , 1000, &CommunicationNodelet::callBack, this);
+    statusPub  = n.advertise<parsian_msgs::parsian_robots_status>("/robots_status",1000);
+    robotPacketSub   = n.subscribe("/packets" , 10000, &CommunicationNodelet::callBack, this);
+
+    communicator.reset(new CCommunicator);
     /////connect serial
-    while(!communicator.isSerialConnected()){
-        communicator.connectSerial("/dev/ttyUSB0");
+    while(!communicator->isSerialConnected()){
+        communicator->connectSerial("/dev/ttyUSB0");
     }
 
     server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
@@ -46,15 +50,26 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
-    communicator.packetCallBack(_packet);
+    communicator->packetCallBack(_packet);
 
 }
 
 void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
-    if (drawer != nullptr)
+    if (drawer != nullptr){
         drawPub.publish(drawer->draws);
+        drawer->draws.vectors.clear();
+    }
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);
+}
+
+
+void CommunicationNodelet::recTimerCb(const ros::TimerEvent &event) {
+    communicator->readData();
+    if(communicator->robotsStat != nullptr)
+    {
+        statusPub.publish(communicator->robotsStat);
+    }
 }
 
 void CommunicationNodelet::ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level)

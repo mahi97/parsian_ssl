@@ -6,11 +6,14 @@
 #include <QWidget>
 #include <QString>
 #include <qcolor.h>
+#include <QMouseEvent>
 #include <GL/gl.h>
 #include <qopenglwidget.h>
 #include <QGridLayout>
 #include <QtOpenGL/qgl.h>
+#include <GL/glu.h>
 #include <parsian_util/core/field.h>
+#include <parsian_msgs/vector2D.h>
 
 
 
@@ -41,16 +44,26 @@ namespace rqt_parsian_gui
         MonitorWidget();
         void drawField();
         CguiDrawer *drawerBuffer;
+        ros::NodeHandle n;
+        ros::Publisher monitor_pub;
+        parsian_msgs::vector2DPtr mousePos;
         //TODO: get these values from util CRobot
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
+        int getViewportWidth();
     protected:
 
 
-
         void initializeGL();
+
         void paintGL();
+        double cameraX,cameraY;
+
+        double scaleFactor;
         void resizeGL(int width, int height);
+        QPainter painter;
+        void mousePressEvent(QMouseEvent *event);
+        void wheelEvent(QWheelEvent *event);
 
 
     private:
@@ -65,6 +78,10 @@ namespace rqt_parsian_gui
         QColor fieldGreen;
         double viewportWidth;
         double WH_RATIO;
+        double coeff;
+        Vector2D centralPoint;
+
+
 
         void qglClearColor(QColor clearColor);
         void setViewportWidth(int width);

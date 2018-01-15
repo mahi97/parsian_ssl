@@ -8,13 +8,11 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
   roslint
   rqt_gui
   rqt_gui_cpp
   std_msgs
   parsian_util
-  parsian_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -116,7 +114,7 @@ roslint_cpp()
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp rqt_gui_cpp std_msgs parsian_util parsian_msgs
+  CATKIN_DEPENDS rqt_gui_cpp parsian_util 
 #  DEPENDS system_lib
 )
 
@@ -124,8 +122,11 @@ catkin_package(
 set (${PROJECT_NAME}_SRCS
   src/${PROJECT_NAME}/monitor.cpp
   src/${PROJECT_NAME}/robotstatus.cpp
+  src/${PROJECT_NAME}/robotstatus_widget.cpp
   src/${PROJECT_NAME}/monitorWidget.cpp
   src/${PROJECT_NAME}/guiDrawer.cpp
+  src/${PROJECT_NAME}/mode_chooser.cpp
+  src/${PROJECT_NAME}/modeChooserWidget.cpp
 )
 
 set(${PROJECT_NAME}_HDRS
@@ -134,6 +135,8 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/robotstatus_widget.h
   include/${PROJECT_NAME}/monitorWidget.h
   include/${PROJECT_NAME}/guiDrawer.h
+  include/${PROJECT_NAME}/mode_chooser.h
+  include/${PROJECT_NAME}/modeChooserWidget.h
 )
 
 
@@ -211,6 +214,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES
   plugin1.xml
   plugin2.xml
+  mode_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
