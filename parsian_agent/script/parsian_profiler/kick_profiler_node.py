@@ -13,6 +13,7 @@ from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_skill_receivePass
 from parsian_msgs.msg import parsian_skill_kick
+from parsian_msgs.msg import parsian_skill_no
 
 #####PROBLEMS#####
 #1)fix the that annoying number in kick skill
@@ -80,7 +81,8 @@ class KickProfiler():
             self.retreat()
             self.state = State.RECEIVE
         if self.state == State.RECEIVE:
-            self.receive()
+            if self.receive():
+                self.state = State.GOFORKICK
 
 
 
@@ -174,37 +176,7 @@ class KickProfiler():
 
 
 
-    #clears if the robot has the ball or not
-    def ballisnear(self, robot, dist = 0.18):
-        # type:(parsian_robot, float) ->object
-        ballpos = point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y)
-        robotpos = point.Point(robot.pos.x, robot.pos.y)
-        if ballpos.distance(robotpos) < dist and math.atan2(math.fabs(ballpos.x - robotpos.x), math.fabs(ballpos.y - robotpos.y)) < math.pi / 3:
-            return 0
-        elif ballpos.distance(robotpos) < dist and not math.atan2(math.fabs(ballpos.x - robotpos.x), math.fabs(ballpos.y - robotpos.y)) < math.pi / 3:
-            return 1
-        elif not ballpos.distance(robotpos) < dist and math.atan2(math.fabs(ballpos.x - robotpos.x), math.fabs(ballpos.y - robotpos.y)) < math.pi / 3:
-            return 2
-        else:
-            return 3
-
-
-    #if ball had a sudden change in its speed robot will go after the ball till reach it
-    def foundtheball(self, robot):
-        # type:(parsian_robot) ->object
-        if self.ballisnear(robot) == 0:
-            return True
-        elif self.ballisnear(robot) == 1:
-            self.gotopoint(robot.id, point.Point(robot.pos.x, robot.pos.y), self.setdir(robot.pos.x, robot.pos.y, self.m_wm.ball.pos.x, self.m_wm.ball.pos.y))
-            return False
-        elif self.ballisnear(robot) == 2 or self.ballisnear(robot) == 3:
-            self.gotopoint(robot.id, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), point.Point(robot.dir.x, robot.dir.y))
-            return False
-
-
-
     def kick(self):
-        # robot1 should do the kicking and robot2 will receive
         if self.kickstat == KickStat.ROBOT1KICKING:
             current_task1 = parsian_robot_task()
             current_task1.select = parsian_robot_task.KICK
@@ -215,21 +187,13 @@ class KickProfiler():
             task1.target.y = self.my_robot2.pos.y
             current_task1.kickTask = task1
             self.task_pub1.publish(current_task1)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 1 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y) > 0.2:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y) > 0.2:
                 self.kickstat = KickStat.ROBOT1RETREATING
                 return True
             else:
                 return False
 
-            # while not self.foundtheball(self.my_robot2):                    #TODO it shouldnt be in a while loop
-            #     current_task2 = parsian_robot_task()
-            #     current_task2.select = parsian_robot_task.RECIVEPASS
-            #     task2 = parsian_skill_receivePass()
-            #     task2.receiveRadius = 0.2
-            #     current_task2.receivePassTask = task2
-            #     self.task_pub2.publish(current_task2)
 
-        # robot2 should do the kicking and robot1 will receive
         if self.kickstat == KickStat.ROBOT2KICKING:
             current_task2 = parsian_robot_task()
             current_task2.select = parsian_robot_task.KICK
@@ -240,39 +204,24 @@ class KickProfiler():
             task2.target.y = self.my_robot1.pos.y
             current_task2.kickTask = task2
             self.task_pub2.publish(current_task2)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 1 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y) > 0.2:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y) > 0.2:
                 self.kickstat = KickStat.ROBOT2RETREATING
                 return True
             else:
                 return False
 
-            # while not self.foundtheball(self.my_robot1):                    #TODO it shouldnt be in a while loop
-            #     current_task1 = parsian_robot_task()
-            #     current_task1.select = parsian_robot_task.RECIVEPASS
-            #     task1 = parsian_skill_receivePass()
-            #     task1.receiveRadius = 0.2
-            #     current_task1.receivePassTask = task1
-            #     self.task_pub1.publish(current_task1)
 
 
 
     def retreat(self):
         if self.kickstat == KickStat.ROBOT1RETREATING:
-            rospy.loginfo('1ret')
             self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2))
             self.receivestat = ReceiveStat.ROBOT2RECING
         if self.kickstat == KickStat.ROBOT2RETREATING:
-            rospy.loginfo('2ret')
             self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1))
             self.receivestat = ReceiveStat.ROBOT1RECING
 
 
-    def ontheway(self, robot, target):
-        # type:(parsian_robot, point.Point) ->object
-        if robot.vel.x * (target.x - robot.pos.x) > 0 and robot.vel.y * (target.y - robot.pos.y) > 0:
-            return True
-        else:
-            return False
 
     def receive(self):
         if self.receivestat == ReceiveStat.ROBOT1RECING:
@@ -284,6 +233,10 @@ class KickProfiler():
             task1.target.y = self.startingpoint1.y
             current_task1.receivePassTask = task1
             self.task_pub1.publish(current_task1)
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y  - self.my_robot1.pos.y) < 0.5:
+                return True
+            else:
+                return False
 
         if self.receivestat == ReceiveStat.ROBOT2RECING:
             current_task2 = parsian_robot_task()
@@ -294,17 +247,18 @@ class KickProfiler():
             task2.target.y = self.startingpoint2.y
             current_task2.receivePassTask = task2
             self.task_pub2.publish(current_task2)
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y  - self.my_robot2.pos.y) < 0.5:
+                return True
+            else:
+                return False
 
 
-
-    #clears that if the ball had a suuden change in its speed
-    def ballwtf(self):
-        if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) == 0:
-            return True
 
     def updatenearballid(self):
         robot1_ball = math.hypot(self.my_robot1.pos.x - self.m_wm.ball.pos.x, self.my_robot1.pos.y - self.m_wm.ball.pos.y)
         robot2_ball = math.hypot(self.my_robot2.pos.x - self.m_wm.ball.pos.x, self.my_robot2.pos.y - self.m_wm.ball.pos.y)
+        if abs(robot1_ball - robot2_ball) < 0.05:
+            self.neaarertoballid = 1
         if robot1_ball > robot2_ball:
             self.neaarertoballid = 2
         else:
@@ -321,8 +275,17 @@ class KickProfiler():
             task1.target.y = self.my_robot2.pos.y
             current_task1.kickTask = task1
             self.task_pub1.publish(current_task1)
-            if self.robotarrived(self.my_robot1, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2):
+            if self.robotarrived(self.my_robot1, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2) and math.hypot(self.my_robot1.pos.x - self.my_robot2.pos.x ,self.my_robot1.pos.y - self.my_robot2.pos.y) >  math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x ,self.m_wm.ball.pos.y - self.my_robot2.pos.y):
                 self.kickstat = KickStat.ROBOT1KICKING
+                # prepair the other robot for reciveing
+                current_task2 = parsian_robot_task()
+                current_task2.select = parsian_robot_task.RECIVEPASS
+                task2 = parsian_skill_receivePass()
+                task2.receiveRadius = 0.5
+                task2.target.x = self.startingpoint2.x
+                task2.target.y = self.startingpoint2.y
+                current_task2.receivePassTask = task2
+                self.task_pub2.publish(current_task2)
                 return True
             else:
                 return  False
@@ -337,12 +300,20 @@ class KickProfiler():
             task2.target.y = self.my_robot1.pos.y
             current_task2.kickTask = task2
             self.task_pub2.publish(current_task2)
-            if self.robotarrived(self.my_robot2, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2):
+            if self.robotarrived(self.my_robot2, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2) and math.hypot(self.my_robot1.pos.x - self.my_robot2.pos.x ,self.my_robot1.pos.y - self.my_robot2.pos.y) >  math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x ,self.m_wm.ball.pos.y - self.my_robot1.pos.y):
                 self.kickstat = KickStat.ROBOT2KICKING
+                # prepair the other robot for reciveing
+                current_task1 = parsian_robot_task()
+                current_task1.select = parsian_robot_task.RECIVEPASS
+                task1 = parsian_skill_receivePass()
+                task1.receiveRadius = 0.5
+                task1.target.x = self.startingpoint1.x
+                task1.target.y = self.startingpoint1.y
+                current_task1.receivePassTask = task1
+                self.task_pub1.publish(current_task1)
                 return True
             else:
                 return  False
-
 
 
 
