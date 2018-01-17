@@ -160,7 +160,7 @@ class MotionProfiler:
         self.__current_value.append(data)
 
     def __saveResult(self):
-        __log_file = open(path.abspath("../../profiler_data/" + str(self.__robot_id) + "_" +
+        __log_file = open(path.abspath("../profiler_data/" + str(self.__robot_id) + "_" +
                                        str(int(round(time.time()/10))) + "_motion.profile"), "w+")
         __log_file.write(str(self.__result))
         __log_file.close()

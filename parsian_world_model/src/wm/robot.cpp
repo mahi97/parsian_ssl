@@ -234,7 +234,7 @@ void Robot::visionUpdate()
     {
         appliedDir -=360;
     }
-    donKalman->z(2) = ANGULAR_DIRECTION*_DEG2RAD;
+    donKalman->z(2) = (ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION)*_DEG2RAD;
 
     kalman::MatrixMM R = kalman::MatrixMM::Zero();
     R(0, 0) = 0.004;
@@ -288,11 +288,12 @@ void Robot::filter(int vanished)
     }
 
     ANGULAR_DIRECTION = observation->dir.th().degree();
-    double kalmanDelayTime = 0.12;
+    double kalmanDelayTime = 0.15;
     if(inOurTeam)
     {
         if(vanished <= 0)
         {
+
 
             int nStep = kalmanDelayTime / 0.016;
             // newPredict(0,false,true,false,(inOurTeam));
