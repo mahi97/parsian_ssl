@@ -229,6 +229,7 @@ void CSkillGotoPointAvoid::execute()
 
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos,agentVel,agent->dir(),lllll,targetDir,vf,0.016,dVx,dVy,dW);
+    if (!addVel.isValid()) addVel = Vector2D(0,0);
     agent->setRobotAbsVel(dVx + addVel.x,dVy + addVel.y,dW);
     agent->accelerationLimiter(vf,oneTouchMode);
    // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
