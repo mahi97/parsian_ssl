@@ -77,10 +77,12 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
     switch (_task->select){
         case parsian_msgs::parsian_robot_task::GOTOPOINT:
             gotoPoint->setMessage(&_task->gotoPointTask);
+            this->agent->kickSpeed = 0;
             skill = gotoPoint;
            // ROS_INFO("GOTOPOINT executed!");
             break;
         case parsian_msgs::parsian_robot_task::GOTOPOINTAVOID:
+            this->agent->kickSpeed = 0;
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
             skill = gotoPointAvoid;
             //ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
@@ -96,11 +98,13 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
             //ROS_INFO("ONETOUCH executed!");
             break;
         case parsian_msgs::parsian_robot_task::RECIVEPASS:
+            this->agent->kickSpeed = 0;
             receivePass->setMessage(&_task->receivePassTask);
             skill = receivePass;
             //ROS_INFO("RECIVEPASS executed!");
             break;
         case parsian_msgs::parsian_robot_task::NOTASK:
+            this->agent->kickSpeed = 0;
             if (_task->noTask.waithere) {
                 agent->waitHere();
                 parsian_robot_command_pub.publish(agent->getCommand());

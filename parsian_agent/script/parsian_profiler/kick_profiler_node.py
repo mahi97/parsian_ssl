@@ -22,12 +22,13 @@ from parsian_msgs.msg import parsian_skill_kick
 
 class State(Enum):
     GOTOPBOTH = 1
-    GOFORKICK = 2
-    KICK = 3
-    RECEIVE = 4
-    RETREAT = 5
-    STANDBY = 6
-    CALCULATING = 7
+    GOBEHINDSMW = 2
+    GOFORKICK = 3
+    KICK = 4
+    RECEIVE = 5
+    RETREAT = 6
+    STANDBY = 7
+    CALCULATING = 8
 
 class KickStat(Enum):
     ROBOT1KICKING = 1
@@ -44,6 +45,9 @@ class ReceiveStat(Enum):
 
 class KickProfiler():
     def __init__(self):
+        self.current_speed = 4
+        self.robot1_count = 0
+        self.robot2_count = 0
         self.m_wm = parsian_world_model()
         self.startingpoint1 = point.Point(-1.5, 0)
         self.startingpoint2 = point.Point(1.5, 0)
@@ -70,11 +74,14 @@ class KickProfiler():
         self.m_wm = data
         self.getrobots(0, 1)
         self.updatenearballid()
-        #rospy.loginfo(self.state)
+        rospy.loginfo(self.state)
         if self.velrecflag:
             self.velrecorder.append(math.hypot(data.ball.vel.x, data.ball.vel.y))
         if self.state == State.GOTOPBOTH:
             if self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2)) and self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1)):
+                self.state = State.GOBEHINDSMW
+        if self.state == State.GOBEHINDSMW:
+            if self.gosomewherebehindball():
                 self.state = State.GOFORKICK
         if self.state == State.GOFORKICK:
             if self.setkickerpos():
@@ -90,7 +97,7 @@ class KickProfiler():
                 self.state = State.CALCULATING
         if self.state == State.CALCULATING:
             if self.calculate():
-                self.state = State.GOFORKICK
+                self.state = State.GOBEHINDSMW
 
 
 
@@ -136,6 +143,7 @@ class KickProfiler():
             current_task1.select = parsian_robot_task.GOTOPOINTAVOID
             task1 = parsian_skill_gotoPointAvoid()
             task1.noAvoid = False
+            task1.ballObstacleRadius = 0.2
             task1.base.lookAt.x = 5000
             task1.base.lookAt.y = 5000
             task1.base.maxVelocity = 1.5
@@ -193,7 +201,7 @@ class KickProfiler():
             current_task1.select = parsian_robot_task.KICK
             task1 = parsian_skill_kick()
             task1.chip = False
-            task1.kickSpeed = 5
+            task1.kickSpeed = 10
             task1.target.x = self.my_robot2.pos.x
             task1.target.y = self.my_robot2.pos.y
             current_task1.kickTask = task1
@@ -211,7 +219,7 @@ class KickProfiler():
             current_task2.select = parsian_robot_task.KICK
             task2 = parsian_skill_kick()
             task2.chip = False
-            task2.kickSpeed = 5
+            task2.kickSpeed = 15
             task2.target.x = self.my_robot1.pos.x
             task2.target.y = self.my_robot1.pos.y
             current_task2.kickTask = task2
@@ -271,8 +279,8 @@ class KickProfiler():
 
 
     def updatenearballid(self):
-        robot1_ball = math.hypot(self.my_robot1.pos.x - self.m_wm.ball.pos.x, self.my_robot1.pos.y - self.m_wm.ball.pos.y)
-        robot2_ball = math.hypot(self.my_robot2.pos.x - self.m_wm.ball.pos.x, self.my_robot2.pos.y - self.m_wm.ball.pos.y)
+        robot1_ball = math.hypot(self.startingpoint1.x - self.m_wm.ball.pos.x, self.startingpoint1.y - self.m_wm.ball.pos.y)
+        robot2_ball = math.hypot(self.startingpoint2.x - self.m_wm.ball.pos.x, self.startingpoint2.y - self.m_wm.ball.pos.y)
         if abs(robot1_ball - robot2_ball) < 0.05:
             self.neaarertoballid = 1
         if robot1_ball > robot2_ball:
@@ -281,7 +289,7 @@ class KickProfiler():
             self.neaarertoballid = 1
 
     def setkickerpos(self):
-        if self.neaarertoballid == 1:
+        if self.kickstat == KickStat.ROBOT1KICKING:
             current_task1 = parsian_robot_task()
             current_task1.select = parsian_robot_task.KICK
             task1 = parsian_skill_kick()
@@ -292,7 +300,6 @@ class KickProfiler():
             current_task1.kickTask = task1
             self.task_pub1.publish(current_task1)
             if self.robotarrived(self.my_robot1, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2) and math.hypot(self.my_robot1.pos.x - self.my_robot2.pos.x ,self.my_robot1.pos.y - self.my_robot2.pos.y) >  math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x ,self.m_wm.ball.pos.y - self.my_robot2.pos.y):
-                self.kickstat = KickStat.ROBOT1KICKING
                 # prepare the other robot for reciveing
                 current_task2 = parsian_robot_task()
                 current_task2.select = parsian_robot_task.RECIVEPASS
@@ -306,7 +313,7 @@ class KickProfiler():
             else:
                 return  False
 
-        if self.neaarertoballid == 2:
+        if self.kickstat == KickStat.ROBOT2KICKING:
             current_task2 = parsian_robot_task()
             current_task2.select = parsian_robot_task.KICK
             task2 = parsian_skill_kick()
@@ -317,7 +324,6 @@ class KickProfiler():
             current_task2.kickTask = task2
             self.task_pub2.publish(current_task2)
             if self.robotarrived(self.my_robot2, point.Point(self.m_wm.ball.pos.x, self.m_wm.ball.pos.y), 0.2) and math.hypot(self.my_robot1.pos.x - self.my_robot2.pos.x ,self.my_robot1.pos.y - self.my_robot2.pos.y) >  math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x ,self.m_wm.ball.pos.y - self.my_robot1.pos.y):
-                self.kickstat = KickStat.ROBOT2KICKING
                 # prepare the other robot for reciveing
                 current_task1 = parsian_robot_task()
                 current_task1.select = parsian_robot_task.RECIVEPASS
@@ -330,6 +336,60 @@ class KickProfiler():
                 return True
             else:
                 return  False
+
+
+    def gosomewherebehindball(self):
+        # y = mx + b
+        eps = 0.0001
+        alpha = 0.20
+        target = point.Point(0,0)
+        if self.neaarertoballid == 1:
+            self.kickstat = KickStat.ROBOT1KICKING
+            m = (self.m_wm.ball.pos.y - self.my_robot2.pos.y)/(self.m_wm.ball.pos.y - self.my_robot2.pos.y + eps)
+            b = self.m_wm.ball.pos.y - (m*self.m_wm.ball.pos.x)
+
+            if self.m_wm.ball.pos.x < self.my_robot2.pos.x:
+                target.x = self.m_wm.ball.pos.x - alpha
+                target.y = m*(target.x) + b
+
+            else:
+                target.x = self.m_wm.ball.pos.x + alpha
+                target.y = m*(target.x) + b
+
+            self.gotopoint(1, target)
+            if self.robotarrived(self.my_robot1, target):
+                self.kickstat = KickStat.ROBOT1KICKING
+                return True
+            else:
+                return False
+
+        if self.neaarertoballid == 2:
+            m = (self.m_wm.ball.pos.y - self.my_robot1.pos.y) / (self.m_wm.ball.pos.y - self.my_robot1.pos.y + eps)
+            b = self.m_wm.ball.pos.y - (m * self.m_wm.ball.pos.x)
+
+            if self.m_wm.ball.pos.x < self.my_robot1.pos.x:
+                target.x = self.m_wm.ball.pos.x - alpha
+                target.y = m * (target.x) + b
+
+            else:
+                target.x = self.m_wm.ball.pos.x + alpha
+                target.y = m * (target.x) + b
+
+
+            self.gotopoint(2, target)
+            if self.robotarrived(self.my_robot2,target):
+                self.kickstat = KickStat.ROBOT2KICKING
+                return True
+            else:
+                return False
+
+
+
+
+
+
+
+
 
     def calculate(self):
         self.velrecflag = False
