@@ -30,6 +30,7 @@ class State(Enum):
     STANDBY = 7
     CALCULATING = 8
     NONE = 9
+    FINISHED = 10
 
 class KickStat(Enum):
     ROBOT1KICKING = 1
@@ -109,7 +110,9 @@ class KickProfiler():
             if self.calculatedone:
                 self.calculatedone = False
                 self.state = State.GOBEHINDSMW
-
+        if self.state == State.FINISHED:
+            self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2))
+            self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1))
 
 
 
@@ -426,12 +429,15 @@ class KickProfiler():
                 self.robot2_count = 1
                 self.robot1_vels[self.current_speed] = []
                 self.robot2_vels[self.current_speed] = []
-            if self.current_speed == 12:
-                __log_file1 = open(path.abspath("../../profiler_data/" + "Robot" +str(self.my_robot1.id) + "_Kick.profile"), "w+")
-                __log_file1.write(str(self.robot1_vels))
+            if self.current_speed == 10:
+                self.state = State.FINISHED
+                rospy.loginfo("finished")
+                __log_file1 = open('_kick1.txt', 'w')
+                __log_file1.write('salam1')
                 __log_file1.close()
-                __log_file2 = open(path.abspath("../../profiler_data/" + "Robot" +str(self.my_robot2.id) + "_Kick.profile"), "w+")
-                __log_file2.write(str(self.robot2_vels))
+                rospy.loginfo('finished 2')
+                __log_file2 = open('_kick2.txt', 'w')
+                __log_file2.write('salam2')
                 __log_file2.close()
 
 
