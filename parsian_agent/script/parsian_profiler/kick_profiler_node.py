@@ -47,7 +47,18 @@ class ReceiveStat(Enum):
 
 class KickProfiler():
     def __init__(self):
+        self.Y1 = 3
+        self.Y2 = -3
+        self.X1 = -4.5
+        self.X2 = 4.5
+        self.Y1M = self.Y1 - 0.3
+        self.Y2M = self.Y2 + 0.3
+        self.X1M = self.X1 + 0.3
+        self.X2M = self.X2 - 0.3
         self.current_speed = 9
+        self.last_speed1 = 1
+        self.last_speed2 = 1
+        self.speed_step = 1
         self.robot1_count = 1
         self.robot2_count = 1
         self.robot1_vels = {}
@@ -58,8 +69,14 @@ class KickProfiler():
         self.startShoot = point.Point(0,0)
         self.endShoot = point.Point(0,0)
         self.m_wm = parsian_world_model()
+
+        self.positions1 = []
+        self.positions2 = []
         self.startingpoint1 = point.Point(-1.5, 0)
         self.startingpoint2 = point.Point(1.5, 0)
+        self.getpositions(self.startingpoint1,self.startingpoint2)
+        self.pos_count = 0
+
         self.my_robot1 = parsian_robot()
         self.my_robot2 = parsian_robot()
         self.state = State.GOTOPBOTH
@@ -81,11 +98,16 @@ class KickProfiler():
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
         self.m_wm = data
-        self.getrobots(1, 2)
+        self.getrobots(0, 7)
         self.updatenearballid()
         #rospy.loginfo(self.state)
         if self.velrecflag:
             self.velrecorder.append(math.hypot(data.ball.vel.x, data.ball.vel.y))
+        if data.ball.pos.x > self.X2M or data.ball.pos.x < self.X1M or data.ball.pos.y > self.Y1M or data.ball.pos.y < self.Y2M:
+            self.state = State.STANDBY
+        if self.state == State.STANDBY:
+            if self.standby():
+                self.state = State.GOBEHINDSMW
         if self.state == State.GOTOPBOTH:
             if self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2)) and self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1)):
                 self.state = State.GOBEHINDSMW
@@ -114,6 +136,127 @@ class KickProfiler():
         if self.state == State.FINISHED:
             self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2))
             self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1))
+
+
+
+
+    def getpositions(self, firstp, secondp):
+        # type: (point.Point, point.Point) -> object
+
+        ## x1 == x2
+        if secondp.x == firstp.x:
+           if (firstp.y > secondp.y):
+               d1 = math.fabs(self.Y1M - firstp.y)
+               d2 = math.fabs(secondp.y - self.Y2M)
+               step1 = d1/10
+               step2 = d2/10
+               for i in range(10):
+                   self.positions1.append(point.Point(firstp.x, firstp.y + i * step1))
+                   self.positions2.append(point.Point(secondp.x, secondp.y - i * step2))
+                   #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
+
+
+
+           else:
+               d1 = math.fabs(self.Y2M - firstp.y)
+               d2 = math.fabs(secondp.y - self.Y1M)
+               step1 = d1 / 10
+               step2 = d2 / 10
+               for i in range(10):
+                   self.positions1.append(point.Point(firstp.x, firstp.y - i * step1))
+                   self.positions2.append(point.Point(secondp.x, secondp.y + i * step2))
+                   ## print('pos1.y = ', firstp.y - i * step1,'and pos2.y',secondp.y + i * step2)
+
+        ## y1 == y2
+        if firstp.y == secondp.y:
+           if (firstp.x < secondp.x):
+               d1 = math.fabs(self.X1M - firstp.x)
+               d2 = math.fabs(secondp.x - self.X2M)
+               step1 = d1/9
+               step2 = d2/9
+               for i in range(10):
+                   self.positions1.append(point.Point(firstp.x - i * step1, firstp.y))
+                   self.positions2.append(point.Point(secondp.x + i * step2, secondp.y))
+                   #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
+
+
+
+           else:
+               d1 = math.fabs(self.X2M - firstp.x)
+               d2 = math.fabs(secondp.x - self.X1M)
+               step1 = d1 / 9
+               step2 = d2 / 9
+               for i in range(10):
+                   self.positions1.append(point.Point(firstp.x  + i * step1, firstp.y))
+                   self.positions2.append(point.Point(secondp.x  - i * step2, secondp.y))
+                   ## print('pos1.x = ', firstp.x + i * step1,'and pos2.x',secondp.x - i * step2)
+
+
+        else:
+            m = (secondp.y - firstp.y)/(secondp.x - firstp.x)
+            b = secondp.y - m * secondp.x
+
+            y_right = m*self.X2M + b
+            y_left = m*self.X1M + b
+
+            x_up = (self.Y1M - b)/m
+            x_down = (self.Y2M - b)/m
+
+            sols = []
+
+            ## filding the intersection points with margined-field
+            if y_right <= self.Y1M and y_right >= self.Y2M:
+                sols.append(point.Point(self.X2M, y_right))
+
+            if y_left <= self.Y1M and y_left >= self.Y2M:
+                sols.append(point.Point(self.X1M, y_left))
+
+            if x_up < self.X2M and x_up > self.X1M:
+                sols.append(point.Point(x_up,self.Y1M))
+
+            if x_down < self.X2M and x_down > self.X1M:
+                sols.append(point.Point(x_down,self.Y2M))
+
+            print(sols[0].x, sols[0].y, sols[1].x, sols[1].y)
+
+            sol0_dist_first = sols[0].distance(firstp)
+            sol0_dist_second = sols[0].distance(secondp)
+            sol1_dist_first = sols[1].distance(firstp)
+            sol1_dist_second = sols[1].distance(secondp)
+
+            # step1 = 0
+            # step2 = 0
+
+            if sol0_dist_first < sol0_dist_second:
+                step1 = sol0_dist_first/10
+                step2 = sol1_dist_second/10
+            else:
+                step2 = sol0_dist_second / 10
+                step1 = sol1_dist_first / 10
+
+            ## obtain positions for robot1
+
+            delta = firstp.minus(secondp)
+            udelta = delta.unitPoint()
+
+            for i in range(10):
+                newPos = point.Point(0,0)
+                newPos.x = firstp.x + i*step1*udelta.x
+                newPos.y = firstp.y + i*step1*udelta.y
+                self.positions1.append(newPos)
+                ## print('pos1.x = ', newPos.x, 'and pos1.y', newPos.y)
+
+
+            ## obtain positions for robot1
+
+            delta = secondp.minus(firstp)
+            udelta = delta.unitPoint()
+
+            for i in range(10):
+                newPos = point.Point(0, 0)
+                newPos.x = secondp.x + i * step2 * udelta.x
+                newPos.y = secondp.y + i * step2 * udelta.y
+                self.positions2.append(newPos)
 
 
 
@@ -273,6 +416,7 @@ class KickProfiler():
             current_task1.select = parsian_robot_task.RECIVEPASS
             task1 = parsian_skill_receivePass()
             task1.receiveRadius = 0.7
+            task1.
             task1.target.x = self.startingpoint1.x
             task1.target.y = self.startingpoint1.y
             current_task1.receivePassTask = task1
@@ -363,7 +507,7 @@ class KickProfiler():
 
 
     def gosomewherebehindball(self):
-        alpha = 0.3
+        alpha = 0.4
         target = point.Point(0,0)
         if self.neaarertoballid == 1:
 
@@ -371,7 +515,8 @@ class KickProfiler():
             r = r.unitPoint()
             r.x = r.x*alpha
             r.y = r.y * alpha
-            target = point.Point(self.m_wm.ball.pos.x + r.x, self.m_wm.ball.pos.y + r.y)
+            target.x = self.m_wm.ball.pos.x + r.x
+            target.y = self.m_wm.ball.pos.y + r.y
 
             self.gotopoint(1, target, self.setdirtorobot(2))
             if self.robotarrived(self.my_robot1, target):
@@ -386,7 +531,8 @@ class KickProfiler():
             r = r.unitPoint()
             r.x = r.x * alpha
             r.y = r.y * alpha
-            target = point.Point(self.m_wm.ball.pos.x + r.x, self.m_wm.ball.pos.y + r.y)
+            target.x = self.m_wm.ball.pos.x + r.x
+            target.y = self.m_wm.ball.pos.y + r.y
 
             self.gotopoint(2, target, self.setdirtorobot(1))
             if self.robotarrived(self.my_robot2,target):
@@ -402,35 +548,46 @@ class KickProfiler():
         self.velrecflag = False
         self.velrecorder.sort()
         self.velrecorder.reverse()
-        if math.hypot(self.startShoot.x - self.endShoot.x, self.startShoot.y - self.endShoot.y) > 0.9:
-            #rospy.loginfo("valid")
-            if self.kickstat == KickStat.ROBOT1RETREATING:
-                rospy.loginfo("robot 1:valid num: %f highest ball vel: %f for current_speed: %f " % (self.robot1_count, self.velrecorder[0], self.current_speed))
-                self.robot1_count += 1
+
+        if self.kickstat == KickStat.ROBOT1RETREATING:
+            if self.velrecorder[0] > self.last_speed1:
+                rospy.loginfo('robot1 valid, speed: %f' % (self.velrecorder[0]))
                 self.robot1_vels[self.current_speed].append(self.velrecorder[0])
-            elif self.kickstat == KickStat.ROBOT2RETREATING:
-                rospy.loginfo("robot 2:valid num: %f highest ball vel: %f for current_speed: %f " % (self.robot2_count, self.velrecorder[0], self.current_speed))
-                self.robot2_count += 1
+                self.robot1_count += 1
+            else:
+                rospy.loginfo('robot1 @@unvalid, speed: %f' %(self.velrecorder[0]))
+
+
+        if self.kickstat == KickStat.ROBOT2RETREATING:
+            if self.velrecorder[0] > self.last_speed2:
+                rospy.loginfo('robot2 valid, speed: %f' %(self.velrecorder[0]))
                 self.robot2_vels[self.current_speed].append(self.velrecorder[0])
+                self.robot2_count += 1
+            else:
+                rospy.loginfo('robot2 @@unvalid, speed: %f' %(self.velrecorder[0]))
+
+
+        if self.robot1_count >= 4 and self.robot2_count >= 4:
+            self.pos_count += 1
+            self.startingpoint1 = self.positions1[self.pos_count]
+            self.startingpoint2 = self.positions2[self.pos_count]
             self.velrecorder[:] = []
-            if self.robot1_count >= 4 and self.robot2_count >= 4:
-                self.current_speed += 1
-                self.robot1_count = 1
-                self.robot2_count = 1
-                self.robot1_vels[self.current_speed] = []
-                self.robot2_vels[self.current_speed] = []
-            if self.current_speed == 10:
-                self.state = State.FINISHED
-
-
-
-        else:
-            rospy.loginfo("un valid")
-
+            self.robot1_count = 1
+            self.robot2_count =1
+            self.last_speed1 = self.robot1_vels[self.current_speed][0]
+            self.last_speed2 = self.robot2_vels[self.current_speed][0]
+            self.current_speed += self.speed_step
+            self.robot1_vels[self.current_speed] = []
+            self.robot2_vels[self.current_speed] = []
 
         self.calculatedone = True
 
-
+    def standby(self):
+        self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2))
+        self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1))
+        if  not self.m_wm.ball.pos.x > self.X2M and not self.m_wm.ball.pos.x < self.X1M and not self.m_wm.ball.pos.y > self.Y1M and not self.m_wm.ball.pos.y < self.Y2M:
+            return True
+        return False
 
 
 
