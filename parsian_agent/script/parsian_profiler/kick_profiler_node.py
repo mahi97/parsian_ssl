@@ -5,6 +5,7 @@ import rospy
 import point
 import math
 from enum import Enum
+from os import path
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import vector2D
 from parsian_msgs.msg import parsian_robot_command
@@ -404,12 +405,12 @@ class KickProfiler():
 
 
     def calculate(self):
-        self.state = State.GOBEHINDSMW
+        self.state = State.NONE
         self.velrecflag = False
+        self.velrecorder.sort()
+        self.velrecorder.reverse()
         if math.hypot(self.startShoot.x - self.endShoot.x, self.startShoot.y - self.endShoot.y) > 0.9:
             #rospy.loginfo("valid")
-            self.velrecorder.sort()
-            self.velrecorder.reverse()
             if self.kickstat == KickStat.ROBOT1RETREATING:
                 rospy.loginfo("robot 1:valid num: %f highest ball vel: %f for current_speed: %f " % (self.robot1_count, self.velrecorder[0], self.current_speed))
                 self.robot1_count += 1
@@ -425,6 +426,14 @@ class KickProfiler():
                 self.robot2_count = 1
                 self.robot1_vels[self.current_speed] = []
                 self.robot2_vels[self.current_speed] = []
+            if self.current_speed == 12:
+                __log_file1 = open(path.abspath("../../profiler_data/" + "Robot" +str(self.my_robot1.id) + "_Kick.profile"), "w+")
+                __log_file1.write(str(self.robot1_vels))
+                __log_file1.close()
+                __log_file2 = open(path.abspath("../../profiler_data/" + "Robot" +str(self.my_robot2.id) + "_Kick.profile"), "w+")
+                __log_file2.write(str(self.robot2_vels))
+                __log_file2.close()
+
 
         else:
             rospy.loginfo("un valid")
