@@ -90,6 +90,7 @@ class KickProfiler():
             if self.gotopoint(1, self.startingpoint1, self.setdirtorobot(2)) and self.gotopoint(2, self.startingpoint2, self.setdirtorobot(1)):
                 self.state = State.GOBEHINDSMW
         if self.state == State.GOBEHINDSMW:
+
             if self.gosomewherebehindball():
                 self.state = State.GOFORKICK
         if self.state == State.GOFORKICK:
@@ -157,10 +158,10 @@ class KickProfiler():
             current_task1.select = parsian_robot_task.GOTOPOINTAVOID
             task1 = parsian_skill_gotoPointAvoid()
             task1.noAvoid = False
-            task1.ballObstacleRadius = 0.2
+            task1.ballObstacleRadius = 0.3
             task1.base.lookAt.x = 5000
             task1.base.lookAt.y = 5000
-            task1.base.maxVelocity = 1.5
+            task1.base.maxVelocity = 0.5
             task1.base.targetPos.x = point.x
             task1.base.targetPos.y = point.y
             task1.base.targetDir.x = dirpoint.x #self.my_robot2.pos.x - self.my_robot1.pos.x
@@ -178,10 +179,10 @@ class KickProfiler():
             current_task2.select = parsian_robot_task.GOTOPOINTAVOID
             task2 = parsian_skill_gotoPointAvoid()
             task2.noAvoid = False
-            task2.ballObstacleRadius = 0.2
+            task2.ballObstacleRadius = 0.3
             task2.base.lookAt.x = 5000
             task2.base.lookAt.y = 5000
-            task2.base.maxVelocity = 1.5
+            task2.base.maxVelocity = 0.5
             task2.base.targetPos.x = point.x
             task2.base.targetPos.y = point.y
             task2.base.targetDir.x = dirpoint.x #self.my_robot1.pos.x - self.my_robot2.pos.x
@@ -362,21 +363,15 @@ class KickProfiler():
 
 
     def gosomewherebehindball(self):
-        # y = mx + b
-        eps = 0.0001
         alpha = 0.3
         target = point.Point(0,0)
         if self.neaarertoballid == 1:
-            m = (self.m_wm.ball.pos.y - self.my_robot2.pos.y)/(self.m_wm.ball.pos.x - self.my_robot2.pos.x + eps)
-            b = self.m_wm.ball.pos.y - (m*self.m_wm.ball.pos.x)
 
-            if self.m_wm.ball.pos.x < self.my_robot2.pos.x:
-                target.x = self.m_wm.ball.pos.x - alpha
-                target.y = m*(target.x) + b
-
-            else:
-                target.x = self.m_wm.ball.pos.x + alpha
-                target.y = m*(target.x) + b
+            r = point.Point(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y )
+            r = r.unitPoint()
+            r.x = r.x*alpha
+            r.y = r.y * alpha
+            target = point.Point(self.m_wm.ball.pos.x + r.x, self.m_wm.ball.pos.y + r.y)
 
             self.gotopoint(1, target, self.setdirtorobot(2))
             if self.robotarrived(self.my_robot1, target):
@@ -386,17 +381,12 @@ class KickProfiler():
                 return False
 
         if self.neaarertoballid == 2:
-            m = (self.m_wm.ball.pos.y - self.my_robot1.pos.y) / (self.m_wm.ball.pos.x - self.my_robot1.pos.x + eps)
-            b = self.m_wm.ball.pos.y - (m * self.m_wm.ball.pos.x)
 
-            if self.m_wm.ball.pos.x < self.my_robot1.pos.x:
-                target.x = self.m_wm.ball.pos.x - alpha
-                target.y = m * (target.x) + b
-
-            else:
-                target.x = self.m_wm.ball.pos.x + alpha
-                target.y = m * (target.x) + b
-
+            r = point.Point(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y)
+            r = r.unitPoint()
+            r.x = r.x * alpha
+            r.y = r.y * alpha
+            target = point.Point(self.m_wm.ball.pos.x + r.x, self.m_wm.ball.pos.y + r.y)
 
             self.gotopoint(2, target, self.setdirtorobot(1))
             if self.robotarrived(self.my_robot2,target):
@@ -431,14 +421,7 @@ class KickProfiler():
                 self.robot2_vels[self.current_speed] = []
             if self.current_speed == 10:
                 self.state = State.FINISHED
-                rospy.loginfo("finished")
-                __log_file1 = open('_kick1.txt', 'w')
-                __log_file1.write('salam1')
-                __log_file1.close()
-                rospy.loginfo('finished 2')
-                __log_file2 = open('_kick2.txt', 'w')
-                __log_file2.write('salam2')
-                __log_file2.close()
+
 
 
         else:
