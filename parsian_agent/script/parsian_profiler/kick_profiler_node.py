@@ -55,10 +55,10 @@ class KickProfiler():
         self.Y2M = self.Y2 + 0.3
         self.X1M = self.X1 + 0.3
         self.X2M = self.X2 - 0.3
-        self.current_speed = 9
+        self.current_speed = 200
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 1
+        self.speed_step = 100
         self.robot1_count = 1
         self.robot2_count = 1
         self.robot1_vels = {}
@@ -72,8 +72,8 @@ class KickProfiler():
 
         self.positions1 = []
         self.positions2 = []
-        self.startingpoint1 = point.Point(-1.5, 0)
-        self.startingpoint2 = point.Point(1.5, 0)
+        self.startingpoint1 = point.Point(-2.25, -1.5)
+        self.startingpoint2 = point.Point(2.25, 1.5 )
         self.getpositions(self.startingpoint1,self.startingpoint2)
         self.pos_count = 0
 
@@ -415,8 +415,7 @@ class KickProfiler():
             current_task1 = parsian_robot_task()
             current_task1.select = parsian_robot_task.RECIVEPASS
             task1 = parsian_skill_receivePass()
-            task1.receiveRadius = 0.7
-            task1.
+            task1.receiveRadius = 1
             task1.target.x = self.startingpoint1.x
             task1.target.y = self.startingpoint1.y
             current_task1.receivePassTask = task1
@@ -432,7 +431,7 @@ class KickProfiler():
             current_task2 = parsian_robot_task()
             current_task2.select = parsian_robot_task.RECIVEPASS
             task2 = parsian_skill_receivePass()
-            task2.receiveRadius = 0.7
+            task2.receiveRadius = 1
             task2.target.x = self.startingpoint2.x
             task2.target.y = self.startingpoint2.y
             current_task2.receivePassTask = task2
@@ -511,33 +510,39 @@ class KickProfiler():
         target = point.Point(0,0)
         if self.neaarertoballid == 1:
 
-            r = point.Point(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y )
-            r = r.unitPoint()
-            r.x = r.x*alpha
-            r.y = r.y * alpha
-            target.x = self.m_wm.ball.pos.x + r.x
-            target.y = self.m_wm.ball.pos.y + r.y
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+                r = point.Point(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y )
+                r = r.unitPoint()
+                r.x = r.x*alpha
+                r.y = r.y * alpha
+                target.x = self.m_wm.ball.pos.x + r.x
+                target.y = self.m_wm.ball.pos.y + r.y
 
-            self.gotopoint(1, target, self.setdirtorobot(2))
-            if self.robotarrived(self.my_robot1, target):
-                self.kickstat = KickStat.ROBOT1KICKING
-                return True
+                self.gotopoint(1, target, self.setdirtorobot(2))
+                if self.robotarrived(self.my_robot1, target):
+                    self.kickstat = KickStat.ROBOT1KICKING
+                    return True
+                else:
+                    return False
             else:
                 return False
 
         if self.neaarertoballid == 2:
 
-            r = point.Point(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y)
-            r = r.unitPoint()
-            r.x = r.x * alpha
-            r.y = r.y * alpha
-            target.x = self.m_wm.ball.pos.x + r.x
-            target.y = self.m_wm.ball.pos.y + r.y
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+                r = point.Point(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y)
+                r = r.unitPoint()
+                r.x = r.x * alpha
+                r.y = r.y * alpha
+                target.x = self.m_wm.ball.pos.x + r.x
+                target.y = self.m_wm.ball.pos.y + r.y
 
-            self.gotopoint(2, target, self.setdirtorobot(1))
-            if self.robotarrived(self.my_robot2,target):
-                self.kickstat = KickStat.ROBOT2KICKING
-                return True
+                self.gotopoint(2, target, self.setdirtorobot(1))
+                if self.robotarrived(self.my_robot2,target):
+                    self.kickstat = KickStat.ROBOT2KICKING
+                    return True
+                else:
+                    return False
             else:
                 return False
 
