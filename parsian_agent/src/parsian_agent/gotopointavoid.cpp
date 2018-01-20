@@ -233,6 +233,9 @@ void CSkillGotoPointAvoid::execute()
     agent->accelerationLimiter(vf,oneTouchMode);
    // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
    // ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
+//    QList <int> dumm;
+
+//    drawer -> draw(QString("time : %1").arg(timeNeeded(agent,targetPos,conf->VelMax,dumm,dumm,0,0,0),Vector2D(1,1));
 
     counter ++;
 }
@@ -289,7 +292,8 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     QList <Vector2D> _result;
     Vector2D _target;
 
-    if(_noAvoid)
+    double tAgentVelTanjent = tAgentVel.length()*cos(Vector2D::angleBetween((posT - _agentT->pos(),tAgentVel.dir())).radian());
+    /*if(_noAvoid)
     {
         _result.clear();
     }
@@ -317,7 +321,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         distEffect += rrtAngSum*angCoef;
         distEffect = std::max(1.0, distEffect);
     }
-
+*/
     if(tAgentVel.length() < 0.2) {
         acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
 
@@ -325,25 +329,16 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         acc =conf->AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf->AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
     }
 
-    double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length()*tAgentVel.length()/2*acc))*2*acc*dec)/(acc+dec));
-    vMaxReal = min(vMaxReal, 4);
-    vMax = min(vMax, vMaxReal);
-    xSat = sqrt(((vMax*vMax)-(tAgentVel.length()*tAgentVel.length()))/acc) + sqrt((vMax*vMax)/dec);
-    _x3 = (-1 * tAgentVel.length()*tAgentVel.length()) / (-2 * fabs(conf->DecMax)) ;
-
-    if(_agentT->pos().dist(posT) < _x3 ) {
-        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
-        return std::max(0.0,(tAgentVel.length()/ conf->DecMax - offset) * distEffect);
+    double tDec = vMax/dec;
+    double tAcc = (vMax-tAgentVelTanjent)/acc;
+    dist = posT.dist(_agentT->pos());
+    double dB = tDec * vMax / 2 + tAcc * (vMax + tAgentVelTanjent) / 2;
+    if(dist > dB) {
+        return tAcc+tDec+(dist - dB)/vMax;
     }
-
-    if(tAgentVel.length() < (vMax)) {
-        if(_agentT->pos().dist(posT) > xSat) {
-            return std::max(0.0, (-1*offset + vMax/dec + (vMax-tAgentVel.length())/acc + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) + ((vMax+tAgentVel.length())*(vMax-tAgentVel.length())/acc))/2)/vMax) * distEffect);
-        }
-        return std::max(0.0, (vMax/dec + (vMax-tAgentVel.length())/acc - offset)*distEffect);
-
-    } else {
-        return std::max(0.0, (vMax/dec + (_agentT->pos().dist(posT) - ((vMax*vMax/(2*dec)) ))/vMax - offset) * distEffect);
+    else
+    {
+        return ((1/dec)+(1-tAgentVelTanjent)/acc)*sqrt(dist*(2*dec*acc/(acc+dec))+(tAgentVelTanjent*tAgentVelTanjent/(2*acc)));
     }
 
 }
