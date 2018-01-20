@@ -50,8 +50,10 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element)
 }
 
 void CSkillGotoPointAvoid::execute()
+
 {
 
+    noAvoid = true;
     //drawer->draw(Circle2D(Vector2D(1,0),0.1),QColor(Qt::red),true);
     if(agent == nullptr)
         return;
