@@ -52,7 +52,7 @@ namespace rqt_parsian_gui
         void waitHere();
 
 
-        ros::Publisher grsim_pub;
+        ros::Publisher publisher;
         parsian_msgs::parsian_robot_commandPtr cmd;
 
 
@@ -83,6 +83,8 @@ namespace rqt_parsian_gui
         QWidget* widget_;
         Ui::HandyController mUI;
         int agentID, speed, kickspeed, chipkickspeed, rollerspeed;
+        ros::NodeHandle* nh;
+        ros::NodeHandle* nh_private;
 
 
     };

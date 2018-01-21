@@ -72,9 +72,9 @@ namespace rqt_parsian_gui
         connect(mUI.RollerSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(rollerspeedchanged(int)));
 
         //initial publishing
-        ros::NodeHandle& nh = getNodeHandle();
-        ros::NodeHandle& nh_private = getPrivateNodeHandle();
-        grsim_pub  = nh.advertise<parsian_msgs::parsian_robot_command>("/robot_command0", 1000);
+        nh = &getNodeHandle();
+        nh_private = &getPrivateNodeHandle();
+        publisher  = nh->advertise<parsian_msgs::parsian_robot_command>("/agent_0/command", 1000);
 
 
         // add widget to the user interface
@@ -87,7 +87,7 @@ namespace rqt_parsian_gui
     void HandyController::shutdownPlugin()
     {
         // unregister all publishers here
-        grsim_pub.shutdown();
+        publisher.shutdown();
     }
 
     void HandyController::saveSettings(qt_gui_cpp::Settings& plugin_settings,
@@ -133,7 +133,7 @@ namespace rqt_parsian_gui
             break;
 
         case EActionType::_FORWARD:
-            //upBtn->setIcon(QIcon("../../resource/icons/green_up.png"));
+//            mUI.Up->setIcon(QIcon("resource/icons/green_up.png"));
             setRobotVel(speed*4.2 / 127.0, 0.0, 0.0);
             break;
 
@@ -288,14 +288,14 @@ namespace rqt_parsian_gui
                 if(e->key() == Qt::Key_K || e->key() == Qt::Key_C || e->key() == Qt::Key_R)
                 {
                     takeAction(_STOP_OTHER);
-                    grsim_pub.publish(cmd);
+                    publisher.publish(cmd);
                     return true;
                 }
                 if(e->key() == Qt::Key_W || e->key() == Qt::Key_A || e->key() == Qt::Key_S
                         || e->key() == Qt::Key_D || e->key() == Qt::Key_Q || e->key() == Qt::Key_E)
                 {
                     takeAction(_STOP_NAVIGATION);
-                    grsim_pub.publish(cmd);
+                    publisher.publish(cmd);
                     return true;
                 }
 
@@ -308,56 +308,56 @@ namespace rqt_parsian_gui
     {
         ROS_INFO("leftclicked");
         takeAction(EActionType::_LEFT);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::uppressed()
     {
         ROS_INFO("upclicked");
         takeAction(EActionType::_FORWARD);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::rightpressed()
     {
         ROS_INFO("rightclicked");
         takeAction(EActionType::_RIGHT);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::downpressed()
     {
         ROS_INFO("downclicked");
         takeAction(EActionType::_BACKWARD);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle1pressed()
     {
         ROS_INFO("angle1clicked");
         takeAction(EActionType::_TURN_CCW);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle2pressed()
     {
         ROS_INFO("angle2clicked");
         takeAction(EActionType::_TURN_CW);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::kickpressed()
     {
         ROS_INFO("kickclicked");
         takeAction(EActionType::_KICK);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
        // cleanRobotKick();
     }
     void HandyController::chippressed()
     {
         ROS_INFO("chipclicked");
         takeAction(EActionType::_CHIP);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
         //cleanRobotChip();
     }
 
@@ -365,7 +365,7 @@ namespace rqt_parsian_gui
     {
         ROS_INFO("haltclicked");
         takeAction(EActionType::_STOP_ALL);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
     }
 
     void HandyController::rollerpressed()
@@ -377,18 +377,19 @@ namespace rqt_parsian_gui
     void HandyController::releasedother()
     {
         takeAction(_STOP_OTHER);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
     }
 
     void HandyController::releasednav()
     {
         takeAction(_STOP_NAVIGATION);
-        grsim_pub.publish(cmd);
+        publisher.publish(cmd);
     }
 
     void HandyController::agentidchanged(QString id)
     {
         agentID = id.toInt();
+        publisher  = nh->advertise<parsian_msgs::parsian_robot_command>("/agent_"+ id.toStdString() +"/command", 1000);
         cmd.reset(new parsian_msgs::parsian_robot_command);
         cmd->robot_id = agentID;
         cmd->kickSpeed = 0;//kickspeed;
