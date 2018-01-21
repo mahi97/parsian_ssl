@@ -89,8 +89,8 @@ class KickProfiler():
 
         self.positions1 = []
         self.positions2 = []
-        self.startingpoint1 = point.Point(-1, 0)  #GUI
-        self.startingpoint2 = point.Point(1, 0 )  #GUI
+        self.startingpoint1 = point.Point(-1.5, -1.5)  #GUI
+        self.startingpoint2 = point.Point(1.5, +1.5 )  #GUI
         self.getpositions(self.startingpoint1,self.startingpoint2)
         self.pos_count = 0
 
@@ -116,11 +116,11 @@ class KickProfiler():
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
         self.m_wm = data
-        self.getrobots(self.robotid1, self.robotid2)
+        self.getrobots(7, 0)
         if self.gui_debug:
             self.draw()
         #self.updatenearballid()
-        #rospy.loginfo(self.state)
+        rospy.loginfo(self.state)
         if self.velrecflag:
             self.velrecorder.append(math.hypot(data.ball.vel.x, data.ball.vel.y))
         if data.ball.pos.x > self.X2M or data.ball.pos.x < self.X1M or data.ball.pos.y > self.Y1M or data.ball.pos.y < self.Y2M:
@@ -298,7 +298,7 @@ class KickProfiler():
             task1.ballObstacleRadius = 0.3
             task1.base.lookAt.x = 5000
             task1.base.lookAt.y = 5000
-            task1.base.maxVelocity = 0.5
+            task1.base.maxVelocity = 0.1
             task1.base.targetPos.x = point.x
             task1.base.targetPos.y = point.y
             task1.base.targetDir.x = dirpoint.x #self.my_robot2.pos.x - self.my_robot1.pos.x
@@ -319,7 +319,7 @@ class KickProfiler():
             task2.ballObstacleRadius = 0.3
             task2.base.lookAt.x = 5000
             task2.base.lookAt.y = 5000
-            task2.base.maxVelocity = 0.5
+            task2.base.maxVelocity = 0.1
             task2.base.targetPos.x = point.x
             task2.base.targetPos.y = point.y
             task2.base.targetDir.x = dirpoint.x #self.my_robot1.pos.x - self.my_robot2.pos.x
@@ -352,8 +352,8 @@ class KickProfiler():
             if self.updatenearballid() == 2:       #WTF: i added this condition
                 self.state = State.GOBEHINDSMW
                 return False
-            if time() - self.kick_start_time1 < 2.0:
-                return False
+            # if time() - self.kick_start_time1 < 2.0:
+            #     return False
             if not self.robotarrived(self.my_robot2, self.startingpoint2) and math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:    #WTF:second cond must be not too
                 return False
             self.velrecflag = True
@@ -381,8 +381,8 @@ class KickProfiler():
             if self.updatenearballid() == 1:       #WTF: i added this condition
                 self.state = State.GOBEHINDSMW
                 return False
-            if time() - self.kick_start_time2 < 2.0:
-                return False
+            # if time() - self.kick_start_time2 < 2.0:
+            #     return False
             if not self.robotarrived(self.my_robot1, self.startingpoint1)  and math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:    #WTF:second cond must be not too
                 return False
             self.velrecflag = True
@@ -517,7 +517,7 @@ class KickProfiler():
 
 
     def gosomewherebehindball(self):
-        if not math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+        if not math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.1:
             return False
         alpha = 0.3         #WTF: from 0.4
         target = point.Point(0,0)
