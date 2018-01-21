@@ -2,6 +2,14 @@
 #define POSITIONINGPLAN_H
 
 #include <parsian_ai/plans/plan.h>
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/gamestate.h>
+#include <parsian_ai/util/knowledge.h>
+#include <vector>
+#include <queue>
+#include <qbytearray.h>
 
 enum class positioningType{
     ONETOUCH,
@@ -18,13 +26,13 @@ enum class edgeMode {
 class holdingPoints
 {
 public:
-	CAgent *player;
+	Agent *player;
 	QList< Vector2D > points;
 	QList< int > cyclesToWait;
 	QList< double > escapeRadius;
 	QList<positioningType> dir;
 	holdingPoints(){}
-	holdingPoints( CAgent *_player, QList< Vector2D > _points, QList< int > _cyclesToWait, QList< double > _escapeRadius , QList<positioningType> _dir )
+	holdingPoints( Agent *_player, QList< Vector2D > _points, QList< int > _cyclesToWait, QList< double > _escapeRadius , QList<positioningType> _dir )
 	{
 		player = _player;
 		points.clear();
@@ -85,6 +93,7 @@ private:
 public:
     PositioningPlan();
 	void staticInit( QList< holdingPoints > &_staticPoints );
+    void init(const QList<Agent*> & _agents , QString playMode );
 	void staticExec();
 	void execute();
     void reset();
@@ -98,11 +107,11 @@ public:
 
         double score;
 
-        static const double target_to_goal_openness_coeff = 100.0;
-        static const double target_to_ball_openness_coeff = 100.0;
-        static const double target_opp_mean_dist_coeff    = 250.0;
-//        static const double target_to_home_pos_dist_coeff =-1.0;
-		static const double target_to_last_target_coeff    =-10.0;//-100.0;
+        static constexpr double target_to_goal_openness_coeff = 100.0;
+        static constexpr double target_to_ball_openness_coeff = 100.0;
+        static constexpr double target_opp_mean_dist_coeff    = 250.0;
+//        static constexpr double target_to_home_pos_dist_coeff =-1.0;
+		static constexpr double target_to_last_target_coeff    =-10.0;//-100.0;
 
     public:
 
@@ -111,7 +120,7 @@ public:
 						   const Vector2D _target ,
                            const Vector2D _last_target );
 
-        int Score()
+        double Score()
         {
             return score;
         }
@@ -122,7 +131,7 @@ public:
         double target_to_home_pos_dist();
         double target_to_last_target();
 		double getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs);
-		double coveredArea( std::priority_queue < QPair< edgeMode , double > , vector< QPair< edgeMode , double > > , Comparar >& obstacles );
+		double coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles );
     };
 };
 

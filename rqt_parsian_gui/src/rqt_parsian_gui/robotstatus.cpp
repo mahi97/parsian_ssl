@@ -3,62 +3,69 @@
 */
 
 #include "rqt_parsian_gui/robotstatus.h"
-#include <pluginlib/class_list_macros.h>
-#include <QStringList>
 
-namespace rqt_parsian_gui
-{
+class parsian_robot_status;
 
-RobotStatus::RobotStatus()
-  : rqt_gui_cpp::Plugin()
-  , widget_(0)
-{
-  // Constructor is called first before initPlugin function, needless to say.
+namespace rqt_parsian_gui {
 
-  // give QObjects reasonable names
-  setObjectName("RobotStatus");
-}
+    RobotStatus::RobotStatus()
+            : rqt_gui_cpp::Plugin() {
+        // Constructor is called first before initPlugin function, needless to say.
+        // give QObjects reasonable names
+        setObjectName("RobotStatus");
+    }
 
-void RobotStatus::initPlugin(qt_gui_cpp::PluginContext& context)
-{
-  // access standalone command line arguments
-  QStringList argv = context.argv();
-  // create QWidget
-  widget_ = new QWidget();
-widget_->setWindowTitle("RobotStatus");
+    void RobotStatus::initPlugin(qt_gui_cpp::PluginContext &context) {
+        n = getNodeHandle();
+        n_private = getPrivateNodeHandle();
 
-  // extend the widget with all attributes and children from UI file
+        rs_sub = n_private.subscribe("/robots_status", 1000, &RobotStatus::rsCallback, this);
+        for (int j = 0; j < max_robot; ++j) {
+            rc_sub[j] = n_private.subscribe(QString("/agent_%1/command").arg(j).toStdString(), 1000, &RobotStatus::rcCallback, this);
+        }
 
-  // add widget to the user interface
-  context.addWidget(widget_);
-}
+        // create QWidget
+        scroll_widget = new QWidget;
+        scrollArea = new QScrollArea;
+        scrollArea_l = new QVBoxLayout;
 
-void RobotStatus::shutdownPlugin()
-{
-  // unregister all publishers here
-}
+        scrollArea_l->setSizeConstraint(QLayout::SetMinimumSize);
+        scroll_widget->setLayout(scrollArea_l);
 
-void RobotStatus::saveSettings(qt_gui_cpp::Settings& plugin_settings,
-    qt_gui_cpp::Settings& instance_settings) const
-{
-  // instance_settings.setValue(k, v)
-}
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setWindowTitle("RobotStatus");
+        scrollArea->setFixedHeight(700);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        scrollArea->setWidget(scroll_widget);
 
-void RobotStatus::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
-    const qt_gui_cpp::Settings& instance_settings)
-{
-  // v = instance_settings.value(k)
-}
+        for (auto &i : statusWidget) {
+            i = new RobotStatusWidget(parsian_msgs::parsian_team_config::YELLOW);
+            scrollArea_l->addWidget(i);
+        }
 
-/*bool hasConfiguration() const
-{
-  return true;
-}
 
-void triggerConfiguration()
-{
-  // Usually used to open a dialog to offer the user a set of configuration
-}*/
+
+        // extend the widget with all attributes and children from UI file
+
+        // add widget to the user interface
+
+        context.addWidget(scrollArea);
+    }
+
+    void RobotStatus::rsCallback(const parsian_msgs::parsian_robots_statusConstPtr msg) {
+        int counter = 0;
+        for (auto &i : statusWidget) {
+            i->setMessage(msg->status[counter++]);
+        }
+    }
+
+    void RobotStatus::rcCallback(const parsian_msgs::parsian_robot_commandConstPtr msg) {
+        statusWidget[msg->robot_id]->setVel(*msg);
+    }
+
+    void RobotStatus::shutdownPlugin(){
+
+    }
 
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::RobotStatus, rqt_gui_cpp::Plugin)

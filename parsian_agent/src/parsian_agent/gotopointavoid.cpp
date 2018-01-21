@@ -133,12 +133,13 @@ void CSkillGotoPointAvoid::execute()
         targetDir = (lookAt - agentPos).norm();
     }
 
-    if(noAvoid )
+    if(noAvoid)
     {
         result.clear();
     }
     else
     {
+        /*********** PLANNER ***************/
 
         agent->initPlanner(targetPos , ourRelaxList , oppRelaxList , avoidPenaltyArea , avoidCenterCircle ,ballObstacleRadius);
         result.clear();

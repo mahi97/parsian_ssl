@@ -6,7 +6,7 @@
 #include <parsian_util/core/ball.h>
 #include <parsian_util/core/movingobject.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
-#include <parsian_util/knowledge.h>
+#include <parsian_util/core/knowledge.h>
 
 #define vRobotTemp 1
 

@@ -63,5 +63,6 @@
   <export>
     <nodelet plugin="${prefix}/nodelet.xml"/>
     <nodelet plugin="${prefix}/common.xml"/>
+    <nodelet plugin="${prefix}/planner.xml"/>
   </export>
 </package>

@@ -8,6 +8,8 @@
 #include <parsian_util/matrix.h>
 #include <parsian_msgs/parsian_robot_command.h>
 #include <parsian_msgs/parsian_robot_task.h>
+#include <parsian_msgs/parsian_get_plan.h>
+#include <parsian_msgs/parsian_path.h>
 #include <QDebug>
 #include <QFile>
 #include <fstream>
@@ -16,7 +18,7 @@
 using namespace std;
 
 #define MAX_KICK_SPEED 1023
-#define new_com_test_robot_id -1
+#define new_com_test_robot_id (-1)
 
 struct Fault {
 
@@ -68,7 +70,8 @@ public:
     double goalVisibility;
     QTime agentStopTime;
     bool timerReset;
-    Agent(int _ID);
+
+    explicit Agent(int _ID);
     bool startTrain;bool stopTrain;double wh1,wh2,wh3,wh4;
     bool starter;
     bool canRecvPass;
@@ -82,7 +85,6 @@ public:
     bool isVisible();
     bool notVisible();
 
-    void setInPlayState(bool state);
     void setOnOffState(bool state);
     void setCommandID  (int ID);
 
@@ -148,23 +150,22 @@ public:
     Vector2D plannerAverageDir;
 
     void setGyroZero();
-    void runPlanner(int agentId, Vector2D target, bool avoidPenaltyArea, bool avoidCenterCircle);
     Vector2D agentAngelForGyro;
     int calibrated;
     void jacobian(double _vx, double _vy, double _w, double &v1, double &v2, double &v3, double &v4);
 
 private:
-    CPlanner planner;
     void jacobianInverse(double _v1, double _v2, double _v3, double _v4,double &_vx, double &_vy, double &_w);
     bool calibrateGyro;
     unsigned int packetNum;
     double lastVf,lastVn;
     short int selfID;
     const double Gravity= 9.8;
-    double getVar( double data[] );
+    double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
-
 public:
+
+    ros::Publisher planner_pub;
     void initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                      const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
                      const double &_ballObstacleRadius);
@@ -173,7 +174,6 @@ public:
     const double gain = 1.013;
     void execute();
     parsian_msgs::parsian_robot_commandPtr getCommand();
-    parsian_msgs::parsian_robot_task getTask();
 };
 
 #endif // CAGENT_H

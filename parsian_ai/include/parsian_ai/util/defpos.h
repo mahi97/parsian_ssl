@@ -2,7 +2,7 @@
 #define DEFPOS_H
 
 #include "parsian_util/geom/geom.h"
-#include "parsian_util/core/worldmodel.h"
+#include "parsian_ai/util/worldmodel.h"
 #include <parsian_util/tools/drawer.h>
 
 struct kk2Angles {

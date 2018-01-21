@@ -87,7 +87,7 @@ CObstacles::CObstacles(){
     obs.clear();
     targetPosition.invalidate();
     agentPos.invalidate();
-    obsMargin = CRobot::robot_radius_new;
+    obsMargin = Robot::robot_radius_new;
 }
 
 void CObstacles::add_rectangle(double cx,double cy,double w,double h)

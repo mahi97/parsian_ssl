@@ -3,10 +3,8 @@
 
 #include <queue>
 #include "parsian_ai/roles/roles.h"
-//#include "skills.h" TODO : Actions
 #include "parsian_ai/plans/plans.h"
 #include <parsian_ai/gamestate.h>
-#include <parsian_ai/soccer.h>
 #include <QPair>
 #include <queue>
 #include <regex>
@@ -37,23 +35,21 @@ public:
     bool lockAgents;
     CMasterPlay();
     virtual ~CMasterPlay();
-    int getDefenseNum();
-    virtual void execute_0() = 0;
-    virtual void execute_1() = 0;
-    virtual void execute_2() = 0;
-    virtual void execute_3() = 0;
-    virtual void execute_4() = 0;
-    virtual void execute_5() = 0;
-    virtual void execute_6() = 0;
+    virtual void reset() = 0;
+    virtual void execute_x() = 0;
+    virtual void init(const QList <Agent*>& _agents) = 0;
+
     void execute();
     virtual QString whoami() {return "MasterPlay";}
     bool canScore();
-    QList <CAgent *> markAgents;
+    QList <Agent *> markAgents;
     //////////////////////////////////////
     bool noPlanException;
-    //////////////////////////////////////
 
-    virtual void reset() = 0;
+    /*static*/ PositioningPlan positioningPlan;
+    /*static*/ CMarkPlan markPlan;
+    /*static*/ DefensePlan defensePlan;
+
 private:
     void execPlay();
     QString formationName;
@@ -62,36 +58,34 @@ private:
 
 protected:
 
-    QList <int> agentsID;
+    QList <Agent*> agentsID;
 
     int executedCycles;
     int defenseN ;
     bool f;
 
-    QList <CAgent *> positionAgents;
+    QList <Agent *> positionAgents;
 
-    QList <CAgent *> stopAgents;
-    CAgent *playMakeAgent;
-    CAgent *blockAgent;
+    QList <Agent *> stopAgents;
+    Agent *playMakeAgent;
+    Agent *blockAgent;
 
-    static PositioningPlan positioningPlan;
-    static CMarkPlan markPlan;
-    static DefensePlan defensePlan;
 
-    static CRolePlayMake playMakeRole;
-    static CRoleBlock blockRole;
+
+    /*static*/ CRolePlayMake playMakeRole;
+    /*static*/ CRoleBlock blockRole;
 
     void initMaster();
-    void setAgentsID(QList <int> _agentsID);
+    void setAgentsID(const QList <Agent*>& _agentsID);
     void setFormation(QString _formationName);
     void setStaticPoints(QList< holdingPoints > _staticPoints);
     void resetPositioning();
     void resetPlayMaker();
-    void appendRemainingsAgents(QList <CAgent *> &_list);
+    void appendRemainingsAgents(QList <Agent *> &_list);
 
     void choosePlayMaker();
     void chooseBlocker();
-    bool canOneTouch(QList<CAgent*> positionAgents , CAgent *playMake);
+    bool canOneTouch(QList<Agent*> positionAgents , Agent *playMake);
     double coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles );
     double getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs);
 };

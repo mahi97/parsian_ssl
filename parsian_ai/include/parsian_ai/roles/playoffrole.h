@@ -5,6 +5,17 @@
 
 #include <QTime>
 
+enum class RoleSkill {
+    Gotopoint      = 0,
+    GotopointAvoid = 1,
+    Kick           = 2,
+    ReceivePass    = 3,
+    OneTouch       = 4,
+    Mark           = 5,  // After Life (Steady)
+    Support        = 6,  // After Life (Move for ball)
+    Defense        = 7   // After Life (Move back to our field)
+};
+
 class CRolePlayOff{
 private:
     void update();
@@ -27,8 +38,8 @@ public:
     GotopointavoidAction *gotoPointAvoidSkill;
 
     ClassProperty(CRolePlayOff, int, AgentID, agentID, updated);
-    ClassProperty(CRolePlayOff, CAgent*, Agent, agent, updated);
-    ClassProperty(CRolePlayOff, ESkill, SelectedSkill, selectedSkill, updated);
+    ClassProperty(CRolePlayOff, Agent*, Agent, agent, updated);
+    ClassProperty(CRolePlayOff, RoleSkill, SelectedSkill, selectedSkill, updated);
     ClassProperty(CRolePlayOff, Vector2D, Target, target, updated);
     ClassProperty(CRolePlayOff, Vector2D, TargetDir, targetDir, updated);
     ClassProperty(CRolePlayOff, Vector2D, TargetVel, targetVel, updated);

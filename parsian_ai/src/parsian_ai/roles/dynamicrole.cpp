@@ -26,8 +26,6 @@ void CRoleDynamic::update() {
         case DynamicEnums::Ready:
             receiveSkill->setTarget(target);
             receiveSkill->setReceiveradius(receiveRadius);
-            receiveSkill->setAvoidopppenaltyarea(true);
-            receiveSkill->setAvoidourpenaltyarea(true);
             break;
 //   case DynamicEnums::Dribble:
 //       dribbleSkill->setAgent(agent);
@@ -77,7 +75,7 @@ void CRoleDynamic::update() {
             shotSkill->setVeryfine(veryFine);
 //       shotSkill->setShotToEmptySpot(false);
 //       if(wm->getIsSimulMode()) // TODO : WM SIMUL
-            shotSkill->setKickspeed(kickSpeed / 100);
+//            shotSkill->setKickspeed(kickSpeed / 100);
 //       else if (chip) {
             shotSkill->setKickspeed(std::max(200, kickSpeed));
 //       } else {
@@ -105,7 +103,6 @@ void CRoleDynamic::update() {
         case DynamicEnums::OneTouch:
             oneTouchSkill->setWaitpos(waitPos);
             oneTouchSkill->setTarget(target);
-            oneTouchSkill->setAvoidpenaltyarea(avoidPenaltyArea);
             break;
         case DynamicEnums::Keep:
             break;

@@ -12,7 +12,7 @@ public:
 
     virtual void setMessage(const void*) = 0;
     virtual void* getMessage() = 0;
-    static QString getActionName();
+    virtual QString getActionName();
 
 protected:
 private:
@@ -27,6 +27,5 @@ private:
         public: inline type get##name() {return local;} \
         public: skill* set##name(type val); \
         protected: type local
-
 
 #endif //PARSIAN_UTIL_ACTION_H

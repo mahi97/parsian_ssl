@@ -20,8 +20,9 @@ public:
     void update(const parsian_msgs::parsian_world_modelConstPtr& _newWM);
 
 private:
+
 };
 
-extern CWorldModel* wm;
+//extern CWorldModel* wm;
 
 #endif // WORLD_MODEL_H

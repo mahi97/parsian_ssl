@@ -2,9 +2,21 @@
 
 #include <parsian_util/action/autogenerate/gotopointaction.h>
 
+GotopointAction::GotopointAction() {
+       dynamicStart = false;
+       maxAcceleration = 0.0;
+       maxDeceleration = 0.0;
+       maxVelocity = 0.0;
+       oneTouchMode = false;
+       slowMode = false;
+       penaltyKick = false;
+       diveMode = false;
+       smooth = false;
+       roller = 0;
+}
+
 void GotopointAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPoint msg = *((parsian_msgs::parsian_skill_gotoPoint*)_msg);
-        robot_id = msg.robot_id;
         dynamicStart = msg.dynamicStart;
         maxAcceleration = msg.maxAcceleration;
         maxDeceleration = msg.maxDeceleration;
@@ -14,6 +26,7 @@ void GotopointAction::setMessage(const void* _msg) {
         penaltyKick = msg.penaltyKick;
         diveMode = msg.diveMode;
         smooth = msg.smooth;
+        roller = msg.roller;
         targetPos = msg.targetPos;
         targetDir = msg.targetDir;
         targetVel = msg.targetVel;
@@ -23,7 +36,6 @@ void GotopointAction::setMessage(const void* _msg) {
 
 void* GotopointAction::getMessage() {
     parsian_msgs::parsian_skill_gotoPoint* _msg = new parsian_msgs::parsian_skill_gotoPoint;
-    _msg->robot_id = robot_id;
     _msg->dynamicStart = dynamicStart;
     _msg->maxAcceleration = maxAcceleration;
     _msg->maxDeceleration = maxDeceleration;
@@ -33,6 +45,7 @@ void* GotopointAction::getMessage() {
     _msg->penaltyKick = penaltyKick;
     _msg->diveMode = diveMode;
     _msg->smooth = smooth;
+    _msg->roller = roller;
     _msg->targetPos = targetPos.toParsianMessage();
     _msg->targetDir = targetDir.toParsianMessage();
     _msg->targetVel = targetVel.toParsianMessage();
@@ -43,6 +56,10 @@ void* GotopointAction::getMessage() {
 
 
 QString GotopointAction::getActionName(){
-    static QString name("GotopointAction");
-    return name;
+    return SActionName();
 }
+
+QString GotopointAction::SActionName(){
+    return QString{"GotopointAction"};
+}
+

@@ -43,7 +43,7 @@ private:
 public:
 	DEF_ROLE(CRolePosition);
 	QList<PositionRegion> regions;
-	virtual void generateFromConfig(CAgent *a);
+	virtual void generateFromConfig(Agent *a);
     virtual CSkillConfigWidget* generateConfigWidget(QWidget *parent);
 	SkillProperty(CRolePosition, QList<Rect2D>, SearchRects, searchRects);
 	SkillProperty(CRolePosition, QList<Rect2D>, AvoidRects,  avoidRects);

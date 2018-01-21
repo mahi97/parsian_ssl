@@ -32,18 +32,7 @@ namespace parsian_packet {
         ros::Publisher  packetPub;
         ros::Timer      timer;
 
-        ros::Subscriber robotPacketSub0 ;
-        ros::Subscriber robotPacketSub1 ;
-        ros::Subscriber robotPacketSub2 ;
-        ros::Subscriber robotPacketSub3 ;
-        ros::Subscriber robotPacketSub4 ;
-        ros::Subscriber robotPacketSub5 ;
-        ros::Subscriber robotPacketSub6 ;
-        ros::Subscriber robotPacketSub7 ;
-        ros::Subscriber robotPacketSub8 ;
-        ros::Subscriber robotPacketSub9 ;
-        ros::Subscriber robotPacketSub10;
-        ros::Subscriber robotPacketSub11;
+        ros::Subscriber robotPacketSub[_MAX_ROBOT_NUM];
 
 
         ros::Subscriber visinSub;

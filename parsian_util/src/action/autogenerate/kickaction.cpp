@@ -2,9 +2,29 @@
 
 #include <parsian_util/action/autogenerate/kickaction.h>
 
+KickAction::KickAction() {
+       tolerance = 0.0;
+       chip = false;
+       kickSpeed = 0.0;
+       spin = 0;
+       slow = false;
+       avoidPenaltyArea = false;
+       avoidOppPenaltyArea = false;
+       interceptMode = false;
+       dontKick = false;
+       sagMode = false;
+       penaltyKick = false;
+       shotEmptySpot = false;
+       passProfiler = false;
+       veryFine = false;
+       goalieMode = false;
+       kickAngTol = 0.0;
+       kickWithCenterOfDribbler = false;
+       playMakeMode = false;
+}
+
 void KickAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_kick msg = *((parsian_msgs::parsian_skill_kick*)_msg);
-        robot_id = msg.robot_id;
         tolerance = msg.tolerance;
         chip = msg.chip;
         kickSpeed = msg.kickSpeed;
@@ -29,7 +49,6 @@ void KickAction::setMessage(const void* _msg) {
 
 void* KickAction::getMessage() {
     parsian_msgs::parsian_skill_kick* _msg = new parsian_msgs::parsian_skill_kick;
-    _msg->robot_id = robot_id;
     _msg->tolerance = tolerance;
     _msg->chip = chip;
     _msg->kickSpeed = kickSpeed;
@@ -55,6 +74,10 @@ void* KickAction::getMessage() {
 
 
 QString KickAction::getActionName(){
-    static QString name("KickAction");
-    return name;
+    return SActionName();
 }
+
+QString KickAction::SActionName(){
+    return QString{"KickAction"};
+}
+

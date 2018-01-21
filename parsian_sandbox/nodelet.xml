@@ -1,7 +1,0 @@
-<library path="lib/libparsian_sandbox_nodelet">
-    <class name="parsian_sandbox/SandBoxNodelet" type="parsian_sandbox::SandBoxNodelet" base_class_type="nodelet::Nodelet">
-        <description>
-            The SandBox :D
-        </description>
-    </class>
-</library>

@@ -6,8 +6,9 @@
 #define PARSIAN_AI_CONFIG_H
 
 #include <parsian_ai/aiConfig.h>
+#include <parsian_msgs/parsian_team_config.h>
 
 extern ai_config::aiConfig conf;
-
+extern parsian_msgs::parsian_team_config teamConfig;
 
 #endif //PARSIAN_AI_CONFIG_H

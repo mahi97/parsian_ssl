@@ -3,5 +3,6 @@
 //
 
 #include <parsian_ai/config.h>
-
+#include <parsian_msgs/parsian_team_config.h>
 ai_config::aiConfig conf;
+parsian_msgs::parsian_team_config teamConfig;

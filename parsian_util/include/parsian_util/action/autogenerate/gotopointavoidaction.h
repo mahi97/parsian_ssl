@@ -8,16 +8,18 @@
 
 #include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
+#include <list>
 
 class GotopointavoidAction : public GotopointAction  {
 
 public:
-
+    GotopointavoidAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
@@ -27,6 +29,21 @@ public:
     SkillProperty(GotopointavoidAction, bool, Drawpath, drawPath);
     SkillProperty(GotopointavoidAction, bool, Divemode, diveMode);
     SkillProperty(GotopointavoidAction, Vector2D, Addvel, addVel);
+protected:
+    std::list<unsigned char> ourrelax;
+public:
+    void clearOurrelax();
+    void addOurrelax(unsigned char);
+    void removeOurrelax(unsigned char);
+    std::list<unsigned char> getOurrelax();
+protected:
+    std::list<unsigned char> theirrelax;
+public:
+    void clearTheirrelax();
+    void addTheirrelax(unsigned char);
+    void removeTheirrelax(unsigned char);
+    std::list<unsigned char> getTheirrelax();
+
 
 };
 

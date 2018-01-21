@@ -15,43 +15,32 @@
 #include <QtCore/QFile>
 #include <QPair>
 #include <QTextStream>
-//#include <parsian_ai/util/loadplayoffjson.h>
-
-
 #include "parsian_util/base.h"
-#include "parsian_util/core/worldmodel.h"
+#include <parsian_ai/util/worldmodel.h>
 #include <parsian_ai/plans/plans.h>
 #include <parsian_ai/plays/plays.h>
+#include <parsian_ai/roles/stop.h>
 
-
-
+enum class BallPossesion {
+    WEDONTHAVETHEBALL = 0,
+    WEHAVETHEBALL = 1,
+    SOSOOUR = 2,
+    SOSOTHEIR = 3
+};
 
 class CCoach {
 
 public:
 
-    ////////GUI Needed
-//    CPlayOff* playOff();
-//    CLoadPlayOffJson* getPlanLoader();
     bool inited;
     double playOnTime;
-    explicit CCoach(CAgent** _agents);
+    explicit CCoach(Agent** _agents);
     ~CCoach();
-//    static ShotSpot getShotSpot(const Vector2D& _ball, const Vector2D& _shotPos);
     void execute();
-    void saveGoalie(); // TODO : Move To roles/Agent
-//    DefensePlan& getDefense();
-    void swapAgents();   //refer to selectedId in knowledge
-    bool swapAgents(int i, int j);
-//    void setOpponents();
-    int mostSupporterNumber(int num);
-    QList<int> findBestPoses(int numberOfPositionAgents);
-//    CKnowledge::ballPossesionState lastBallPossesionState;
-//    CKnowledge::ballPossesionState isBallOurs();
-//    CKnowledge::ballPossesionState ballPStateIntented;
-//    static QMap<QString, EditData*> editData; //Contains Formations
-    /*  ClassProperty(CCoach, Vector2D, LastBallVelPm, lastBallVelPM, updated);
-      ClassProperty(CCoach, Vector2D, LastBallPos, lastBallPos, updated);*/
+    DefensePlan& getDefense();
+    BallPossesion lastBallPossesionState;
+    BallPossesion isBallOurs();
+    BallPossesion ballPState;
 
 private:
     bool lastASWasCritical;
@@ -59,52 +48,45 @@ private:
     bool passPlayMake;
     Vector2D lastBallVelPM;
     Vector2D lastBallPos;
-    bool updated;
     double findMostPossible(Vector2D agentPos);
-//    CKnowledge::State kkLastState;
-    CAgent *goalieAgent;
-    CAgent *exeptionPlayMake;
+    States lastState;
+    Agent *goalieAgent;
+    Agent *exeptionPlayMake;
     double exeptionPlayMakeThr;
-    QList<CAgent*> defenseAgents;
-//    DefensePlan defenses;
+    QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
     Vector2D defenseTargets[12];
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
-    QTime playMakeSelectTime;
     double playMakeIntentionInterval;
     double possessionIntentionInterval;
-    double playMakeIntended;
 
     CMasterPlay          *selectedPlay;
 
-//    CPlayOff             *ourPlayOff;
-//    COurPenalty          *ourPenalty;
+    CPlayOff             *ourPlayOff;
+    COurPenalty          *ourPenalty;
 //    COurBallPlacement    *ourBallPlacement;
-//
-//    CTheirDirect         *theirDirect;
-//    CTheirPenalty        *theirPenalty;
-//    CTheirKickOff        *theirKickOff;
-//    CTheirIndirect       *theirIndirect;
-//    CTheirBallPlacement  *theirBallPlacement;
-//
-//    CDynamicAttack       *dynamicAttack;
-//
-//    CStopPlay            *stopPlay;
-//
-//
-//    CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+
+    CTheirDirect         *theirDirect;
+    CTheirPenalty        *theirPenalty;
+    CTheirKickOff        *theirKickOff;
+    CTheirIndirect       *theirIndirect;
+    CTheirBallPlacement  *theirBallPlacement;
+
+    CDynamicAttack       *dynamicAttack;
+
+    CStopPlay            *stopPlay;
+
+
+    CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
-    CAgent** agents;
+    Agent** agents;
     int lastAssignCycle;
 
-    QPair<QList<CAgent *>, QList<CAgent *> > lastAssign;
-    void savePostAssignment();
-    void loadPostAssignment();
     void checkRoleAssignments();
     ///////manage over number of agents
     ///
@@ -113,33 +95,27 @@ private:
     bool first;
     QList <int> missMatchIds;
     ///////////////////////////////////////
-    int lastSelected;
     int cyclesWaitAfterballMoved;
-    QList <CAgent*> lastDefenseAgents;
-    QList <int> lastDefenderAgents;
-    void checkTransitionToForceStart();
-//    void updateKnowledgeVars();
-//    void doIntention();
-    void clearIntentions();
+    QList <Agent*> lastDefenseAgents;
+
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
-//    void decidePreferedDefenseAgentsCountAndGoalieAgent();
+    void decidePreferedDefenseAgentsCountAndGoalieAgent();
     void decideAttack();
     void decideDefense();
-//    void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
-//    void decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers);
+    void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
+    void decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers);
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr ;
-//    void virtualTheirPlayOffState();
+    void virtualTheirPlayOffState();
     bool transientFlag;
-//    CKnowledge::State lastState;
     QTime trasientTimeOut;
     int translationTimeOutTime;
     bool isBallcollide();
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
-    int playmakeId,supporterId;
+    int playmakeId;
     double playMakeTh;
     int lastPlayMake;
     void choosePlaymakeAndSupporter(bool defenseFirst);
@@ -150,58 +126,32 @@ private:
     {
         SAFE     = 0,
         FAST     = 1,
-        CRITICAL = 2,
-        BallInOppJaw  = 3
+        CRITICAL = 2
     };
     attackState ourAttackState;
     void updateAttackState();
 
 
     ///////////////////////New Play Off
-//    void selectPlayOffMode(int agentSize, NGameOff::EMode& _mode);
-//    void initPlayOffMode(NGameOff::EMode _mode,
-//                         POMODE _gameMode,
-//                         const QList<int>& _agentSize);
-//    void setPlayOff(NGameOff::EMode _mode);
-//    int PlayoffLFUPolicy(QList<SPlan*> prevValidPlans, QList<SPlan*> validPlans);
-//    int PlayoffShufflePolicy(QList<SPlan*> prevValidPlans, QList<SPlan*> validPlans);
-//    int LFUPlan(QList<SPlan*> validPlans);
-//    void MinChanceOfValidplans(QList<SPlan*> validPlans);
-//    void initStaticPlay(POMODE _mode, const QList<int>& _agentSize);
-//    void initDynamicPlay(QList<int> _ourplayers);
-//    void initFastPlay(QList<int> _ourplayers);
-//    void initFirstPlay(QList<int> _ourplayers);
-//    void setStaticPlay();
-//    void setDynamicPlay();
-//    void setFirstPlay();
-//    void setFastPlay();
-//
-//    QList<SPlan*> getValidPlans(const POMODE _mode, const QList<int> &_ourPlayers);
-//
-//    QList<SPlan *> getMatchedPlans(const QStringList& _tags, const QList<SPlan *> &_plans);
-//    QList<SPlan *> getMatchedPlans(int _shotSpot, const QList<SPlan*> &_plans);
-
-//    CLoadPlayOffJson* m_planLoader;
+    void selectPlayOffMode(int agentSize, NGameOff::EMode& _mode);
+    void initPlayOffMode(NGameOff::EMode _mode,
+                         POMODE _gameMode,
+                         const QList<int>& _agentSize);
+    void setPlayOff(NGameOff::EMode _mode);
+    void initStaticPlay(POMODE _mode, const QList<int>& _agentSize);
+    void initDynamicPlay(const QList<int> &_ourplayers);
+    void initFastPlay(const QList<int> &_ourplayers);
+    void initFirstPlay(const QList<int> &_ourplayers);
+    void setStaticPlay();
+    void setDynamicPlay();
+    void setFirstPlay();
+    void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
 
-    bool isTagsMatched(const QStringList& base, const QStringList& required);
-    bool isTagsNearMatched(const QStringList& base, const QStringList& required);
 
-    bool isRegionMatched(const Vector2D& _ball, const double& _radius = 1.0); //circular Matching
-    //TODO : squere or Liner matching
-//    NGameOff::SPlan* chooseMostSuccecfull(const QList<NGameOff::SPlan*>& plans);
-//    void LFUInit(QList<NGameOff::SPlan*> allPlans);
-//    void saveLFUReapeatData(QList<SPlan*> plans);
-//    void ShufflePlanIndexing(QList<SPlan*> Plans);
-//    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
-//    void checkGUItoRefineMatch(NGameOff::SPlan* _plan, const QList<int> &_ourplayers);
-    QStringList currentTags;
     int preferedShotSpot;
-    QStringList guiTags; // TODO : add tags to gui playoffTab
 
-//    NGameOff::SPlan* lastPlan;
     QList<int> lastPlayers;
-//    CKnowledge::ballPossesionState ballPState;
     Vector2D lastBallVel;
     //////////////Decide Attack functions
     void decideHalt               (QList<int>&);
@@ -214,24 +164,13 @@ private:
     void decideTheirDirect        (QList<int>&);
     void decideOurPenalty         (QList<int>&);
     void decideTheirPenalty       (QList<int>&);
-    void decideNormalStart        (QList<int>&);
     void decideStart              (QList<int>&);
     void decideOurBallPlacement   (QList<int>&);
     void decideTheirBallPlacement (QList<int>&);
     void decideHalfTimeLineUp   (QList<int>&);
     void decideNull               (QList<int>&);
     /////////////////////////////////////
-    unsigned int staticPlayoffPlansCounter;
-    unsigned int shuffleCounter, shuffleSize;
-    bool shuffled;
-    double LFUPlanID,maxLFU, LFU;
-//    QList<SPlan *> LFUList;
-    bool firstPlanRepeatInit;
     QTextStream out;
-    QFile playoffPlanSelectionDataFile;
-    QList<int> staticPlayoffPlansShuffleIndexing;
-    int minChance, minChanceRepeat;
-
     bool isFastPlay();
     ///HMD
     bool checkOverdef();
@@ -240,6 +179,12 @@ private:
     // inter change
     void checkSensorShootFault();
     int  faultDetectionCounter[12];
+
+
+    // MAHI ADD IN ROS
+    QList <CRobot*> toBeMopps;
+    int desiredDefCount;
+    QString stateForMark;
 };
 
 #endif //PARSIAN_AI_COACH_H

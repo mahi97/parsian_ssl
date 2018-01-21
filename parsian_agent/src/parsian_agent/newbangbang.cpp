@@ -141,8 +141,8 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
 
     //////////////////////// dec calculations
     double vp =(posPidDist*posPid->kp);
-    double moreDec = 0.7;
-    double decOffset = 0.6;
+    double moreDec = 0.9;
+    double decOffset = 0.2;
 
     switch(decidePlan())
     {
@@ -155,7 +155,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos,Vector2D _agentVel,Vector2D 
         break;
     case _bangBangDec:
         if(Vel2 == 0 )
-            vDes = sqrt(vp*vp + 2*dmax*agentPos.dist(pos2)*moreDec) - decOffset;
+            vDes = sqrt(vp*vp + 2 * dmax*agentPos.dist(pos2)*moreDec) - decOffset;
         else
             vDes = sqrt(Vel2*Vel2 + 2*dmax*agentPos.dist(pos2)*moreDec)- decOffset ;
         break;

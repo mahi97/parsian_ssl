@@ -2,6 +2,15 @@
 
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
+GotopointavoidAction::GotopointavoidAction() {
+       avoidPenaltyArea = false;
+       noAvoid = false;
+       avoidCenterCircle = false;
+       ballObstacleRadius = 0.0;
+       drawPath = false;
+       diveMode = false;
+}
+
 void GotopointavoidAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPointAvoid msg = *((parsian_msgs::parsian_skill_gotoPointAvoid*)_msg);
         avoidPenaltyArea = msg.avoidPenaltyArea;
@@ -31,6 +40,36 @@ void* GotopointavoidAction::getMessage() {
 
 
 QString GotopointavoidAction::getActionName(){
-    static QString name("GotopointavoidAction");
-    return name;
+    return SActionName();
+}
+
+QString GotopointavoidAction::SActionName(){
+    return QString{"GotopointavoidAction"};
+}
+
+void GotopointavoidAction::clearOurrelax() {
+    ourrelax.clear();
+}
+
+void GotopointavoidAction::addOurrelax(unsigned char _t) {
+    ourrelax.push_back(_t);
+}
+void GotopointavoidAction::removeOurrelax(unsigned char _t) {
+    ourrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getOurrelax() {
+    return ourrelax;
+}
+void GotopointavoidAction::clearTheirrelax() {
+    theirrelax.clear();
+}
+
+void GotopointavoidAction::addTheirrelax(unsigned char _t) {
+    theirrelax.push_back(_t);
+}
+void GotopointavoidAction::removeTheirrelax(unsigned char _t) {
+    theirrelax.remove(_t);
+}
+std::list<unsigned char> GotopointavoidAction::getTheirrelax() {
+    return theirrelax;
 }

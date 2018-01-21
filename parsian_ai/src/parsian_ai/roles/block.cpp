@@ -1,9 +1,10 @@
 #include <parsian_ai/roles/block.h>
 
+CRoleBlockInfo* CRoleBlock::roleInfo{};
 
 CRoleBlock::CRoleBlock(Agent *_agent) : CRole(_agent)
 {
-    gotopoint = new Goto(_agent);
+    gotopoint = new GotopointavoidAction();
 }
 
 CRoleBlock::~CRoleBlock()
@@ -13,21 +14,24 @@ CRoleBlock::~CRoleBlock()
 
 void CRoleBlock::execute()
 {
-    gotopoint->setAgent(agent);
-	info()->findPos(blockGoal);
+    info()->findPos(blockGoal);
 
 	Vector2D dir, p;
 	p = agent->oneTouchCheck(info()->blockPosition, &dir);
 	if (p.valid())
 	{
-		gotopoint->init(p ,dir);
-		gotopoint->execute();
+        gotopoint->setTargetdir(dir);
+        gotopoint->setTargetpos(p);
+
 	}
 	else
 	{
-		gotopoint->init(info()->blockPosition ,dir);
-		gotopoint->execute();
+
+        gotopoint->setTargetpos(info()->blockPosition);
+        gotopoint->setTargetdir(dir);
+
 	}
+    agent->action = gotopoint;
 }
 
 double CRoleBlock::progress()
@@ -46,6 +50,11 @@ void CRoleBlock::parse(QStringList params)
     }
 }
 
+CRoleBlockInfo* CRoleBlock::info()
+{
+    return roleInfo;
+}
+
 CRoleBlockInfo::CRoleBlockInfo(QString _roleName) : CRoleInfo(_roleName)
 {
 
@@ -60,36 +69,36 @@ void CRoleBlockInfo::findPos(bool blockGoal)
         }
 
 	if ( blockGoal ){
-		blockPosition = ( wm->field->ourGoal() - wm->ball->pos).norm()*( blockDist + CRobot::robot_radius_old) + wm->ball->pos;
+		blockPosition = ( wm->field->ourGoal() - wm->ball->pos).norm()*( blockDist + Robot::robot_radius_old) + wm->ball->pos;
 	}
 	else{
-		Vector2D goalPos = ( wm->field->ourGoal() - wm->ball->pos).norm()*( blockDist + CRobot::robot_radius_old) + wm->ball->pos;
+		Vector2D goalPos = ( wm->field->ourGoal() - wm->ball->pos).norm()*( blockDist + Robot::robot_radius_old) + wm->ball->pos;
         Vector2D pos;
-		int kicker = knowledge->getNearestOppToPoint( wm->ball->pos );
+		int kicker = know->getNearestOppToPoint( wm->ball->pos );
 		if (kicker == -1){
 			blockPosition = goalPos;
 		}
 		else{
-			pos = ( wm->ball->pos - wm->opp[kicker]->pos).norm()*( blockDist + CRobot::robot_radius_old) + wm->ball->pos;
+			pos = ( wm->ball->pos - wm->opp[kicker]->pos).norm()*( blockDist + Robot::robot_radius_old) + wm->ball->pos;
 
-            Rect2D checkRect = Rect2D( wm->field->fieldRect().left() + CRobot::robot_radius_old, wm->field->fieldRect().top() - CRobot::robot_radius_old , _FIELD_WIDTH- 2 *CRobot::robot_radius_old, _FIELD_HEIGHT-2*CRobot::robot_radius_old);
+            Rect2D checkRect = Rect2D( wm->field->fieldRect().left() + Robot::robot_radius_old, wm->field->fieldRect().top() - Robot::robot_radius_old , wm->field->_FIELD_WIDTH- 2 *Robot::robot_radius_old, wm->field->_FIELD_HEIGHT -2*Robot::robot_radius_old);
             if ( Vector2D::angleBetween( ( wm->ball->pos - wm->opp[kicker]->pos) , ( wm->field->ourGoal() - wm->ball->pos)).abs() < 30 && checkRect.contains( pos))
                 blockPosition = pos;                
             else
                 blockPosition = goalPos;
-            if ( knowledge->getGameState()==CKnowledge::TheirKickOff)
+            if ( gameState->theirKickoff())
             {
-                if (blockPosition.x > -CRobot::robot_radius_old)
+                if (blockPosition.x > -Robot::robot_radius_old)
                 {
                     if (blockPosition.y > 0)
                     {
-                        blockPosition.x = -CRobot::robot_radius_old;
-						blockPosition.y = blockDist + CRobot::robot_radius_old;
+                        blockPosition.x = -Robot::robot_radius_old;
+						blockPosition.y = blockDist + Robot::robot_radius_old;
                     }
                     else
                     {
-                        blockPosition.x = -CRobot::robot_radius_old;
-						blockPosition.y = -1*blockDist - CRobot::robot_radius_old;
+                        blockPosition.x = -Robot::robot_radius_old;
+						blockPosition.y = -1*blockDist - Robot::robot_radius_old;
                     }
                 }
             }

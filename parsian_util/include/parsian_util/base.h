@@ -197,6 +197,11 @@ struct GameStatePacket
 
 #define InitVal(val) val = _##val
 
+#define ClassProperty(skill,type,name,local,chflag) \
+        public: inline type get##name() const {return local;} \
+        public: inline skill* set##name(type val) {local = val;chflag = true;return this;} \
+        protected: type local
+
 #define foragents(i) for (int i=0;i<_NUM_PLAYERS;i++)
 #define for_visible_agents(AGENTS, i) for (int i=0;i<_NUM_PLAYERS;i++) if (AGENTS[i]->isVisible())
 
