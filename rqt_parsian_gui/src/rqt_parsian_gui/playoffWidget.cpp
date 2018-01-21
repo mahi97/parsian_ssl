@@ -97,9 +97,11 @@ PlayOffWidget::~PlayOffWidget() {
 void PlayOffWidget::updateModel() {
 
     model->clear();
+
     QStandardItem *pkg;
     QStandardItem *file;
     QStandardItem *plan;
+
     int pkgCounter  = 0;
     int fileCounter = 0;
     int planCounter = 0;
@@ -132,10 +134,10 @@ void PlayOffWidget::updateModel() {
                              QString::fromStdString(theplans->response.allPlans[i].planFile) + ".png" +"/></html>");
             pkg->appendRow(file);
         }
+
         planCounter++;
         plan = new QStandardItem(QString("%1").arg(i));
         file->appendRow(plan);
-
         file->setEditable(false);
         plan->setEditable(false);
         pkg->setEditable(false);
@@ -167,8 +169,8 @@ void PlayOffWidget::updateBtn(bool _debug) {
 }
 
 void PlayOffWidget::slt_updatePlans() {
-    theplans->response.allPlans.clear();
     theplans->request.newPlans.clear();
+    theplans->response.allPlans.clear();
     client.call(*theplans);
     updateModel();
 }
@@ -181,8 +183,8 @@ void PlayOffWidget::slt_active() {
                 while (model.child(++i, 0).data().toString() != "") {
                     int j = -1;
                     while (model.child(i, 0).child(++j, 0).data().toString() != "") {
-                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).active = static_cast<unsigned char>(true);
-                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).master = static_cast<unsigned char>(true);
+                        theplans->request.newPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).active = static_cast<unsigned char>(true);
+                        theplans->request.newPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).master = static_cast<unsigned char>(true);
 
                     }
                 }
@@ -190,15 +192,15 @@ void PlayOffWidget::slt_active() {
                 details[0]->setText(QString("Type : File"));
                 int i = -1;
                 while (model.child(++i, 0).data().toString() != "") {
-                    theplans->response.allPlans.at(model.child(i, 0).data().toUInt()).active = static_cast<unsigned char>(true);
-                    theplans->response.allPlans.at(model.child(i, 0).data().toUInt()).master = static_cast<unsigned char>(false);
+                    theplans->request.newPlans.at(model.child(i, 0).data().toUInt()).active = static_cast<unsigned char>(true);
+                    theplans->request.newPlans.at(model.child(i, 0).data().toUInt()).master = static_cast<unsigned char>(false);
 
                 }
             } else if (model.parent().parent().parent().row() == -1) {
 
                 int planIndex = model.data().toInt();
 
-                choosen = &theplans->response.allPlans.at(planIndex);
+                choosen = &theplans->request.newPlans.at(static_cast<unsigned long>(planIndex));
                 choosen->active = static_cast<unsigned char>(true);
                 choosen->master = static_cast<unsigned char>(false);
 
@@ -207,7 +209,9 @@ void PlayOffWidget::slt_active() {
             active->setEnabled(false);
             deactive->setEnabled(true);
             master->setEnabled(true);
-
+            theplans->response.allPlans.clear();
+            client.call(*theplans);
+            updateModel();
         }
 }
 
@@ -219,30 +223,33 @@ void PlayOffWidget::slt_deactive() {
                 while (model.child(++i, 0).data().toString() != "") {
                     int j = -1;
                     while (model.child(i, 0).child(++j, 0).data().toString() != "") {
-//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.master = false;
-//                        theplans->response.allPlans.at(model.child(i, 0).child(j, 0).data().toInt())->gui.active = false;
+                        theplans->request.newPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).master = static_cast<unsigned char>(false);
+                        theplans->request.newPlans.at(model.child(i, 0).child(j, 0).data().toUInt()).active = static_cast<unsigned char>(false);
                     }
                 }
             } else if (model.parent().parent().row() == -1) {
                 details[0]->setText(QString("Type : File"));
                 int i = -1;
                 while (model.child(++i, 0).data().toString() != "") {
-//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.master = false;
-//                    theplans->response.allPlans.at(model.child(i, 0).data().toInt())->gui.active = false;
+                    theplans->response.allPlans.at(model.child(i, 0).data().toUInt()).master = static_cast<unsigned char>(false);
+                    theplans->response.allPlans.at(model.child(i, 0).data().toUInt()).active = static_cast<unsigned char>(false);
                 }
             } else if (model.parent().parent().parent().row() == -1) {
 
                 int planIndex = model.data().toInt();
-//
-//                choosen = theplans->response.allPlans.at(planIndex);
-//                choosen->gui.active = false;
-//                choosen->gui.master = false;
+
+                choosen = &theplans->response.allPlans.at(planIndex);
+                choosen->active = static_cast<unsigned char>(false);
+                choosen->master = static_cast<unsigned char>(false);
             }
 
             active->setEnabled(true);
             deactive->setEnabled(false);
             master->setEnabled(true);
 
+            theplans->response.allPlans.clear();
+            client.call(*theplans);
+            updateModel();
         }
 }
 
@@ -278,6 +285,9 @@ void PlayOffWidget::slt_master() {
             deactive->setEnabled(true);
             master->setEnabled(false);
 
+            theplans->response.allPlans.clear();
+            client.call(*theplans);
+            updateModel();
         }
 }
 
