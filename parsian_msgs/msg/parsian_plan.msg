@@ -1,3 +1,13 @@
-float64  lastDist
-string[] Tags
-parsian_msgs/parsian_plan_agent[] agents
+string name
+string planFile
+string package
+bool active
+bool master
+uint32[3] index
+uint32 agentSize
+float64 chance
+float64 lastDist
+
+string[] tags
+int32 succesRate
+int32 planRepeat

@@ -8,12 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roslint
-  rqt_gui
-  rqt_gui_cpp
-  std_msgs
-  parsian_util
-)
+        roslint
+        rqt_gui
+        rqt_gui_cpp
+        std_msgs
+        parsian_msgs
+        parsian_util
+        )
 
 ## System dependencies are found with CMake's conventions
 
@@ -112,32 +113,35 @@ roslint_cpp()
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS rqt_gui_cpp parsian_util 
-#  DEPENDS system_lib
+        INCLUDE_DIRS include
+        LIBRARIES ${PROJECT_NAME}
+        CATKIN_DEPENDS rqt_gui_cpp parsian_util
+        #  DEPENDS system_lib
 )
 
 
 set (${PROJECT_NAME}_SRCS
-  src/${PROJECT_NAME}/monitor.cpp
-  src/${PROJECT_NAME}/robotstatus.cpp
-  src/${PROJECT_NAME}/robotstatus_widget.cpp
-  src/${PROJECT_NAME}/monitorWidget.cpp
-  src/${PROJECT_NAME}/guiDrawer.cpp
-  src/${PROJECT_NAME}/mode_chooser.cpp
-  src/${PROJECT_NAME}/modeChooserWidget.cpp
-)
+        src/${PROJECT_NAME}/monitor.cpp
+        src/${PROJECT_NAME}/robotstatus.cpp
+        src/${PROJECT_NAME}/robotstatus_widget.cpp
+        src/${PROJECT_NAME}/monitorWidget.cpp
+        src/${PROJECT_NAME}/guiDrawer.cpp
+        src/${PROJECT_NAME}/mode_chooser.cpp
+        src/${PROJECT_NAME}/modeChooserWidget.cpp
+        src/${PROJECT_NAME}/playoffWidget.cpp
+        src/${PROJECT_NAME}/playoff.cpp )
 
 set(${PROJECT_NAME}_HDRS
-  include/${PROJECT_NAME}/monitor.h
-  include/${PROJECT_NAME}/robotstatus.h
-  include/${PROJECT_NAME}/robotstatus_widget.h
-  include/${PROJECT_NAME}/monitorWidget.h
-  include/${PROJECT_NAME}/guiDrawer.h
-  include/${PROJECT_NAME}/mode_chooser.h
-  include/${PROJECT_NAME}/modeChooserWidget.h
-)
+        include/${PROJECT_NAME}/monitor.h
+        include/${PROJECT_NAME}/robotstatus.h
+        include/${PROJECT_NAME}/robotstatus_widget.h
+        include/${PROJECT_NAME}/monitorWidget.h
+        include/${PROJECT_NAME}/guiDrawer.h
+        include/${PROJECT_NAME}/mode_chooser.h
+        include/${PROJECT_NAME}/modeChooserWidget.h
+        include/${PROJECT_NAME}/playoff.h
+        include/${PROJECT_NAME}/playoffWidget.h
+        )
 
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
@@ -153,16 +157,16 @@ endif()
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${CMAKE_CURRENT_BINARY_DIR}/..
-  ${catkin_INCLUDE_DIRS}
+        include
+        ${CMAKE_CURRENT_BINARY_DIR}/..
+        ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
-    ${${PROJECT_NAME}_SRCS}
-    ${${PROJECT_NAME}_MOCS}
-    )
+        ${${PROJECT_NAME}_SRCS}
+        ${${PROJECT_NAME}_MOCS}
+        )
 
 ## Declare a C++ executable
 # add_executable(rqt_example_cpp_node src/rqt_example_cpp_node.cpp)
@@ -173,8 +177,8 @@ add_library(${PROJECT_NAME}
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+        ${catkin_LIBRARIES}
+        )
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
   target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
@@ -198,25 +202,25 @@ endif()
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-)
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        #   PATTERN ".svn" EXCLUDE
+        )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  plugin1.xml
-  plugin2.xml
-  mode_plugin.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+        plugin1.xml
+        plugin2.xml
+        mode_plugin.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 #############
 ## Testing ##

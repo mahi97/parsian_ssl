@@ -1,0 +1,15 @@
+parsian_plan[] newPlans
+uint8 newMode
+
+int8 DIRECT   = 1
+int8 INDIRECT = 2
+int8 KICKOFF  = 3
+
+---
+
+parsian_plan[] allPlans
+uint8[] allModes
+
+int8 DIRECT   = 1
+int8 INDIRECT = 2
+int8 KICKOFF  = 3
