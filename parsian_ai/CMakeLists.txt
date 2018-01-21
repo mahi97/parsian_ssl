@@ -40,7 +40,7 @@ find_package(QJSON REQUIRED)
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+#catkin_python_setup()
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -94,6 +94,7 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/soccer.cpp
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
+
 		src/${PROJECT_NAME}/coach.cpp
 		)
 
@@ -137,14 +138,16 @@ add_library(${PROJECT_NAME}_util
 
 
 add_library(${PROJECT_NAME}_nodelet
-		src/ai_nodelet.cpp
+		src/parsian_ai/ai_nodelet.cpp
 		)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+
+
 add_executable(${PROJECT_NAME}_node
-		src/ai_node.cpp
+		src/parsian_ai/ai_node.cpp
 		)
 
 ## Rename C++ executable without prefix
@@ -174,7 +177,6 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 		${PROJECT_NAME}
 		${QT_LIBRARIES}
 		)
-
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
@@ -221,6 +223,7 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_util
 		)
 
+
 target_link_libraries(${PROJECT_NAME}_plays
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
@@ -256,10 +259,11 @@ target_link_libraries(${PROJECT_NAME}_roles
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(PROGRAMS
+   		scripts/plan_service_server
+		scripts/plan_service_client
+   		DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+		)
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node

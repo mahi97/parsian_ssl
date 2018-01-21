@@ -1,14 +1,12 @@
 string name
 string planFile
 string package
-bool active
-bool master
+bool isActive
+bool isMaster
 uint32[3] index
 uint32 agentSize
 float64 chance
 float64 lastDist
-
 string[] tags
 int32 succesRate
 int32 planRepeat
-
