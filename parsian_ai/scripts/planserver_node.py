@@ -15,13 +15,16 @@ class Get_Plan:
 
     def handle_gui_plan_request(self, req):
         #type: (parsian_update_plans)
-        # print(req)
+
+        received = req.request.newPlan
+        if len(received) > 0:
+            self.__w.update_master_active(received, req.request.isMaster, req.request.isActive)
         return self.__w.get_all_plans()
 
 
-    def handle_plan_request(selfself, req):
+    def handle_plan_request(self, req):
         #type: (plan_service)
-        gameMode = req
+        return self.__w.choose_plan(req.request.playersNum, req.request.gameMode)
 
 if __name__ == '__main__':
     Get_Plan()
