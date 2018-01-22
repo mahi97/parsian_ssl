@@ -155,7 +155,40 @@ void CSkillKickOneTouch::execute()
     else if((oneTouchArea.intersection(ballPath,&sol1,&sol2) != 0) && wm->ball->vel.length() > 0.1)
     {
         gotopointavoid->setNoavoid(false);
-        intersectPos = ballPath.nearestPoint(kickerPoint);
+        double agentTime= 0 ;
+        drawer->draw(QString("agentT dif : %1").arg(kickerPoint.dist(wm->ball->getPosInFuture(0.5))) , Vector2D(2.5,-1));
+
+        if(kickerPoint.dist(wm->ball->getPosInFuture(0.5)) < 0.1 || wm->ball->pos.dist(agentPos) < 1)
+        {
+            intersectPos = ballPath.nearestPoint(kickerPoint);
+        }
+        else
+        {
+            bool posFound  = false;
+            for(double i = 0 ; i < 5 ; i += 0.1)
+            {
+
+                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
+                QList <int> dummy;
+                agentTime = CSkillGotoPointAvoid::timeNeeded(agent,intersectPos + addVec,conf->VelMax,dummy,dummy,false,0,true);
+
+
+                if(agentTime < (i - (0.5 - min(wm->ball->vel.length(),4)/8 ) ))
+                {
+                    posFound  = true;
+                    break;
+                }
+            }
+
+            if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(intersectPos + addVec))
+            {
+                intersectPos = ballPath.nearestPoint(kickerPoint);
+            }
+        }
+        //        intersectPos = ballPath.nearestPoint(kickerPoint);
+        drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
+
+
         if(wm->field->isInOppPenaltyArea(intersectPos) || oppPenaltyAreaWP.contains(waitPos))
         {
             if(oppPenaltyArea.intersection(ballLine,&sol1,&sol2) != 0)
@@ -202,4 +235,7 @@ void CSkillKickOneTouch::execute()
         gotopointavoid->init(waitPos, oneTouchDir);
         gotopointavoid->execute();
     }
+
+    ballLastVel = wm->ball->vel;
+    lastInterceptPos = intersectPos;
 }
