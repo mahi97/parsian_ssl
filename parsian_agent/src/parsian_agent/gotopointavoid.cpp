@@ -294,7 +294,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     QList <Vector2D> _result;
     Vector2D _target;
 
-    double tAgentVelTanjent = tAgentVel.length()*cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
+    double tAgentVelTanjent =  tAgentVel.length()*cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
     /*if(_noAvoid)
     {
         _result.clear();
@@ -324,23 +324,26 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
         distEffect = std::max(1.0, distEffect);
     }
 */
-    if(tAgentVel.length() < 0.2) {
-        acc = (conf->AccMaxForward + conf->AccMaxNormal)/2;
+    double vXvirtual = (posT - _agentT->pos()).x;
+    double vYvirtual = (posT - _agentT->pos()).y;
+    double veltanV= (vXvirtual)*cos(tAgentDir.th().radian()) + (vYvirtual)*sin(tAgentDir.th().radian());
+    double velnormV= -1*(vXvirtual)*sin(tAgentDir.th().radian()) + (vYvirtual)*cos(tAgentDir.th().radian());
+    double accCoef =1,realAcc = 4;
 
-    } else {
-        acc =conf->AccMaxForward*(fabs(veltan)/tAgentVel.length()) + conf->AccMaxNormal*(fabs(velnorm)/tAgentVel.length());
-    }
+    accCoef = atan(fabs(veltanV)/fabs(velnormV))/_PI*2;
+        acc = accCoef*conf->AccMaxForward + (1-accCoef)*conf->AccMaxNormal;
 
     double tDec = vMax/dec;
     double tAcc = (vMax-tAgentVelTanjent)/acc;
     dist = posT.dist(_agentT->pos());
     double dB = tDec * vMax / 2 + tAcc * (vMax + tAgentVelTanjent) / 2;
+
     if(dist > dB) {
         return tAcc+tDec+(dist - dB)/vMax;
     }
     else
     {
-        return ((1/dec)+(1-tAgentVelTanjent)/acc)*sqrt(dist*(2*dec*acc/(acc+dec))+(tAgentVelTanjent*tAgentVelTanjent/(2*acc)));
+        return ((1/dec)+(1/acc))*sqrt(dist*(2*dec*acc/(acc+dec))+(tAgentVelTanjent*tAgentVelTanjent/(2*acc)))-(tAgentVelTanjent)/acc;
     }
 
 }
