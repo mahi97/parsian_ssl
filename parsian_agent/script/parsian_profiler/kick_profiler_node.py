@@ -12,6 +12,7 @@ from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import vector2D
 from parsian_msgs.msg import parsian_robot_command
 from parsian_msgs.msg import parsian_skill_gotoPointAvoid
+from parsian_msgs.msg import parsian_skill_no
 from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot
 from parsian_msgs.msg import parsian_skill_receivePass
@@ -148,7 +149,6 @@ class KickProfiler():
                 self.state = State.CALCULATING
         if self.state == State.CALCULATING:
             self.calculate()
-            time.sleep(1)
         if self.state == State.NONE:
             if self.calculatedone:
                 self.calculatedone = False
@@ -424,6 +424,12 @@ class KickProfiler():
             current_task1.receivePassTask = task1
             self.task_pub1.publish(current_task1)
             if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+                current_task1 = parsian_robot_task()
+                current_task1.select = parsian_robot_task.NOTASK
+                task1 = parsian_skill_no()
+                current_task1.noTask = task1
+                self.task_pub1.publish(current_task1)
+                time.sleep(1)
                 return True
             # if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y  - self.my_robot1.pos.y) >= 0.5:
             #     return True
@@ -440,6 +446,12 @@ class KickProfiler():
             current_task2.receivePassTask = task2
             self.task_pub2.publish(current_task2)
             if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+                current_task2 = parsian_robot_task()
+                current_task2.select = parsian_robot_task.NOTASK
+                task2 = parsian_skill_no()
+                current_task2.noTask = task2
+                self.task_pub2.publish(current_task2)
+                time.sleep(1)
                 return True
             # if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y  - self.my_robot2.pos.y) >= 0.5:
             #     return True
