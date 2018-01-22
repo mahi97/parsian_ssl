@@ -20,6 +20,8 @@ from parsian_msgs.msg import parsian_skill_kick
 from parsian_msgs.msg import parsian_draw
 from parsian_msgs.msg import parsian_draw_circle
 from parsian_msgs.msg import parsian_draw_text
+from dynamic_reconfigure.server import Server
+from parsian_agent.cfg import kick_profilerConfig
 
 
 class State(Enum):
@@ -49,26 +51,28 @@ class ReceiveStat(Enum):
 
 class KickProfiler():
     def __init__(self):
-        self.margin = 0.3                               #GUI
-        self.Y1 = 3                                     #GUI
-        self.Y2 = -3                                    #GUI
-        self.X1 = -4.5                                  #GUI
-        self.X2 = 4.5                                   #GUI
-        self.Y1M = self.Y1 - self.margin                #GUI*
-        self.Y2M = self.Y2 + self.margin                #GUI*
-        self.X1M = self.X1 + self.margin                #GUI*
-        self.X2M = self.X2 - self.margin                #GUI*
-        self.robotid1 = 0                               #GUI
-        self.robotid2 = 1                               #GUI
-        self.repeat = 3                                 #GUI
-        self.spinner = 0                                #GUI
-        self.gui_debug = False                          #GUI
-        self.startingpoint1 = point.Point(2, -1.5)      #GUI
-        self.startingpoint2 = point.Point(2, +1.5 )     #GUI
-        self.robot1_restPos = point.Point(-4, -2.5)     #GUI
-        self.robot2_restPos = point.Point(-3.6, 2.5)    #GUI
+        self.margin = 0                                     # 0.3                                  #GUI
+        self.Y1 = 0                                         #3                                     #GUI
+        self.Y2 = 0                                         #-3                                    #GUI
+        self.X1 = 0                                         #-4.5                                  #GUI
+        self.X2 = 0                                         #4.5                                   #GUI
+        self.Y1M = 0                                        #self.Y1 - self.margin                 #GUI*
+        self.Y2M = 0                                        #self.Y2 + self.margin                 #GUI*
+        self.X1M = 0                                        #self.X1 + self.margin                 #GUI*
+        self.X2M = 0                                        #self.X2 - self.margin                 #GUI*
+        self.robotid1 = 0                                   #0                                     #GUI
+        self.robotid2 = 0                                   #1                                     #GUI
+        self.repeat = 0                                     #3                                     #GUI
+        self.spinner = 0                                    #0                                     #GUI
+        self.gui_debug = 0                                  #False                                 #GUI
+        self.startingpoint1 = point.Point(0, 0)             #point.Point(0, -1.5)                  #GUI
+        self.startingpoint2 = point.Point(0, 0)             #point.Point(2, +1.5 )                 #GUI
+        self.robot1_restPos = point.Point(0, 0)             #point.Point(-4, -2.5)                 #GUI
+        self.robot2_restPos = point.Point(0, 0)             #point.Point(-3.6, 2.5)                #GUI
 
-        self.current_speed = 5
+        self.startingkickspeed = 5
+        self.endingkickspeed = 6
+        self.current_speed = self.startingkickspeed
 
         self.robot1_vels = {}
         self.robot1_vels[self.current_speed] = []
@@ -76,7 +80,6 @@ class KickProfiler():
         self.robot2_vels[self.current_speed] = []
         self.positions1 = []
         self.positions2 = []
-        self.getpositions(self.startingpoint1,self.startingpoint2)
 
         self.last_speed1 = 1
         self.last_speed2 = 1
@@ -85,13 +88,15 @@ class KickProfiler():
         self.robot2_count = 1
         self.calculatedone = False
         self.savingdone = False
+        self.setupdone = False
+        self.confcbonce = False
         self.startShoot = point.Point(0,0)
         self.endShoot = point.Point(0,0)
         self.m_wm = parsian_world_model()
         self.pos_count = 0
         self.my_robot1 = parsian_robot()
         self.my_robot2 = parsian_robot()
-        self.state = State.GOTOPBOTH
+        self.state = State.STANDBY
         self.kickstat = KickStat.NONE
         self.receivestat = ReceiveStat.NONE
         self.velrecorder = []
@@ -99,6 +104,32 @@ class KickProfiler():
         self.wm_sub = rospy.Subscriber('world_model', parsian_world_model, self.wmCallback, queue_size=1,
                                   buff_size=2 ** 24)
         self.draw_pub = rospy.Publisher('draws', parsian_draw , queue_size=1, latch=True)
+        self.srv = Server(kick_profilerConfig, self.cfg_callback)
+
+    def resetvalues(self):
+        self.current_speed = self.startingkickspeed
+        self.last_speed1 = 1
+        self.last_speed2 = 1
+        self.robot1_count = 1
+        self.robot2_count = 1
+        self.calculatedone = False
+        self.savingdone = False
+        self.setupdone = False
+        self.confcbonce = False
+        self.startShoot = point.Point(0,0)
+        self.endShoot = point.Point(0,0)
+        self.pos_count = 0
+        self.velrecflag = False
+        self.velrecorder = []
+        self.robot1_vels = {}
+        self.robot1_vels[self.current_speed] = []
+        self.robot2_vels = {}
+        self.robot2_vels[self.current_speed] = []
+        self.positions1 = []
+        self.positions2 = []
+        return True
+
+
 
 
 
@@ -159,6 +190,49 @@ class KickProfiler():
         if self.state == State.STANDBY:
             if self.standby():
                 self.state = State.GOBEHINDSMW
+
+
+
+    def cfg_callback(self, config, level):
+
+    #if not self.confcbonce:
+        self.confcbonce = True
+        self.margin = config.Margin                                   # 0.3                                  #GUI
+        self.Y1 = config.Upper_Boundry                                #3                                     #GUI
+        self.Y2 = config.Lower_Boundry                                #-3                                    #GUI
+        self.X1 = config.Left_Boundry                                 #-4.5                                  #GUI
+        self.X2 = config.Right_Boundry                                #4.5                                   #GUI
+        self.Y1M = self.Y1 - self.margin                                                              #GUI*
+        self.Y2M = self.Y2 + self.margin                                                              #GUI*
+        self.X1M = self.X1 + self.margin                                                              #GUI*
+        self.X2M = self.X2 - self.margin                                                              #GUI*
+        self.robotid1 = config.Robot1_id                              #0                                     #GUI
+        self.robotid2 = config.Robot2_id                              #1                                     #GUI
+        self.repeat = config.Repeat                                   #3                                     #GUI
+        self.spinner = config.Spinner                                 #0                                     #GUI
+        self.gui_debug = config.GUI_Debug                             #False                                 #GUI
+        self.startingpoint1.x = config.Robot1_start_pos_x             #point.Point(0, -1.5)                  #GUI
+        self.startingpoint1.y = config.Robot1_start_pos_y             #point.Point(0, -1.5)                  #GUI
+        self.startingpoint2.x = config.Robot2_start_pos_x             #point.Point(2, +1.5 )                 #GUI
+        self.startingpoint2.y = config.Robot2_start_pos_y             #point.Point(2, +1.5 )                 #GUI
+
+        self.positions1 = []
+        self.positions2 = []
+        self.getpositions(self.startingpoint1,self.startingpoint2)
+
+        self.robot1_restPos.x = config.Robot1_rest_pos_x              #point.Point(-4, -2.5)                 #GUI
+        self.robot1_restPos.y = config.Robot1_rest_pos_y              #point.Point(-4, -2.5)                 #GUI
+        self.robot2_restPos.x = config.Robot2_rest_pos_x              #point.Point(-3.6, 2.5)                #GUI
+        self.robot2_restPos.y = config.Robot2_rest_pos_y              #point.Point(-3.6, 2.5)                #GUI
+
+        if config.Run:
+            self.setupdone = True
+        if not config.Run:
+            if self.state == State.FINISHED:
+                self.resetvalues()
+            self.setupdone = False
+            self.state = State.STANDBY
+        return config
 
 
 
@@ -550,7 +624,7 @@ class KickProfiler():
             self.last_speed1 = self.robot1_vels[self.current_speed][0]
             self.last_speed2 = self.robot2_vels[self.current_speed][0]
             self.current_speed += self.speed_step
-            if self.current_speed > 10:  #1023 WTF: i added this
+            if self.current_speed > self.endingkickspeed:  #1023 WTF: i added this
                 self.state = State.FINISHED
                 return 1
             self.robot1_vels[self.current_speed] = []
@@ -649,7 +723,7 @@ class KickProfiler():
         task2 = parsian_skill_no()
         current_task2.noTask = task2
         self.task_pub2.publish(current_task2)
-        if  not self.m_wm.ball.pos.x > self.X2M and not self.m_wm.ball.pos.x < self.X1M and not self.m_wm.ball.pos.y > self.Y1M and not self.m_wm.ball.pos.y < self.Y2M:
+        if self.setupdone and not self.m_wm.ball.pos.x > self.X2M and not self.m_wm.ball.pos.x < self.X1M and not self.m_wm.ball.pos.y > self.Y1M and not self.m_wm.ball.pos.y < self.Y2M:
             return True
         return False
 

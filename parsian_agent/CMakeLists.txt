@@ -48,6 +48,7 @@ catkin_python_setup()
 generate_dynamic_reconfigure_options(
     cfg/agent.cfg
     cfg/motion_pro.cfg
+    cfg/kick_pro.cfg
 )
 
 ###################################
