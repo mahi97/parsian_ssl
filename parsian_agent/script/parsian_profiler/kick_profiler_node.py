@@ -7,7 +7,7 @@ import math
 import rospkg
 from enum import Enum
 from os import path
-from time import time
+import time
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import vector2D
 from parsian_msgs.msg import parsian_robot_command
@@ -62,11 +62,11 @@ class KickProfiler():
         self.X1M = self.X1 + self.margin
         self.X2M = self.X2 - self.margin
         self.robotid1 = 0                               #GUI
-        self.robotid2 = 7                              #GUI
-        self.current_speed = 200
+        self.robotid2 = 1                              #GUI
+        self.current_speed = 5
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 100
+        self.speed_step = 1
         self.robot1_count = 1
         self.robot2_count = 1
         self.repeat = 3                                 #GUI
@@ -84,13 +84,13 @@ class KickProfiler():
         self.spinner1 = 0                           #GUI
         self.spinner2 = 0                           #GUI
         self.gui_debug = True                      #GUI
-        self.kick_start_time1 = 0
-        self.kick_start_time2 = 0
+        # self.kick_start_time1 = 0
+        # self.kick_start_time2 = 0
 
         self.positions1 = []
         self.positions2 = []
-        self.startingpoint1 = point.Point(-1.5, -1.5)  #GUI
-        self.startingpoint2 = point.Point(1.5, +1.5 )  #GUI
+        self.startingpoint1 = point.Point(2, -1.5)  #GUI
+        self.startingpoint2 = point.Point(2, +1.5 )  #GUI
         self.getpositions(self.startingpoint1,self.startingpoint2)
         self.pos_count = 0
 
@@ -116,7 +116,7 @@ class KickProfiler():
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
         self.m_wm = data
-        self.getrobots(7, 0)
+        self.getrobots(self.robotid1, self.robotid2)
         if self.gui_debug:
             self.draw()
         #self.updatenearballid()
@@ -147,7 +147,8 @@ class KickProfiler():
             if self.receive():
                 self.state = State.CALCULATING
         if self.state == State.CALCULATING:
-             self.calculate()
+            self.calculate()
+            time.sleep(1)
         if self.state == State.NONE:
             if self.calculatedone:
                 self.calculatedone = False
@@ -166,7 +167,7 @@ class KickProfiler():
         # type: (point.Point, point.Point) ->object
         # x1 == x2
         if secondp.x == firstp.x:
-           if (firstp.y > secondp.y):
+            if (firstp.y > secondp.y):
                d1 = math.fabs(self.Y1M - firstp.y)
                d2 = math.fabs(secondp.y - self.Y2M)
                step1 = d1/10
@@ -175,7 +176,7 @@ class KickProfiler():
                    self.positions1.append(point.Point(firstp.x, firstp.y + i * step1))
                    self.positions2.append(point.Point(secondp.x, secondp.y - i * step2))
                    #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
-           else:
+            else:
                d1 = math.fabs(self.Y2M - firstp.y)
                d2 = math.fabs(secondp.y - self.Y1M)
                step1 = d1 / 10
@@ -185,8 +186,8 @@ class KickProfiler():
                    self.positions2.append(point.Point(secondp.x, secondp.y + i * step2))
                    # print('pos1.y = ', firstp.y - i * step1,'and pos2.y',secondp.y + i * step2)
         # y1 == y2
-        if firstp.y == secondp.y:
-           if firstp.x < secondp.x:
+        elif firstp.y == secondp.y:
+            if firstp.x < secondp.x:
                d1 = math.fabs(self.X1M - firstp.x)
                d2 = math.fabs(secondp.x - self.X2M)
                step1 = d1/9
@@ -195,7 +196,7 @@ class KickProfiler():
                    self.positions1.append(point.Point(firstp.x - i * step1, firstp.y))
                    self.positions2.append(point.Point(secondp.x + i * step2, secondp.y))
                    #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
-           else:
+            else:
                d1 = math.fabs(self.X2M - firstp.x)
                d2 = math.fabs(secondp.x - self.X1M)
                step1 = d1 / 9
@@ -349,9 +350,6 @@ class KickProfiler():
 
     def kick(self):
         if self.kickstat == KickStat.ROBOT1KICKING:
-            if self.updatenearballid() == 2:       #WTF: i added this condition
-                self.state = State.GOBEHINDSMW
-                return False
             # if time() - self.kick_start_time1 < 2.0:
             #     return False
             if not self.robotarrived(self.my_robot2, self.startingpoint2) and math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:    #WTF:second cond must be not too
@@ -368,7 +366,7 @@ class KickProfiler():
             current_task1.kickTask = task1
             self.task_pub1.publish(current_task1)
             if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y) > 0.2:
-                self.kick_start_time1 = time()
+                # self.kick_start_time1 = time()
                 self.kickstat = KickStat.ROBOT1RETREATING
                 self.startShoot = point.Point(self.my_robot1.pos.x, self.my_robot1.pos.y)
                 self.endShoot = point.Point(self.my_robot2.pos.x, self.my_robot2.pos.y)
@@ -378,9 +376,6 @@ class KickProfiler():
 
 
         if self.kickstat == KickStat.ROBOT2KICKING:
-            if self.updatenearballid() == 1:       #WTF: i added this condition
-                self.state = State.GOBEHINDSMW
-                return False
             # if time() - self.kick_start_time2 < 2.0:
             #     return False
             if not self.robotarrived(self.my_robot1, self.startingpoint1)  and math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:    #WTF:second cond must be not too
@@ -397,7 +392,7 @@ class KickProfiler():
             current_task2.kickTask = task2
             self.task_pub2.publish(current_task2)
             if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y) > 0.2:
-                self.kick_start_time2 = time()
+                # self.kick_start_time2 = time()
                 self.kickstat = KickStat.ROBOT2RETREATING
                 self.startShoot = point.Point(self.my_robot2.pos.x, self.my_robot2.pos.y)
                 self.endShoot = point.Point(self.my_robot1.pos.x, self.my_robot1.pos.y)
@@ -428,10 +423,10 @@ class KickProfiler():
             task1.target.y = self.startingpoint1.y
             current_task1.receivePassTask = task1
             self.task_pub1.publish(current_task1)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y  - self.my_robot1.pos.y) < 0.5:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
                 return True
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y  - self.my_robot1.pos.y) >= 0.5:
-                return True
+            # if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y  - self.my_robot1.pos.y) >= 0.5:
+            #     return True
             else:
                 return False
 
@@ -444,10 +439,10 @@ class KickProfiler():
             task2.target.y = self.startingpoint2.y
             current_task2.receivePassTask = task2
             self.task_pub2.publish(current_task2)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y  - self.my_robot2.pos.y) < 0.5:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
                 return True
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y  - self.my_robot2.pos.y) >= 0.5:
-                return True
+            # if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y  - self.my_robot2.pos.y) >= 0.5:
+            #     return True
             else:
                 return False
 
@@ -579,9 +574,6 @@ class KickProfiler():
         if self.robot1_count > self.repeat and self.robot2_count > self.repeat:
             if self.current_speed == 1000:      #WTF: i added this
                 self.speed_step = 23
-            if self.current_speed > 1023:  #1023 WTF: i added this
-                self.state = State.FINISHED
-                return 1
 
             self.pos_count += 1
             self.startingpoint1 = self.positions1[self.pos_count]
@@ -591,6 +583,9 @@ class KickProfiler():
             self.last_speed1 = self.robot1_vels[self.current_speed][0]
             self.last_speed2 = self.robot2_vels[self.current_speed][0]
             self.current_speed += self.speed_step
+            if self.current_speed > 6:  #1023 WTF: i added this
+                self.state = State.FINISHED
+                return 1
             self.robot1_vels[self.current_speed] = []
             self.robot2_vels[self.current_speed] = []
 
@@ -647,11 +642,11 @@ class KickProfiler():
 
     def save(self):
         file1 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid1) + "_" +
-                                       str(int(round(time()/10))) + "_kick.profile"), "w+")
+                                       str(int(round(time.time()/10))) + "_kick.profile"), "w+")
         file1.write(str(self.robot1_vels))
         file1.close()
         file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
-                                       str(int(round(time()/10))) + "_kick.profile"), "w+")
+                                       str(int(round(time.time()/10))) + "_kick.profile"), "w+")
         file2.write(str(self.robot1_vels))
         file2.close()
         rospy.loginfo("saved!!")
