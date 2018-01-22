@@ -15,18 +15,13 @@ namespace rqt_parsian_gui {
         n_private = getPrivateNodeHandle();
 
 
-        playOffWidget = new PlayOffWidget(n);
+        playOffWidget.reset(new PlayOffWidget(n));
 
         // extend the widget with all attributes and children from UI file
 
         // add widget to the user interface
 
-        context.addWidget(playOffWidget);
-    }
-
-
-    void PlayOff::shutdownPlugin(){
-
+       context.addWidget(playOffWidget.get());
     }
 
 }  // namespace rqt_parsian_gui

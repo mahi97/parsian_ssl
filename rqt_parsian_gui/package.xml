@@ -62,6 +62,6 @@
     <rqt_gui plugin="${prefix}/plugin1.xml"/>
     <rqt_gui plugin="${prefix}/plugin2.xml"/>
     <rqt_gui plugin="${prefix}/mode_plugin.xml"/>
-    <!--<rqt_gui plugin="${prefix}/playoff_plugin.xml"/>-->
+    <rqt_gui plugin="${prefix}/playoff_plugin.xml"/>
   </export>
 </package>

@@ -6,19 +6,20 @@
 
 using namespace rqt_parsian_gui;
 
-PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(parent) {
+PlayOffWidget::PlayOffWidget(ros::NodeHandle & n) : QWidget() {
 
     client = n.serviceClient<parsian_msgs::parsian_update_plans> ("update_plans");
     theplans = new parsian_msgs::parsian_update_plans();
+
     theplans->response.allPlans.clear();
     theplans->request.newPlans.clear();
     client.call(*theplans);
-
+    ROS_INFO_STREAM("sdsds");
 
     chosen = nullptr;
 
-    mode = new QPushButton("Debug Mode", this);
-    update = new QPushButton("Update (Don't Worry! it will work fine :)", this);
+    mode = new QPushButton("Debug Mode");
+    update = new QPushButton("Update (Don't Worry! it will work fine :)");
     active = new QPushButton("Active");
     deactive = new QPushButton("Deactive");
     master = new QPushButton("Master");
@@ -26,7 +27,7 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(pare
     columns = new QColumnView();
 
     active->setEnabled(false);
-    update->setEnabled(false);
+   // update->setEnabled(false);
     deactive->setEnabled(false);
     master->setEnabled(false);
 
@@ -35,7 +36,7 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(pare
     model = new QStandardItemModel();
     selection = new QItemSelectionModel(model);
 
-    updateModel();
+    //updateModel();
 
     columns->setModel(model);
     columns->setFont(QFont("Monospace"));
@@ -50,12 +51,12 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(pare
     //*Details*//
 
 
-    QFrame *line = new QFrame(this);
+    QFrame *line = new QFrame;
     line->setFrameShape(QFrame::HLine);
 
 
     auto buttons = new QHBoxLayout;
-    auto *main = new QVBoxLayout(this);
+    auto *main = new QVBoxLayout;
     auto *detail = new QVBoxLayout;
 
     buttons->addWidget(deactive);
@@ -82,16 +83,11 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n,QWidget *parent) : QWidget(pare
     connect(master, SIGNAL(clicked()), this, SLOT(slt_master()));
     connect(deactive, SIGNAL(clicked()), this, SLOT(slt_deactive()));
     connect(model, SIGNAL(itemChanged(QStandardItem * )), this, SLOT(slt_edit(QStandardItem * )));
-    connect(selection, SIGNAL(selectionChanged(
-                                      const QItemSelection &, const QItemSelection &)),
+    connect(selection, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
             this, SLOT(slt_selectionChanged(QItemSelection, QItemSelection)));
-    //connect(m_loader, SIGNAL(plansUpdated()), this, SLOT(updateModel()));
+//    connect(m_loader, Q_SIGNAL(plansUpdated()), this, Q_SLOT(updateModel()));
 
     setLayout(main);
-}
-
-PlayOffWidget::~PlayOffWidget() {
-
 }
 
 void PlayOffWidget::updateModel() {
@@ -106,19 +102,20 @@ void PlayOffWidget::updateModel() {
     int fileCounter = 0;
     int planCounter = 0;
 
+
     for (size_t i = 0;i < theplans->response.allPlans.size();i++) {
         theplans->response.allPlans[i].index[0] = static_cast<uint32_t>(pkgCounter);
         theplans->response.allPlans[i].index[1] = static_cast<uint32_t>(fileCounter);
         theplans->response.allPlans[i].index[2] = static_cast<uint32_t>(planCounter);
 
-        
+
         if (lastPlan->package != theplans->response.allPlans[i].package ) {
             pkgCounter++;
             fileCounter++;
-            debugger->debug("PKG",D_ALI);
+           // debugger->debug("PKG",D_ALI);
             pkg = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].package));
             model->appendRow(pkg);
-            debugger->debug( "FILE",D_ALI);
+            //debugger->debug( "FILE",D_ALI);
             file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
             QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
             file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
@@ -127,7 +124,7 @@ void PlayOffWidget::updateModel() {
         }
         else if (lastPlan->planFile != theplans->response.allPlans[i].planFile) {
             fileCounter++;
-            debugger->debug("PLAN",D_ALI);
+//            debugger->debug("PLAN",D_ALI);
             file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
             QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
             file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
@@ -155,22 +152,24 @@ void PlayOffWidget::slt_changeMode() {
 
 void PlayOffWidget::updateBtn(bool _debug) {
     if (_debug) {
-        update->setEnabled(true);
-        columns->setEnabled(true);
-        active->setEnabled(true);
-        master->setEnabled(true);
-        deactive->setEnabled(true);
+//        update->setEnabled(true);
+//        columns->setEnabled(true);
+//        active->setEnabled(true);
+//        master->setEnabled(true);
+//        deactive->setEnabled(true);
     } else {
-        active->setEnabled(false);
-        update->setEnabled(false);
-        deactive->setEnabled(false);
-        master->setEnabled(false);
+//        active->setEnabled(false);
+//        update->setEnabled(false);
+//        deactive->setEnabled(false);
+//        master->setEnabled(false);
     }
 }
 
 void PlayOffWidget::slt_updatePlans() {
-    theplans->request.newPlans.clear();
-    theplans->response.allPlans.clear();
+
+//    theplans->request.newPlans.clear();
+//    theplans->response.allPlans.clear();
+
     client.call(*theplans);
     updateModel();
 }
@@ -201,8 +200,8 @@ void PlayOffWidget::slt_active() {
                 int planIndex = model.data().toInt();
 
                 chosen = &theplans->request.newPlans[static_cast<unsigned long>(planIndex)];
-                chosen->isActive = static_cast<unsigned char>(true);
-                chosen->isMaster = static_cast<unsigned char>(false);
+//                chosen->isActive = static_cast<unsigned char>(true);
+//                chosen->isMaster = static_cast<unsigned char>(false);
 
             }
 
@@ -240,9 +239,9 @@ void PlayOffWidget::slt_deactive() {
 
                 int planIndex = model.data().toInt();
 
-                chosen = &theplans->response.allPlans.at(planIndex);
-                chosen->isActive = static_cast<unsigned char>(false);
-                chosen->isMaster = static_cast<unsigned char>(false);
+                chosen = &theplans->request.newPlans[static_cast<unsigned long>(planIndex)];
+//                chosen->isActive = static_cast<unsigned char>(false);
+//                chosen->isMaster = static_cast<unsigned char>(false);
             }
 
             active->setEnabled(true);
@@ -250,8 +249,8 @@ void PlayOffWidget::slt_deactive() {
             master->setEnabled(true);
 
             theplans->response.allPlans.clear();
-            client.call(*theplans);
-            updateModel();
+//            client.call(*theplans);
+//            updateModel();
         }
 }
 
@@ -278,9 +277,9 @@ void PlayOffWidget::slt_master() {
 
                 unsigned int planIndex = model.data().toUInt();
 
-                chosen = &theplans->response.allPlans.at(planIndex);
-                chosen->isActive = static_cast<unsigned char>(true);
-                chosen->isMaster = static_cast<unsigned char>(true);
+                chosen = &theplans->request.newPlans[static_cast<unsigned long>(planIndex)];
+//                chosen->isActive = static_cast<unsigned char>(true);
+//                chosen->isMaster = static_cast<unsigned char>(true);
             }
 
             active->setEnabled(false);
@@ -288,8 +287,8 @@ void PlayOffWidget::slt_master() {
             master->setEnabled(false);
 
             theplans->response.allPlans.clear();
-            client.call(*theplans);
-            updateModel();
+//            client.call(*theplans);
+//            updateModel();
         }
 }
 
@@ -299,7 +298,8 @@ void PlayOffWidget::slt_edit(QStandardItem *_item) {
 
 void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
 
-    for (int i = 0; i < 8; i++) details[i]->setText("");
+    for(int i = 0; i < 8; i++)
+        details[i]->setText("");
 
 //    chosen = NULL;
     itemSelected = selected;
@@ -308,14 +308,11 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const Q
 
             if (model.parent().row() == -1) {
                 details[0]->setText(QString("Type  : Package"));
-
                 active->setEnabled(true);
                 deactive->setEnabled(true);
                 master->setEnabled(true);
-
             } else if (model.parent().parent().row() == -1) {
                 details[0]->setText(QString("Type : File"));
-
                 active->setEnabled(true);
                 deactive->setEnabled(true);
                 master->setEnabled(true);
@@ -323,28 +320,27 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const Q
             } else if (model.parent().parent().parent().row() == -1) {
 
                 unsigned int planIndex = model.data().toUInt();
+//                chosen = &theplans->response.allPlans.at(planIndex);
 
-                chosen = &theplans->response.allPlans.at(planIndex);
-
-                details[0]->setText(QString("Type       : Plan"));
-                details[1]->setText(QString("Agent Size : %1").arg(chosen->agentSize));
+//                details[0]->setText(QString("Type       : Plan"));
+//                details[1]->setText(QString("Agent Size : %1").arg(chosen->agentSize));
 //                details[2]->setText(QString("Plan Mode  : %1").arg(m_loader->getModeStr(chosen->planMode)));
-                details[3]->setText(QString("Chance     : %1").arg(chosen->chance));
-                details[4]->setText(QString("Last Dist  : %1").arg(chosen->lastDist));
+//                details[3]->setText(QString("Chance     : %1").arg(chosen->chance));
+//                details[4]->setText(QString("Last Dist  : %1").arg(chosen->lastDist));
                 auto final_tag = new QString();
-                for(std::string str:chosen->tags)
-                    *final_tag += QString::fromStdString(str) + "  ";
+//                for(std::string str:chosen->tags)
+//                    *final_tag += QString::fromStdString(str) + "  ";
                 details[5]->setText(QString("Tags       : %1").arg(*final_tag));
 //                details[6]->setText(QString("ShotPos    : (%1, %2)").arg(chosen->matching.shotPos.x).arg(
 //                        chosen->matching.shotPos.y));
                 //details[7]->setText(QString("ShotZone   : %1").arg(CCoach::getShotSpot(chosen->matching.initPos.ball, chosen->matching.shotPos)));
 
-                active->setEnabled(!chosen->isActive);
-                deactive->setEnabled(chosen->isActive);
-                master->setEnabled(!chosen->isMaster);
-
-            } else {
-                details[0]->setText(QString("Type : SubPlan !!"));
+//                active->setEnabled(!chosen->isActive);
+//                deactive->setEnabled(chosen->isActive);
+//                master->setEnabled(!chosen->isMaster);
+//
+//            } else {
+//                details[0]->setText(QString("Type : SubPlan !!"));
 
             }
         }

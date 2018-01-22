@@ -12,17 +12,16 @@ find_package(catkin REQUIRED COMPONENTS
         rqt_gui
         rqt_gui_cpp
         std_msgs
-        parsian_msgs
         parsian_util
         )
 
 ## System dependencies are found with CMake's conventions
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
 else()
-  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-  include(${QT_USE_FILE})
+    find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+    include(${QT_USE_FILE})
 endif()
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -128,8 +127,8 @@ set (${PROJECT_NAME}_SRCS
         src/${PROJECT_NAME}/guiDrawer.cpp
         src/${PROJECT_NAME}/mode_chooser.cpp
         src/${PROJECT_NAME}/modeChooserWidget.cpp
-#        src/${PROJECT_NAME}/playoffWidget.cpp
-#        src/${PROJECT_NAME}/playoff.cpp
+        src/${PROJECT_NAME}/playoffWidget.cpp
+        src/${PROJECT_NAME}/playoff.cpp
         )
 
 set(${PROJECT_NAME}_HDRS
@@ -140,15 +139,15 @@ set(${PROJECT_NAME}_HDRS
         include/${PROJECT_NAME}/guiDrawer.h
         include/${PROJECT_NAME}/mode_chooser.h
         include/${PROJECT_NAME}/modeChooserWidget.h
-        #include/${PROJECT_NAME}/playoff.h
-        #include/${PROJECT_NAME}/playoffWidget.h
+        include/${PROJECT_NAME}/playoffWidget.h
+        include/${PROJECT_NAME}/playoff.h
         )
 
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+    qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 else()
-  qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+    qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
 endif()
 
 ###########
@@ -182,9 +181,9 @@ target_link_libraries(${PROJECT_NAME}
         )
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
+    target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 else()
-  target_link_libraries(${PROJECT_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 endif()
 
 #############

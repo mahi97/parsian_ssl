@@ -22,8 +22,7 @@ namespace rqt_parsian_gui {
     Q_OBJECT
 
     public:
-        PlayOffWidget(ros::NodeHandle & n,QWidget *parent = 0);
-        ~PlayOffWidget();
+        PlayOffWidget(ros::NodeHandle & n );
 
     protected:
 
@@ -54,11 +53,11 @@ namespace rqt_parsian_gui {
         std::string *chosen;
         QItemSelection itemSelected;
 
-    private slots:
+    private Q_SLOTS:
         void updateModel();
         void updateBtn(bool _debug);
 
-    public slots:
+    public Q_SLOTS:
         void slt_changeMode();
         void slt_updatePlans();
         void slt_active();
