@@ -235,9 +235,9 @@ void CSkillGotoPointAvoid::execute()
     agent->accelerationLimiter(vf,oneTouchMode);
    // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);
    // ROS_INFO_STREAM("x: "<<agentPos.x<<"y: "<<agentPos.y<<"w: "<< dW);
-//    QList <int> dumm;
+    QList <int> dumm;
 
-//    drawer -> draw(QString("time : %1").arg(timeNeeded(agent,targetPos,conf->VelMax,dumm,dumm,0,0,0),Vector2D(1,1));
+    drawer -> draw(QString("time : %1").arg(timeNeeded(agent,targetPos,conf->VelMax,dumm,dumm,0,0,0)),Vector2D(1,1));
 
     counter ++;
 }
@@ -294,7 +294,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT,Vector2D posT,double vMax
     QList <Vector2D> _result;
     Vector2D _target;
 
-    double tAgentVelTanjent = tAgentVel.length()*cos(Vector2D::angleBetween((posT - _agentT->pos(),tAgentVel.dir())).radian());
+    double tAgentVelTanjent = tAgentVel.length()*cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
     /*if(_noAvoid)
     {
         _result.clear();
