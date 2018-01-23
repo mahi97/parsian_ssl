@@ -8,6 +8,8 @@ import rospkg
 from enum import Enum
 from os import path
 import time
+import signal
+import sys
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import vector2D
 from parsian_msgs.msg import parsian_robot_command
@@ -51,6 +53,8 @@ class ReceiveStat(Enum):
 
 class KickProfiler():
     def __init__(self):
+
+        signal.signal(signal.SIGINT, self.signal_handler)
         self.margin = 0                                     # 0.3                                  #GUI
         self.Y1 = 0                                         #3                                     #GUI
         self.Y2 = 0                                         #-3                                    #GUI
@@ -69,9 +73,12 @@ class KickProfiler():
         self.startingpoint2 = point.Point(0, 0)             #point.Point(2, +1.5 )                 #GUI
         self.robot1_restPos = point.Point(0, 0)             #point.Point(-4, -2.5)                 #GUI
         self.robot2_restPos = point.Point(0, 0)             #point.Point(-3.6, 2.5)                #GUI
+        self.realspeedmax = 0                                                                      #GUI
 
+        self.robot1_overspeed = False
+        self.robot2_overspeed = False
         self.startingkickspeed = 5
-        self.endingkickspeed = 6
+        self.endingkickspeed = 1023
         self.current_speed = self.startingkickspeed
 
         self.robot1_vels = {}
@@ -108,10 +115,13 @@ class KickProfiler():
 
     def resetvalues(self):
         self.current_speed = self.startingkickspeed
+        self.realspeedmax = 0                                                                      #GUI
         self.last_speed1 = 1
         self.last_speed2 = 1
         self.robot1_count = 1
         self.robot2_count = 1
+        self.robot1_overspeed = False
+        self.robot2_overspeed = False
         self.calculatedone = False
         self.savingdone = False
         self.setupdone = False
@@ -209,6 +219,7 @@ class KickProfiler():
         self.robotid1 = config.Robot1_id                              #0                                     #GUI
         self.robotid2 = config.Robot2_id                              #1                                     #GUI
         self.repeat = config.Repeat                                   #3                                     #GUI
+        self.realspeedmax = config.Real_speed_max                     #0                                     #GUI
         self.spinner = config.Spinner                                 #0                                     #GUI
         self.gui_debug = config.GUI_Debug                             #False                                 #GUI
         self.startingpoint1.x = config.Robot1_start_pos_x             #point.Point(0, -1.5)                  #GUI
@@ -496,7 +507,7 @@ class KickProfiler():
             task1.target.y = self.my_robot2.pos.y
             current_task1.kickTask = task1
             self.task_pub1.publish(current_task1)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y) > 0.2:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot1.pos.x, self.m_wm.ball.pos.y - self.my_robot1.pos.y) > 0.4:
                 # self.kick_start_time1 = time()
                 self.kickstat = KickStat.ROBOT1RETREATING
                 self.startShoot = point.Point(self.my_robot1.pos.x, self.my_robot1.pos.y)
@@ -521,7 +532,7 @@ class KickProfiler():
             task2.target.y = self.my_robot1.pos.y
             current_task2.kickTask = task2
             self.task_pub2.publish(current_task2)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y) > 0.2:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) > 0.02 and math.hypot(self.m_wm.ball.pos.x - self.my_robot2.pos.x, self.m_wm.ball.pos.y - self.my_robot2.pos.y) > 0.4:
                 # self.kick_start_time2 = time()
                 self.kickstat = KickStat.ROBOT2RETREATING
                 self.startShoot = point.Point(self.my_robot2.pos.x, self.my_robot2.pos.y)
@@ -598,6 +609,8 @@ class KickProfiler():
             if self.velrecorder[0] > self.last_speed1 and self.robot1_count <= self.repeat:
                 rospy.loginfo('robot1 valid, speed: %f' % (self.velrecorder[0]))
                 self.robot1_vels[self.current_speed].append(self.velrecorder[0])
+                if self.velrecorder[0] > self.realspeedmax:
+                    self.robot1_overspeed = True
                 self.velrecorder[:] = []
                 self.robot1_count += 1
             else:
@@ -607,6 +620,8 @@ class KickProfiler():
             if self.velrecorder[0] > self.last_speed2 and self.robot2_count <= self.repeat:
                 rospy.loginfo('robot2 valid, speed: %f' %(self.velrecorder[0]))
                 self.robot2_vels[self.current_speed].append(self.velrecorder[0])
+                if self.velrecorder[0] > self.realspeedmax:
+                    self.robot2_overspeed = True
                 self.velrecorder[:] = []
                 self.robot2_count += 1
             else:
@@ -625,6 +640,9 @@ class KickProfiler():
             self.last_speed2 = self.robot2_vels[self.current_speed][0]
             self.current_speed += self.speed_step
             if self.current_speed > self.endingkickspeed:  #1023 WTF: i added this
+                self.state = State.FINISHED
+                return 1
+            if self.robot1_overspeed and self.robot2_overspeed:
                 self.state = State.FINISHED
                 return 1
             self.robot1_vels[self.current_speed] = []
@@ -769,7 +787,12 @@ class KickProfiler():
             return point.Point(self.my_robot2.pos.x - self.my_robot1.pos.x,
                                self.my_robot2.pos.y - self.my_robot1.pos.y)
 
-
+    def signal_handler(self, signal, frame):
+        print('You pressed Ctrl+C!')
+        if not self.savingdone:
+            self.save()
+            self.savingdone = True
+        sys.exit(0)
 
 if __name__ == '__main__':
     try:
