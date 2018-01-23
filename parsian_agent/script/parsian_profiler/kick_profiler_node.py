@@ -77,7 +77,7 @@ class KickProfiler():
 
         self.robot1_overspeed = False
         self.robot2_overspeed = False
-        self.startingkickspeed = 5
+        self.startingkickspeed = 200
         self.endingkickspeed = 1023
         self.current_speed = self.startingkickspeed
 
@@ -90,7 +90,7 @@ class KickProfiler():
 
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 1
+        self.speed_step = 100
         self.robot1_count = 1
         self.robot2_count = 1
         self.calculatedone = False
@@ -145,7 +145,7 @@ class KickProfiler():
 
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
-        rospy.loginfo(self.state)
+        #rospy.loginfo(self.state)
         self.m_wm = data
         self.getrobots(self.robotid1, self.robotid2)
         #starting the profile --> both robots to their starting points --> til they arrived their destination
@@ -565,7 +565,7 @@ class KickProfiler():
             task1.target.y = self.startingpoint1.y
             current_task1.receivePassTask = task1
             self.task_pub1.publish(current_task1)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 or self.m_wm.ball.pos.x > self.X2M or self.m_wm.ball.pos.x < self.X1M or self.m_wm.ball.pos.y > self.Y1M or self.m_wm.ball.pos.y < self.Y2M:
                 current_task1 = parsian_robot_task()
                 current_task1.select = parsian_robot_task.NOTASK
                 task1 = parsian_skill_no()
@@ -585,7 +585,7 @@ class KickProfiler():
             task2.target.y = self.startingpoint2.y
             current_task2.receivePassTask = task2
             self.task_pub2.publish(current_task2)
-            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02:
+            if math.hypot(self.m_wm.ball.vel.x, self.m_wm.ball.vel.y) < 0.02 or self.m_wm.ball.pos.x > self.X2M or self.m_wm.ball.pos.x < self.X1M or self.m_wm.ball.pos.y > self.Y1M or self.m_wm.ball.pos.y < self.Y2M:
                 current_task2 = parsian_robot_task()
                 current_task2.select = parsian_robot_task.NOTASK
                 task2 = parsian_skill_no()
@@ -607,25 +607,25 @@ class KickProfiler():
         self.velrecorder.reverse()
         if self.kickstat == KickStat.ROBOT1RETREATING:
             if self.velrecorder[0] > self.last_speed1 and self.robot1_count <= self.repeat:
-                rospy.loginfo('robot1 valid, speed: %f' % (self.velrecorder[0]))
+                rospy.loginfo('robot1 valid, current: %f ,speed: %f' % (self.velrecorder[0], self.current_speed))
                 self.robot1_vels[self.current_speed].append(self.velrecorder[0])
                 if self.velrecorder[0] > self.realspeedmax:
                     self.robot1_overspeed = True
                 self.velrecorder[:] = []
                 self.robot1_count += 1
             else:
-                rospy.loginfo('robot1 @@unvalid, speed: %f' %(self.velrecorder[0]))
+                rospy.loginfo('robot1 @@unvalid, current: %f ,speed: %f' %(self.velrecorder[0], self.current_speed))
 
         if self.kickstat == KickStat.ROBOT2RETREATING:
             if self.velrecorder[0] > self.last_speed2 and self.robot2_count <= self.repeat:
-                rospy.loginfo('robot2 valid, speed: %f' %(self.velrecorder[0]))
+                rospy.loginfo('robot2 valid, current: %f ,speed: %f' %(self.velrecorder[0], self.current_speed))
                 self.robot2_vels[self.current_speed].append(self.velrecorder[0])
                 if self.velrecorder[0] > self.realspeedmax:
                     self.robot2_overspeed = True
                 self.velrecorder[:] = []
                 self.robot2_count += 1
             else:
-                rospy.loginfo('robot2 @@unvalid, speed: %f' %(self.velrecorder[0]))
+                rospy.loginfo('robot2 @@unvalid, current: %f,speed: %f' %(self.velrecorder[0], self.current_speed))
 
         if self.robot1_count > self.repeat and self.robot2_count > self.repeat:
             if self.current_speed == 1000:      #WTF: i added this
