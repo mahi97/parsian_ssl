@@ -84,6 +84,7 @@ public:
     bool theirPenaltyShootout();
 
     States getState();
+    void setState(const States& s, bool isReady = false);
 };
 extern GameState *gameState;
 #endif

@@ -152,7 +152,13 @@ bool GameState::theirPenaltyShootout(){return state == States::TheirPenaltyShoot
 bool GameState::ready(){
     return isReady;
 }
+
 /////
 States GameState::getState(){
     return state;
+}
+
+void GameState::setState(const States &s, bool isReady) {
+    state = s;
+    this->isReady = isReady;
 }
