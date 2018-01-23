@@ -75,6 +75,7 @@ class KickProfiler():
         self.robot2_restPos = point.Point(0, 0)             #point.Point(-3.6, 2.5)                #GUI
         self.realspeedmax = 0                                                                      #GUI
 
+        self.stepnum = 0
         self.robot1_overspeed = False
         self.robot2_overspeed = False
         self.startingkickspeed = 200
@@ -90,7 +91,7 @@ class KickProfiler():
 
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 100
+        self.speed_step = 50
         self.robot1_count = 1
         self.robot2_count = 1
         self.calculatedone = False
@@ -116,6 +117,7 @@ class KickProfiler():
     def resetvalues(self):
         self.current_speed = self.startingkickspeed
         self.realspeedmax = 0                                                                      #GUI
+        self.stepnum = 0
         self.last_speed1 = 1
         self.last_speed2 = 1
         self.robot1_count = 1
@@ -145,7 +147,7 @@ class KickProfiler():
 
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
-        #rospy.loginfo(self.state)
+        rospy.loginfo(self.state)
         self.m_wm = data
         self.getrobots(self.robotid1, self.robotid2)
         #starting the profile --> both robots to their starting points --> til they arrived their destination
@@ -251,23 +253,24 @@ class KickProfiler():
     #and get some positions, as the shoot power rise up the robots distanse increases
     def getpositions(self, firstp, secondp):
         # type: (point.Point, point.Point) ->object
+        self.stepnum = (1000 - self.startingkickspeed)/self.speed_step + 2
         # x1 == x2
         if secondp.x == firstp.x:
             if (firstp.y > secondp.y):
                d1 = math.fabs(self.Y1M - firstp.y)
                d2 = math.fabs(secondp.y - self.Y2M)
-               step1 = d1/10
-               step2 = d2/10
-               for i in range(10):
+               step1 = d1/self.stepnum
+               step2 = d2/self.stepnum
+               for i in range(self.stepnum):
                    self.positions1.append(point.Point(firstp.x, firstp.y + i * step1))
                    self.positions2.append(point.Point(secondp.x, secondp.y - i * step2))
                    #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
             else:
                d1 = math.fabs(self.Y2M - firstp.y)
                d2 = math.fabs(secondp.y - self.Y1M)
-               step1 = d1 / 10
-               step2 = d2 / 10
-               for i in range(10):
+               step1 = d1 / self.stepnum
+               step2 = d2 / self.stepnum
+               for i in range(self.stepnum):
                    self.positions1.append(point.Point(firstp.x, firstp.y - i * step1))
                    self.positions2.append(point.Point(secondp.x, secondp.y + i * step2))
                    # print('pos1.y = ', firstp.y - i * step1,'and pos2.y',secondp.y + i * step2)
@@ -276,18 +279,18 @@ class KickProfiler():
             if firstp.x < secondp.x:
                d1 = math.fabs(self.X1M - firstp.x)
                d2 = math.fabs(secondp.x - self.X2M)
-               step1 = d1/9
-               step2 = d2/9
-               for i in range(10):
+               step1 = d1/self.stepnum
+               step2 = d2/self.stepnum
+               for i in range(self.stepnum):
                    self.positions1.append(point.Point(firstp.x - i * step1, firstp.y))
                    self.positions2.append(point.Point(secondp.x + i * step2, secondp.y))
                    #print('pos1.y = ', firstp.y + i * step1,'and pos2.y',secondp.y - i * step2)
             else:
                d1 = math.fabs(self.X2M - firstp.x)
                d2 = math.fabs(secondp.x - self.X1M)
-               step1 = d1 / 9
-               step2 = d2 / 9
-               for i in range(10):
+               step1 = d1 / self.stepnum
+               step2 = d2 / self.stepnum
+               for i in range(self.stepnum):
                    self.positions1.append(point.Point(firstp.x  + i * step1, firstp.y))
                    self.positions2.append(point.Point(secondp.x  - i * step2, secondp.y))
                    # print('pos1.x = ', firstp.x + i * step1,'and pos2.x',secondp.x - i * step2)
@@ -316,15 +319,15 @@ class KickProfiler():
             # step1 = 0
             # step2 = 0
             if sol0_dist_first < sol0_dist_second:
-                step1 = sol0_dist_first/10
-                step2 = sol1_dist_second/10
+                step1 = sol0_dist_first/self.stepnum
+                step2 = sol1_dist_second/self.stepnum
             else:
-                step2 = sol0_dist_second / 10
-                step1 = sol1_dist_first / 10
+                step2 = sol0_dist_second / self.stepnum
+                step1 = sol1_dist_first / self.stepnum
             #obtain positions for robot1
             delta = firstp.minus(secondp)
             udelta = delta.unitPoint()
-            for i in range(10):
+            for i in range(self.stepnum):
                 newPos = point.Point(0,0)
                 newPos.x = firstp.x + i*step1*udelta.x
                 newPos.y = firstp.y + i*step1*udelta.y
@@ -333,7 +336,7 @@ class KickProfiler():
             #obtain positions for robot1
             delta = secondp.minus(firstp)
             udelta = delta.unitPoint()
-            for i in range(10):
+            for i in range(self.stepnum):
                 newPos = point.Point(0, 0)
                 newPos.x = secondp.x + i * step2 * udelta.x
                 newPos.y = secondp.y + i * step2 * udelta.y
@@ -655,11 +658,11 @@ class KickProfiler():
     def save(self):
         if self.spinner > 0:
             file1 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid1) + "_" +
-                                           str(int(round(time.time()/10))) + "_kick(spin_" + str(self.spinner) + ").profile"), "w+")
+                                           str(int(round(time.time()/10))) + "(spin_" + str(self.spinner) + ")_kick.profile"), "w+")
             file1.write(str(self.robot1_vels))
             file1.close()
             file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
-                                           str(int(round(time.time()/10))) + "_kick(spin_" + str(self.spinner) + ").profile"), "w+")
+                                           str(int(round(time.time()/10))) + + "(spin_" + str(self.spinner) + ")_kick.profile"), "w+")
             file2.write(str(self.robot1_vels))
             file2.close()
         if self.spinner == 0:
@@ -688,7 +691,7 @@ class KickProfiler():
         text.position.x = 0
         text.position.y = 0
         drawer.texts.append(text)
-        for i in range(10):
+        for i in range(self.stepnum):
             cir = parsian_draw_circle()
             cir.circle.radius = 0.025
             cir.filled = True
@@ -701,7 +704,7 @@ class KickProfiler():
             cir.circle.center.x = self.positions1[i].x
             cir.circle.center.y = self.positions1[i].y
             drawer.circles.append(cir)
-        for i in range(10):
+        for i in range(self.stepnum):
             cir = parsian_draw_circle()
             cir.circle.radius = 0.025
             cir.filled = True
