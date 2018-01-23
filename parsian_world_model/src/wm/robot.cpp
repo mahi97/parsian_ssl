@@ -9,53 +9,73 @@
 #include <fstream>
 
 
+const double Robot::robot_radius_old = 0.090;
+//const double Robot::robot_radius_new = 0.080;
+const double Robot::robot_radius_new = 0.0890;
+const double Robot::center_from_kicker_old = 0.075;
+//const double Robot::center_from_kicker_new = 0.070;
+const double Robot::center_from_kicker_new = 0.06;
+const double Robot::kicker_width_old = 0.074;
+//const double Robot::kicker_width_new = 0.080;
+const double Robot::kicker_width_new = 0.082;
+const double Robot::wheel_rad_old = 0.035;
+//const double Robot::wheel_rad_new = 0.03;
+const double Robot::wheel_rad_new = 0.027;
 
-const double CRobot::robot_radius_old = 0.090;
-//const double CRobot::robot_radius_new = 0.080;
-const double CRobot::robot_radius_new = 0.0890;
-const double CRobot::center_from_kicker_old = 0.075;
-//const double CRobot::center_from_kicker_new = 0.070;
-const double CRobot::center_from_kicker_new = 0.06;
-const double CRobot::kicker_width_old = 0.074;
-//const double CRobot::kicker_width_new = 0.080;
-const double CRobot::kicker_width_new = 0.082;
-const double CRobot::wheel_rad_old = 0.035;
-//const double CRobot::wheel_rad_new = 0.03;
-const double CRobot::wheel_rad_new = 0.027;
-
-void CRobot::setNewRobot(bool _new)
+void Robot::setNewRobot(bool _new)
 {
     newRobot = _new;
 }
 
-bool CRobot::isNewRobot()
+bool Robot::isNewRobot()
 {
     return newRobot;
 }
 
-double CRobot::robotRadius()
+double Robot::robotRadius()
 {
     return (newRobot) ? robot_radius_new : robot_radius_old;
 }
 
-double CRobot::kickerWidth()
+double Robot::kickerWidth()
 {
     return (newRobot) ? kicker_width_new : kicker_width_old;
 }
 
-double CRobot::centerFromKicker()
+double Robot::centerFromKicker()
 {
     return (newRobot) ? center_from_kicker_new : center_from_kicker_old;
 }
 
-double CRobot::wheelRadius()
+double Robot::wheelRadius()
 {
     return (newRobot) ? wheel_rad_new : wheel_rad_old;
 }
 
 
-CRobot::CRobot(int _id, bool isOurTeam, bool noKalman) : CMovingObject(true)
+Robot::Robot(int _id, bool isOurTeam, bool noKalman) : MovingObject(true)
 {
+    ////////////////////////////////new kalman
+    kalman::Vector x;
+    x(0) =-1* observation->pos.y;
+    x(1) = observation->pos.x;
+    x(2) = observation->dir.th().radian();
+    x(3) = 0.0;
+    x(4) = 0.0;
+    x(5) = 0.0;
+    donKalman = new kalman(x);
+    kalmanTime.start();
+    // we can only observe the position
+    donKalman->H(0, 0) = 1.0;
+    donKalman->H(1, 1) = 1.0;
+    donKalman->H(2, 2) = 1.0;
+
+    vForwardCmd = 0.5;
+    vNormalCmd = 0;
+    vAngCmd = 0;
+    test = 0;
+    /////////////////////////////////////////////
+
     /*////////////////////*/
 
 
@@ -86,10 +106,154 @@ CRobot::CRobot(int _id, bool isOurTeam, bool noKalman) : CMovingObject(true)
     markedByDefense = false;
     markedByMark = false;
 }
+void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand)
+{
+    kalman *kalman = donKalman;
+    const qint64 lastTime = (updateFuture) ?kalmanFutureLastTime:kalmanLastTime;
+    double timeDiff = (max(kalmanTime.elapsed() , 1))*0.001;//(time - lastTime);
+    //timeDiff = 0.016;
+    Q_ASSERT(timeDiff >= 0);
+    const float phi = kalman->baseState()(2)- (_PI/2);
+    const float v_s = kalman->baseState()(3);
+    const float v_f = kalman->baseState()(4);
+    const float omega = kalman->baseState()(5);
+    // Process state transition: update position with the current speed
+    kalman->F(0, 3) = std::cos(phi) * timeDiff;
+    kalman->F(0, 4) = -1* std::sin(phi) * timeDiff;
+    kalman->F(1, 3) = std::sin(phi) * timeDiff;
+    kalman->F(1, 4) = 1*std::cos(phi) * timeDiff;
+    kalman->F(2, 5) = timeDiff;
 
-CRobot::~CRobot() = default;
+    kalman->F(3, 3) = 1;
+    kalman->F(4, 4) = 1;
+    kalman->F(5, 5) = 1;
 
-void CRobot::resetKalman()
+    kalman->u = kalman::Vector::Zero();
+    ////////////strange if
+    test++;
+    float v_x = std::cos(phi)*v_s - std::sin(phi)*v_f;
+    float v_y = std::sin(phi)*v_s + std::cos(phi)*v_f;
+    ROS_INFO_STREAM("Vf" << phi*_RAD2DEG << " VN" << vNormalCmd);
+    // radio commands are intended to be applied over 10ms
+    float cmd_interval = (float)(timeDiff);
+    //TODO: add radio command
+    float cmd_omega = vAngCmd * _DEG2RAD;
+    float cmd_v_y = vForwardCmd*sin(-phi) - (vNormalCmd*cos(-phi));
+    float cmd_v_x = -1*vForwardCmd*cos(-phi) - (vNormalCmd*sin(-phi));
+    float a_w = (cmd_omega - omega)/cmd_interval;
+
+    float accel_x = (cmd_v_x - v_x)/cmd_interval;
+    float accel_y = (cmd_v_y - v_y)/cmd_interval;
+    float accel_s = (std::cos(-phi)*accel_x - std::sin(-phi)*accel_y) * timeDiff;
+    float accel_f = (std::sin(-phi)*accel_x + std::cos(-phi)*accel_y)* timeDiff;
+
+
+    /* if(fabs(accel_f) > conf()->BangBang_AccMaxForward())
+        accel_f = conf()->BangBang_AccMaxForward() * sign(accel_f);
+    if(fabs(accel_s )> conf()->BangBang_AccMaxNormal())
+        accel_s = conf()->BangBang_AccMaxNormal() * sign(accel_s);
+   */
+    //debug(QString("acc : %1").arg(accel_f),D_MHMMD);
+
+
+    kalman->u(0) = 0;
+    kalman->u(1) = 0;
+    kalman->u(2) = 0;
+    //TODO : must know is it simulator or not
+    if(/*(!knowledge->isSimulMode) &&*/ applyCommand)
+    {
+        kalman->u(3) = accel_s / time;
+        kalman->u(4) =  accel_f / time;
+        kalman->u(5) = a_w * timeDiff / time;
+    }
+
+    // update covariance jacobian
+    kalman->B = kalman->F;
+    kalman->B(0, 2) = -(v_s*std::sin(phi) + v_f*std::cos(phi)) * timeDiff;
+    kalman->B(1, 2) = (v_s*std::cos(phi) - v_f*std::sin(phi)) * timeDiff;
+
+
+    // Process noise: stddev for acceleration
+    // guessed from the accelerations that are possible on average
+    const float sigma_a_x = 4.0f;
+    const float sigma_a_y = 4.0f;
+    // a bit too low, but that speed is nearly impossible all the time
+    const float sigma_a_phi = 10.0f;
+
+    // using no position errors (in opposite to the CMDragons model)
+    // seems to yield better results in the simulator
+    // d = timediff
+    // G = (d^2/2, d^2/2, d^2/2, d, d, d)
+    // sigma = (x, y, phi, x, y, phi)  (using x = sigma_a_x, ...)
+    // Q = GG^T*(diag(sigma)^2)
+    kalman::Vector G;
+    G(0) = timeDiff * timeDiff / 2 * sigma_a_x;
+    G(1) = timeDiff * timeDiff / 2 * sigma_a_y;
+    G(2) = timeDiff * timeDiff / 2 * sigma_a_phi;
+    G(3) = timeDiff * sigma_a_x;
+    G(4) = timeDiff * sigma_a_y;
+    G(5) = timeDiff * sigma_a_phi;
+
+    //    if (cameraSwitched) {
+    //        // handle small errors in camera alignment
+    //        G(0) += 0.02;
+    //        G(1) += 0.02;
+    //        G(2) += 0.05;
+    //    }
+
+    kalman->Q(0, 0) = G(0) * G(0);
+    kalman->Q(0, 3) = G(0) * G(3);
+    kalman->Q(3, 0) = G(3) * G(0);
+    kalman->Q(3, 3) = G(3) * G(3);
+
+    kalman->Q(1, 1) = G(1) * G(1);
+    kalman->Q(1, 4) = G(1) * G(4);
+    kalman->Q(4, 1) = G(4) * G(1);
+    kalman->Q(4, 4) = G(4) * G(4);
+
+    kalman->Q(2, 2) = G(2) * G(2);
+    kalman->Q(2, 5) = G(2) * G(5);
+    kalman->Q(5, 2) = G(5) * G(2);
+    kalman->Q(5, 5) = G(5) * G(5);
+
+    kalman->predict(permanentUpdate);
+    kalmanLastTime = time;
+
+
+}
+void Robot::visionUpdate()
+{
+    donKalman->z(0) = -1*observation->pos.y;
+    donKalman->z(1) = observation->pos.x;
+    double appliedDir = observation->dir.th().degree();
+    if((observation->dir.th().degree() - lastDir.th().degree()) > 180)
+    {
+        appliedDir += 360;
+    }
+    if((observation->dir.th().degree() - lastDir.th().degree()) < -180)
+    {
+        appliedDir -=360;
+    }
+    donKalman->z(2) = (ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION)*_DEG2RAD;
+
+    kalman::MatrixMM R = kalman::MatrixMM::Zero();
+    R(0, 0) = 0.004;
+    R(1, 1) = 0.004;
+    R(2, 2) = 0.01;
+    donKalman->R = R.cwiseProduct(R);
+    donKalman->update();
+}
+
+
+
+Robot::~Robot()
+{
+    if(donKalman != NULL) {
+        delete donKalman;
+    }
+}
+
+void Robot::resetKalman()
 {
     if (tracker != nullptr)
     {
@@ -99,20 +263,17 @@ void CRobot::resetKalman()
     }
 }
 
-void CRobot::init()
+void Robot::init()
 {
     //    motionEstimator = new CMotionEstimator();
     //    motionEstimator->svm->load("model.svm");
 }
 
-void CRobot::filter(int vanished)
+void Robot::filter(int vanished)
 {
-
-    //	bool all = false;
-
-    if (tracker == nullptr)
+    if (tracker == NULL)
     {
-        CMovingObject::filter(vanished);
+        MovingObject::filter(vanished);
         return;
     }
 
@@ -127,27 +288,90 @@ void CRobot::filter(int vanished)
     }
 
     ANGULAR_DIRECTION = observation->dir.th().degree();
+    double kalmanDelayTime = 0.15;
+    if(inOurTeam)
+    {
+        if(vanished <= 0)
+        {
+
+
+            int nStep = kalmanDelayTime / 0.016;
+            // newPredict(0,false,true,false,(inOurTeam));
+            for(int i= 0  ; i < (nStep) ; i++)
+            {
+                newPredict(nStep,false,true,false,inOurTeam);
+            }
+            visionUpdate();
+
+            pos = Vector2D(donKalman->state()(1),-1*donKalman->state()(0));
+            dir = Vector2D(cos(donKalman->state()(2)),sin(donKalman->state()(2)));
+
+            double phi = donKalman->state()(2);
+            const float v_s = donKalman->state()(3);
+            const float v_f = donKalman->state()(4);
+            //debug(QString("phi: %1").arg(phi))
+            float vx = -1*std::cos(phi)*v_s + std::sin(phi)*v_f;
+            float vy = -1*std::sin(phi)*v_s - std::cos(phi)*v_f;
+
+            vel = Vector2D(vx,vy);
+            acc = Vector2D(0,0);
+            angularVel = donKalman->state()(5);
+            inSight = 1;
+
+        }
+        else if(vanished <= blindness)
+        {
+            //TODO: get from config
+            int nStep = kalmanDelayTime / 0.016;
+            newPredict(1,false,true,false,(false));
+            visionUpdate();
+
+            pos = Vector2D(donKalman->state()(1),-1*donKalman->state()(0));
+            dir = Vector2D(cos(donKalman->state()(2)),sin(donKalman->state()(2)));
+            double phi = donKalman->state()(3);
+            const float v_s = donKalman->state()(3);
+            const float v_f = donKalman->state()(4);
+            float vx = std::cos(phi)*v_s - std::sin(phi)*v_f;
+            float vy = std::sin(phi)*v_s + std::cos(phi)*v_f;
+            vel = Vector2D(vx,vy);
+            acc = Vector2D(0,0);
+            angularVel = donKalman->state()(5);
+            inSight = 0.5;
+
+        }
+        else
+        {
+            pos.invalidate();
+            inSight = 0;
+        }
+        kalmanTime.restart();
+        return;
+
+    }
+
     ////////////////////mhmmd
     int kalmanVelTune = 8;
     if (vanished<=0)
     {
         vraw v;
 
-        v.angle = static_cast<double>(ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION);
+        v.angle = ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION;
         v.conf  = observation->confidence;
         v.pos   = observation->pos;
         v.timestamp = observation->time;
-        if(inOurTeam)
-        {
-            tracker->command(v.timestamp,Vector2D(kalman_velocs.vx, kalman_velocs.vy), kalman_velocs.vw);
-        }
+        //TODO: add robot command
+//        if(inOurTeam)
+//        {
+//            tracker->command(v.timestamp,Vector2D(wm->our[id]->kalman_velocs.vx,wm->our[id]->kalman_velocs.vy),wm->our[id]->kalman_velocs.vw);
+//        }
+
         tracker->observeNew(v,0,0);
         pos = v.pos;
         dir = observation->dir;
-        //pos = tracker->position(getFramePeriod());
+        pos = tracker->position(getFramePeriod());
         vel = tracker->velocity(kalmanVelTune*getFramePeriod());
         acc = tracker->acceleration(kalmanVelTune*getFramePeriod());
-        //dir = Vector2D::unitVector(tracker->direction(getFramePeriod()));
+        dir = Vector2D::unitVector(tracker->direction(getFramePeriod()));
         angularVel = tracker->angular_velocity(kalmanVelTune*getFramePeriod());
 
         inSight = 1.0;
@@ -181,21 +405,21 @@ void CRobot::filter(int vanished)
 
             vraw v;
             v.conf  = 1;
-            v.angle = static_cast<double>(ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION);
+            v.angle = ANGULAR_DIRECTION + ADD_TO_ANGULAR_DIRECTION;
             v.pos   = observation->pos;
             v.timestamp = observation->time;
 
-            if(inOurTeam)
-            {
-                tracker->command(v.timestamp,Vector2D(kalman_velocs.vx,kalman_velocs.vy),kalman_velocs.vw);
-            }
+            // if(inOurTeam)
+            // {
+            //     tracker->command(v.timestamp,Vector2D(kalman_velocs.vx,kalman_velocs.vy),kalman_velocs.vw);
+            // }
 
             pos = v.pos;
             dir = observation->dir;
-            //			pos = tracker->position((8+vanished)*getFramePeriod());
+     //			pos = tracker->position((8+vanished)*getFramePeriod());
             vel = tracker->velocity((kalmanVelTune+vanished-1)*getFramePeriod());
             acc = tracker->acceleration((kalmanVelTune+vanished-1)*getFramePeriod());
-            //			dir = Vector2D::unitVector(tracker->direction((8+vanished)*getFramePeriod()));
+      			dir = Vector2D::unitVector(tracker->direction((8+vanished)*getFramePeriod()));
             angularVel = tracker->angular_velocity((kalmanVelTune+vanished-1)*getFramePeriod());
             inSight = 0.5;
         }
@@ -210,40 +434,31 @@ void CRobot::filter(int vanished)
         }
     }
 
-
-#ifdef velProblem1
-    ////////////////////////////////////// if vel problem :(((((((
-    vel = vel *2;
-#endif
-#ifdef velProblem2
-    vel = vel /2;
-#endif
-
 }
 
-//double CRobot::distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2)
+//double Robot::distFunction(Vector2D pos1,Vector2D dir1,Vector2D pos2,Vector2D dir2)
 //{
 //    return hypot(((pos1-pos2).length() / hypot(field._FIELD_WIDTH, field._FIELD_HEIGHT)),Vector2D::angleBetween(dir1,dir2).degree()/360.0);
 //}
 
 
 
-bool CRobot::isActive()
+bool Robot::isActive()
 {
     return (this->inSight > 0.0);
 }
 
-Vector2D CRobot::getKickerPos(double margin)
+Vector2D Robot::getKickerPos(double margin)
 {
     return pos + dir*(centerFromKicker()+margin);
 }
 
-Circle2D CRobot::getCirle()
+Circle2D Robot::getCirle()
 {
     return Circle2D{pos, robotRadius()};
 }
 
-//bool CRobot::isBallOwner(double verticaldist, double horizontaldist)
+//bool Robot::isBallOwner(double verticaldist, double horizontaldist)
 ////default horizontal dist is kickerWidth()
 //{
 //    double d1 = horizontaldist;
@@ -253,12 +468,12 @@ Circle2D CRobot::getCirle()
 //            && (fabs((ball->pos - pos).outerProduct(dir))<d1*0.5));
 //}
 //
-//double CRobot::ballComingSpeed()
+//double Robot::ballComingSpeed()
 //{
 //    return ball->vel * (pos - ball->pos).norm();
 //}
 
-//bool CRobot::isBallComingTowardMe(double factor,double vBallMin)
+//bool Robot::isBallComingTowardMe(double factor,double vBallMin)
 //{
 //    Vector2D v1=pos-ball->pos;
 //    Vector2D v2=ball->vel.norm();
@@ -266,7 +481,7 @@ Circle2D CRobot::getCirle()
 //    return (fabs(v1.outerProduct(v2)) < k*kickerWidth()*0.5) && (v1.innerProduct(v2) > 0) && (ball->vel.length()>vBallMin);
 //}
 
-//bool CRobot::isBallGoingFartherFrom(double factor,double vBallMin)
+//bool Robot::isBallGoingFartherFrom(double factor,double vBallMin)
 //{
 //    Vector2D v1=pos-ball->pos;
 //    Vector2D v2=ball->vel.norm();
@@ -274,14 +489,14 @@ Circle2D CRobot::getCirle()
 //    return (fabs(v1.outerProduct(v2)) < k*kickerWidth()*0.5) && (v1.innerProduct(v2) < 0) && (ball->vel.length()>vBallMin);
 //}
 //
-//bool CRobot::isBallBack()
+//bool Robot::isBallBack()
 //{
 //    return (((ball->pos-pos).outerProduct(dir) < 2.0*robotRadius())
 //            &&
 //            ((ball->pos-(dir*robotRadius())).innerProduct(dir)<0));
 //}
 //
-//bool CRobot::isBallAside()
+//bool Robot::isBallAside()
 //{
 //    //atan(3.5/8.7)  ~ 25 degrees
 //    if ((ball->pos - pos).length() < robotRadius() + CBall::radius + 0.03)
@@ -294,7 +509,7 @@ Circle2D CRobot::getCirle()
 //    return false;
 //}
 //
-//bool CRobot::collidesBall(Vector2D target)
+//bool Robot::collidesBall(Vector2D target)
 //{
 //Line2D l(pos, target);
 //double s = sign((ball->pos - pos) * (target - pos))*sign((ball->pos - target) * (target - pos));
@@ -302,7 +517,7 @@ Circle2D CRobot::getCirle()
 //return l.dist(ball->pos) < CBall::radius + robotRadius() + 0.01;
 //}
 //
-//bool CRobot::isBallBack(Vector2D goal)
+//bool Robot::isBallBack(Vector2D goal)
 //{
 //Vector2D target = -(goal - ball->pos).norm()*(centerFromKicker() + CBall::radius+0.020) + ball->pos;
 //Segment2D l1(this->pos+Vector2D::unitVector((this->pos-target).th().degree()+90)*robotRadius(),target+Vector2D::unitVector(this->dir.th().degree()+90)*robotRadius());
@@ -323,14 +538,14 @@ Circle2D CRobot::getCirle()
 //
 
 
-void CRobot::setReplace(Vector2D newPos, float newDirection)
+void Robot::setReplace(Vector2D newPos, float newDirection)
 {
 replPos = newPos;
 replDir = newDirection;
 repl = true;
 }
 
-int CRobot::replacementPacket(char* buf)
+int Robot::replacementPacket(char* buf)
 {
     if (repl) buf[0] = 100;
     else buf[0] = 10;
@@ -355,8 +570,7 @@ int CRobot::replacementPacket(char* buf)
 }
 
 
-void CRobot::recvData(char Data)
+void Robot::recvData(char Data)
 {
     kickSensor = (((Data & 0x08) >> 4) == 1);
 }
-

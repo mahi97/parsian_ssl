@@ -27,18 +27,18 @@ kkRPMode CSkillReceivePass::decideMode()
     Circle2D tempCircle2(target, receiveRadius);
     drawer->draw(tempCircle, QColor(Qt::cyan));
 
-        cirThresh = 1.0;
-        Circle2D tempKickCircle(kkAgentPos, 0.3 + kickCirThresh);
-        Segment2D tempBallPath(kkBallPos, kkBallPos + wm->ball->vel.norm()*10);
-        drawer->draw(tempBallPath,QColor(Qt::yellow));
-        Vector2D sol1, sol2;
-        if(tempCircle2.intersection(tempBallPath, &sol1, &sol2)  )
-        {
-            kickCirThresh = 0;
-            return RPINTERSECT;
-        }
+    cirThresh = 1.0;
+    Circle2D tempKickCircle(kkAgentPos, 0.3 + kickCirThresh);
+    Segment2D tempBallPath(kkBallPos, kkBallPos + wm->ball->vel.norm()*10);
+    drawer->draw(tempBallPath,QColor(Qt::yellow));
+    Vector2D sol1, sol2;
+    if(tempCircle2.intersection(tempBallPath, &sol1, &sol2)  )
+    {
+        kickCirThresh = 0;
+        return RPINTERSECT;
+    }
 
-        return RPWAITPOS;
+    return RPWAITPOS;
 
 }
 
@@ -57,13 +57,13 @@ void CSkillReceivePass::execute()
     ballPath.assign(kkBallPos,kkBallPos + wm->ball->vel.norm()*(kkAgentPos.dist(kkBallPos)+1));
     drawer->draw(ballPath,"red");
 
-
+    Vector2D agentPos = agent->pos();
     Vector2D oneTouchDir;
-        oneTouchDir = (kkBallPos - kkAgentPos).norm();
+    oneTouchDir = (kkBallPos - kkAgentPos).norm();
 
     drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
 
-//    Vector2D addVec = Vector2D(0.095*cos((target-kkAgentPos).th().radian()), 0.095*sin((target-kkAgentPos).th().radian()));
+    //    Vector2D addVec = Vector2D(0.095*cos((target-kkAgentPos).th().radian()), 0.095*sin((target-kkAgentPos).th().radian()));
     Vector2D intersectPos;
     Line2D agentDirLine(kkAgentPos , kkAgentPos + oneTouchDir.norm());
     Line2D agentPerLine(kkAgentPos, kkAgentPos + oneTouchDir.norm());
@@ -74,43 +74,64 @@ void CSkillReceivePass::execute()
     Vector2D tempVecDamp, tempDampTarget;
     switch (receivePassMode)
     {
-        case RPWAITPOS:
-            if (target.valid())
-                gotopointavoid->init(target, oneTouchDir);
-            else
-                gotopointavoid->init(agent->pos(), oneTouchDir);
-            agent->setRoller(0);
-            gotopointavoid->setSlowmode(false);
-            gotopointavoid->execute();
-            DEBUG("RPWAITPOS",D_KK);
-            break;
-        case  RPDAMP:
-        case RPRECEIVE:
-            tempVecDamp = (kkAgentPos - kkBallPos).norm();
-            tempDampSpeed = (ballRealVel - agent->vel().length())*0.05;
-            if(tempDampSpeed > 0.003) tempDampSpeed = 0.003;
-            tempDampTarget = kkBallPos + (kkAgentPos - kkBallPos).norm()*0.10 + tempVecDamp*tempDampSpeed;
-            gotopointavoid->init(tempDampTarget,oneTouchDir);
-            gotopointavoid->execute();
-            DEBUG("RPdamp-Back",D_KK);
-            break;
-        case RPINTERSECT:
-            agent->setRoller(2); // TODO : Robot Command
-            intersectPos = agentPerLine.intersection(tempBallPath);
-            gotopointavoid->init(intersectPos,oneTouchDir);
-            gotopointavoid->setSlowmode(false);
-            gotopointavoid->setOnetouchmode(true);
-            gotopointavoid->execute();
-            DEBUG("Intercept", D_KK);
+    case RPWAITPOS:
+        if (target.valid())
+            gotopointavoid->init(target, oneTouchDir);
+        else
+            gotopointavoid->init(agent->pos(), oneTouchDir);
+        agent->setRoller(0);
+        gotopointavoid->setSlowmode(false);
+        gotopointavoid->execute();
+        DEBUG("RPWAITPOS",D_KK);
+        break;
+    case  RPDAMP:
+    case RPRECEIVE:
+        tempVecDamp = (kkAgentPos - kkBallPos).norm();
+        tempDampSpeed = (ballRealVel - agent->vel().length())*0.05;
+        if(tempDampSpeed > 0.003) tempDampSpeed = 0.003;
+        tempDampTarget = kkBallPos + (kkAgentPos - kkBallPos).norm()*0.10 + tempVecDamp*tempDampSpeed;
+        gotopointavoid->init(tempDampTarget,oneTouchDir);
+        gotopointavoid->execute();
+        DEBUG("RPdamp-Back",D_KK);
+        break;
+    case RPINTERSECT:
 
-            break;
-        case RPNONE:
-            gotopointavoid->init(target,oneTouchDir);
-            gotopointavoid->setOnetouchmode(true);
-            gotopointavoid->setSlowmode(false);
-            gotopointavoid->execute();
-            DEBUG("RP",D_KK);
-            break;
+        Vector2D kickerPoint = agent->pos();
+        double agentTime = 0;
+        Vector2D dummy;
+        if(Circle2D(agentPos,0.15).intersection(Segment2D(wm->ball->pos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy) )
+        {
+            intersectPos = ballPath.nearestPoint(kickerPoint);
+        }
+        else
+        {
+            bool posFound  = false;
+            for(double i = 0 ; i < 5 ; i += 0.1)
+            {
+
+                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
+                QList <int> dummy;
+                agentTime = CSkillGotoPointAvoid::timeNeeded(agent,intersectPos,conf->VelMax,dummy,dummy,false,0,true);
+
+
+                if(agentTime < (i - (0.5 /*- min(wm->ball->vel.length(),4)/8 */) ))
+                {
+                    posFound  = true;
+                   break;
+                }
+            }
+
+            if(posFound == false /*||*/ /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ /*!wm->field->isInField(intersectPos )*/)
+            {
+                intersectPos = ballPath.nearestPoint(kickerPoint);
+            }
+        }
+        gotopointavoid->init(intersectPos,oneTouchDir);
+        gotopointavoid->setSlowmode(false);
+        gotopointavoid->setOnetouchmode(false);
+        gotopointavoid->execute();
+        break;
+
     }
 
 }

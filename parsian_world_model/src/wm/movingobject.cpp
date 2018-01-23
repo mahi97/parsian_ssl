@@ -4,7 +4,7 @@ double observeTimeStep = 0.02;
 double lastObserveTimeStep = 0.01;
 
 
-CMovingObject::CMovingObject(bool resetToZero)
+MovingObject::MovingObject(bool resetToZero)
         : vanishedCounter() , lastInsight() , delayTime() , kalmanEnabled() , stoppedFrames() , lastSpeeds() , pos() ,
           dir(), angularVel() , obstacleRadius() , modelObjStopPos() , modelDir() , modelCurDir() ,
           modelFrameCnt() , modelC2Sum() , modelC2Ave() , modelC2Count() , modelDirC0() , modelDirC1() , ballStopPos() {
@@ -30,7 +30,7 @@ CMovingObject::CMovingObject(bool resetToZero)
 
 }
 
-void CMovingObject::update(CMovingObject* obj)
+void MovingObject::update(MovingObject* obj)
 {
     if (obj == nullptr) return;
     cam_id = obj->cam_id;
@@ -51,24 +51,24 @@ void CMovingObject::update(CMovingObject* obj)
     modelSampleTime = obj->modelSampleTime;
 }
 
-void CMovingObject::update(CRawObject raw)
+void MovingObject::update(CRawObject raw)
 {
     cam_id = raw.cam_id;
     *observation = raw;
     kalmanFilter();
 }
 
-void CMovingObject::updateDelayTime(double newDelayTime)
+void MovingObject::updateDelayTime(double newDelayTime)
 {
     delayTime = newDelayTime;
 }
 
-void CMovingObject::init()
+void MovingObject::init()
 {
 
 }
 
-void CMovingObject::findModel(double dt)
+void MovingObject::findModel(double dt)
 {
     if(hist.count() > 100)
         delete hist.dequeue();
@@ -83,12 +83,12 @@ void CMovingObject::findModel(double dt)
     modelSampleTime = dt;
 }
 
-void CMovingObject::resetKalman()
+void MovingObject::resetKalman()
 {
-//overloaded by CBall & CRobot
+//overloaded by CBall & Robot
 }
 
-void CMovingObject::filter(int vanished)
+void MovingObject::filter(int vanished)
 {
     pos = observation->pos;
     dir = observation->dir;
@@ -97,7 +97,7 @@ void CMovingObject::filter(int vanished)
     acc.assign(0,0);
 }
 
-void CMovingObject::kalmanFilter()
+void MovingObject::kalmanFilter()
 {
     //Kalman Watchdog
     if (std::isnan(vel.x) || std::isnan(vel.y)) /////WHAT THE HELL!!!!!!
@@ -184,7 +184,7 @@ void CMovingObject::kalmanFilter()
 }
 
 
-Vector2D CMovingObject::predict(double time)
+Vector2D MovingObject::predict(double time)
 {
     //must be checked if it works precisely or not
     if (time < 0.001)
@@ -205,7 +205,7 @@ Vector2D CMovingObject::predict(double time)
 }
 
 
-Vector2D CMovingObject::predictV(double time)
+Vector2D MovingObject::predictV(double time)
 {
     if (acc.valid() && (acc*vel<0))
     {
@@ -216,14 +216,14 @@ Vector2D CMovingObject::predictV(double time)
     return vel;
 }
 
-Vector2D CMovingObject::whereIsAtVel(Vector2D V)
+Vector2D MovingObject::whereIsAtVel(Vector2D V)
 {
     double dx=(V.x*V.x - vel.x*vel.x)/(2*acc.x);
     double dy=(V.y*V.y - vel.y*vel.y)/(2*acc.y);
     return Vector2D{pos.x + dx, pos.y + dy};
 }
 
-double CMovingObject::whenIsAtVel(double L)
+double MovingObject::whenIsAtVel(double L)
 {
     double A=acc.x*acc.x + acc.y*acc.y;
     double B=2*(vel.x*acc.x + vel.y*acc.y);

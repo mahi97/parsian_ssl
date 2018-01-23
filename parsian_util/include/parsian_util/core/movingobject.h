@@ -26,10 +26,6 @@ public:
     double inSight;
     double obstacleRadius;
     int cam_id;
-    Vector2D predict(double time);
-    Vector2D predictV(double time);
-    Vector2D whereIsAtVel(Vector2D V);
-    double whenIsAtVel(double L);
 
     void update(const parsian_msgs::parsian_robot& _newMO);
 

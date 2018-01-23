@@ -489,7 +489,7 @@ void CSkillKick::jTurn()
     Vector2D movementThSpeed,movementThPos;
     double movementDir = ((ballPos - agentPos).th() - kickFinalDir).degree();
     double shift = 0;
-    double distCoef = 0.15;
+    double distCoef = 0.20;
 
     idealPass = (ballPos - agentPos).norm()*distCoef;
     /*
@@ -546,43 +546,43 @@ void CSkillKick::jTurn()
 
 */
 
-    if(movementDir < 20 && movementDir > -20)
+    if(movementDir < 10 && movementDir > -10)
         shift = 0;
     else if(movementDir > 50)
-        shift = 15 + (1-agentPos.dist(ballPos))*61;
+        shift = 45 + (1-agentPos.dist(ballPos))*61;
     else if(movementDir < -50)
-        shift = -15 - (1-agentPos.dist(ballPos))*61;
+        shift = -45 - (1-agentPos.dist(ballPos))*61;
     else if(movementDir > 30) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 5 + (1-agentPos.dist(ballPos))*10;
+            shift = 35 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =5 + (1-agentPos.dist(ballPos))*35;
+            shift =45 + (1-agentPos.dist(ballPos))*35;
         distCoef = 0.17;
     }
     else if(movementDir < -30){
         if(wm->ball->vel.length() < 0.1)
-            shift = -5 - (1-agentPos.dist(ballPos))*10;
+            shift = -25 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -5 - (1-agentPos.dist(ballPos))*35;
+            shift = -35 - (1-agentPos.dist(ballPos))*35;
 
         distCoef = 0.17;
     }
     else if(movementDir > 0) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 5 + (1-agentPos.dist(ballPos))*10;
+            shift = 25 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =5 + (1-agentPos.dist(ballPos))*20;
+            shift =35 + (1-agentPos.dist(ballPos))*20;
         distCoef = 0.17;
     }
     else if(movementDir < 0){
         if(wm->ball->vel.length() < 0.1)
-            shift = -5 - (1-agentPos.dist(ballPos))*10;
+            shift = -25 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -5 - (1-agentPos.dist(ballPos))*20;
+            shift = -35 - (1-agentPos.dist(ballPos))*20;
 
         distCoef = 0.17;
     }
-
+distCoef = 0.20;
     idealPass.rotate(shift);
     targetForJturnSpeed = agentPos + idealPass;
 
@@ -657,7 +657,7 @@ void CSkillKick::jTurn()
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
-    speedPid->kp = 6 +2.1*agentPos.dist(ballPos) + dirReduce;
+    speedPid->kp = 7;
 
 
     if(!jTurnFromBack)
@@ -886,6 +886,19 @@ void CSkillKick::findPosToGo()
     Circle2D dribblerArea(agentPos+agentDir.norm()*0.1,0.25);
     Circle2D robotArea(agentPos,1);
 
+    if( (agentPos.dist(ballPos) < 0.4)) {
+        if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && dribblerArea.contains(ballPos))
+        {
+            turnForKick();
+            return;
+
+        }
+        else
+        {
+            jTurn();
+            return;
+        }
+    }
     gpa->setAddvel(Vector2D(0,0));
     if(agentPos.dist(ballPos) < 1.5) {
         robotArea.assign(agentPos,max(agentPos.dist(ballPos) - 0.1, 0.01));
@@ -1004,17 +1017,6 @@ void CSkillKick::findPosToGo()
         gpa->setBallobstacleradius(0);
     else
         gpa->setBallobstacleradius(0);
-    if(((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60) && (agentPos.dist(ballPos) < 1) && (wm->ball->vel.length() > 0.2)) || (agentPos.dist(ballPos) < 0.4)) {
-        if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && dribblerArea.contains(ballPos))
-        {
-            turnForKick();
-        }
-        else
-        {
-            jTurn();
-        }
-        return;
-    }
 
     gpa->setSlowmode(slow);
     gpa->setDivemode(false);
