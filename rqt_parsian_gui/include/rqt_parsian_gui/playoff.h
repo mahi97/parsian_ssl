@@ -16,15 +16,13 @@ namespace rqt_parsian_gui{
 class PlayOff : public rqt_gui_cpp::Plugin {
     Q_OBJECT
     public:
-
         PlayOff();
         virtual void initPlugin(qt_gui_cpp::PluginContext& context);
-        virtual void shutdownPlugin();
 
     private:
         ros::NodeHandle n;
         ros::NodeHandle n_private;
-        PlayOffWidget* playOffWidget;
+        boost::shared_ptr<PlayOffWidget> playOffWidget;
 
     };
 }  // namespace rqt_example_cpp
