@@ -49,7 +49,7 @@ CCoach::CCoach(Agent**_agents)
     stopPlay            = new CStopPlay();
 
     for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-        stopRoles[i] = new CRoleStop(agents[i]);
+        stopRoles[i] = new CRoleStop(nullptr);
     }
 
     lastDefenseAgents.clear();
@@ -539,9 +539,7 @@ void CCoach::assignDefenseAgents(int defenseCount){
 
     lastDefenseAgents.clear();
     lastDefenseAgents.append(defenseAgents);
-
-    defenseAgents.clear();
-    defenseAgents.append(defenseAgents);
+//    defenseAgents.clear();
 }
 bool CCoach::isBallcollide(){
     // TODO : change this :P
@@ -748,6 +746,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
                 playmakeId = ourPlayer;
             }
         }
+        ROS_INFO_STREAM("op :"<<ballPos.x<<"  "<<agents[ourPlayers[0]]->pos().x);
         lastPlayMake = playmakeId;
     }
     else
@@ -1153,11 +1152,22 @@ void CCoach::execute()
     ROS_INFO_STREAM("GAMESTATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
     decideAttack();
+    for(int i = 0 ; i < 8 ; i ++)
+    {
+        if(agents[i]->action != NULL)
+        ROS_INFO_STREAM("robot ID decide: "<< i << "task : " << agents[i]->action->getActionName().toStdString());
+    }
+
     checkSensorShootFault();
     // checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
     // Old Role Base Execution -- used for block, old_playmaker
     checkRoleAssignments();
+    for(int i = 0 ; i < 8 ; i ++)
+    {
+        if(agents[i]->action != NULL)
+        ROS_INFO_STREAM("robot ID decide 33333: "<< i << "task : " << agents[i]->action->getActionName().toStdString());
+    }
 
     //// Handle Roles Here
     for (auto &stopRole : stopRoles) {
@@ -1165,6 +1175,11 @@ void CCoach::execute()
             stopRole->execute();
             ROS_INFO_STREAM("DD " << stopRole->agent->id());
         }
+    }
+    for(int i = 0 ; i < 8 ; i ++)
+    {
+        if(agents[i]->action != NULL)
+        ROS_INFO_STREAM("robot ID decide 2222: "<< i << "task : " << agents[i]->action->getActionName().toStdString());
     }
 
 //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
@@ -1222,13 +1237,14 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     }
 
     QList<int> tempAgents;
+
     for (int i = 0; i < _ourPlayers.size(); i++) {
+        stopRoles[i]->assign(nullptr);
         Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
             ROS_INFO_STREAM("D " << i);
             stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
         } else {
-            stopRoles[i]->assign(nullptr);
             tempAgents.append(tempAgent->id());
         }
     }
