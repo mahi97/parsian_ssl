@@ -1,8 +1,9 @@
-#!/usr/bin/ python
+#!/usr/bin/env python
+# license removed for brevity
 
 import rospy
 from parsian_msgs.srv import *
-from  plan_stuff import docWatch
+import docWatch
 
 
 class Get_Plan:

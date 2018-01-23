@@ -12,21 +12,21 @@ from parsian_msgs.msg import vector2D
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+import rospkg
 
 class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
-        self.__p = os.getcwd().rsplit('/', 1)[0]
-        self.__p = self.__p.rsplit('/', 1)[0]
-        self.__p = self.__p + "/plans/"
-
+        self.p = rospkg.RosPack().get_path("parsian_ai")
+        print ("pack path: "+self.p)
+        self.p += "/plans/"
         self.__observer = Observer()
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
+        self.__event_handler = Handler(self.p)
 
     def run(self):
-        self.__event_handler = Handler(self.__p)
-        self.__observer.schedule(self.__event_handler, self.__p, recursive=True)
+        self.__observer.schedule(self.__event_handler, self.p, recursive=True)
         self.__observer.start()
         try:
             while True:
@@ -61,7 +61,7 @@ class Handler(FileSystemEventHandler):
         self.plans_to_dict()
 
         self.shuffle_indexing(self.__final_list)  # call once
-
+        
         # self.choose_plan(4, 3)
         # print (self.message_generator(self.__final_dict[0]))
 
@@ -89,6 +89,7 @@ class Handler(FileSystemEventHandler):
                 #         printfname.rsplit('/', 1)[1]   # just file name
                 file_list.append(fname)
 
+        ignore_lst = []
         for f in file_list:  # find ignore list
             if f != None:
                 if f.endswith('.ignore'):
@@ -127,6 +128,7 @@ class Handler(FileSystemEventHandler):
 
     def add_plan(self, path_to_plan):
         flag = 0
+        print ("adding plan...")
         if str(path_to_plan).endswith(".json"):
             if not (str(path_to_plan).split("/plans")[1]) in self.__ignore:
                 for pattern in self.__ignore:
@@ -166,7 +168,9 @@ class Handler(FileSystemEventHandler):
 
         print("ignored plans:")
         for fil in new_file_list2:
-            print("\t"+str(fil).split("/plans")[1])
+            str_list = str(fil).split("/plans")
+            if len(str_list) > 0:
+                print("\t"+[1])
 
         last = [term for term in new_file_list if not term in new_file_list2]
 
@@ -263,14 +267,12 @@ class Handler(FileSystemEventHandler):
             with open(str(plan)) as json_data:
                 tmp = json.load(json_data)
                 for i in range(0, len(tmp["plans"])):
-                    dict1 = {}
                     dict1 = tmp["plans"][i]
                     dict1.update({"filename": str(plan)})
                     dict1.update({"isMaster": False})
                     dict1.update({"isActive": True})
-                    dict1.update({"succesRate": 0})
+                    dict1.update({"successRate": 0})
                     dict1.update({"planRepeat": 0})
-
                     self.__final_dict.append(dict1)
         return self.__final_dict
 
