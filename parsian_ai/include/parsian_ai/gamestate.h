@@ -40,6 +40,7 @@ using namespace  parsian_msgs;
 
 class GameState {
 private:
+    int command_ctr;
     States state;
     int ourScore,theirScore;
     bool isReady;
