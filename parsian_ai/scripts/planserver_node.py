@@ -8,19 +8,22 @@ import docWatch
 
 class Get_Plan:
     def __init__(self):
+
+        rospy.init_node('plan_server')
+        self.s = rospy.Service('update_plans', parsian_update_plans, self.handle_gui_plan_request)
         self.__w = docWatch.Watcher()
         self.__w.run()
-        rospy.init_node('plan_server')
-        rospy.Service('update_plans', parsian_update_plans, self.handle_gui_plan_request)
+        rospy.spin()
 
 
     def handle_gui_plan_request(self, req):
-        #type: (parsian_update_plans)
-
-        received = req.request.newPlan
+        #type: (parsian_update_plansRequest)
+        print req
+        received = req.newPlans
         if len(received) > 0:
-            self.__w.update_master_active(received, req.request.isMaster, req.request.isActive)
-        return self.__w.get_all_plans_msgs()
+            self.__w.update_master_active(received, req.isMaster, req.isActive)
+            print ("response to gui......")
+            return self.__w.get_all_plans()
 
 
     def handle_plan_request(self, req):

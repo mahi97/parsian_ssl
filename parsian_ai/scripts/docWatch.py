@@ -7,7 +7,6 @@ import json
 import random
 
 from parsian_msgs.msg import parsian_plan
-from parsian_msgs.msg import vector2D
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -37,13 +36,14 @@ class Watcher:
         self.__observer.join()
 
     def get_all_plans(self):
+        print ("response to gui request...")
         return self.__event_handler.get_all_plans_msgs()
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
 
     def update_master_active(self, name_list, is_master, is_active):
-        self.update_master_active(name_list, is_master, is_active)
+        self.__event_handler.update_master_active(name_list, is_master, is_active)
 
 class Handler(FileSystemEventHandler):
 
@@ -61,7 +61,7 @@ class Handler(FileSystemEventHandler):
         self.plans_to_dict()
 
         self.shuffle_indexing(self.__final_list)  # call once
-        
+
         # self.choose_plan(4, 3)
         # print (self.message_generator(self.__final_dict[0]))
 
@@ -290,7 +290,7 @@ class Handler(FileSystemEventHandler):
         plan_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
         plan_msg.planRepeat    = plan_dict["planRepeat"]
-        plan_msg.succesRate    = plan_dict["succesRate"]
+        plan_msg.succesRate    = plan_dict["successRate"]
         return plan_msg
 
 
