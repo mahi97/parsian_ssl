@@ -802,7 +802,7 @@ void CCoach::decideAttack()
     for (int ourPlayer : ourPlayers) {
         str += QString(" %1").arg(ourPlayer);
     }
-    debugger->debug(QString("%1: Size: %2 --> (%3)").arg("text :").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
+    debugger->debug(QString("%1: Size: %2 --> (%3)").arg("text: ").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -1132,6 +1132,8 @@ void CCoach::setFirstPlay() {
 
 void CCoach::execute()
 {
+    gameState->setState(States::PlayOn);
+
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
     decidePreferedDefenseAgentsCountAndGoalieAgent();
@@ -1301,7 +1303,6 @@ void CCoach::decideStart(QList<int> &_ourPlayers) {
         selectedPlay=theirPenalty;
         return;
     }
-
     selectedPlay = dynamicAttack;
     decidePlayOn(_ourPlayers, lastPlayers);
 }
