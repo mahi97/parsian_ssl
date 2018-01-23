@@ -102,11 +102,12 @@ void PlayOffWidget::updateModel() {
     int fileCounter = 0;
     int planCounter = 0;
 
+    int index[theplans->response.allPlans.size()][3] ; // to use in f
 
     for (size_t i = 0;i < theplans->response.allPlans.size();i++) {
-        theplans->response.allPlans[i].index[0] = static_cast<uint32_t>(pkgCounter);
-        theplans->response.allPlans[i].index[1] = static_cast<uint32_t>(fileCounter);
-        theplans->response.allPlans[i].index[2] = static_cast<uint32_t>(planCounter);
+        index[i][0] = pkgCounter;
+        index[i][1] = fileCounter;
+        index[i][2] = planCounter;
 
 
         if (lastPlan->package != theplans->response.allPlans[i].package ) {
