@@ -1,4 +1,3 @@
-string name
 string planFile
 string package
 bool isActive
