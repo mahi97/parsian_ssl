@@ -27,11 +27,11 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n) : QWidget() {
     columns = new QColumnView();
 
     active->setEnabled(false);
-   // update->setEnabled(false);
+    update->setEnabled(false);
     deactive->setEnabled(false);
     master->setEnabled(false);
 
-    //    selection = columns->selectionModel();
+    selection = columns->selectionModel();
 
     model = new QStandardItemModel();
     selection = new QItemSelectionModel(model);
@@ -152,16 +152,16 @@ void PlayOffWidget::slt_changeMode() {
 
 void PlayOffWidget::updateBtn(bool _debug) {
     if (_debug) {
-//        update->setEnabled(true);
-//        columns->setEnabled(true);
-//        active->setEnabled(true);
-//        master->setEnabled(true);
-//        deactive->setEnabled(true);
+        update->setEnabled(true);
+        columns->setEnabled(true);
+        active->setEnabled(true);
+        master->setEnabled(true);
+        deactive->setEnabled(true);
     } else {
-//        active->setEnabled(false);
-//        update->setEnabled(false);
-//        deactive->setEnabled(false);
-//        master->setEnabled(false);
+        active->setEnabled(false);
+        update->setEnabled(false);
+        deactive->setEnabled(false);
+        master->setEnabled(false);
     }
 }
 
@@ -199,7 +199,7 @@ void PlayOffWidget::slt_active() {
 
                 int planIndex = model.data().toInt();
 
-                chosen = &theplans->request.newPlans[static_cast<unsigned long>(planIndex)];
+                //chosen = &theplans->request.newPlans[static_cast<unsigned long>(planIndex)];
 //                chosen->isActive = static_cast<unsigned char>(true);
 //                chosen->isMaster = static_cast<unsigned char>(false);
 

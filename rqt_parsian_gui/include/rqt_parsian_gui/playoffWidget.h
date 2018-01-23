@@ -50,7 +50,7 @@ namespace rqt_parsian_gui {
         QLabel *details[8];
 
         parsian_msgs::parsian_plan *lastPlan;
-        std::string *chosen;
+        parsian_msgs::parsian_plan *chosen;
         QItemSelection itemSelected;
 
     private Q_SLOTS:
