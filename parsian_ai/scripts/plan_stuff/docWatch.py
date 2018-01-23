@@ -37,9 +37,11 @@ class Watcher:
     def get_all_plans(self):
         return self.__event_handler.get_all_plans()
 
+    def choose_plan(self, player_num, game_mode):
+        return self.__event_handler.choose_plan(player_num, game_mode)
 
-    def choose_plan(self):
-        return self.__event_handler.choose_plan()
+    def update_master_active(self, name_list, is_master, is_active):
+        self.update_master_active(name_list, is_master, is_active)
 
 class Handler(FileSystemEventHandler):
 
@@ -47,15 +49,18 @@ class Handler(FileSystemEventHandler):
         self.__final_list = []
         self.__ignore = []
         self.__shuffleCount = 0
+        self.__final_dict = []
 
         global final_list, shuffleCount
 
         # read_plan(f[5])
         self.__final_list = self.list_valid_plans(p)
 
-        self.plansToDict()
+        self.plans_to_dict()
 
         self.shuffle_indexing(self.__final_list)  # call once
+
+        self.choose_plan(4,3)
 
     # @staticmethod
     def on_any_event(self, event):
@@ -72,9 +77,6 @@ class Handler(FileSystemEventHandler):
         elif event.event_type == 'deleted':
             # print("Received deleted event - %s" % event.src_path)
             self.remove_plan(event.src_path)
-
-
-
 
     def list_valid_plans(self, path):
         file_list = []
@@ -120,9 +122,7 @@ class Handler(FileSystemEventHandler):
         self.__final_list = self.ignore_plans(file_list2, ignore_lst)
         return self.__final_list
 
-
     def add_plan(self, path_to_plan):
-
         flag = 0
         if str(path_to_plan).endswith(".json"):
             if not (str(path_to_plan).split("/plans")[1]) in self.__ignore:
@@ -143,12 +143,10 @@ class Handler(FileSystemEventHandler):
 
         return self.__final_list
 
-
     def remove_plan(self, path_to_plan):
         if path_to_plan in self.__final_list:
             print(str(path_to_plan).split("/plans")[1]+" removed.")
             self.__final_list.remove(path_to_plan)
-
 
     def ignore_plans(self, file_list, ignore_list):
         # files:
@@ -175,10 +173,8 @@ class Handler(FileSystemEventHandler):
 
         return last
 
-
     def shuffle_indexing(self, alist):
         random.shuffle(alist)
-
 
     def read_plan(self, plan_path):
         print("opening plan "+str(plan_path).split("/plans")[1])
@@ -224,27 +220,50 @@ class Handler(FileSystemEventHandler):
                 print(plan_i["ballInitPos"]["x"])
                 print(plan_i["ballInitPos"]["y"])
 
-    def plansToDict(self):
-        dictlist = []
+    def plans_to_dict(self):
+        self.__final_dict = []
         for plan in self.__final_list:
-            planDict = open(str(plan)).read()
-            dictlist.append(planDict)
-            # print("nanananananananannanananananna"
-            # print(str(plan))
-            # print(planDict.keys)
-            return dictlist
+            with open(str(plan)) as json_data:
+                dict1 = {}
+                dict1 = json.load(json_data)
+                dict1.update({"filename": str(plan)})
+                dict1.update({"isMaster": False})
+                dict1.update({"isActive": True})
+                self.__final_dict.append(dict1)
+        return self.__final_dict
 
-    def choose_plan(self):
-        if len(self.__final_list) > self.__shuffleCount:
-            self.__shuffleCount += 1
-            return self.__final_list[self.__shuffleCount-1]
-        else:
-            self.__shuffleCount = 1
-            return self.__final_list[self.__shuffleCount - 1]
+    def choose_plan(self, player_num, game_mode):
+        # DIRECT   = 1
+        # INDIRECT = 2
+        # KICKOFF  = 3
+        plan_mode = ""
+        if game_mode == 1:
+            plan_mode = "DIRECT"
+        elif game_mode == 2:
+            plan_mode = "INDIRECT"
+        elif game_mode == 3:
+            plan_mode = "KICKOFF"
+
+        #get a sublist from final_list based on player_num and game_mode
+        sublist = []
+        for plans in self.__final_dict:
+            # print(plans["plans"][0]["agentInitPos"])
+            for plan in plans["plans"]:
+                if len(plan["agentInitPos"]) >= player_num and plan["planMode"] == plan_mode and plan["chance"] > 0 and plan["lastDist"] >= 0:
+                    print("matched: "+plans["filename"].split("plans/")[1]+" --- num agents: "+str(len(plan["agentInitPos"])))
+                    sublist.append(plan)
+
+        return sublist[0]
 
     def get_all_plans(self):
-        return self.__final_list
+        return self.__final_dict
 
+    def update_master_active(self, name_list, is_master, is_active):
+        for plan in self.__final_dict:
+            for need_update in name_list:
+                if plan["filename"] == need_update:
+                    plan["isMaster"] = is_master
+                    plan["isActive"] = is_active
 
 if __name__ == '__main__':
     w = Watcher()
