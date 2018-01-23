@@ -2201,7 +2201,7 @@ void DefensePlan::initVars(float goalCircleRad){
     if (firstBallPos.x < topGoal.x + 0.05)
         firstBallPos.x  = topGoal.x + 0.05;
 
-    ballPos = wm->ball->predict(catch_time);
+    ballPos = wm->ball->getPosInFuture(catch_time);
     if (ballVel.length() > 0.3 /*&& fabs(Vector2D::angleBetween(Vector2D(-1, 0), wm->ball->vel).degree()) < 45*/)
         ballPos = firstBallPos;
 
