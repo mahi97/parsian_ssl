@@ -157,8 +157,8 @@ void CSkillKickOneTouch::execute()
         gotopointavoid->setNoavoid(false);
         double agentTime= 0 ;
         drawer->draw(QString("agentT dif : %1").arg(kickerPoint.dist(wm->ball->getPosInFuture(0.5))) , Vector2D(2.5,-1));
-
-        if(kickerPoint.dist(wm->ball->getPosInFuture(0.5)) < 0.1 || wm->ball->pos.dist(agentPos) < 1)
+        Vector2D dummy;
+        if(!fastestPoint || Circle2D(agentPos,0.1).intersection(Segment2D(wm->ball->pos,wm->ball->getPosInFuture(reachBeforeBallTime)),&dummy,&dummy))
         {
             intersectPos = ballPath.nearestPoint(kickerPoint);
         }
@@ -173,7 +173,7 @@ void CSkillKickOneTouch::execute()
                 agentTime = CSkillGotoPointAvoid::timeNeeded(agent,intersectPos + addVec,conf->VelMax,dummy,dummy,false,0,true);
 
 
-                if(agentTime < (i - (0.5 - min(wm->ball->vel.length(),4)/8 ) ))
+                if(agentTime < (i - (reachBeforeBallTime) ))
                 {
                     posFound  = true;
                     break;
