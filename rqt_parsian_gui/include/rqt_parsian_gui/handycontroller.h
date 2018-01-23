@@ -85,6 +85,10 @@ namespace rqt_parsian_gui
         int agentID, speed, kickspeed, chipkickspeed, rollerspeed;
         ros::NodeHandle* nh;
         ros::NodeHandle* nh_private;
+        ros::Timer timer_;
+        void timerCb(const ros::TimerEvent& event);
+
+
 
 
     };

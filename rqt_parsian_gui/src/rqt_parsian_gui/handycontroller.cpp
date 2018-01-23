@@ -71,6 +71,8 @@ namespace rqt_parsian_gui
         connect(mUI.ChipKickSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(chipkickspeedchanged(int)));
         connect(mUI.RollerSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(rollerspeedchanged(int)));
 
+        timer_ = n.createTimer(ros::Duration(0.0166), boost::bind(& GrsimNodelet::timerCb, this, _1));
+
         //initial publishing
         nh = &getNodeHandle();
         nh_private = &getPrivateNodeHandle();
@@ -82,6 +84,11 @@ namespace rqt_parsian_gui
         widget_->show();
 
 
+    }
+
+    void HandyController::timerCb(const ros::TimerEvent& event){
+        // Using timers is the preferred 'ROS way' to manual threading
+//        send();
     }
 
     void HandyController::shutdownPlugin()
