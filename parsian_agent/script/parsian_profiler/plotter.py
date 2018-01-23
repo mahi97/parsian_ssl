@@ -15,7 +15,7 @@ for item in ls:
         for (dist, phi, khab) in f:
             for point in f[(dist, phi, khab)]['data']:
                 command.append(point['robot_command'])
-                world_model.append(point['world_model'])
+                world_model.append(point['world_model']*1.364894903)
                 remain_dist.append(point['remain_dist'])
                 time.append(point['time'])
             plt.figure()
@@ -23,11 +23,11 @@ for item in ls:
             plt.xlabel(r'time')
             plt.title(str(round(phi/pi*180))+"  "+str(round(180*khab/pi, 2)))
             wm = plt.plot(time, world_model, 'ro',color='blue', label="world_model vel")
-            plt.plot(time, world_model, 'k--')
+            #plt.plot(time, world_model, 'k--')
             com = plt.plot(time, command, 'ro',color='red', label="command vel")
-            plt.plot(time, command, 'k--')
+            #plt.plot(time, command, 'k--')
             rem = plt.plot(time, remain_dist, 'ro',color='green', label="remain dist")
-            plt.plot(time, remain_dist, 'k--')
+            #plt.plot(time, remain_dist, 'k--')
 
             plt.legend(bbox_to_anchor=(1, 1),
                        bbox_transform=plt.gcf().transFigure)

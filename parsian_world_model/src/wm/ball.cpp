@@ -6,7 +6,7 @@ const double _ROBOT_RADIUS = 0.09;
 
 const double CBall::radius = 0.0215;
 
-CBall::CBall(bool noKalman) : CMovingObject()
+CBall::CBall(bool noKalman) : MovingObject()
 {
     init();
     if (!noKalman)
@@ -218,7 +218,7 @@ void CBall::filter(int vanished)
 
     if (tracker == nullptr)
     {
-        CMovingObject::filter(vanished);
+        MovingObject::filter(vanished);
         return;
     }
     if (vanished<=0)

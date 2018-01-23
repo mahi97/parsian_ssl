@@ -13,7 +13,7 @@
 #include <parsian_world_model/util/balltracker.h>
 #include <parsian_util/base.h>
 
-class CBall : public CMovingObject
+class CBall : public MovingObject
 {
 private:
 //    CField field;

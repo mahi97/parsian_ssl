@@ -21,12 +21,13 @@ public:
     Vector2D positioningPoints[_MAX_NUM_PLAYERS];
     int positioningPointsCount;
 
+    double vForwardCmd[12], vNormalCmd[12], vAngCmd[12];
     quint8 game_state;
     quint8 game_mode;
 
     CVisionBelief belief;
-    QList<CRobot*> ourTeam[_MAX_NUM_PLAYERS];
-    QList<CRobot*> oppTeam[_MAX_NUM_PLAYERS];
+    QList<Robot*> ourTeam[_MAX_NUM_PLAYERS];
+    QList<Robot*> oppTeam[_MAX_NUM_PLAYERS];
     QList<CBall*> ball;
     QString ourRole[_MAX_NUM_PLAYERS];
     QString oppRole[_MAX_NUM_PLAYERS];
@@ -36,7 +37,7 @@ public:
     bool closing;
     CHalfWorld();
     void track(QList<CRawObject>& p0, QList<CRawObject>& p);
-    void update(QList<CRobot*>& robot, CVisionBelief* v, QList<CRawObject>& robot0, int id, bool our);
+    void update(QList<Robot*>& robot, CVisionBelief* v, QList<CRawObject>& robot0, int id, bool our);
     void update(QList<CBall*>& ball, CVisionBelief* v);
     void update(CVisionBelief* v);
     void update(CHalfWorld* w);
