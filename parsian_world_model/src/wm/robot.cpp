@@ -110,7 +110,7 @@ void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, boo
 {
     kalman *kalman = donKalman;
     const qint64 lastTime = (updateFuture) ?kalmanFutureLastTime:kalmanLastTime;
-    double timeDiff = kalmanTime.elapsed()*0.001;//(time - lastTime);
+    double timeDiff = (max(kalmanTime.elapsed() , 1))*0.001;//(time - lastTime);
     //timeDiff = 0.016;
     Q_ASSERT(timeDiff >= 0);
     const float phi = kalman->baseState()(2)- (_PI/2);
@@ -368,10 +368,10 @@ void Robot::filter(int vanished)
         tracker->observeNew(v,0,0);
         pos = v.pos;
         dir = observation->dir;
-        //pos = tracker->position(getFramePeriod());
+        pos = tracker->position(getFramePeriod());
         vel = tracker->velocity(kalmanVelTune*getFramePeriod());
         acc = tracker->acceleration(kalmanVelTune*getFramePeriod());
-        //dir = Vector2D::unitVector(tracker->direction(getFramePeriod()));
+        dir = Vector2D::unitVector(tracker->direction(getFramePeriod()));
         angularVel = tracker->angular_velocity(kalmanVelTune*getFramePeriod());
 
         inSight = 1.0;
@@ -409,17 +409,17 @@ void Robot::filter(int vanished)
             v.pos   = observation->pos;
             v.timestamp = observation->time;
 
-            if(inOurTeam)
-            {
-                tracker->command(v.timestamp,Vector2D(kalman_velocs.vx,kalman_velocs.vy),kalman_velocs.vw);
-            }
+            // if(inOurTeam)
+            // {
+            //     tracker->command(v.timestamp,Vector2D(kalman_velocs.vx,kalman_velocs.vy),kalman_velocs.vw);
+            // }
 
             pos = v.pos;
             dir = observation->dir;
-            //			pos = tracker->position((8+vanished)*getFramePeriod());
+     //			pos = tracker->position((8+vanished)*getFramePeriod());
             vel = tracker->velocity((kalmanVelTune+vanished-1)*getFramePeriod());
             acc = tracker->acceleration((kalmanVelTune+vanished-1)*getFramePeriod());
-            //			dir = Vector2D::unitVector(tracker->direction((8+vanished)*getFramePeriod()));
+      			dir = Vector2D::unitVector(tracker->direction((8+vanished)*getFramePeriod()));
             angularVel = tracker->angular_velocity((kalmanVelTune+vanished-1)*getFramePeriod());
             inSight = 0.5;
         }
@@ -574,4 +574,3 @@ void Robot::recvData(char Data)
 {
     kickSensor = (((Data & 0x08) >> 4) == 1);
 }
-
