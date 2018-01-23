@@ -19,7 +19,7 @@ class Get_Plan:
         received = req.request.newPlan
         if len(received) > 0:
             self.__w.update_master_active(received, req.request.isMaster, req.request.isActive)
-        return self.__w.get_all_plans()
+        return self.__w.get_all_plans_msgs()
 
 
     def handle_plan_request(self, req):

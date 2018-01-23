@@ -6,6 +6,8 @@ import json
 
 import random
 
+from parsian_msgs.msg import parsian_plan
+from parsian_msgs.msg import vector2D
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -35,7 +37,7 @@ class Watcher:
         self.__observer.join()
 
     def get_all_plans(self):
-        return self.__event_handler.get_all_plans()
+        return self.__event_handler.get_all_plans_msgs()
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
@@ -60,7 +62,8 @@ class Handler(FileSystemEventHandler):
 
         self.shuffle_indexing(self.__final_list)  # call once
 
-        self.choose_plan(4,3)
+        # self.choose_plan(4, 3)
+        # print (self.message_generator(self.__final_dict[0]))
 
     # @staticmethod
     def on_any_event(self, event):
@@ -220,18 +223,6 @@ class Handler(FileSystemEventHandler):
                 print(plan_i["ballInitPos"]["x"])
                 print(plan_i["ballInitPos"]["y"])
 
-    def plans_to_dict(self):
-        self.__final_dict = []
-        for plan in self.__final_list:
-            with open(str(plan)) as json_data:
-                dict1 = {}
-                dict1 = json.load(json_data)
-                dict1.update({"filename": str(plan)})
-                dict1.update({"isMaster": False})
-                dict1.update({"isActive": True})
-                self.__final_dict.append(dict1)
-        return self.__final_dict
-
     def choose_plan(self, player_num, game_mode):
         # DIRECT   = 1
         # INDIRECT = 2
@@ -246,17 +237,18 @@ class Handler(FileSystemEventHandler):
 
         #get a sublist from final_list based on player_num and game_mode
         sublist = []
-        for plans in self.__final_dict:
-            # print(plans["plans"][0]["agentInitPos"])
-            for plan in plans["plans"]:
-                if len(plan["agentInitPos"]) >= player_num and plan["planMode"] == plan_mode and plan["chance"] > 0 and plan["lastDist"] >= 0:
-                    print("matched: "+plans["filename"].split("plans/")[1]+" --- num agents: "+str(len(plan["agentInitPos"])))
-                    sublist.append(plan)
+        for plan in self.__final_dict:
+            if len(plan["agentInitPos"]) >= player_num and plan["planMode"] == plan_mode and plan["chance"] > 0 and plan["lastDist"] >= 0:
+                print("matched: "+plan["filename"].split("plans/")[1]+" --- num agents: "+str(len(plan["agentInitPos"])))
+                sublist.append(plan)
 
         return sublist[0]
 
-    def get_all_plans(self):
-        return self.__final_dict
+    def get_all_plans_msgs(self):
+        plans_msg = []
+        for plan in self.__final_dict:
+            plans_msg.append(self.message_generator(plan))
+        return plans_msg
 
     def update_master_active(self, name_list, is_master, is_active):
         for plan in self.__final_dict:
@@ -264,6 +256,41 @@ class Handler(FileSystemEventHandler):
                 if plan["filename"] == need_update:
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
+
+    def plans_to_dict(self):
+        self.__final_dict = []
+        for plan in self.__final_list:
+            with open(str(plan)) as json_data:
+                tmp = json.load(json_data)
+                for i in range(0, len(tmp["plans"])):
+                    dict1 = {}
+                    dict1 = tmp["plans"][i]
+                    dict1.update({"filename": str(plan)})
+                    dict1.update({"isMaster": False})
+                    dict1.update({"isActive": True})
+                    dict1.update({"succesRate": 0})
+                    dict1.update({"planRepeat": 0})
+
+                    self.__final_dict.append(dict1)
+        return self.__final_dict
+
+    def message_generator(self, plan_dict):
+        plan_msg = parsian_plan()
+        plan_msg.planFile      = plan_dict["filename"]
+        plan_msg.package       = plan_dict["filename"].split("/")[-2]
+        plan_msg.isActive      = plan_dict["isActive"]
+        plan_msg.isMaster      = plan_dict["isMaster"]
+        plan_msg.agentSize     = len(plan_dict["agentInitPos"])
+        plan_msg.chance        = plan_dict["chance"]
+        plan_msg.lastDist      = plan_dict["lastDist"]
+        plan_msg.tags          = plan_dict["tags"]
+        plan_msg.planMode      = plan_dict["planMode"]
+        plan_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
+        plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
+        plan_msg.planRepeat    = plan_dict["planRepeat"]
+        plan_msg.succesRate    = plan_dict["succesRate"]
+        return plan_msg
+
 
 if __name__ == '__main__':
     w = Watcher()
