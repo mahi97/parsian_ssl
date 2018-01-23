@@ -316,12 +316,9 @@ void CDynamicAttack::assignTasks() {
     if (mahiPlayMaker != nullptr) {
         playMake();
     }
+if(currentPlan.agentSize > 0) {
 
-    QList <Vector2D> fakePoses;
-    fakePoses << Vector2D(0,0) << Vector2D(2,2) << Vector2D(2,-2) << Vector2D(3,-2.5) << Vector2D(3,2.5);
-    if(currentPlan.agentSize > 0) {
-
-        positioning(fakePoses);
+        positioning(semiDynamicPosition);
     }
 
 }
@@ -502,27 +499,32 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
 
                     roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setReceiveRadius(
-                            std::max(0.0, 1 - roleAgents[i]->getAgent()->pos()
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                                                 .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Ready);// Receive Skill
-                    ROS_INFO("kiri tar az in ham mishe 3:D");
 
                     break;
                 case DynamicEnums::OneTouch: // OneTouch Reflects
 
                     roleAgents[i]->setWaitPos(_points.at(i));
+                    roleAgents[i]->setReceiveRadius(
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
+                                                                .dist(roleAgents[i]->getTarget())));
+
                     // TODO : fix the target
                     roleAgents[i]->setTarget(wm->field->oppGoal());
                     roleAgents[i]->setSelectedSkill(DynamicEnums::OneTouch);// Receive Skill
-                    ROS_INFO("kiri tar az in ham mishe 2:D");
 
                     break;
                 case DynamicEnums::Move:
 
+
+                    roleAgents[i]->setReceiveRadius(
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
+                                                                .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setTargetDir(ballPos - roleAgents[i]->getAgent()->pos());
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Move);
-                    ROS_INFO("kiri tar az in ham mishe :D");
 
                     break;
                 case DynamicEnums::NoSkill:
