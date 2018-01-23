@@ -13,8 +13,12 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n) : QWidget() {
 
     theplans->response.allPlans.clear();
     theplans->request.newPlans.clear();
-    client.call(*theplans);
-
+    if(client.call(*theplans))
+        ROS_INFO("req to plan server......");
+    else {
+        ROS_INFO("ERROR req to plan server");
+        return;
+    }
 
     chosen = nullptr;
 
