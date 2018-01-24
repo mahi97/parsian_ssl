@@ -91,7 +91,7 @@ class KickProfiler():
 
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 50
+        self.speed_step = 100
         self.robot1_count = 1
         self.robot2_count = 1
         self.calculatedone = False
@@ -505,7 +505,8 @@ class KickProfiler():
             task1 = parsian_skill_kick()
             task1.chip = False
             task1.spin = self.spinner
-            task1.kickSpeed = self.current_speed
+            task1.iskickchargetime = True
+            task1.kickchargetime = self.current_speed
             task1.target.x = self.my_robot2.pos.x
             task1.target.y = self.my_robot2.pos.y
             current_task1.kickTask = task1
@@ -530,7 +531,8 @@ class KickProfiler():
             task2 = parsian_skill_kick()
             task2.chip = False
             task2.spin = self.spinner
-            task2.kickSpeed = self.current_speed
+            task2.iskickchargetime = True
+            task2.kickchargetime = self.current_speed
             task2.target.x = self.my_robot1.pos.x
             task2.target.y = self.my_robot1.pos.y
             current_task2.kickTask = task2
