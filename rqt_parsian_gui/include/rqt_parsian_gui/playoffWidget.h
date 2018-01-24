@@ -34,7 +34,7 @@ namespace rqt_parsian_gui {
 
         QColumnView *columns;
 
-        bool debugMode = false;
+        bool debugMode = true;
         QList<QList<bool> > activeGUI;
         QList<QList<bool> > masterGUI;
 

@@ -8,14 +8,13 @@ import random
 from parsian_msgs.msg import parsian_plan
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
 import rospkg
 
 class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
-	    signal.signal(signal.SIGINT, self.signal_handler)
+        signal.signal(signal.SIGINT, self.signal_handler)
         self.path = rospkg.RosPack().get_path("parsian_ai")
         print ("pack path: " + self.path)
         self.path += "/plans/"
@@ -28,15 +27,15 @@ class Watcher:
         # self.__event_handler.update_master_active(l, True, True)
 
     def run(self):
-        self.__observer.schedule(self.__event_handler, self.p, recursive=True)
+        self.__observer.schedule(self.__event_handler, self.path, recursive=True)
         self.__observer.start()
         try:
             while True:
                 time.sleep(5)
         except:
             self.__observer.stop()
-	    # print("Error")
-	    sys.exit(0)
+        # print("Error")
+        sys.exit(0)
         self.__observer.join()
 
     def get_all_plans(self):
@@ -50,10 +49,10 @@ class Watcher:
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
-	
+
     def signal_handler(self, signal, frame):
-	print("\nctrl+C pressed!")
-	sys.exit(0)
+        print("\nctrl+C pressed!")
+        sys.exit(0)
 
 class Handler(FileSystemEventHandler):
 
