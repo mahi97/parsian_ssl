@@ -11,13 +11,14 @@ from watchdog.events import FileSystemEventHandler
 
 import rospkg
 
+
 class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
-	signal.signal(signal.SIGINT, self.signal_handler)
+        signal.signal(signal.SIGINT, self.signal_handler)
         self.p = rospkg.RosPack().get_path("parsian_ai")
-        print ("pack path: "+self.p)
+        print ("pack path: " + self.p)
         self.p += "/plans/"
         self.__observer = Observer()
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
@@ -35,9 +36,9 @@ class Watcher:
                 time.sleep(5)
         except:
             self.__observer.stop()
-	    # print("Error")
-	    sys.exit(0)
-        self.__observer.join()
+            # print("Error")
+            self.__observer.join()
+            sys.exit(0)
 
     def get_all_plans(self):
         return self.__event_handler.get_all_plans_msgs()
@@ -50,13 +51,13 @@ class Watcher:
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
-	
+
     def signal_handler(self, signal, frame):
-	print("\nctrl+C pressed!")
-	sys.exit(0)
+        print("\nctrl+C pressed!")
+        sys.exit(0)
+
 
 class Handler(FileSystemEventHandler):
-
     def __init__(self, p):
         self.__final_list = []
         self.__ignore = []
@@ -80,7 +81,7 @@ class Handler(FileSystemEventHandler):
         if event.is_directory:
             return None
 
-        # elif event.event_type == 'created':
+            # elif event.event_type == 'created':
             # print("Received created event - %s." % event.src_path)
 
         elif event.event_type == 'modified':
@@ -119,9 +120,9 @@ class Handler(FileSystemEventHandler):
             if f != None:
                 if f.endswith('.json'):
                     # if os.stat(str(f)).st_size != 0:
-                        # print("adding " + str(f).rsplit('/', 1)[1]
-                        # with open(str(f)) as json_data:
-                        #     plan_data.append(json.load(json_data))
+                    # print("adding " + str(f).rsplit('/', 1)[1]
+                    # with open(str(f)) as json_data:
+                    #     plan_data.append(json.load(json_data))
                     if os.stat(str(f)).st_size == 0:
                         bad_files.append(f)
                         print("empty: " + str(f) + " --> removed!")
@@ -145,7 +146,7 @@ class Handler(FileSystemEventHandler):
                     if pattern != '':
                         try:
                             if (re.search(pattern, str(path_to_plan).split("/plans")[1]) and
-                                    re.search(pattern, str(path_to_plan).split("/plans")[1]).start() == 0):
+                                        re.search(pattern, str(path_to_plan).split("/plans")[1]).start() == 0):
                                 flag = 1
                         except:
                             print("Invalid Expression: " + pattern)
@@ -154,13 +155,13 @@ class Handler(FileSystemEventHandler):
 
         if flag == 0:
             self.__final_list.append(path_to_plan)
-            print(str(path_to_plan).split("/plans")[1]+" added.")
+            print(str(path_to_plan).split("/plans")[1] + " added.")
 
         return self.__final_list
 
     def remove_plan(self, path_to_plan):
         if path_to_plan in self.__final_list:
-            print(str(path_to_plan).split("/plans")[1]+" removed.")
+            print(str(path_to_plan).split("/plans")[1] + " removed.")
             self.__final_list.remove(path_to_plan)
 
     def ignore_plans(self, file_list, ignore_list):
@@ -171,22 +172,23 @@ class Handler(FileSystemEventHandler):
             if pattern != '':
                 try:
                     for f in new_file_list:
-                        if re.search(pattern, str(f).split("/plans")[1]) and re.search(pattern, str(f).split("/plans")[1]).start() == 0:
+                        if re.search(pattern, str(f).split("/plans")[1]) and re.search(pattern, str(f).split("/plans")[
+                            1]).start() == 0:
                             new_file_list2.append(f)
                 except:
-                    print("Invalid Expression: "+pattern)
+                    print("Invalid Expression: " + pattern)
 
         print("ignored plans:")
         for fil in new_file_list2:
             str_list = str(fil).split("/plans")
             if len(str_list) > 0:
-                print("\t"+[1])
+                print("\t" + [1])
 
         last = [term for term in new_file_list if not term in new_file_list2]
 
         print("FINAL LIST:")
         for i in last:
-            print("\t"+str(i).split("/plans")[1])
+            print("\t" + str(i).split("/plans")[1])
 
         return last
 
@@ -194,7 +196,7 @@ class Handler(FileSystemEventHandler):
         random.shuffle(alist)
 
     def read_plan(self, plan_path):
-        print("opening plan "+str(plan_path).split("/plans")[1])
+        print("opening plan " + str(plan_path).split("/plans")[1])
         with open(str(plan_path)) as json_data:
             a = (json.load(json_data))
 
@@ -202,8 +204,8 @@ class Handler(FileSystemEventHandler):
             print(a["id"])
 
             plans_cnt = len(a["plans"])
-            for p_i in range(0,plans_cnt):
-                print("-------------------------------plan %d:"%p_i)
+            for p_i in range(0, plans_cnt):
+                print("-------------------------------plan %d:" % p_i)
                 plan_i = a["plans"][p_i]
                 agents_cnt = len(plan_i["agents"])
                 for p_a_i in range(0, agents_cnt):
@@ -249,11 +251,13 @@ class Handler(FileSystemEventHandler):
         elif game_mode == 3:
             plan_mode = "KICKOFF"
 
-        #get a sublist from final_list based on player_num and game_mode
+        # get a sublist from final_list based on player_num and game_mode
         sublist = []
         for plan in self.__final_dict:
-            if len(plan["agentInitPos"]) >= player_num and plan["planMode"] == plan_mode and plan["chance"] > 0 and plan["lastDist"] >= 0:
-                print("matched: "+plan["filename"].split("plans/")[1]+" --- num agents: "+str(len(plan["agentInitPos"])))
+            if len(plan["agentInitPos"]) >= player_num and plan["planMode"] == plan_mode and plan["chance"] > 0 and \
+                            plan["lastDist"] >= 0:
+                print("matched: " + plan["filename"].split("plans/")[1] + " --- num agents: " + str(
+                    len(plan["agentInitPos"])))
                 sublist.append(plan)
 
         return sublist[0]
@@ -292,18 +296,18 @@ class Handler(FileSystemEventHandler):
     def message_generator(self, plan_dict):
         plan_response = parsian_plan
         plan_msg = parsian_plan()
-        plan_msg.isActive      = plan_dict["isActive"]
-        plan_msg.isMaster      = plan_dict["isMaster"]
-        plan_msg.planFile      = plan_dict["filename"]
-        plan_msg.agentSize     = len(plan_dict["agentInitPos"])
-        plan_msg.chance        = plan_dict["chance"]
-        plan_msg.lastDist      = plan_dict["lastDist"]
-        plan_msg.tags          = plan_dict["tags"]
-        plan_msg.planMode      = plan_dict["planMode"]
+        plan_msg.isActive = plan_dict["isActive"]
+        plan_msg.isMaster = plan_dict["isMaster"]
+        plan_msg.planFile = plan_dict["filename"]
+        plan_msg.agentSize = len(plan_dict["agentInitPos"])
+        plan_msg.chance = plan_dict["chance"]
+        plan_msg.lastDist = plan_dict["lastDist"]
+        plan_msg.tags = plan_dict["tags"]
+        plan_msg.planMode = plan_dict["planMode"]
         plan_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
-        plan_msg.planRepeat    = plan_dict["planRepeat"]
-        plan_msg.succesRate    = plan_dict["successRate"]
+        plan_msg.planRepeat = plan_dict["planRepeat"]
+        plan_msg.succesRate = plan_dict["successRate"]
         return plan_msg
 
 
