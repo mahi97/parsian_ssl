@@ -56,7 +56,7 @@ catkin_python_setup()
 catkin_package(
         INCLUDE_DIRS
         include
-        LIBRARIES ${PROJECT_NAME} ${PROJECT_NAME}_nodelet
+        LIBRARIES ${PROJECT_NAME}_nodelet
         CATKIN_DEPENDS nodelet parsian_msgs roscpp rospy
         #  DEPENDS
 )
@@ -82,13 +82,11 @@ add_executable(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}_nodelet
-
         )
 
 target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
         ${QT_LIBRARIES}
-        ${PROJECT_NAME}
 	)
 
 # dependencies
@@ -96,13 +94,11 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 add_dependencies(${PROJECT_NAME}_node
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}
         )
 
 add_dependencies(${PROJECT_NAME}_nodelet
         ${${PROJECT_NAME}_EXPORTED_TARGETS}
         ${catkin_EXPORTED_TARGETS}
-        ${PROJECT_NAME}
         )
 
 #############
@@ -120,7 +116,7 @@ add_dependencies(${PROJECT_NAME}_nodelet
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+install(TARGETS ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
