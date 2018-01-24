@@ -26,11 +26,11 @@ public:
     void updateRobotStatus(const parsian_msgs::parsian_robotConstPtr&);
     void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr&);
 
-
     parsian_msgs::parsian_debugs getDebugs() { return debugger->debugs; }
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
+
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 

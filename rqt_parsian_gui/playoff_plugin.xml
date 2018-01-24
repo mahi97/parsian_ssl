@@ -1,0 +1,20 @@
+<library path="lib/librqt_parsian_gui">
+    <class name="rqt_parsian_gui/PlayOff" type="rqt_parsian_gui::PlayOff" base_class_type="rqt_gui_cpp::Plugin">
+        <description>
+            robot status widget to show robots incoming information
+        </description>
+        <qtgui>
+            <!-- optional grouping...
+            <group>
+              <label>Group</label>
+            </group>
+            <group>
+              <label>Subgroup</label>
+            </group>
+            -->
+            <label>PlayOff</label>
+            <icon type="theme">system-help</icon>
+            <statustip>Great user interface to provide real value.</statustip>
+        </qtgui>
+    </class>
+</library>
