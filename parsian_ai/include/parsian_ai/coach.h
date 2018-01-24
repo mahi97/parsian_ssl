@@ -45,8 +45,10 @@ public:
     BallPossesion ballPState;
 
     bool requestForPlan = false;
+    parsian_msgs::plan_serviceRequest planRequest;
     parsian_msgs::plan_serviceResponse receivedPlan;
-    parsian_msgs::plan_serviceRequest getPlanRequest(States gamestate, int ourPlayersCount, std::string hint[]);
+
+    plan_serviceRequest getPlanRequest();
     void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
 
 

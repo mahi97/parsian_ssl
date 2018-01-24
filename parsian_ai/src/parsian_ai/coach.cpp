@@ -48,8 +48,8 @@ CCoach::CCoach(Agent**_agents)
     //Stop
     stopPlay            = new CStopPlay();
 
-    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-        stopRoles[i] = new CRoleStop(nullptr);
+    for (auto &stopRole : stopRoles) {
+        stopRole = new CRoleStop(nullptr);
     }
 
     lastDefenseAgents.clear();
@@ -70,6 +70,7 @@ CCoach::CCoach(Agent**_agents)
     overDefThr = 0;
     selectedPlay = stopPlay;
     for (int &i : faultDetectionCounter) i = 0;
+    firstTime = true;
 }
 
 CCoach::~CCoach()
@@ -273,8 +274,6 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    preferedDefenseCounts = 0;
-    preferedGoalieAgent = -1;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -814,6 +813,7 @@ void CCoach::decideAttack()
         return;
         break;
     case States::PlayOff:
+        ROS_INFO("miad inja badesh sag mizane");
         decideStop(ourPlayers);
         break;
 
@@ -907,6 +907,7 @@ void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
         }
 
     } else {
+
         setPlayOff( ourPlayOff->getMasterMode() );
     }
 }
@@ -1135,7 +1136,15 @@ void CCoach::setFirstPlay() {
 
 void CCoach::execute()
 {
-    gameState->setState(States::PlayOff);
+    gameState->setState(States::OurIndirectKick, true);
+    if(gameState->getState() == States::PlayOff)
+    {
+        ROS_INFO_STREAM("sag 1");
+    }
+    else
+    {
+        ROS_INFO_STREAM("sag 2");
+    }
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
@@ -1232,7 +1241,9 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     QList<int> tempAgents;
 
     for (int i = 0; i < _ourPlayers.size(); i++) {
+        ROS_INFO_STREAM("inja sag zade dg :D " << i);
         stopRoles[i]->assign(nullptr);
+
         Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
             ROS_INFO_STREAM("D " << i);
@@ -1241,11 +1252,10 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
             tempAgents.append(tempAgent->id());
         }
     }
-
     _ourPlayers.clear();
     _ourPlayers.append(tempAgents);
     selectedPlay = stopPlay;
-    selectedPlay->positioningPlan.reset();
+//    selectedPlay->positioningPlan.reset();
 }
 
 void CCoach::decideOurKickOff(QList<int> &_ourPlayers) {
@@ -1392,32 +1402,37 @@ void CCoach::checkSensorShootFault() {
 
 }
 
-parsian_msgs::plan_serviceRequest CCoach::getPlanRequest(States gamestate, int ourPlayersCount, std::string hint[]){
-    parsian_msgs::plan_serviceRequest req;
-    switch (gamestate){
-        case States::OurIndirectKick:
-            req.plan_req.gameMode = req.plan_req.INDIRECT;
+
+void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
+
+    switch (_mode){
+        case POMODE::INDIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
             break;
-        case States::OurDirectKick:
-            req.plan_req.gameMode = req.plan_req.DIRECT;
+        case POMODE::DIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
             break;
-        case States::OurKickOff:
-            req.plan_req.gameMode = req.plan_req.KICKOFF;
+        case POMODE::KICKOFF:
+            planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
             break;
     }
 
-    req.plan_req.hint.clear();
-    for (int i = 0; i < hint->size(); ++i) {
-        req.plan_req.hint.push_back(hint[i]);
-    }
+    planRequest.plan_req.playersNum = static_cast<unsigned char>(_agentSize.size());
 
+//    req.plan_req.hint.clear();
+//    for (int i = 0; i < hint->size(); ++i) {
+//        req.plan_req.hint.push_back(hint[i]);
+//    }
+
+}
+
+plan_serviceRequest CCoach::getPlanRequest(){
     requestForPlan = true;
-    return req;
+    return planRequest;
 
 }
 
 void CCoach::setPlanResponse(parsian_msgs::plan_serviceResponse planResponse){
-
+    receivedPlan.the_plan = planResponse.the_plan;
 }
-
 

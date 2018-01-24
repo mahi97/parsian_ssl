@@ -81,19 +81,30 @@ void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
 
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
-    if(gameState->ready()) {
-        DEBUG("is ready", D_MAHI);
-    }
+//    if(_ref->command.command == ssl_refree_command::STOP)
+//    {
+//        ROS_INFO_STREAM("ref vaghean halte");
+//    }
+//    if(gameState->ready()) {
+//        ROS_INFO_STREAM("ref ready");
+//    }
+    ROS_INFO_STREAM("ref count : "<< _ref->command_counter);
+
     if(gameState->isPlayOff()) {
-        DEBUG("is play off", D_MAHI);
+        ROS_INFO_STREAM("ref play off");
     }
     if(gameState->isPlayOn()) {
-        DEBUG("is play on", D_MAHI);
+        ROS_INFO_STREAM("ref play on");
     }
+    if(gameState->ourDirectKick()) {
+        ROS_INFO_STREAM("ref our Direct");
+    }
+
     if(gameState->canMove()) {
-        DEBUG("is not halt", D_MAHI);
+        ROS_INFO_STREAM("ref !halt");
     }
-    DEBUG("is running", D_MAHI);
+
+    DEBUG("ref kiram tu in esma", D_MAHI);
 
 }
 
@@ -101,20 +112,10 @@ parsian_msgs::plan_service* AI::generate_plan() {
 
     parsian_msgs::plan_service *ai_plan = new plan_service();
 
-    if (gameState->indirectKick()) {
-        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.INDIRECT;
-    }
-    else if(gameState->directKick()) {
-        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.DIRECT;
-    }
-    else if(gameState->kickoff()) {
-        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.KICKOFF;
-    }
-
-    ai_plan->request.plan_req.playersNum = static_cast<unsigned char>(wm->our.activeAgentsCount());
-
-    std::string str = "";
-    ai_plan->request.plan_req.hint.push_back(str);
 
     return ai_plan;
+}
+
+CSoccer* AI::getSoccer() {
+    return soccer;
 }
