@@ -26,7 +26,7 @@ class Get_Plan:
             received.remove('')
         if len(received) > 0:
             print ("response to gui...... update plans")
-            self.response.allPlans = self.__w.update_master_active(received, req.isMaster, req.isActive)
+            self.response.allPlans = self.__w.update_master_active(received, req.index, req.isMaster, req.isActive)
             return self.response
         else:
             print ("response to gui...... return all plans")

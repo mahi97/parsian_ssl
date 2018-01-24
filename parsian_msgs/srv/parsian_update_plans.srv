@@ -1,4 +1,5 @@
 string[] newPlans
+uint32[] index
 bool isActive
 bool isMaster
 
