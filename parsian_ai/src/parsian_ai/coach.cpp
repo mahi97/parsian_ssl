@@ -273,8 +273,6 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    preferedDefenseCounts = 0;
-    preferedGoalieAgent = -1;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -812,6 +810,7 @@ void CCoach::decideAttack()
         return;
         break;
     case States::PlayOff:
+        ROS_INFO("miad inja badesh sag mizane");
         decideStop(ourPlayers);
         break;
 
@@ -1133,7 +1132,17 @@ void CCoach::setFirstPlay() {
 
 void CCoach::execute()
 {
-    gameState->setState(States::PlayOn);
+//    gameState->setState(States::PlayO);
+
+//    return;
+    if(gameState->getState() == States::PlayOff)
+    {
+        ROS_INFO_STREAM("sag 1");
+    }
+    else
+    {
+        ROS_INFO_STREAM("sag 2");
+    }
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
@@ -1241,7 +1250,9 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     QList<int> tempAgents;
 
     for (int i = 0; i < _ourPlayers.size(); i++) {
+        ROS_INFO_STREAM("inja sag zade dg :D " << i);
         stopRoles[i]->assign(nullptr);
+
         Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
             ROS_INFO_STREAM("D " << i);
@@ -1250,11 +1261,10 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
             tempAgents.append(tempAgent->id());
         }
     }
-
     _ourPlayers.clear();
     _ourPlayers.append(tempAgents);
     selectedPlay = stopPlay;
-    selectedPlay->positioningPlan.reset();
+//    selectedPlay->positioningPlan.reset();
 }
 
 void CCoach::decideOurKickOff(QList<int> &_ourPlayers) {

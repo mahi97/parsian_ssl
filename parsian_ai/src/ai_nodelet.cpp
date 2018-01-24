@@ -60,6 +60,7 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
 
 }
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
+
     ai->updateReferee(_ref);
 }
 
