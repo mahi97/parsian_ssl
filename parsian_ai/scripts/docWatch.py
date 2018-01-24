@@ -1,13 +1,9 @@
 import time
 import os
-
 import re
 import json
-
 import random
-
 from parsian_msgs.msg import parsian_plan
-
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -283,6 +279,7 @@ class Handler(FileSystemEventHandler):
         return self.__final_dict
 
     def message_generator(self, plan_dict):
+        plan_response = parsian_plan
         plan_msg = parsian_plan()
         plan_msg.isActive      = plan_dict["isActive"]
         plan_msg.isMaster      = plan_dict["isMaster"]
