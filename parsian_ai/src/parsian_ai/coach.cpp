@@ -1130,6 +1130,54 @@ void CCoach::setFirstPlay() {
     firstIsFinished = false;
 }
 
+
+void CCoach::checkTransitionToForceStart(){
+    Vector2D lastPos;
+    ballHist.append(wm->ball->pos);
+    if(ballHist.count() > 100)
+    {
+        ballHist.removeAt(0);
+    }
+    if( ballHist.size() > 10 ){
+        lastPos = ballHist.at(ballHist.size()-10);
+    }
+    else{
+        if( ballHist.size() )
+            lastPos = ballHist.first();
+        else
+            lastPos = wm->ball->pos;
+    }
+
+    double ballChangedPosDist = wm->ball->pos.dist(lastPos);
+
+    if(!gameState->isPlayOn()){
+        if( cyclesWaitAfterballMoved == 0 && ballChangedPosDist > 0.05 ){
+            cyclesWaitAfterballMoved = 1;
+        }
+        else if( cyclesWaitAfterballMoved ){
+            cyclesWaitAfterballMoved++;
+        }
+    }
+    ///////////////////////////////////// by DON
+    if (gameState->ourRestart())
+    {
+        //transition to game on
+
+        if ( cyclesWaitAfterballMoved > 6 && selectedPlay->playOnFlag == true)
+        {
+            gameState->setState(States::PlayOn);
+        }
+    }
+
+    if( gameState->theirRestart() ){
+        //transition to game on
+        if ( cyclesWaitAfterballMoved > 0 )
+        {
+            gameState->setState(States::PlayOn);
+        }
+    }
+}
+
 void CCoach::execute()
 {
 //    gameState->setState(States::PlayO);
@@ -1162,6 +1210,12 @@ void CCoach::execute()
     ROS_INFO_STREAM("PM :" << playmakeId);
     ROS_INFO_STREAM("GAMESTATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
+    for (auto &stopRole : stopRoles) {
+        if (stopRole->agent != nullptr) {
+            stopRole->assign(nullptr);
+//            ROS_INFO_STREAM("DD " << stopRole->agent->id());
+        }
+    }
     decideAttack();
     for(int i = 0 ; i < 8 ; i ++)
     {
@@ -1223,9 +1277,11 @@ void CCoach::decideHalt(QList<int>& _ourPlayers) {
     cyclesWaitAfterballMoved = 0;
     _ourPlayers.clear();
     _ourPlayers.append(wm->our.data->activeAgents);
+    NoAction * a = new NoAction();
     for( int i = 0 ; i < _ourPlayers.count() ; i++ )
     {
-        //        agents[_ourPlayers[i]]->waitHere(); // TODO : Halt Role or No Action
+//        a->waithere();
+                agents[_ourPlayers[i]]->action =  a; // TODO : Halt Role or No Action
     }
 
     if(!ourPlayOff->deleted)
