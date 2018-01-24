@@ -300,7 +300,6 @@ class Handler(FileSystemEventHandler):
         plan_msg.isActive      = plan_dict["isActive"]
         plan_msg.isMaster      = plan_dict["isMaster"]
         plan_msg.planFile      = plan_dict["filename"]
-        plan_msg.package       = plan_dict["filename"].split("/")[-2]
         plan_msg.agentSize     = len(plan_dict["agentInitPos"])
         plan_msg.chance        = plan_dict["chance"]
         plan_msg.lastDist      = plan_dict["lastDist"]
