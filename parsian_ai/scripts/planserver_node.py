@@ -18,12 +18,19 @@ class Get_Plan:
 
     def handle_gui_plan_request(self, req):
         #type: (parsian_update_plansRequest)
-        print req
+        print("---> request:")
+        print (req)
         received = req.newPlans
+        if '' in received:
+            received.remove('')
         if len(received) > 0:
-            self.__w.update_master_active(received, req.isMaster, req.isActive)
-            print ("response to gui......")
-            return self.__w.get_all_plans()
+            print ("response to gui...... update plans")
+            res = [self.__w.update_master_active(received, req.isMaster, req.isActive)]
+            return res
+        else:
+            print ("response to gui...... return all plans")
+            upres = [self.__w.get_all_plans()]
+            return upres
 
 
     def handle_plan_request(self, req):

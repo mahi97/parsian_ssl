@@ -24,6 +24,10 @@ class Watcher:
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
         self.__event_handler = Handler(self.p)
 
+        # l=[]
+        # l.append("/home/fateme/Workspace/parsian_ws/src/parsian_ssl/parsian_ai/plans/2Pass/pass.json")
+        # self.__event_handler.update_master_active(l, True, True)
+
     def run(self):
         self.__observer.schedule(self.__event_handler, self.p, recursive=True)
         self.__observer.start()
@@ -36,14 +40,13 @@ class Watcher:
         self.__observer.join()
 
     def get_all_plans(self):
-        print ("response to gui request...")
         return self.__event_handler.get_all_plans_msgs()
+
+    def update_master_active(self, name_list, is_master, is_active):
+        return self.__event_handler.update_master_active(name_list, is_master, is_active)
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
-
-    def update_master_active(self, name_list, is_master, is_active):
-        self.__event_handler.update_master_active(name_list, is_master, is_active)
 
 class Handler(FileSystemEventHandler):
 
@@ -255,11 +258,14 @@ class Handler(FileSystemEventHandler):
         return plans_msg
 
     def update_master_active(self, name_list, is_master, is_active):
+        l = []
         for plan in self.__final_dict:
             for need_update in name_list:
                 if plan["filename"] == need_update:
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
+                    l.append(self.message_generator(plan))
+        return l
 
     def plans_to_dict(self):
         self.__final_dict = []
@@ -278,10 +284,10 @@ class Handler(FileSystemEventHandler):
 
     def message_generator(self, plan_dict):
         plan_msg = parsian_plan()
-        plan_msg.planFile      = plan_dict["filename"]
-        plan_msg.package       = plan_dict["filename"].split("/")[-2]
         plan_msg.isActive      = plan_dict["isActive"]
         plan_msg.isMaster      = plan_dict["isMaster"]
+        plan_msg.planFile      = plan_dict["filename"]
+        plan_msg.package       = plan_dict["filename"].split("/")[-2]
         plan_msg.agentSize     = len(plan_dict["agentInitPos"])
         plan_msg.chance        = plan_dict["chance"]
         plan_msg.lastDist      = plan_dict["lastDist"]
