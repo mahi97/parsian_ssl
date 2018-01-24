@@ -48,8 +48,8 @@ CCoach::CCoach(Agent**_agents)
     //Stop
     stopPlay            = new CStopPlay();
 
-    for( int i=0 ; i<_MAX_NUM_PLAYERS ; i++ ){
-        stopRoles[i] = new CRoleStop(nullptr);
+    for (auto &stopRole : stopRoles) {
+        stopRole = new CRoleStop(nullptr);
     }
 
     lastDefenseAgents.clear();
@@ -70,6 +70,7 @@ CCoach::CCoach(Agent**_agents)
     overDefThr = 0;
     selectedPlay = stopPlay;
     for (int &i : faultDetectionCounter) i = 0;
+    firstTime = true;
 }
 
 CCoach::~CCoach()
@@ -907,6 +908,7 @@ void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
         }
 
     } else {
+
         setPlayOff( ourPlayOff->getMasterMode() );
     }
 }
@@ -1135,7 +1137,7 @@ void CCoach::setFirstPlay() {
 
 void CCoach::execute()
 {
-    gameState->setState(States::PlayOff);
+    gameState->setState(States::OurIndirectKick, true);
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
@@ -1389,6 +1391,10 @@ void CCoach::checkSensorShootFault() {
         }
 
     }
+
+}
+
+void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
 
 }
 
