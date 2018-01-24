@@ -635,6 +635,7 @@ void CPlanner::emitPlan(const vector<Vector2D>& _resultModified, const Vector2D&
     for(const auto& v : _resultModified) {
         path->results.push_back(v.toParsianMessage());
     }
+    path->header.stamp = ros::Time::now();
     path_pub.publish(path);
 }
 

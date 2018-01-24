@@ -1,4 +1,4 @@
-std_msgs/Header Header
+Header header
 uint8 robot_id
 uint8 packet_id
 uint8 roller_speed
