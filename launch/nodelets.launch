@@ -6,7 +6,7 @@
     <node pkg="nodelet" type="nodelet" name="commonconfig"   args="load parsian_agent/CommonConfig            all_nodelet" output="screen"/> 
 
     <node pkg="nodelet" type="nodelet" name="agent_0"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
-<!--    <node pkg="nodelet" type="nodelet" name="agent_1"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="agent_1"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="agent_2"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/> 
     <node pkg="nodelet" type="nodelet" name="agent_3"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="agent_4"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
@@ -18,9 +18,8 @@
     <node pkg="nodelet" type="nodelet" name="agent_10"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="agent_11"   args="load parsian_agent/AgentNodelet               all_nodelet" output="screen"/>
 
--->
     <node pkg="nodelet" type="nodelet" name="planner_0"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
-<!--    <node pkg="nodelet" type="nodelet" name="planner_1"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="planner_1"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="planner_2"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/> 
     <node pkg="nodelet" type="nodelet" name="planner_3"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="planner_4"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
@@ -31,13 +30,11 @@
     <node pkg="nodelet" type="nodelet" name="planner_9"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="planner_10"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
     <node pkg="nodelet" type="nodelet" name="planner_11"   args="load parsian_agent/PlannerNodelet           all_nodelet" output="screen"/>
--->
-    
-    <node pkg="nodelet" type="nodelet" name="latency"    args="load parsian_tools/Latency    all_nodelet" output="screen" />
+
     <node pkg="nodelet" type="nodelet" name="grsim"    args="load parsian_protobuf_wrapper/GrsimNodelet    all_nodelet" output="screen" />  
     <node pkg="nodelet" type="nodelet" name="vision"   args="load parsian_protobuf_wrapper/VisionNodelet   all_nodelet" output="screen"  />
     <node pkg="nodelet" type="nodelet" name="worldmodel"  	   args="load parsian_world_model/WMNodelet            all_nodelet" output="screen"  />
-   <!-- <node pkg="nodelet" type="nodelet" name="packet"   args="load parsian_packet/PacketNodelet             all_nodelet" output="screen" />-->
-   <!-- <node pkg="nodelet" type="nodelet" name="comm"  	   args="load parsian_communication/CommunicationNodelet   all_nodelet" output="screen" />-->
+    <node pkg="nodelet" type="nodelet" name="packet"   args="load parsian_packet/PacketNodelet             all_nodelet" output="screen" />
+    <node pkg="nodelet" type="nodelet" name="comm"  	   args="load parsian_communication/CommunicationNodelet   all_nodelet" output="screen" />
 
 </launch>
