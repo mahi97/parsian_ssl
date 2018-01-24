@@ -8,19 +8,10 @@ using namespace rqt_parsian_gui;
 
 PlayOffWidget::PlayOffWidget(ros::NodeHandle & n) : QWidget() {
 
-    client = n.serviceClient<parsian_msgs::parsian_update_plans> ("update_plans");
+    client = n.serviceClient<parsian_msgs::parsian_update_plans> ("/update_plans", true);
     theplans = new parsian_msgs::parsian_update_plans();
-
-    theplans->response.allPlans.clear();
-    theplans->request.newPlans.clear();
-    if(client.call(*theplans))
-        ROS_INFO("req to plan server......");
-    else {
-        ROS_INFO("ERROR req to plan server");
-        return;
-    }
-
-    chosen = nullptr;
+    lastPlan = new parsian_msgs::parsian_plan();
+    chosen = new parsian_msgs::parsian_plan();
 
     mode = new QPushButton("Debug Mode");
     update = new QPushButton("Update (Don't Worry! it will work fine :)");
@@ -172,10 +163,12 @@ void PlayOffWidget::updateBtn(bool _debug) {
 
 void PlayOffWidget::slt_updatePlans() {
 
-    theplans->request.newPlans.clear();
-    theplans->response.allPlans.clear();
-
-    client.call(*theplans);
+    if(client.call(*theplans))
+        ROS_INFO("req to plan server......");
+    else {
+        ROS_INFO("ERROR req to plan server");
+        return;
+    }
     updateModel();
 }
 
@@ -189,7 +182,6 @@ void PlayOffWidget::slt_active() {
                     while (model.child(i, 0).child(++j, 0).data().toString() != "") {
                         theplans->request.isActive = static_cast<unsigned char>(true);
                         theplans->request.isMaster = static_cast<unsigned char>(true);
-
                     }
                 }
             } else if (model.parent().parent().row() == -1) {
@@ -213,7 +205,8 @@ void PlayOffWidget::slt_active() {
             active->setEnabled(false);
             deactive->setEnabled(true);
             master->setEnabled(true);
-            theplans->response.allPlans.clear();
+
+
             client.call(*theplans);
             updateModel();
         }
