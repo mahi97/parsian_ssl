@@ -1,5 +1,4 @@
 string planFile
-string package
 bool isActive
 bool isMaster
 uint32 agentSize

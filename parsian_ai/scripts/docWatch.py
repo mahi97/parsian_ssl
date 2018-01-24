@@ -1,5 +1,7 @@
 import time
 import os
+import signal
+import sys
 import re
 import json
 import random
@@ -13,6 +15,7 @@ class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
+	signal.signal(signal.SIGINT, self.signal_handler)
         self.p = rospkg.RosPack().get_path("parsian_ai")
         print ("pack path: "+self.p)
         self.p += "/plans/"
@@ -32,7 +35,8 @@ class Watcher:
                 time.sleep(5)
         except:
             self.__observer.stop()
-            print("Error")
+	    # print("Error")
+	    sys.exit(0)
         self.__observer.join()
 
     def get_all_plans(self):
@@ -43,6 +47,10 @@ class Watcher:
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
+	
+    def signal_handler(self, signal, frame):
+	print("\nctrl+C pressed!")
+	sys.exit(0)
 
 class Handler(FileSystemEventHandler):
 
@@ -283,7 +291,6 @@ class Handler(FileSystemEventHandler):
         plan_msg.isActive      = plan_dict["isActive"]
         plan_msg.isMaster      = plan_dict["isMaster"]
         plan_msg.planFile      = plan_dict["filename"]
-        plan_msg.package       = plan_dict["filename"].split("/")[-2]
         plan_msg.agentSize     = len(plan_dict["agentInitPos"])
         plan_msg.chance        = plan_dict["chance"]
         plan_msg.lastDist      = plan_dict["lastDist"]
