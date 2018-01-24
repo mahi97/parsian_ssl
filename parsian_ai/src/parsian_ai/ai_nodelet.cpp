@@ -54,13 +54,13 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ai->execute();
 
     for(int i=0; i < wm->our.activeAgentsCount(); i++) {
-//        ROS_INFO("SEND");
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
 }
 
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
+
     ai->updateReferee(_ref);
 }
 
