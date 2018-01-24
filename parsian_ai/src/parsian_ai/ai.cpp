@@ -104,6 +104,5 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
         ROS_INFO_STREAM("ref !halt");
     }
 
-    DEBUG("ref kiram tu in esma", D_MAHI);
 
 }

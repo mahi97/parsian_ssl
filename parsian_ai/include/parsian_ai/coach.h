@@ -43,6 +43,10 @@ public:
     BallPossesion ballPState;
 
 private:
+    /////////////////////transition to force start
+     void checkTransitionToForceStart();
+     QList <Vector2D> ballHist;
+    //////////////////////////
     bool lastASWasCritical;
     Vector2D passPos;
     bool passPlayMake;
