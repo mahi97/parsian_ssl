@@ -30,6 +30,7 @@ public:
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
+
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];
 
