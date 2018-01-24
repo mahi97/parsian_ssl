@@ -254,14 +254,13 @@ class Handler(FileSystemEventHandler):
         return plans_msg
 
     def update_master_active(self, name_list, is_master, is_active):
-        l = []
         for plan in self.__final_dict:
             for need_update in name_list:
                 if plan["filename"] == need_update:
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
-                    l.append(self.message_generator(plan))
-        return l
+
+        return self.get_all_plans_msgs()
 
     def plans_to_dict(self):
         self.__final_dict = []
