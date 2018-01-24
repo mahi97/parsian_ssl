@@ -96,35 +96,44 @@ void PlayOffWidget::updateModel() {
     int pkgCounter  = 0;
     int fileCounter = 0;
     int planCounter = 0;
-
+    QStringList last_path_dir;
+    QString last_pkg;
+    QStringList response_path_dir;
+    QString response_pkg;
     int index[theplans->response.allPlans.size()][3] ; // to use in f
 
     for (size_t i = 0;i < theplans->response.allPlans.size();i++) {
+
         index[i][0] = pkgCounter;
         index[i][1] = fileCounter;
         index[i][2] = planCounter;
 
+        if( i != 0) {
+            last_path_dir = QString::fromStdString(lastPlan->planFile).split("/");
+            last_pkg = last_path_dir[last_path_dir.size() - 2];
+        }else
+            last_pkg="";
+        response_path_dir = QString::fromStdString(theplans->response.allPlans[i].planFile).split("/");
+        response_pkg = response_path_dir[response_path_dir.size()-2];
 
-        if (lastPlan->package != theplans->response.allPlans[i].package ) {
+        if (last_pkg != response_pkg ) {
             pkgCounter++;
             fileCounter++;
            // debugger->debug("PKG",D_ALI);
-            pkg = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].package));
+            pkg = new QStandardItem(response_pkg);
             model->appendRow(pkg);
             //debugger->debug( "FILE",D_ALI);
-            file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
-            QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
-            file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
-                             QString::fromStdString(theplans->response.allPlans[i].planFile) + ".png" +"/></html>");
+            file = new QStandardItem(response_path_dir.last().left(7));
+            QString temp = response_pkg;
+            file->setToolTip("<html><img src="+temp.replace(".","/") + "/" + response_pkg + ".png" +"/></html>");
             pkg->appendRow(file);
         }
-        else if (lastPlan->planFile != theplans->response.allPlans[i].planFile) {
+        else if (last_pkg != response_pkg) {
             fileCounter++;
 //            debugger->debug("PLAN",D_ALI);
-            file = new QStandardItem(QString::fromStdString(theplans->response.allPlans[i].planFile));
-            QString temp = QString::fromStdString(theplans->response.allPlans[i].package);
-            file->setToolTip("<html><img src="+temp.replace(".","/") + "/" +
-                             QString::fromStdString(theplans->response.allPlans[i].planFile) + ".png" +"/></html>");
+            file = new QStandardItem(response_path_dir.last().left(7));
+            QString temp = response_pkg;
+            file->setToolTip("<html><img src=" + temp.replace(".","/") + "/" + response_pkg + ".png" +"/></html>");
             pkg->appendRow(file);
         }
 
