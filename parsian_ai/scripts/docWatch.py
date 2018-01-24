@@ -15,13 +15,13 @@ class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
-	signal.signal(signal.SIGINT, self.signal_handler)
-        self.p = rospkg.RosPack().get_path("parsian_ai")
-        print ("pack path: "+self.p)
-        self.p += "/plans/"
+	    signal.signal(signal.SIGINT, self.signal_handler)
+        self.path = rospkg.RosPack().get_path("parsian_ai")
+        print ("pack path: " + self.path)
+        self.path += "/plans/"
         self.__observer = Observer()
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
-        self.__event_handler = Handler(self.p)
+        self.__event_handler = Handler(self.path)
 
         # l=[]
         # l.append("/home/fateme/Workspace/parsian_ws/src/parsian_ssl/parsian_ai/plans/2Pass/pass.json")
@@ -63,7 +63,8 @@ class Handler(FileSystemEventHandler):
         self.__shuffleCount = 0
         self.__final_dict = []
 
-        global final_list, shuffleCount
+        global final_list, shuffleCount, path
+        path = p
 
         # read_plan(f[5])
         self.__final_list = self.list_valid_plans(p)
@@ -85,11 +86,13 @@ class Handler(FileSystemEventHandler):
 
         elif event.event_type == 'modified':
             # print("Received modified event - %s" % event.src_path)
-            self.add_plan(event.src_path)
+            # self.add_plan(event.src_path)
+            self.refresh()
 
         elif event.event_type == 'deleted':
             # print("Received deleted event - %s" % event.src_path)
-            self.remove_plan(event.src_path)
+            self.refresh()
+            # self.remove_plan(event.src_path)
 
     def list_valid_plans(self, path):
         file_list = []
@@ -162,6 +165,11 @@ class Handler(FileSystemEventHandler):
         if path_to_plan in self.__final_list:
             print(str(path_to_plan).split("/plans")[1]+" removed.")
             self.__final_list.remove(path_to_plan)
+
+    def refresh(self):
+        global path
+        self.__final_list = self.list_valid_plans(path)
+        self.plans_to_dict()
 
     def ignore_plans(self, file_list, ignore_list):
         # files:

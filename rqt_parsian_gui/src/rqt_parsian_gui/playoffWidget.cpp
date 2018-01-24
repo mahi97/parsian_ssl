@@ -213,8 +213,7 @@ void PlayOffWidget::slt_active() {
             master->setEnabled(true);
         }
 
-    client.call(*theplans);
-    updateModel();
+    slt_updatePlans();
 }
 
 void PlayOffWidget::slt_deactive() {
@@ -242,14 +241,15 @@ void PlayOffWidget::slt_deactive() {
                 theplans->request.newPlans.push_back(theplans->response.allPlans[planIndex].planFile);
                 theplans->request.index.push_back(planIndex);
             }
+            theplans->request.isActive = static_cast<unsigned char>(false);
+            theplans->request.isMaster = static_cast<unsigned char>(false);
 
             active->setEnabled(true);
             deactive->setEnabled(false);
             master->setEnabled(true);
 
         }
-    client.call(*theplans);
-    updateModel();
+    slt_updatePlans();
 }
 
 void PlayOffWidget::slt_master() {
@@ -277,13 +277,15 @@ void PlayOffWidget::slt_master() {
                 theplans->request.index.push_back(planIndex);
             }
 
+            theplans->request.isActive = static_cast<unsigned char>(true);
+            theplans->request.isMaster = static_cast<unsigned char>(true);
+
             active->setEnabled(false);
             deactive->setEnabled(true);
             master->setEnabled(false);
 
         }
-    client.call(*theplans);
-    updateModel();
+    slt_updatePlans();
 }
 
 void PlayOffWidget::slt_edit(QStandardItem *_item) {
