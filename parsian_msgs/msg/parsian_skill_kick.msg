@@ -1,5 +1,7 @@
 float64 tolerance
 bool chip
+bool iskickchargetime
+float64 kickchargetime
 float64 kickSpeed
 int32 spin
 bool slow

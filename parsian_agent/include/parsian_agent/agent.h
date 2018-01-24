@@ -14,7 +14,11 @@
 #include <QFile>
 #include <fstream>
 #include <QTime>
-
+#include <vector>
+#include <string>
+#include <ros/package.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 using namespace std;
 
 #define MAX_KICK_SPEED 1023
@@ -163,6 +167,12 @@ private:
     const double Gravity= 9.8;
     double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
+    //kick profiler usage
+    std::vector<std::vector<std::string>> dataList;
+    void getprofilerdata();
+    bool gotprofilerdatas;
+    float convertkickspeedtokickchargetime(float kickspeed);
+    float coef_a, coef_b, coef_c;
 public:
 
     ros::Publisher planner_pub;

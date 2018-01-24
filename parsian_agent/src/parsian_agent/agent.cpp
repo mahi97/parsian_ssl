@@ -113,6 +113,12 @@ Matrix Agent::ANN_forward( Matrix input )
 
 Agent::Agent(int _ID)
 {
+    gotprofilerdatas = false;
+    coef_a = 0;
+    coef_b = 0;
+    coef_c = 0;
+    getprofilerdata();
+
     srand48(time(nullptr));
     packetNum = 0;
     stopTrain=false;wh1=wh2=wh3=wh4=0.0;startTrain=false;
@@ -735,7 +741,17 @@ double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
 double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
 {
     // TODO : Move Profiler Here
-    return speed;
+//    ROS_INFO_STREAM("kian want to change too time");
+    if (gotprofilerdatas)
+    {
+//        ROS_INFO_STREAM("kian changed succes time");
+        return convertkickspeedtokickchargetime(speed);
+    }
+    else
+    {
+//        ROS_INFO_STREAM("kian couldnt change");
+        return speed;
+    }
 }
 
 double Agent::chipValueDistance(double value,bool spinner) //for chip recieve
@@ -983,4 +999,48 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     command->spinner= static_cast<unsigned char>(false);
 
     return command;
+}
+
+//kick profiler usage
+void Agent::getprofilerdata()
+{
+    std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_kick.csv");
+    if (!file.is_open())
+        ROS_INFO_STREAM("profiler datas failed to open");
+    else
+    {
+        ROS_INFO_STREAM("file opened");
+        std::string line = "";
+        // Iterate through each line and split the content using delimeter
+        while (getline(file, line))
+        {
+            std::vector<std::string> vec;
+            boost::algorithm::split(vec, line, boost::is_any_of(","));
+            dataList.push_back(vec);
+        }
+        // Close the File
+        file.close();
+        for(int i{1}; i<dataList.size(); i++)
+            if(atoi(dataList[i][0].c_str()) == id())
+            {
+                coef_a = atof(dataList[i][1].c_str());
+                coef_b = atof(dataList[i][2].c_str());
+                coef_c = atof(dataList[i][3].c_str());
+                gotprofilerdatas = true;
+            }
+    }
+}
+float Agent::convertkickspeedtokickchargetime(float kickspeed)
+{
+    if (gotprofilerdatas)
+    {
+        return coef_a*kickspeed*kickspeed + coef_b*kickspeed + coef_c;
+    }
+    else
+    {
+        ROS_INFO_STREAM("there was no result for this robot in profiler datas");
+        return -1;
+    }
+
+
 }
