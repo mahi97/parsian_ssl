@@ -5,6 +5,8 @@
 KickAction::KickAction() {
        tolerance = 0.0;
        chip = false;
+       iskickchargetime = false;
+       kickchargetime = 0.0;
        kickSpeed = 0.0;
        spin = 0;
        slow = false;
@@ -27,6 +29,8 @@ void KickAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_kick msg = *((parsian_msgs::parsian_skill_kick*)_msg);
         tolerance = msg.tolerance;
         chip = msg.chip;
+        iskickchargetime = msg.iskickchargetime;
+        kickchargetime = msg.kickchargetime;
         kickSpeed = msg.kickSpeed;
         spin = msg.spin;
         slow = msg.slow;
@@ -51,6 +55,8 @@ void* KickAction::getMessage() {
     parsian_msgs::parsian_skill_kick* _msg = new parsian_msgs::parsian_skill_kick;
     _msg->tolerance = tolerance;
     _msg->chip = chip;
+    _msg->iskickchargetime = iskickchargetime;
+    _msg->kickchargetime = kickchargetime;
     _msg->kickSpeed = kickSpeed;
     _msg->spin = spin;
     _msg->slow = slow;
