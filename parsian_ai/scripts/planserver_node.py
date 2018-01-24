@@ -10,7 +10,9 @@ class Get_Plan:
     def __init__(self):
 
         rospy.init_node('plan_server')
+
         self.s = rospy.Service('update_plans', parsian_update_plans, self.handle_gui_plan_request)
+        self.s = rospy.Service('get_plans', plan_service, self.handle_plan_request)
         self.__w = docWatch.Watcher()
         self.response = parsian_update_plansResponse()
         self.__w.run()
@@ -36,7 +38,7 @@ class Get_Plan:
 
     def handle_plan_request(self, req):
         #type: (plan_service)
-        return self.__w.choose_plan(req.request.playersNum, req.request.gameMode)
+        return self.__w.choose_plan(req.playersNum, req.gameMode)
 
 if __name__ == '__main__':
     Get_Plan()

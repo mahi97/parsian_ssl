@@ -879,6 +879,7 @@ void CCoach::decideAttack()
 void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
 
     //Decide Plan
+    ROS_INFO_STREAM("playoff "<<firstTime);
     firstIsFinished = ourPlayOff->isFirstFinished();
     if (firstTime) {
         NGameOff::EMode tempMode;
@@ -1397,6 +1398,7 @@ void CCoach::checkSensorShootFault() {
 
 void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
 
+    ROS_INFO("request");
     switch (_mode){
         case POMODE::INDIRECT:
             planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
