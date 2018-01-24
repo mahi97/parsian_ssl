@@ -39,8 +39,7 @@ namespace parsian_ai {
 
         ros::Timer timer_;
 
-        ros::Publisher planReqPub;
-        ros::Subscriber planSub;
+        ros::ServiceClient plan_client;
 
         void playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg);
 

@@ -93,3 +93,25 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     DEBUG("is running", D_MAHI);
 
 }
+
+parsian_msgs::plan_service* AI::generate_plan() {
+
+    parsian_msgs::plan_service *ai_plan = new plan_service();
+
+    if (gameState->indirectKick()) {
+        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.INDIRECT;
+    }
+    else if(gameState->directKick()) {
+        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.DIRECT;
+    }
+    else if(gameState->kickoff()) {
+        ai_plan->request.plan_req.gameMode = ai_plan->request.plan_req.KICKOFF;
+    }
+
+    ai_plan->request.plan_req.playersNum = static_cast<unsigned char>(wm->our.activeAgentsCount());
+
+    std::string str = "";
+    ai_plan->request.plan_req.hint.push_back(str);
+
+    return ai_plan;
+}

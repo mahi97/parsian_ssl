@@ -15,6 +15,7 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_ai/config.h>
 
+
 class AI {
 public:
     AI();
@@ -30,6 +31,8 @@ public:
     parsian_msgs::parsian_draw   getDraw()   { return drawer->draws; }
 
     parsian_msgs::parsian_robot_task getTask(int robotID);
+
+    parsian_msgs::plan_service* generate_plan();
 
 private:
     parsian_msgs::parsian_robot_task robotsTask[_MAX_NUM_PLAYERS];

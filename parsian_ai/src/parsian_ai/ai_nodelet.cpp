@@ -73,9 +73,5 @@ void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t
 }
 
 void AINodelet::playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg) {
-
-//    parsian_msgs::parsian_ai_plan_request reqMsg;
-//    reqMsg.ourPlayers = ai->getPlayersList();
-//    reqMsg.ourPlayers;
-
+    parsian_msgs::plan_service* p = ai->generate_plan();
 }

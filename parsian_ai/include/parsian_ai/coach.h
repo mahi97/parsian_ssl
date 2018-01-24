@@ -21,6 +21,8 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 
+#include <parsian_msgs/plan_service.h>
+
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
     WEHAVETHEBALL = 1,
@@ -41,6 +43,12 @@ public:
     BallPossesion lastBallPossesionState;
     BallPossesion isBallOurs();
     BallPossesion ballPState;
+
+    bool requestForPlan = false;
+    parsian_msgs::plan_serviceResponse receivedPlan;
+    parsian_msgs::plan_serviceRequest getPlanRequest(States gamestate, int ourPlayersCount, std::string hint[]);
+    void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
+
 
 private:
     bool lastASWasCritical;

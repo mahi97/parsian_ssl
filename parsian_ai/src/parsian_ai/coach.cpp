@@ -1382,3 +1382,32 @@ void CCoach::checkSensorShootFault() {
 
 }
 
+parsian_msgs::plan_serviceRequest CCoach::getPlanRequest(States gamestate, int ourPlayersCount, std::string hint[]){
+    parsian_msgs::plan_serviceRequest req;
+    switch (gamestate){
+        case States::OurIndirectKick:
+            req.plan_req.gameMode = req.plan_req.INDIRECT;
+            break;
+        case States::OurDirectKick:
+            req.plan_req.gameMode = req.plan_req.DIRECT;
+            break;
+        case States::OurKickOff:
+            req.plan_req.gameMode = req.plan_req.KICKOFF;
+            break;
+    }
+
+    req.plan_req.hint.clear();
+    for (int i = 0; i < hint->size(); ++i) {
+        req.plan_req.hint.push_back(hint[i]);
+    }
+
+    requestForPlan = true;
+    return req;
+
+}
+
+void CCoach::setPlanResponse(parsian_msgs::plan_serviceResponse planResponse){
+
+}
+
+
