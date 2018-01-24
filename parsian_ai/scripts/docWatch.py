@@ -1,12 +1,13 @@
 import time
 import os
+import signal
 
 import re
 import json
 
 import random
 
-from parsian_msgs.msg import parsian_plan
+from parsian_msgs.msg import parsian_plan, sys
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -17,6 +18,8 @@ class Watcher:
     DIRECTORY_TO_WATCH = ""
 
     def __init__(self):
+        signal.signal(signal.SIGINT, self.signal_handler)
+
         self.p = rospkg.RosPack().get_path("parsian_ai")
         print ("pack path: "+self.p)
         self.p += "/plans/"
@@ -37,7 +40,9 @@ class Watcher:
         except:
             self.__observer.stop()
             print("Error")
+            sys.exit(0)
         self.__observer.join()
+
 
     def get_all_plans(self):
         return self.__event_handler.get_all_plans_msgs()
@@ -47,6 +52,14 @@ class Watcher:
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
+
+    def signal_handler(self, signal, frame):
+        print('You pressed Ctrl+C!')
+        if not self.savingdone:
+            self.save()
+            self.savingdone = True
+        sys.exit(0)
+
 
 class Handler(FileSystemEventHandler):
 
