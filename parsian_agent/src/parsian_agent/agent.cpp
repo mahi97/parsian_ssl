@@ -380,7 +380,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     //        lastVn = velnorm;
     //    }
 
-    if(vel().length() > 0.2)
+   /* if(vel().length() > 0.2)
     {
         agentStopTime.restart();
         timerReset = false;
@@ -392,7 +392,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         agentStopTime.restart();
         timerReset = true;
     }
-
+*/
     double lastV,commandV;
     double vCoef = 1;
     double tempVf = vforward , tempVn = vnormal;
