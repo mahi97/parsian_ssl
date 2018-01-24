@@ -1418,10 +1418,9 @@ void DefensePlan::execute(){
         lastBallPosition = wm->ball->pos;
         return;
     }
-    else if( gameState->isPlayOn()/*knowledge->getGameMode() == CKnowledge::Start*/ && gameState->penaltyShootout()){
+    if (gameState->isPlayOn()/*knowledge->getGameMode() == CKnowledge::Start*/ && gameState->penaltyShootout()) {
         penaltyShootOutMode();
-    }
-    else{
+    } else{
         if(goalKeeperAgent != nullptr){
             setGoalKeeperState();
             setGoalKeeperTargetPoint();

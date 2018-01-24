@@ -20,8 +20,10 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
         return;
     command_ctr = ref_wrapper->command_counter;
     ///////////////////// when we are ready any command means force start
-    if(isReady && state != States::PlayOn){
+    if(isReady && (state != States::PlayOn) && (ref_wrapper->command.command != ssl_refree_command::HALT)
+            && (ref_wrapper->command.command != ssl_refree_command::STOP)){
         state = States::PlayOn;
+        isReady = false;
         return;
     }
 
@@ -40,7 +42,7 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
     switch (ref_wrapper->command.command) {
     case ssl_refree_command::FORCE_START:
         state = States::PlayOn;
-        isReady=true;
+        isReady=false;
         return;
     case ssl_refree_command::HALT:
         state = States::Halt;
