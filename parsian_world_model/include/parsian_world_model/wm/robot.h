@@ -9,6 +9,9 @@
 #include <parsian_world_model/util/robottracker.h>
 #include <parsian_util/base.h>
 #include <parsian_util/core/field.h>
+#include <parsian_world_model/util/newkalman.h>
+#include <QTime>
+
 
 struct kalmParam
 {
@@ -19,7 +22,7 @@ struct kalmParam
 
 
 
-class CRobot : public CMovingObject
+class Robot : public MovingObject
 {
 private:
     double ANGULAR_DIRECTION;
@@ -50,8 +53,8 @@ public:
     double kickerWidth();
     double centerFromKicker();
     double wheelRadius();
-    CRobot(int _id, bool isOurTeam, bool noKalman=false);
-    ~CRobot();
+    Robot(int _id, bool isOurTeam, bool noKalman=false);
+    ~Robot();
     virtual void init();
     virtual void filter(int vanished);
     virtual void resetKalman();
@@ -61,7 +64,7 @@ public:
     int id;
     bool inOurTeam;
     bool kickSensor;
-    QList<CRobot*> relaxed;
+    QList<Robot*> relaxed;
     bool elementNotInSight;
     bool isActive();
     Circle2D getCirle();
@@ -78,12 +81,22 @@ public:
     Property(bool, Replaced, repl);
     Property(Vector2D, ReplPos, replPos);
     Property(float, ReplDir, replDir);
-
+    /////////////////new kalman
+    qint64 kalmanLastTime,kalmanFutureLastTime;
+    typedef KalmanFilter<6,3> kalman;
+    kalman *donKalman;
+    kalman *donKalmanF;
+    void newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand);
+    void visionUpdate();
+    QTime kalmanTime;
+    Vector2D lastDir;
 public:
     bool markedByDefense;
     bool markedByMark;
     bool shootSensor;
     double danger;
+    double vForwardCmd,vNormalCmd,vAngCmd;
+    long long test;
 };
 
 

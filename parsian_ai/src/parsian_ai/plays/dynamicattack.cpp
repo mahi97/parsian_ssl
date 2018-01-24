@@ -316,8 +316,8 @@ void CDynamicAttack::assignTasks() {
     if (mahiPlayMaker != nullptr) {
         playMake();
     }
+if(currentPlan.agentSize > 0) {
 
-    if(currentPlan.agentSize > 0) {
         positioning(semiDynamicPosition);
     }
 
@@ -329,6 +329,7 @@ void CDynamicAttack::assignTasks() {
  */
 void CDynamicAttack::dynamicPlanner(int agentSize) {
 
+
     activeAgents.clear();
     for(size_t i = 0; i < 6;i++) {
         mahiAgentsID[i] = -1;
@@ -337,16 +338,18 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     for(int i = 0; i < agentSize; i++) {
         activeAgents.append(agentsID[i]);
     }
-
     makePlan(agentSize);
+
     if(agentSize > 0) {
         chooseBestPositons();
     }
     assignId();
+
     if(agentSize > 0) {
         //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
     }
+
     assignTasks();
     DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
     DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
@@ -359,6 +362,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         }
     }
     DBUG(QString("[DA] PM SKILL: %1").arg(roleAgentPM->getSelectedSkill()), D_MAHI);
+    ROS_INFO("seda mizane 2222");
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
@@ -399,9 +403,9 @@ void CDynamicAttack::playMake() {
     roleAgentPM->setAvoidPenaltyArea(true);
 
     Vector2D og = wm->ball->pos - wm->field->ourGoal();
-
     switch(currentPlan.playmake.skill) {
     case DynamicEnums::Dribble:
+        ROS_INFO_STREAM("drrible");//<< currentPlan.playmake.skill);
         roleAgentPM -> setTargetDir(currentPlan.passPos);
         roleAgentPM -> setTarget(oppRob);
         roleAgentPM -> setChip(false);
@@ -409,6 +413,7 @@ void CDynamicAttack::playMake() {
         roleAgentPM -> setSelectedSkill(DynamicEnums::Dribble); // skill Dribble
         break;
     case DynamicEnums::Pass:
+        ROS_INFO_STREAM("pass");
         roleAgentPM -> setChip(chipOrNot(currentPlan.passPos, 0.5, 0.1));
         roleAgentPM -> setTarget(currentPlan.passPos);
         roleAgentPM -> setEmptySpot(false);
@@ -436,6 +441,7 @@ void CDynamicAttack::playMake() {
         break;
 
     case DynamicEnums::Chip:
+        ROS_INFO_STREAM("chip");
         roleAgentPM->setNoKick(false);
         if (currentPlan.playmake.region == DynamicEnums::Goal) {
             roleAgentPM ->setTarget(wm->field->oppGoal());
@@ -467,6 +473,7 @@ void CDynamicAttack::playMake() {
         break;
     }
     default:
+        ROS_INFO_STREAM("default");
         roleAgentPM->setEmptySpot(true);
         roleAgentPM->setChip(false);
         roleAgentPM->setNoKick(false);
@@ -492,7 +499,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
 
                     roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setReceiveRadius(
-                            std::max(0.0, 1 - roleAgents[i]->getAgent()->pos()
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                                                 .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Ready);// Receive Skill
 
@@ -500,6 +507,10 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                 case DynamicEnums::OneTouch: // OneTouch Reflects
 
                     roleAgents[i]->setWaitPos(_points.at(i));
+                    roleAgents[i]->setReceiveRadius(
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
+                                                                .dist(roleAgents[i]->getTarget())));
+
                     // TODO : fix the target
                     roleAgents[i]->setTarget(wm->field->oppGoal());
                     roleAgents[i]->setSelectedSkill(DynamicEnums::OneTouch);// Receive Skill
@@ -507,13 +518,16 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     break;
                 case DynamicEnums::Move:
 
+
+                    roleAgents[i]->setReceiveRadius(
+                            std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
+                                                                .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setTargetDir(ballPos - roleAgents[i]->getAgent()->pos());
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Move);
 
                     break;
                 case DynamicEnums::NoSkill:
-
                     roleAgents[i]->setSelectedSkill(DynamicEnums::Ready);// Receive Skill
 
                     break;
@@ -1140,16 +1154,21 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     QList <Vector2D> temp;
     int ans = 0;
     double points[10] = {};
+
     for (auto _point : _points)
         temp.append(_point);
+
 //    debug(QString("DIntention %3").arg(dribbleIntention.elapsed()), D_PARSA);
     //if we are dribbling
+    int a = temp.size();
+    ROS_INFO("build shode");
     if(dribbleIntention.elapsed() < 3000)
     {
-        currentPlan.passPos = temp[0];
+        currentPlan.passPos =  temp[0];
         return;
     }
     //else
+
     for(int i = 0; i < temp.size(); i++)
     {
         if(lastPassPosLoc == temp[i])

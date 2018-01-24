@@ -5,8 +5,9 @@ GameState *gameState;
 GameState::GameState()
 {
     state= States::PlayOff;
-    ourScore=0;
-    theirScore=0;
+    ourScore = 0;
+    theirScore = 0;
+    command_ctr = 0;
 }
 
 int GameState::getOurScore(){return ourScore;}
@@ -14,6 +15,10 @@ int GameState::getTheirScore(){ return theirScore;}
 
 void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
+
+    if(ref_wrapper->command_counter == command_ctr)
+        return;
+    command_ctr = ref_wrapper->command_counter;
     ///////////////////// when we are ready any command means force start
     if(isReady && state != States::PlayOn){
         state = States::PlayOn;
@@ -107,6 +112,7 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
         return;
         default:break;
     }
+
 }
 
 bool GameState::isPlayOn() { return state == States::PlayOn; }
@@ -152,7 +158,13 @@ bool GameState::theirPenaltyShootout(){return state == States::TheirPenaltyShoot
 bool GameState::ready(){
     return isReady;
 }
+
 /////
 States GameState::getState(){
     return state;
+}
+
+void GameState::setState(const States &s, bool isReady) {
+    state = s;
+    this->isReady = isReady;
 }

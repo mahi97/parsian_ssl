@@ -1412,7 +1412,7 @@ void DefensePlan::execute(){
         }
         return;
     }
-    else if(gameState->theirPenaltyKick()){
+    if(gameState->theirPenaltyKick()){
         //TO DO: add penalty goalie for penalty shootout
         penaltyShootOutMode();
         lastBallPosition = wm->ball->pos;
@@ -1652,6 +1652,7 @@ void DefensePlan::penaltyShootOutMode(){
 
         drawer->draw(agentTarget, QColor(Qt::darkBlue));
         break;
+        default:break;
     }
 
 
@@ -2201,7 +2202,7 @@ void DefensePlan::initVars(float goalCircleRad){
     if (firstBallPos.x < topGoal.x + 0.05)
         firstBallPos.x  = topGoal.x + 0.05;
 
-    ballPos = wm->ball->predict(catch_time);
+    ballPos = wm->ball->getPosInFuture(catch_time);
     if (ballVel.length() > 0.3 /*&& fabs(Vector2D::angleBetween(Vector2D(-1, 0), wm->ball->vel).degree()) < 45*/)
         ballPos = firstBallPos;
 
@@ -3100,11 +3101,10 @@ bool DefensePlan::isInTheIndirectAreaPass(Vector2D opp){
     DBUG(QString("IndirectAreaPass"),D_HAMED);
     double indirectAvoidRadius = 0.5 + 0.2;
     Circle2D indirectAvoidCircle(wm->ball->pos, indirectAvoidRadius);
-    if (indirectAvoidCircle.contains(PassBlockRatio(segmentperpass, opp).first()) && !know->variables["transientFlag"].toBool())
-        return true;
-    else{
-        return false;
-    }
+    if (indirectAvoidCircle.contains(PassBlockRatio(segmentperpass, opp).first()) && !know->variables["transientFlag"].toBool()) return true;
+
+    return false;
+
 }
 
 QList<Vector2D> DefensePlan::indirectAvoidPass(Vector2D opp){
@@ -3835,32 +3835,37 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayoff(QList<Vector2
 
 QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D> oppposdanger) {
 
-    double KA=1; //Angle Coefficient
-    double KDB=1;  //Distance To Ball
-    double KDG=1;  //Distnce To Goal
-    double RangeofAngle = Vector2D::angleOf(wm->field->ourGoalR(),Vector2D(-1.0 * (wm->field->_FIELD_WIDTH / 2 - wm->field->_GOAL_RAD), 0), wm->field->ourGoalL()).degree();
+    double KA = 1; //Angle Coefficient
+    double KDB = 1;  //Distance To Ball
+    double KDG = 1;  //Distnce To Goal
+    double RangeofAngle = Vector2D::angleOf(wm->field->ourGoalR(),
+                                            Vector2D(-1.0 * (wm->field->_FIELD_WIDTH / 2 - wm->field->_GOAL_RAD), 0),
+                                            wm->field->ourGoalL()).degree();
     //drawer->draw(Vector2D(-1.0 * (_FIELD_WIDTH - _GOAL_WIDTH), 0), QColor(Qt::red));
     // double RangeofAngle2 = Vector2D::angleOf(wm->field->ou,Vector2D(0, -1.0 * (_FIELD_WIDTH - _GOAL_WIDTH)), wm->field->ourGoalL()).degree();
 
-    double RangeofDistancetoBall = fabs(Segment2D(Vector2D(wm->field->_FIELD_WIDTH/2,wm->field->_FIELD_HEIGHT /2), Vector2D(-1.0 * wm->field->_FIELD_WIDTH/2,-1.0 * wm->field->_FIELD_HEIGHT /2)).length());
+    double RangeofDistancetoBall = fabs(Segment2D(Vector2D(wm->field->_FIELD_WIDTH / 2, wm->field->_FIELD_HEIGHT / 2),
+                                                  Vector2D(-1.0 * wm->field->_FIELD_WIDTH / 2,
+                                                           -1.0 * wm->field->_FIELD_HEIGHT / 2)).length());
 
-    double RangeofDistancetoGoal = fabs(Segment2D(Vector2D(wm->field->_FIELD_WIDTH/2,wm->field->_FIELD_HEIGHT /2), wm->field->ourGoal()).length());
+    double RangeofDistancetoGoal = fabs(Segment2D(Vector2D(wm->field->_FIELD_WIDTH / 2, wm->field->_FIELD_HEIGHT / 2),
+                                                  wm->field->ourGoal()).length());
 
     double RangeofTempDis = 2;
-    double angle, distancetoball, distancetogoal,danger;
-
+    double angle, distancetoball, distancetogoal, danger;
 
 
     QPair<Vector2D, double> temp;
     QList<QPair<Vector2D, double> > output;
-    for(int i = 0; i<oppposdanger.count(); i++) {
+    for (int i = 0; i < oppposdanger.count(); i++) {
         temp.first = oppposdanger[i];
 
 
-        angle = Vector2D::angleOf(wm->field->ourGoalR(), oppposdanger[i], wm->field->ourGoalL() ).degree();
-        distancetoball =  (oppposdanger[i] - wm->ball->pos).length();
-        distancetogoal =  (oppposdanger[i] - wm->field->ourGoal()).length();
-        danger = (KA * fabs(angle) / RangeofAngle) + ( KDB * 1 - (distancetoball / RangeofDistancetoBall) ) + (KDG * 1 -(distancetogoal / RangeofDistancetoGoal));
+        angle = Vector2D::angleOf(wm->field->ourGoalR(), oppposdanger[i], wm->field->ourGoalL()).degree();
+        distancetoball = (oppposdanger[i] - wm->ball->pos).length();
+        distancetogoal = (oppposdanger[i] - wm->field->ourGoal()).length();
+        danger = (KA * fabs(angle) / RangeofAngle) + (KDB * 1 - (distancetoball / RangeofDistancetoBall)) +
+                 (KDG * 1 - (distancetogoal / RangeofDistancetoGoal));
 
 
         temp.second = danger;
@@ -3870,16 +3875,14 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D
 
         // finding nearest to intersect
         Segment2D tempsegment;
-        tempsegment.assign(oppposdanger[i],wm->field->ourGoal());
+        tempsegment.assign(oppposdanger[i], wm->field->ourGoal());
 
         double mintempdis = 0.0;
-        if(wm->our.activeAgentsCount() != 0)
+        if (wm->our.activeAgentsCount() != 0)
             mintempdis = tempsegment.dist(wm->our.active(0)->pos);
 
-        for(int j=0; j<wm->our.activeAgentsCount(); j++)
-        {
-            if(tempsegment.dist(wm->our.active(j)->pos) < mintempdis)
-            {
+        for (int j = 0; j < wm->our.activeAgentsCount(); j++) {
+            if (tempsegment.dist(wm->our.active(j)->pos) < mintempdis) {
                 mintempdis = tempsegment.dist(wm->our.active(j)->pos);
             }
 
@@ -3894,18 +3897,16 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D
     }
 
     ///sorting the Qlist
-    for(int i = 0; i< output.count(); i++)
-    {
-        for(int j = 0; j< output.count() - 1; j++ )
-        {
-            if(output[j].second < output[j + 1].second)
-                output.swap(j, j+1);
+    for (int i = 0; i < output.count(); i++) {
+        for (int j = 0; j < output.count() - 1; j++) {
+            if (output[j].second < output[j + 1].second)
+                output.swap(j, j + 1);
         }
     }
 
     //for(int i=0; i<output.count(); i++)
     //{
-        //drawer->draw(QString("HMD Danger New%1" ).arg(output[i].second),output[i].first + Vector2D(0,.2),QColor(Qt::red));
+    //drawer->draw(QString("HMD Danger New%1" ).arg(output[i].second),output[i].first + Vector2D(0,.2),QColor(Qt::red));
     //}
 
     return output;
