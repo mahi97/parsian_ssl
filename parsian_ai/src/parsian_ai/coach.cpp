@@ -540,8 +540,8 @@ void CCoach::assignDefenseAgents(int defenseCount){
     lastDefenseAgents.clear();
     lastDefenseAgents.append(defenseAgents);
 
-    defenseAgents.clear();
-    defenseAgents.append(defenseAgents);
+//    defenseAgents.clear();
+//    defenseAgents.append(defenseAgents);
 }
 bool CCoach::isBallcollide(){
     // TODO : change this :P
@@ -797,6 +797,7 @@ void CCoach::decideAttack()
             ourPlayers.removeOne(defenseAgent->id());
         }
     }
+    selectedPlay->defensePlan.debugAgents("DEF : ");
     selectedPlay->defensePlan.debugAgents("DEF : ");
     QString str;
     for (int ourPlayer : ourPlayers) {
@@ -1132,7 +1133,7 @@ void CCoach::setFirstPlay() {
 
 void CCoach::execute()
 {
-    gameState->setState(States::PlayOn);
+    gameState->setState(States::PlayOff);
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
@@ -1154,11 +1155,11 @@ void CCoach::execute()
     ////////////////////////////////////////////
     decideAttack();
     checkSensorShootFault();
-    // checks whether the goalie is under the net or not if it is moves out
+//     checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
-    // Old Role Base Execution -- used for block, old_playmaker
-    checkRoleAssignments();
-
+//     Old Role Base Execution -- used for block, old_playmaker
+//    checkRoleAssignments();
+//
     //// Handle Roles Here
     for (auto &stopRole : stopRoles) {
         if (stopRole->agent != nullptr) {

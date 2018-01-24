@@ -17,7 +17,7 @@ void AI::execute() {
 }
 
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
-    if (wm->our.data->activeAgents.contains(robotID)) {
+    if (wm->our.data->activeAgents.contains(robotID) != nullptr) {
         if (soccer->agents[robotID]->action != nullptr) {
             if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
