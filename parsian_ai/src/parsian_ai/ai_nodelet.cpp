@@ -20,6 +20,7 @@ void AINodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
+
     refereeSub = nh.subscribe("/refbox/referee", 1000,  &AINodelet::refereeCallBack, this);
     teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
 
@@ -47,8 +48,6 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
 }
 
-
-
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ai->updateWM(_wm);
     ROS_INFO("wm updated");
@@ -59,6 +58,7 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     }
 
 }
+
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
 
     ai->updateReferee(_ref);
@@ -72,3 +72,10 @@ void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t
     conf = config;
 }
 
+void AINodelet::playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg) {
+
+//    parsian_msgs::parsian_ai_plan_request reqMsg;
+//    reqMsg.ourPlayers = ai->getPlayersList();
+//    reqMsg.ourPlayers;
+
+}

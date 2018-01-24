@@ -135,7 +135,7 @@ void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_p
             robotPacks.value.push_back(temp);
         }
     }
-
+    robotPacks.header.stamp = ros::Time::now();
     packetPub.publish(robotPacks);
 }
 
