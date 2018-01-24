@@ -1137,14 +1137,6 @@ void CCoach::setFirstPlay() {
 void CCoach::execute()
 {
     gameState->setState(States::OurIndirectKick, true);
-    if(gameState->getState() == States::PlayOff)
-    {
-        ROS_INFO_STREAM("sag 1");
-    }
-    else
-    {
-        ROS_INFO_STREAM("sag 2");
-    }
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();

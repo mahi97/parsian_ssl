@@ -42,8 +42,11 @@ class Watcher:
     def get_all_plans(self):
         return self.__event_handler.get_all_plans_msgs()
 
-    def update_master_active(self, name_list, is_master, is_active):
-        return self.__event_handler.update_master_active(name_list, is_master, is_active)
+    def update_master_active(self, name_list, plan_index, is_master, is_active):
+        if len(name_list) != len(plan_index):
+            print("not all plans are indexed")
+            return None
+        return self.__event_handler.update_master_active(name_list, plan_index, is_master, is_active)
 
     def choose_plan(self, player_num, game_mode):
         return self.__event_handler.choose_plan(player_num, game_mode)
@@ -261,10 +264,10 @@ class Handler(FileSystemEventHandler):
             plans_msg.append(self.message_generator(plan))
         return plans_msg
 
-    def update_master_active(self, name_list, is_master, is_active):
+    def update_master_active(self, name_list, plan_index, is_master, is_active):
         for plan in self.__final_dict:
-            for need_update in name_list:
-                if plan["filename"] == need_update:
+            for i in range(0, len(name_list)):
+                if plan["filename"] == name_list[i] and plan["index"] == plan_index[i]:
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
 
@@ -277,6 +280,7 @@ class Handler(FileSystemEventHandler):
                 tmp = json.load(json_data)
                 for i in range(0, len(tmp["plans"])):
                     dict1 = tmp["plans"][i]
+                    dict1.update({"index": i})
                     dict1.update({"filename": str(plan)})
                     dict1.update({"isMaster": False})
                     dict1.update({"isActive": True})
