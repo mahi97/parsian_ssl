@@ -119,8 +119,8 @@ Circle2D::intersection( const Line2D & line,
     {
         if ( std::fabs( line.b() ) < EPSILOON )
         {
-            std::cerr << "Circle2D::intersection() illegal line."
-                      << std::endl;
+         //   std::cerr << "Circle2D::intersection() illegal line."
+         //             << std::endl;
             return 0;
         }
 
