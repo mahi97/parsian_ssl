@@ -40,7 +40,7 @@ public:
     virtual int index(CRole* me);
     virtual void addAgent(Agent* agent);
 
-    virtual void reset(){}
+    virtual void reset(){ agents.clear(); }
 };
 
 

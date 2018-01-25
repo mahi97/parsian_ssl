@@ -597,6 +597,7 @@ void CCoach::virtualTheirPlayOffState()
 void CCoach::decideDefense(){
     assignGoalieAgent(preferedGoalieAgent);
     assignDefenseAgents(preferedDefenseCounts);
+    ROS_INFO_STREAM("SD: " << preferedDefenseCounts << " : " << defenseAgents.size());
     if( gameState->theirPenaltyKick() ){
         defenseAgents.clear();
         selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
@@ -868,6 +869,13 @@ void CCoach::decideAttack()
     QList<Agent*> ourAgents;
     for(auto& ourPlayer : ourPlayers) {
         ourAgents.append(agents[ourPlayer]);
+    }
+
+    //// Handle Roles Here
+    for (auto &stopRole : stopRoles) {
+        if (stopRole->agent != nullptr) {
+            stopRole->execute();
+        }
     }
 
     selectedPlay->init(ourAgents);
@@ -1184,15 +1192,7 @@ void CCoach::checkTransitionToForceStart(){
 
 void CCoach::execute()
 {
-    gameState->setState(States::OurIndirectKick, true);
-    if(gameState->getState() == States::PlayOff)
-    {
-        ROS_INFO_STREAM("sag 1");
-    }
-    else
-    {
-        ROS_INFO_STREAM("sag 2");
-    }
+    gameState->setState(States::PlayOff, true);
 
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
@@ -1210,18 +1210,13 @@ void CCoach::execute()
     }
     ROS_INFO_STREAM("M : " << preferedDefenseCounts);
     ROS_INFO_STREAM("PM :" << playmakeId);
-    ROS_INFO_STREAM("GAMESTATE : " << static_cast<int>(gameState->getState()));
+    ROS_INFO_STREAM("GAMESTATEEE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
-    for (auto &stopRole : stopRoles) {
-        if (stopRole->agent != nullptr) {
-            stopRole->assign(nullptr);
-//            ROS_INFO_STREAM("DD " << stopRole->agent->id());
-        }
-    }
+
     decideAttack();
     for(int i = 0 ; i < 8 ; i ++)
     {
-        if(agents[i]->action != NULL)
+        if(agents[i]->action != nullptr)
             ROS_INFO_STREAM("robot ID decide: "<< i << "task : " << agents[i]->action->getActionName().toStdString());
     }
 
@@ -1230,13 +1225,6 @@ void CCoach::execute()
     checkGoalieInsight();
     //// Old Role Base Execution -- used for block, old_playmaker
     checkRoleAssignments();
-
-    //// Handle Roles Here
-    for (auto &stopRole : stopRoles) {
-        if (stopRole->agent != nullptr) {
-            stopRole->execute();
-        }
-    }
 
     //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
 }
@@ -1295,14 +1283,12 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     }
 
     QList<int> tempAgents;
-
+    stopRoles[0]->info()->reset();
     for (int i = 0; i < _ourPlayers.size(); i++) {
-        ROS_INFO_STREAM("inja sag zade dg :D " << i);
-        stopRoles[i]->assign(nullptr);
+        stopRoles[i]->agent = nullptr;
 
         Agent* tempAgent = agents[_ourPlayers.at(i)];
         if (!tempAgent->changeIsNeeded) {
-            ROS_INFO_STREAM("D " << i);
             stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
         } else {
             tempAgents.append(tempAgent->id());
@@ -1311,7 +1297,7 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     _ourPlayers.clear();
     _ourPlayers.append(tempAgents);
     selectedPlay = stopPlay;
-//    selectedPlay->positioningPlan.reset();
+    selectedPlay->positioningPlan.reset();
 }
 
 void CCoach::decideOurKickOff(QList<int> &_ourPlayers) {

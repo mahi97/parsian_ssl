@@ -140,11 +140,8 @@ CRoleStopInfo* CRoleStop::info()
 
 void CRoleStop::assign(Agent *agent) {
     CRole::assign(agent);
-    if(agent != NULL)
-    {
-        agent->roleName = m_info->getRoleName();
-        m_info->addAgent(agent);
-    }
+    agent->roleName = m_info->getRoleName();
+    m_info->addAgent(agent);
 }
 
 
