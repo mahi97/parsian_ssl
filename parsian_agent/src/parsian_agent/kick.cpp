@@ -657,7 +657,7 @@ distCoef = 0.20;
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
-    speedPid->kp = 7;
+    speedPid->kp = 4;
 
 
     if(!jTurnFromBack)

@@ -52,11 +52,12 @@ void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config
 void VisionNodelet::timerCb(const ros::TimerEvent &event) {
 
     while (vision->receive(vision_packet)) {
-        ROS_INFO("v");
+        //ROS_INFO("v");
         if (vision_packet.has_detection()) {
             parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
             *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
 //            wrapper->detections.push_back(detection);
+            detection->header.stamp = ros::Time::now();
             ssl_detection_pub.publish(detection);
         }
 

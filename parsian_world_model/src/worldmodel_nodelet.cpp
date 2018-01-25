@@ -48,8 +48,8 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
         packs = 0;
         wm->merge(frame);
         parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(colour_yellow, side_left);
-        temp->Header.stamp = ros::Time::now();
-        temp->Header.frame_id = std::to_string(_detection->frame_number);
+        temp->header.stamp = ros::Time::now();
+        temp->header.frame_id = std::to_string(_detection->frame_number);
         wm_pub.publish(temp);
     }
 

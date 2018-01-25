@@ -11,7 +11,6 @@ from parsian_msgs.msg import parsian_plan
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
 import rospkg
 
 
@@ -20,19 +19,19 @@ class Watcher:
 
     def __init__(self):
         signal.signal(signal.SIGINT, self.signal_handler)
-        self.p = rospkg.RosPack().get_path("parsian_ai")
-        print ("pack path: " + self.p)
-        self.p += "/plans/"
+        self.path = rospkg.RosPack().get_path("parsian_ai")
+        print ("pack path: " + self.path)
+        self.path += "/plans/"
         self.__observer = Observer()
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
-        self.__event_handler = Handler(self.p)
+        self.__event_handler = Handler(self.path)
 
         # l=[]
         # l.append("/home/fateme/Workspace/parsian_ws/src/parsian_ssl/parsian_ai/plans/2Pass/pass.json")
         # self.__event_handler.update_master_active(l, True, True)
 
     def run(self):
-        self.__observer.schedule(self.__event_handler, self.p, recursive=True)
+        self.__observer.schedule(self.__event_handler, self.path, recursive=True)
         self.__observer.start()
         try:
             while True:
@@ -52,7 +51,6 @@ class Watcher:
             print("not all plans are indexed")
             return None
         return self.__event_handler.update_master_active(name_list, plan_index, is_master, is_active)
-
     def choose_plan(self, player_num, game_mode, ball_x, ball_y):
         return self.__event_handler.choose_plan(player_num, game_mode, ball_x, ball_y)
 
@@ -68,7 +66,8 @@ class Handler(FileSystemEventHandler):
         self.__shuffleCount = 0
         self.__final_dict = []
 
-        global final_list, shuffleCount
+        global final_list, shuffleCount, path
+        path = p
 
         # read_plan(f[5])
         self.__final_list = self.list_valid_plans(p)
@@ -90,11 +89,13 @@ class Handler(FileSystemEventHandler):
 
         elif event.event_type == 'modified':
             # print("Received modified event - %s" % event.src_path)
-            self.add_plan(event.src_path)
+            # self.add_plan(event.src_path)
+            self.refresh()
 
         elif event.event_type == 'deleted':
             # print("Received deleted event - %s" % event.src_path)
-            self.remove_plan(event.src_path)
+            self.refresh()
+            # self.remove_plan(event.src_path)
 
     def list_valid_plans(self, path):
         file_list = []
@@ -168,6 +169,12 @@ class Handler(FileSystemEventHandler):
             print(str(path_to_plan).split("/plans")[1] + " removed.")
             self.__final_list.remove(path_to_plan)
 
+    def refresh(self):
+        global path
+        self.__final_list = self.list_valid_plans(path)
+        self.shuffle_indexing(self.__final_list)
+        self.plans_to_dict()
+
     def ignore_plans(self, file_list, ignore_list):
         # files:
         new_file_list = [fi for fi in file_list if (str(fi).split("/plans")[1] not in ignore_list)]
@@ -227,7 +234,9 @@ class Handler(FileSystemEventHandler):
                     sublist.append(plan)
 
         if len(sublist) > 0:
-            return self.message_generator(sublist[0])
+            i = self.__shuffleCount % len(sublist)
+            i += 1
+            return self.message_generator(sublist[i])
 
         # indirect plan can work for direct mode
         elif plan_mode == "DIRECT":
@@ -243,7 +252,9 @@ class Handler(FileSystemEventHandler):
                               + " --> num agents: " + str(len(plan["agentInitPos"])))
                         sublist.append(plan)
             if len(sublist) > 0:
-                return self.message_generator(sublist[0])
+                i = self.__shuffleCount % len(sublist)
+                i += 1
+                return self.message_generator(sublist[i])
             else:
                 print ("\nNO PLAN MATCHED!\n")
                 print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num) + "\n")

@@ -26,7 +26,6 @@ public:
     void updateWM(const parsian_msgs::parsian_world_modelConstPtr&);
     void updateRobotStatus(const parsian_msgs::parsian_robotConstPtr&);
     void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr&);
-
     CSoccer* getSoccer();
 
     parsian_msgs::parsian_debugs getDebugs() { return debugger->debugs; }
