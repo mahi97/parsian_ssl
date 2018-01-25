@@ -78,8 +78,8 @@ class KickProfiler():
         self.stepnum = 0
         self.robot1_overspeed = False
         self.robot2_overspeed = False
-        self.startingkickspeed = 5
-        self.endingkickspeed = 15
+        self.startingkickspeed = 200
+        self.endingkickspeed = 1023
         self.current_speed = self.startingkickspeed
 
         self.robot1_vels = {}
@@ -91,7 +91,7 @@ class KickProfiler():
 
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 1
+        self.speed_step = 100
         self.robot1_count = 1
         self.robot2_count = 1
         self.robot1_bad_count = 0
@@ -263,7 +263,7 @@ class KickProfiler():
     #and get some positions, as the shoot power rise up the robots distanse increases
     def getpositions(self, firstp, secondp):
         # type: (point.Point, point.Point) ->object
-        self.stepnum = (self.endingkickspeed - self.startingkickspeed)/self.speed_step + 2
+        self.stepnum = (1000 - self.startingkickspeed)/self.speed_step + 2
         # x1 == x2
         if secondp.x == firstp.x:
             if (firstp.y > secondp.y):
@@ -659,7 +659,7 @@ class KickProfiler():
             self.robot2_count = 1
             self.robot1_bad_count = 0
             self.robot2_bad_count = 0
-            if self.bad_flag:
+            if not self.bad_flag:
                 self.last_speed1 = self.robot1_vels[self.current_speed][0]
                 self.last_speed2 = self.robot2_vels[self.current_speed][0]
             self.bad_flag = False
