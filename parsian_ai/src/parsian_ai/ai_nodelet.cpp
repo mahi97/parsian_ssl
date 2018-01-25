@@ -57,6 +57,23 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
+    /// handle plan request
+    if(ai->getSoccer()->getCoach()->requestForPlan){
+        parsian_msgs::plan_service req;
+        req.request = ai->getSoccer()->getCoach()->getPlanRequest();
+
+        if(plan_client.call(req)){
+            ai->getSoccer()->getCoach()->setPlanResponse(req.response);
+            ai->getSoccer()->getCoach()->requestForPlan = false;
+            ROS_INFO("ai requesting for plan...");
+
+        } else {
+            ROS_INFO("ERROR! in ai plan request");
+        }
+    } else {
+        ROS_INFO("No plan requested");
+    }
+
 }
 
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
@@ -70,12 +87,4 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
 
 void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
     conf = config;
-}
-
-void AINodelet::playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg) {
-
-//    parsian_msgs::parsian_ai_plan_request reqMsg;
-//    reqMsg.ourPlayers = ai->getPlayersList();
-//    reqMsg.ourPlayers;
-
 }

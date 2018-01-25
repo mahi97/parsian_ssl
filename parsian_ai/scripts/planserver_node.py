@@ -6,18 +6,18 @@ from parsian_msgs.srv import *
 import docWatch
 
 
-class Get_Plan:
+class getPlan:
     def __init__(self):
 
         rospy.init_node('plan_server')
-        self.s = rospy.Service('update_plans', parsian_update_plans, self.handle_gui_plan_request)
+        self.s1 = rospy.Service('update_plans', parsian_update_plans, self.handle_gui_plan_request)
+        self.s2 = rospy.Service('get_plans', plan_service, self.handle_plan_request)
         self.__w = docWatch.Watcher()
         self.response = parsian_update_plansResponse()
         self.__w.run()
-        rospy.spin()
 
     def handle_gui_plan_request(self, req):
-        #type:(parsian_update_plansRequest)
+        # type:(parsian_update_plansRequest) -> req
 
         print("---> request:")
         print(req)
@@ -33,10 +33,16 @@ class Get_Plan:
             self.response.allPlans = self.__w.get_all_plans()
             return self.response
 
-
     def handle_plan_request(self, req):
-        #type: (plan_service)
-        return self.__w.choose_plan(req.request.playersNum, req.request.gameMode)
+        # type: (plan_serviceRequest) -> req
+        response = plan_serviceResponse()
+        out = self.__w.choose_plan(req.plan_req.playersNum, req.plan_req.gameMode, req.plan_req.ballPos.x, req.plan_req.ballPos.y)
+        if out is not None:
+            return out
+        else:
+            print ("No plan received")
+
 
 if __name__ == '__main__':
-    Get_Plan()
+    g = getPlan()
+    rospy.spin()

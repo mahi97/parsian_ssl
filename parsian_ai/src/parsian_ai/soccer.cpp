@@ -81,3 +81,7 @@ void CSoccer::customControl(bool &custom) {
     custom = true;
     updateTask();
 }
+
+CCoach* CSoccer::getCoach() {
+    return coach;
+}
