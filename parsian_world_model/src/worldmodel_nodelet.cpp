@@ -13,6 +13,7 @@ void WMNodelet::onInit() {
 
 //    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
     wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
+    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& WMNodelet::teamConfigCb, this, _1));
     vision_detection_sub = nh.subscribe("vision_detection", 1000, &WMNodelet::detectionCb, this);
     QString robotCommandSubName;
     for(int i = 0 ; i < 12 ; i++) {
@@ -47,12 +48,19 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     if (packs >= 4) {
         packs = 0;
         wm->merge(frame);
-        parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(colour_yellow, side_left);
+        parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(isOurColorYellow, isOurSideLeft);
         temp->header.stamp = ros::Time::now();
         temp->header.frame_id = std::to_string(_detection->frame_number);
         wm_pub.publish(temp);
     }
 
+}
+
+
+void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+{
+    isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
+    isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
 }
 
 //void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)

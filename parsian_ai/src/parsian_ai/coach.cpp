@@ -1324,6 +1324,7 @@ void CCoach::decideTheirKickOff(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurDirect(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("inja kharab shod!");
     if(ourPlayOff->deleted)
     {
         ourPlayOff->deleted = false;
