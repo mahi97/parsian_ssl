@@ -1454,7 +1454,7 @@ void CCoach::checkSensorShootFault() {
 
 void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
 
-    ROS_INFO("request");
+    ROS_INFO("initStaticPlay: request");
     switch (_mode){
         case POMODE::INDIRECT:
             planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
@@ -1467,15 +1467,30 @@ void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
             break;
     }
 
+    planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
+
     planRequest.plan_req.ballPos.x = wm->ball->pos.x;
     planRequest.plan_req.ballPos.y = wm->ball->pos.y;
 
     planRequest.plan_req.playersNum = static_cast<unsigned char>(_agentSize.size());
 
+
+    parsian_msgs::plan_service req;
+    req.request = planRequest;
+
+    if(plan_client.call(req)){
+        std::string str = req.response.the_plan.planFile;
+        ROS_INFO_STREAM("response: %s" << str);
+    } else {
+        ROS_INFO("initStaticPlay: ERROR");
+    }
+
 //    req.plan_req.hint.clear();
 //    for (int i = 0; i < hint->size(); ++i) {
 //        req.plan_req.hint.push_back(hint[i]);
 //    }
+
+
 
 }
 
@@ -1489,3 +1504,6 @@ void CCoach::setPlanResponse(parsian_msgs::plan_serviceResponse planResponse){
     receivedPlan.the_plan = planResponse.the_plan;
 }
 
+void CCoach::setPlanClient(ros::ServiceClient _plan_client) {
+    plan_client = _plan_client;
+}

@@ -234,9 +234,10 @@ class Handler(FileSystemEventHandler):
                     sublist.append(plan)
 
         if len(sublist) > 0:
-            i = self.__shuffleCount % len(sublist)
-            i += 1
-            return self.message_generator(sublist[i])
+            # i = self.__shuffleCount % len(sublist)
+            # i += 1
+            # return self.message_generator(sublist[i])
+            return self.message_generator(sublist[0])
 
         # indirect plan can work for direct mode
         elif plan_mode == "DIRECT":
@@ -244,17 +245,20 @@ class Handler(FileSystemEventHandler):
             for plan in self.__final_dict:
                 if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
                         or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                    print("ball pos matched")
+                    print("ball pos matched: " + plan["filename"].split("plans/")[1]
+                          + "agent size: " + str(len(plan["agentInitPos"])) + plan["planMode"]
+                          + ", lastDist: " + str(plan["lastDist"]) + ", chance: " +str(plan["chance"]))
                     if len(plan["agentInitPos"]) >= player_num \
                             and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                             and plan["planMode"] == "INDIRECT":
-                        print("matched: " + plan["filename"].split("plans/")[1]
+                        print("MATCHED: " + plan["filename"].split("plans/")[1]
                               + " --> num agents: " + str(len(plan["agentInitPos"])))
                         sublist.append(plan)
             if len(sublist) > 0:
-                i = self.__shuffleCount % len(sublist)
-                i += 1
-                return self.message_generator(sublist[i])
+                # i = self.__shuffleCount % len(sublist)
+                # i += 1
+                # return self.message_generator(sublist[i])
+                return self.message_generator(sublist[0])
             else:
                 print ("\nNO PLAN MATCHED!\n")
                 print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num) + "\n")
