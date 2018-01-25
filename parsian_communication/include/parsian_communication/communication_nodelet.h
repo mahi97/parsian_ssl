@@ -16,6 +16,8 @@
 
 #include <parsian_communication/communicator.h>
 
+#include <parsian_msgs/parsian_team_config.h>
+
 #include <dynamic_reconfigure/server.h>
 #include "parsian_communication/communicationConfig.h"
 
@@ -28,6 +30,7 @@ namespace parsian_communication {
 
         boost::shared_ptr<CCommunicator> communicator;
         ros::Subscriber robotPacketSub;
+        ros::Subscriber team_config_sub;
         ros::Publisher  drawPub;
         ros::Publisher  debugPub;
         ros::Publisher  statusPub;
@@ -42,7 +45,11 @@ namespace parsian_communication {
         void recTimerCb(const ros::TimerEvent& event);
 
         boost::shared_ptr<dynamic_reconfigure::Server<communication_config::communicationConfig>> server;
-        void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level) ;
+        void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level);
+        communication_config::communicationConfig conf;
+
+        void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+        bool realGame = false;
 
     };
 }

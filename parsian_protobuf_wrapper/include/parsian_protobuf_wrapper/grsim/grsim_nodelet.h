@@ -17,6 +17,9 @@
 #include "parsian_msgs/grsim_robot_replacement.h"
 #include "parsian_msgs/grsim_ball_replacement.h"
 
+#include <parsian_msgs/parsian_team_config.h>
+
+
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -33,6 +36,8 @@ public:
                              parsian_msgs::grsim_ball_replacement::Response& res);
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
                               parsian_msgs::grsim_robot_replacement::Response& res);
+    void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+
 
     boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
     dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
@@ -44,7 +49,7 @@ public:
     std::string ip;
     int port;
 
-    bool color;
+    bool isYellow;
 
     grSim_Packet packet;
     grSim_Commands* GrsimCommand;
@@ -65,6 +70,7 @@ public:
     ros::Subscriber sub5;
     ros::Subscriber sub_0;
     ros::Subscriber _sub;
+    ros::Subscriber team_config_sub;
     ros::ServiceServer service0;
     ros::ServiceServer service1;
 };
