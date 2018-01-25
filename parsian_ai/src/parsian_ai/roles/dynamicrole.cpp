@@ -115,10 +115,12 @@ void CRoleDynamic::update() {
 
 void CRoleDynamic::execute() {
 
-    if (updated) {
+    /*if (updated) {
         update();
-    }
+    }*/
+    update();
 
+    ROS_INFO("seda mizane");
     switch(selectedSkill) {
         case DynamicEnums::Ready:
             agent->action = receiveSkill;

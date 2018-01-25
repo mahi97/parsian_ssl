@@ -129,7 +129,7 @@ add_library(${PROJECT_NAME}_roles
 		)
 
 add_library(${PROJECT_NAME}_util
-		src/parsian_ai/util/defpos.cpp
+		 src/parsian_ai/util/defpos.cpp
 		src/parsian_ai/util/knowledge.cpp
 		src/parsian_ai/util/worldmodel.cpp
 		#		src/parsian_ai/util/planloader.cpp

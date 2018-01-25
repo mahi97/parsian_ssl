@@ -40,6 +40,7 @@ private:
 public:
     CRoleDynamic* setKickRealSpeed(double val) {
 //        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
+        kickSpeed = val*100;
         DBUG(QString("setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
         updated = true;
         return this;

@@ -5,7 +5,7 @@
 #include <parsian_world_model/wm/rawobject.h>
 
 
-CRawObject::CRawObject(int frameCnt, Vector2D _pos, double orientation, int _ID, double _confidence, CMovingObject *_ref, int _cam_id, double t)
+CRawObject::CRawObject(int frameCnt, Vector2D _pos, double orientation, int _ID, double _confidence, MovingObject *_ref, int _cam_id, double t)
         : pos() , dir() , updated() , mergeCount() {
     frameCount = frameCnt;
     pos = _pos;

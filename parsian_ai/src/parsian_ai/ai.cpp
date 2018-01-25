@@ -17,8 +17,9 @@ void AI::execute() {
 }
 
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
-    if (wm->our.data->activeAgents.contains(robotID)) {
+    if (wm->our.data->activeAgents.contains(robotID) != nullptr) {
         if (soccer->agents[robotID]->action != nullptr) {
+            ROS_INFO_STREAM("robot ID : "<< robotID << "task : " << soccer->agents[robotID]->action->getActionName().toStdString());
             if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
                 task = reinterpret_cast<parsian_skill_kick *>(soccer->agents[robotID]->action->getMessage());
@@ -73,23 +74,40 @@ void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
     wm->update(_wm);
-
+    for(int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
+        soccer->agents[i]->self = *wm->our[i];
+    }
 }
 
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
-    if(gameState->ready()) {
-        DEBUG("is ready", D_MAHI);
-    }
+//    if(_ref->command.command == ssl_refree_command::STOP)
+//    {
+//        ROS_INFO_STREAM("ref vaghean halte");
+//    }
+//    if(gameState->ready()) {
+//        ROS_INFO_STREAM("ref ready");
+//    }
+    ROS_INFO_STREAM("ref count : "<< _ref->command_counter);
+
     if(gameState->isPlayOff()) {
-        DEBUG("is play off", D_MAHI);
+        ROS_INFO_STREAM("ref play off");
     }
     if(gameState->isPlayOn()) {
-        DEBUG("is play on", D_MAHI);
+        ROS_INFO_STREAM("ref play on");
     }
-    if(gameState->canMove()) {
-        DEBUG("is not halt", D_MAHI);
+    if(gameState->ourDirectKick()) {
+        ROS_INFO_STREAM("ref our Direct");
     }
-    DEBUG("is running", D_MAHI);
 
+    if(gameState->canMove()) {
+        ROS_INFO_STREAM("ref !halt");
+    }
+
+    DEBUG("ref kiram tu in esma", D_MAHI);
+
+}
+
+CSoccer* AI::getSoccer() {
+    return soccer;
 }

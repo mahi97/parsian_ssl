@@ -39,10 +39,7 @@ namespace parsian_ai {
 
         ros::Timer timer_;
 
-        ros::Publisher planReqPub;
-        ros::Subscriber planSub;
-
-        void playoffPlanCallBack(const parsian_msgs::parsian_planConstPtr &_planMsg);
+        ros::ServiceClient plan_client;
 
         //config server setup
         boost::shared_ptr<dynamic_reconfigure::Server<ai_config::aiConfig>> server;

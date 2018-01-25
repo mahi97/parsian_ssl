@@ -62,12 +62,7 @@ CPlayOff::~CPlayOff()
 bool CPlayOff:: isBlockDisturbing(){
     if(blockerState == 7)
         return true;
-    else if(conf.UseForcedBlock){
-//        blockerID=knowledge->nearestOppToBall; // TODO : FIX
-        return true;
-    }
-    else
-    return false;
+    return conf.UseForcedBlock;
 
 }
 
@@ -85,7 +80,6 @@ void CPlayOff::globalExecute() {
         }
 
 
-        Q_ASSERT(masterPlan != nullptr);
         if(masterPlan != nullptr) {
             DBUG(QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
 
@@ -110,8 +104,10 @@ void CPlayOff::globalExecute() {
                     staticExecute();
                 }
             }
-            else
+            else {
                 staticExecute();
+
+            }
 
 
         } else {

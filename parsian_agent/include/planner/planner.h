@@ -32,6 +32,7 @@ public:
     explicit CPlanner(int _ID);
     ~CPlanner();
     void runPlanner();
+    void run();
     void resetPlanner(Vector2D);
     void initPathPlanner(Vector2D _goal,const QList<int>& _ourRelaxList,const QList<int>& _oppRelaxList ,const bool& _avoidPenaltyArea , const bool& _avoidCenterArea , const double& _ballObstacleRadius );
     int getID();
@@ -67,7 +68,7 @@ private:
     double timeEstimator(Vector2D _pos,Vector2D _vel,Vector2D _ang,Vector2D _goal);
     void createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel, Vector2D _ang, Vector2D &_center, double &_rad, Vector2D agentPos, Vector2D agentVel, Vector2D agentGoal, Vector2D agentDir);
     void emitPlan(const vector<Vector2D>& _resultModified, const Vector2D& averageDir);
-
+    bool readyToPlan;
 public:
     ros::Publisher path_pub;
 };

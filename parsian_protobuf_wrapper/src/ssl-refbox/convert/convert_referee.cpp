@@ -12,7 +12,7 @@ namespace pr {
      */
     parsian_msgs::ssl_refree_wrapper convert_referee_data(SSL_Referee protoRef, bool us_is_yellow) {
         parsian_msgs::ssl_refree_wrapper rosRef;
-
+        rosRef.command_counter = protoRef.command_counter();
         rosRef.packet_timestamp = protoRef.packet_timestamp();
 
         rosRef.stage = convert_referee_stage(protoRef.stage());

@@ -17,6 +17,8 @@ public:
     ~CBall();
     double whenBallReachToPoint(double dist) const;
     Vector2D getPosInFuture(double _t) const;
+//    double distToBallReachToPoint(double time,Vector2D point);
+
     double getBallAcc() const;
 
     static const double radius;

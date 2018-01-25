@@ -40,6 +40,7 @@ using namespace  parsian_msgs;
 
 class GameState {
 private:
+    int command_ctr;
     States state;
     int ourScore,theirScore;
     bool isReady;
@@ -84,6 +85,7 @@ public:
     bool theirPenaltyShootout();
 
     States getState();
+    void setState(const States& s, bool isReady = false);
 };
 extern GameState *gameState;
 #endif
