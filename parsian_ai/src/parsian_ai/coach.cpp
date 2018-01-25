@@ -1486,18 +1486,14 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
         std::string str = req.response.the_plan.planFile;
         receivedPlan = req.response;
 
-        ROS_INFO("initStaticPlay: plan received");
         NGameOff::SPlan *thePlan = planMsgToSPlan(receivedPlan, _ourplayers.size());
-        ROS_INFO("initStaticPlay: plan converted");
         matchPlan(thePlan, _ourplayers); //Match The Plan
-        ROS_INFO("initStaticPlay: plan matched");
 
 //        checkGUItoRefineMatch(thePlan, _ourplayers);
         ourPlayOff->setMasterPlan(thePlan);
-        ROS_INFO("initStaticPlay: plan set as master");
         ourPlayOff->analyseShoot(); // should call after setmasterplan
-        ourPlayOff->analysePass();  // should call after setmasterplan
-        ROS_INFO("initStaticPlay: plan analyzed");
+//        ourPlayOff->analysePass();  // should call after setmasterplan
+//        ROS_INFO("initStaticPlay: pass analyzed");
         ourPlayOff->setInitial(true);
         ourPlayOff->lockAgents = true;
 //        lastPlan = thePlan;
@@ -1512,7 +1508,7 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 }
 
 NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize) {
-    NGameOff::SPlan* plan = new NGameOff::SPlan();
+    SPlan *plan = new NGameOff::SPlan();
 
 //    for (int i = 0; i < planMsg.the_plan.tags.size(); i++) {
 //        plan->common.tags.push_back((planMsg.the_plan.tags.at(i)).c_str());
@@ -1520,6 +1516,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
 
     plan->common.currentSize = _currSize;
 
+//    plan->execution.AgentPlan
     if(planMsg.the_plan.planMode == "INDIRECT")
         plan->common.planMode = POMODE::INDIRECT;
     else if(planMsg.the_plan.planMode == "DIRECT")
@@ -1535,19 +1532,19 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
     plan->matching.initPos.ball.x = planMsg.the_plan.ballInitPos.x;
     plan->matching.initPos.ball.y = planMsg.the_plan.ballInitPos.y;
 
-    for (int j = 0; j < planMsg.the_plan.agentInitPos.size(); ++j) {
+    for (int j = 0; j < planMsg.the_plan.agentSize; j++) {
         plan->matching.initPos.agents.push_back(planMsg.the_plan.agentInitPos[j]);
-//        plan->matching.initPos.agents[j].x = planMsg.the_plan.agentInitPos[j].x;
-//        plan->matching.initPos.agents[j].y = planMsg.the_plan.agentInitPos[j].y;
     }
 
+    return plan;
 }
 
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     MWBM matcher;
     matcher.create(_plan->common.currentSize, _ourplayers.size());
-    for (size_t i = 0; i < _plan->common.currentSize; i++) {
-        for (size_t j = 0; j < _ourplayers.size(); j++) {
+
+    for (int i = 0; i < _plan->common.currentSize; i++) {
+        for (int j = 0; j < _ourplayers.size(); j++) {
 
             double weight;
             if (_plan->matching.initPos.agents.at(i).x == -100) {
@@ -1558,14 +1555,12 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
             matcher.setWeight(i, j, -(weight));
         }
     }
-    ROS_INFO_STREAM("[Coach] matched plan with : " << matcher.findMatching());
     qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
     for (size_t i = 0; i < _plan->common.currentSize; i++) {
         int matchedID = matcher.getMatch(i);
         _plan->common.matchedID.insert(i, _ourplayers.at(matchedID));
 
     }
-    ROS_INFO("[Coach] mathched by");
     qDebug() << "[Coach] mathched by" << _plan->common.matchedID;
 }
 
