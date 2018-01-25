@@ -106,3 +106,7 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
 
 
 }
+
+CSoccer* AI::getSoccer() {
+    return soccer;
+}

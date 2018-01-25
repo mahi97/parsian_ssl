@@ -887,6 +887,7 @@ void CCoach::decideAttack()
 void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
 
     //Decide Plan
+    ROS_INFO_STREAM("playoff "<<firstTime);
     firstIsFinished = ourPlayOff->isFirstFinished();
     if (firstTime) {
         NGameOff::EMode tempMode;
@@ -1444,7 +1445,41 @@ void CCoach::checkSensorShootFault() {
 
 }
 
+
 void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
 
+    ROS_INFO("request");
+    switch (_mode){
+        case POMODE::INDIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
+            break;
+        case POMODE::DIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
+            break;
+        case POMODE::KICKOFF:
+            planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
+            break;
+    }
+
+    planRequest.plan_req.ballPos.x = wm->ball->pos.x;
+    planRequest.plan_req.ballPos.y = wm->ball->pos.y;
+
+    planRequest.plan_req.playersNum = static_cast<unsigned char>(_agentSize.size());
+
+//    req.plan_req.hint.clear();
+//    for (int i = 0; i < hint->size(); ++i) {
+//        req.plan_req.hint.push_back(hint[i]);
+//    }
+
+}
+
+plan_serviceRequest CCoach::getPlanRequest(){
+    requestForPlan = true;
+    return planRequest;
+
+}
+
+void CCoach::setPlanResponse(parsian_msgs::plan_serviceResponse planResponse){
+    receivedPlan.the_plan = planResponse.the_plan;
 }
 

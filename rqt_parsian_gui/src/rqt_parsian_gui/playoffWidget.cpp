@@ -252,6 +252,7 @@ void PlayOffWidget::slt_deactive() {
             master->setEnabled(true);
 
         }
+
     slt_updatePlans();
 }
 

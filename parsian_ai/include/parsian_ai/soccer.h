@@ -30,6 +30,8 @@ public:
 
     virtual void customControl(bool& custom);
 
+    CCoach* getCoach();
+
     Agent **agents;
     CCoach *coach;
     clock_t realTimeTime;
