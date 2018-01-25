@@ -78,8 +78,8 @@ class KickProfiler():
         self.stepnum = 0
         self.robot1_overspeed = False
         self.robot2_overspeed = False
-        self.startingkickspeed = 200
-        self.endingkickspeed = 1023
+        self.startingkickspeed = 5
+        self.endingkickspeed = 15
         self.current_speed = self.startingkickspeed
 
         self.robot1_vels = {}
@@ -91,9 +91,12 @@ class KickProfiler():
 
         self.last_speed1 = 1
         self.last_speed2 = 1
-        self.speed_step = 100
+        self.speed_step = 1
         self.robot1_count = 1
         self.robot2_count = 1
+        self.robot1_bad_count = 0
+        self.robot2_bad_count = 0
+        self.bad_flag = False
         self.calculatedone = False
         self.savingdone = False
         self.setupdone = False
@@ -122,6 +125,9 @@ class KickProfiler():
         self.last_speed2 = 1
         self.robot1_count = 1
         self.robot2_count = 1
+        self.robot1_bad_count = 0
+        self.robot2_bad_count = 0
+        self.bad_flag = False
         self.robot1_overspeed = False
         self.robot2_overspeed = False
         self.calculatedone = False
@@ -147,7 +153,7 @@ class KickProfiler():
 
     def wmCallback(self, data):
         # type:(parsian_world_model) ->object
-        rospy.loginfo(self.state)
+        #rospy.loginfo(self.state)
         self.m_wm = data
         self.getrobots(self.robotid1, self.robotid2)
         #starting the profile --> both robots to their starting points --> til they arrived their destination
@@ -198,7 +204,11 @@ class KickProfiler():
             self.velrecorder.append(math.hypot(data.ball.vel.x, data.ball.vel.y))
         #the ball outside the desired area --> both robots noAction --> till the ball come back
         if data.ball.pos.x > self.X2M or data.ball.pos.x < self.X1M or data.ball.pos.y > self.Y1M or data.ball.pos.y < self.Y2M:
-            self.state = State.STANDBY
+            if self.state == State.RECEIVE or self.state == State.NONE or self.state == State.CALCULATING:
+                if self.calculatedone:
+                    self.state = State.STANDBY
+            else:
+                self.state = State.STANDBY
         if self.state == State.STANDBY:
             if self.standby():
                 self.state = State.GOBEHINDSMW
@@ -253,7 +263,7 @@ class KickProfiler():
     #and get some positions, as the shoot power rise up the robots distanse increases
     def getpositions(self, firstp, secondp):
         # type: (point.Point, point.Point) ->object
-        self.stepnum = (1000 - self.startingkickspeed)/self.speed_step + 2
+        self.stepnum = (self.endingkickspeed - self.startingkickspeed)/self.speed_step + 2
         # x1 == x2
         if secondp.x == firstp.x:
             if (firstp.y > secondp.y):
@@ -619,6 +629,7 @@ class KickProfiler():
                 self.velrecorder[:] = []
                 self.robot1_count += 1
             else:
+                self.robot1_bad_count += 1
                 rospy.loginfo('robot1 @@unvalid, current: %f ,speed: %f' %(self.velrecorder[0], self.current_speed))
 
         if self.kickstat == KickStat.ROBOT2RETREATING:
@@ -630,9 +641,14 @@ class KickProfiler():
                 self.velrecorder[:] = []
                 self.robot2_count += 1
             else:
+                self.robot2_bad_count += 1
                 rospy.loginfo('robot2 @@unvalid, current: %f,speed: %f' %(self.velrecorder[0], self.current_speed))
 
-        if self.robot1_count > self.repeat and self.robot2_count > self.repeat:
+        if self.robot1_bad_count > 2 and self.robot2_bad_count > 2 or self.robot1_bad_count > 2 and self.robot2_count > self.repeat or self.robot2_bad_count > 2 and self.robot1_count > self.repeat:
+            self.bad_flag = True
+
+        if self.robot1_count > self.repeat and self.robot2_count > self.repeat or self.bad_flag:
+            rospy.loginfo("step up")
             if self.current_speed == 1000:      #WTF: i added this
                 self.speed_step = 23
 
@@ -640,9 +656,13 @@ class KickProfiler():
             self.startingpoint1 = self.positions1[self.pos_count]
             self.startingpoint2 = self.positions2[self.pos_count]
             self.robot1_count = 1
-            self.robot2_count =1
-            self.last_speed1 = self.robot1_vels[self.current_speed][0]
-            self.last_speed2 = self.robot2_vels[self.current_speed][0]
+            self.robot2_count = 1
+            self.robot1_bad_count = 0
+            self.robot2_bad_count = 0
+            if self.bad_flag:
+                self.last_speed1 = self.robot1_vels[self.current_speed][0]
+                self.last_speed2 = self.robot2_vels[self.current_speed][0]
+            self.bad_flag = False
             self.current_speed += self.speed_step
             if self.current_speed > self.endingkickspeed:  #1023 WTF: i added this
                 self.state = State.FINISHED
@@ -795,8 +815,10 @@ class KickProfiler():
     def signal_handler(self, signal, frame):
         print('You pressed Ctrl+C!')
         if not self.savingdone:
-            self.save()
-            self.savingdone = True
+            ans = raw_input("save the results?(y,n)")
+            if ans == "y":
+                self.save()
+                self.savingdone = True
         sys.exit(0)
 
 if __name__ == '__main__':
