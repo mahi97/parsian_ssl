@@ -225,7 +225,9 @@ class Handler(FileSystemEventHandler):
         for plan in self.__final_dict:
             if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
                     or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                print("ball pos matched")
+                print("ball pos matched: " + plan["filename"].split("plans/")[1]
+                      + ", agent size: " + str(len(plan["agentInitPos"])) + ", " + plan["planMode"]
+                      + ", lastDist: " + str(plan["lastDist"]) + ", chance: " + str(plan["chance"]))
                 if len(plan["agentInitPos"]) >= player_num \
                         and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                         and plan["planMode"] == plan_mode:
@@ -246,7 +248,7 @@ class Handler(FileSystemEventHandler):
                 if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
                         or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
                     print("ball pos matched: " + plan["filename"].split("plans/")[1]
-                          + "agent size: " + str(len(plan["agentInitPos"])) + plan["planMode"]
+                          + ", agent size: " + str(len(plan["agentInitPos"])) + ", " + plan["planMode"]
                           + ", lastDist: " + str(plan["lastDist"]) + ", chance: " +str(plan["chance"]))
                     if len(plan["agentInitPos"]) >= player_num \
                             and plan["chance"] > 0 and plan["lastDist"] >= 0 \
@@ -310,7 +312,6 @@ class Handler(FileSystemEventHandler):
         return self.__final_dict
 
     def message_generator(self, plan_dict):
-        plan_response = parsian_plan
         plan_msg = parsian_plan()
         plan_msg.isActive = plan_dict["isActive"]
         plan_msg.isMaster = plan_dict["isMaster"]
@@ -323,7 +324,12 @@ class Handler(FileSystemEventHandler):
         plan_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
         plan_msg.planRepeat = plan_dict["planRepeat"]
-        plan_msg.succesRate = plan_dict["successRate"]
+        plan_msg.successRate = plan_dict["successRate"]
+        i = 0
+        for pos in plan_dict["agentInitPos"]:
+            plan_msg.agentInitPos[i].x = pos["x"]
+            plan_msg.agentInitPos[i].y = pos["y"]
+            i += 1
         return plan_msg
 
 

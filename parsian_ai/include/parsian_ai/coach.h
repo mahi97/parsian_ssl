@@ -115,6 +115,9 @@ private:
     int cyclesWaitAfterballMoved;
     QList <Agent*> lastDefenseAgents;
 
+    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
+    NGameOff::SPlan* planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
+
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
