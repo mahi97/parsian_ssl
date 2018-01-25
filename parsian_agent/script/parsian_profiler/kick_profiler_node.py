@@ -665,7 +665,7 @@ class KickProfiler():
             file1.close()
             file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
                                            str(int(round(time.time()/10))) + + "(spin_" + str(self.spinner) + ")_kick.profile"), "w+")
-            file2.write(str(self.robot1_vels))
+            file2.write(str(self.robot2_vels))
             file2.close()
         if self.spinner == 0:
             file1 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid1) + "_" +
@@ -674,7 +674,7 @@ class KickProfiler():
             file1.close()
             file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
                                            str(int(round(time.time()/10))) + "_kick(nospin).profile"), "w+")
-            file2.write(str(self.robot1_vels))
+            file2.write(str(self.robot2_vels))
             file2.close()
         rospy.loginfo("saved!!")
 
