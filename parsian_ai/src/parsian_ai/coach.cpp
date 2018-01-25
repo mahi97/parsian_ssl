@@ -1411,6 +1411,9 @@ void CCoach::initStaticPlay(POMODE _mode, const QList<int> &_agentSize) {
             break;
     }
 
+    planRequest.plan_req.ballPos.x = wm->ball->pos.x;
+    planRequest.plan_req.ballPos.y = wm->ball->pos.y;
+
     planRequest.plan_req.playersNum = static_cast<unsigned char>(_agentSize.size());
 
 //    req.plan_req.hint.clear();

@@ -36,8 +36,11 @@ class getPlan:
     def handle_plan_request(self, req):
         # type: (plan_serviceRequest) -> req
         response = plan_serviceResponse()
-        out = self.__w.choose_plan(req.plan_req.playersNum, req.plan_req.gameMode)
-        return out
+        out = self.__w.choose_plan(req.plan_req.playersNum, req.plan_req.gameMode, req.plan_req.ballPos.x, req.plan_req.ballPos.y)
+        if out is not None:
+            return out
+        else:
+            print ("No plan received")
 
 
 if __name__ == '__main__':

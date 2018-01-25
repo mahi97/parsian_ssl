@@ -1,7 +1,6 @@
 import time
 import os
 import signal
-
 import sys
 
 import re
@@ -54,8 +53,8 @@ class Watcher:
             return None
         return self.__event_handler.update_master_active(name_list, plan_index, is_master, is_active)
 
-    def choose_plan(self, player_num, game_mode):
-        return self.__event_handler.choose_plan(player_num, game_mode)
+    def choose_plan(self, player_num, game_mode, ball_x, ball_y):
+        return self.__event_handler.choose_plan(player_num, game_mode, ball_x, ball_y)
 
     def signal_handler(self, signal, frame):
         print("\nctrl+C pressed!")
@@ -200,51 +199,7 @@ class Handler(FileSystemEventHandler):
     def shuffle_indexing(self, alist):
         random.shuffle(alist)
 
-    def read_plan(self, plan_path):
-        print("opening plan " + str(plan_path).split("/plans")[1])
-        with open(str(plan_path)) as json_data:
-            a = (json.load(json_data))
-
-            print(a["apiVersion"])
-            print(a["id"])
-
-            plans_cnt = len(a["plans"])
-            for p_i in range(0, plans_cnt):
-                print("-------------------------------plan %d:" % p_i)
-                plan_i = a["plans"][p_i]
-                agents_cnt = len(plan_i["agents"])
-                for p_a_i in range(0, agents_cnt):
-                    plan_i_ag = plan_i["agents"][p_a_i]
-                    print("agent ID: ")
-                    print(plan_i_ag["ID"])
-                    plan_i_ag_i_pos = plan_i_ag["positions"]
-                    agents_pos_cnt = len(plan_i_ag["positions"])
-                    for p_a_p_i in range(0, agents_pos_cnt):
-                        print(plan_i_ag_i_pos[p_a_p_i]["angel"])
-                        print(plan_i_ag_i_pos[p_a_p_i]["pos-x"])
-                        print(plan_i_ag_i_pos[p_a_p_i]["pos-y"])
-                        print(plan_i_ag_i_pos[p_a_p_i]["tolerance"])
-                        plan_i_ag_i_pos_i_s = plan_i_ag_i_pos[p_a_p_i]["skills"]
-                        agents_pos_skill_cnt = len(plan_i_ag_i_pos[p_a_p_i]["skills"])
-                        for p_a_p_S_i in range(0, agents_pos_skill_cnt):
-                            print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["flag"])
-                            print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["name"])
-                            print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["primary"])
-                            print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["secondary"])
-                            if "target" in plan_i_ag_i_pos_i_s[p_a_p_S_i]:
-                                print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["target"]["agent"])
-                                print(plan_i_ag_i_pos_i_s[p_a_p_S_i]["target"]["index"])
-                            else:
-                                print("no target for this skill")
-                            print("")
-                print(plan_i["chance"])
-                print(plan_i["lastDist"])
-                print(plan_i["planMode"])
-                print(plan_i["tags"])
-                print(plan_i["ballInitPos"]["x"])
-                print(plan_i["ballInitPos"]["y"])
-
-    def choose_plan(self, player_num, game_mode):
+    def choose_plan(self, player_num, game_mode, ball_x, ball_y):
         # DIRECT   = 1
         # INDIRECT = 2
         # KICKOFF  = 3
@@ -256,27 +211,57 @@ class Handler(FileSystemEventHandler):
         elif game_mode == 3:
             plan_mode = "KICKOFF"
 
-        # get a sublist from final_list based on player_num and game_mode
+        # get a sublist from final_list based on player_num, game_mode and ball_pos
         sublist = []
+        rad = 0.9
+        # normal checking:
         for plan in self.__final_dict:
-            if len(plan["agentInitPos"]) >= player_num \
-                    and plan["planMode"] == plan_mode \
-                    and plan["chance"] > 0 and plan["lastDist"] >= 0:
-                print("matched: " + plan["filename"].split("plans/")[1]
-                      + " --- num agents: " + str(len(plan["agentInitPos"])))
-                sublist.append(plan)
+            if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
+                    or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+                print("ball pos matched")
+                if len(plan["agentInitPos"]) >= player_num \
+                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                        and plan["planMode"] == plan_mode:
+                    print("matched: " + plan["filename"].split("plans/")[1]
+                          + " --> num agents: " + str(len(plan["agentInitPos"])))
+                    sublist.append(plan)
 
         if len(sublist) > 0:
             return self.message_generator(sublist[0])
+
+        # indirect plan can work for direct mode
+        elif plan_mode == "DIRECT":
+            print ("searching for Indirect plans for direct mode...")
+            for plan in self.__final_dict:
+                if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
+                        or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+                    print("ball pos matched")
+                    if len(plan["agentInitPos"]) >= player_num \
+                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                            and plan["planMode"] == "INDIRECT":
+                        print("matched: " + plan["filename"].split("plans/")[1]
+                              + " --> num agents: " + str(len(plan["agentInitPos"])))
+                        sublist.append(plan)
+            if len(sublist) > 0:
+                return self.message_generator(sublist[0])
+            else:
+                print ("\nNO PLAN MATCHED!\n")
+                print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num) + "\n")
         else:
             print ("\nNO PLAN MATCHED!\n")
             print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num)+"\n")
-            print ("All available plans:")
-            for d in self.__final_dict:
-                print d['filename'].split("/")[-1]
-                print ("\tagent size: " + str(len(d["agentInitPos"])) + ", "+d["planMode"]
-                       + ", chance: " + str(d["chance"])+", last dist: " + str(d["lastDist"]))
+            # print ("All available plans:")
+            # for d in self.__final_dict:
+            #     print (d['filename'].split("/")[-1] + "\tagent size: "
+            #            + str(len(d["agentInitPos"])) + ", "+d["planMode"]
+            #            + ", chance: " + str(d["chance"])+", last dist: " + str(d["lastDist"]))
             return None
+
+    def circle_contains(self, x, y, r, point_x, point_y):
+        if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
+            return False
+        else:
+            return True
 
     def get_all_plans_msgs(self):
         plans_msg = []
