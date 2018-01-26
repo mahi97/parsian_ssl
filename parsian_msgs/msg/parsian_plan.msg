@@ -7,5 +7,7 @@ float64 lastDist
 string[] tags
 string planMode
 vector2D ballInitPos
-int32 succesRate
+int32 successRate
 int32 planRepeat
+vector2D[8] agentInitPos
+parsian_msgs/parsian_plan_agent[8] agents

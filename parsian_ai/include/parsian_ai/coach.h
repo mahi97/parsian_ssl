@@ -51,6 +51,9 @@ public:
     plan_serviceRequest getPlanRequest();
     void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
 
+    ros::ServiceClient plan_client;
+    void setPlanClient(ros::ServiceClient _plan_client);
+
 
 private:
     /////////////////////transition to force start
@@ -111,6 +114,9 @@ private:
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
     QList <Agent*> lastDefenseAgents;
+
+    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
+    NGameOff::SPlan* planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
 
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
