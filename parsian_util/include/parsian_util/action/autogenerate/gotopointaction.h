@@ -13,12 +13,13 @@
 class GotopointAction : public Action {
 
 public:
-
+    GotopointAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(GotopointAction, bool, Dynamicstart, dynamicStart);

@@ -13,12 +13,13 @@
 class KickAction : public Action {
 
 public:
-
+    KickAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(KickAction, double, Tolerance, tolerance);

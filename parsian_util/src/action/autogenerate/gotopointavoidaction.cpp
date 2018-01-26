@@ -2,6 +2,15 @@
 
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 
+GotopointavoidAction::GotopointavoidAction() {
+       avoidPenaltyArea = false;
+       noAvoid = false;
+       avoidCenterCircle = false;
+       ballObstacleRadius = 0.0;
+       drawPath = false;
+       diveMode = false;
+}
+
 void GotopointavoidAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_gotoPointAvoid msg = *((parsian_msgs::parsian_skill_gotoPointAvoid*)_msg);
         avoidPenaltyArea = msg.avoidPenaltyArea;
@@ -31,8 +40,11 @@ void* GotopointavoidAction::getMessage() {
 
 
 QString GotopointavoidAction::getActionName(){
-    static QString name("GotopointavoidAction");
-    return name;
+    return SActionName();
+}
+
+QString GotopointavoidAction::SActionName(){
+    return QString{"GotopointavoidAction"};
 }
 
 void GotopointavoidAction::clearOurrelax() {

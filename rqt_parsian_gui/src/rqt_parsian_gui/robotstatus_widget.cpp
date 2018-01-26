@@ -2,8 +2,8 @@
 // Created by noOne on 11/30/2017.
 //
 #include <rqt_parsian_gui/robotstatus_widget.h>
-
-
+#include <ros/package.h>
+#include <rospack/rospack.h>
 
 namespace rqt_parsian_gui
 {
@@ -11,7 +11,10 @@ namespace rqt_parsian_gui
 
         this->setFixedSize(400, 150);
 
-        QFile *file=new QFile("resource/style_sheet/check_box_fault.ssh");
+	std::string s;
+        s = ros::package::getPath("rqt_parsian_gui");
+        QFile *file=new QFile((s+"resource/style_sheet/check_box_fault.ssh").c_str());
+
         bool bOpened = file->open(QFile::ReadOnly);
         assert (bOpened);
         QString styleSheet_fault = QLatin1String(file->readAll());
@@ -77,7 +80,7 @@ namespace rqt_parsian_gui
 
         //########################################### load image
 
-        color = (team_color == parsian_msgs::parsian_team_config::isYellow) ? 'y' : 'b';
+        color = (team_color == parsian_msgs::parsian_team_config::YELLOW) ? 'y' : 'b';
         draw_dir(0);
         //############################################################### progress bars
 
@@ -204,9 +207,6 @@ namespace rqt_parsian_gui
     void RobotStatusWidget::draw_dir(double ang){
         agent_i = new QPixmap(QPixmap::fromImage(QImage(getFileName())));
         agent_p = new QPainter(agent_i);
-        QBrush *b = new QBrush();
-        b->setColor(Qt::red);
-        agent_p->setBrush(*b);
         agent_p->drawLine(25, 25, static_cast<int>(25 * (1 + std::cos(ang))),
                           static_cast<int>(25 * (1 - std::sin(ang))));
         vel_dir->setPixmap(*agent_i);

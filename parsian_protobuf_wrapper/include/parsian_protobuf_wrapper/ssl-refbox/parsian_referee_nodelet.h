@@ -14,6 +14,8 @@
 #include <parsian_protobuf_wrapper/common/net/robocup_ssl_client.h>
 #include <parsian_protobuf_wrapper/ssl-refbox/convert/convert_referee.h>
 
+#include <parsian_msgs/parsian_team_config.h>
+
 #include "parsian_protobuf_wrapper/refereeConfig.h"
 
 namespace parsian_protobuf_wrapper {
@@ -33,14 +35,19 @@ namespace parsian_protobuf_wrapper {
         void reconnect();
         void timerCb(const ros::TimerEvent& event);
         void callback(const protobuf_wrapper_config::refereeConfig &config, uint32_t level) ;
+        void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+
 
         boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::refereeConfig>> server;
 
 
         SSL_Referee ssl_referee;
-        std::string teamColor;
+        //std::string teamColor;
         ros::Publisher ssl_referee_pub;
         ros::Timer timer;
+
+        ros::Subscriber team_config_sub;
+
 
     };
 

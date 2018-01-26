@@ -2,6 +2,12 @@
 
 #include <parsian_util/action/autogenerate/receivepassaction.h>
 
+ReceivepassAction::ReceivepassAction() {
+       slow = false;
+       receiveRadius = 0.0;
+       ignoreAngle = false;
+}
+
 void ReceivepassAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_receivePass msg = *((parsian_msgs::parsian_skill_receivePass*)_msg);
         slow = msg.slow;
@@ -25,7 +31,10 @@ void* ReceivepassAction::getMessage() {
 
 
 QString ReceivepassAction::getActionName(){
-    static QString name("ReceivepassAction");
-    return name;
+    return SActionName();
+}
+
+QString ReceivepassAction::SActionName(){
+    return QString{"ReceivepassAction"};
 }
 

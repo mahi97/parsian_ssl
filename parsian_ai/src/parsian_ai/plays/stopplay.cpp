@@ -30,25 +30,24 @@ void CStopPlay::stopPosition() {
     setFormation("Stop7");
 
     for (int i = 0;i < 6 ; i++) {
-        if(conf.LineUpPosition == "OurCornerL") {
-            rolePosition[i] = Vector2D(0.25*i-0.5, wm->field->_FIELD_HEIGHT/2);
-
-        } else if(conf.LineUpPosition == "OurCornerR") {
-            rolePosition[i] = Vector2D(0.25*i-0.5, - wm->field->_FIELD_HEIGHT/2);
-
-        } else if(conf.LineUpPosition == "parsian") {
-//            if (conf()->LocalSettings_OurTeamSide == "Left") {
-                rolePosition[i] = Vector2D(0.25*i-1, - wm->field->_FIELD_HEIGHT/2);
+//        if(conf.LineUpPosition == "OurCornerL") {
+//            rolePosition[i] = Vector2D(0.25*i-0.5, wm->field->_FIELD_HEIGHT/2);
 //
-//            } else {
-//                rolePosition[i] = Vector2D((-0.25*i+1), - wm->field->_FIELD_HEIGHT/2);
+//        } else if(conf.LineUpPosition == "OurCornerR") {
+//            rolePosition[i] = Vector2D(0.25*i-0.5, - wm->field->_FIELD_HEIGHT/2);
 //
-//            }
-        }
+//        } else if(conf.LineUpPosition == "parsian") {
+            if (teamConfig.side == teamConfig.LEFT) {
+//                rolePosition[i] = Vector2D(0.25*i-1, - wm->field->_FIELD_HEIGHT/2);
+
+            } else {
+////                rolePosition[i] = Vector2D((-0.25*i+1), - wm->field->_FIELD_HEIGHT/2);
+            }
+//        }
 
     }
 
-    for(int i = 0; i < agentsID.size(); i++) {
+    for(auto i = 0; i < agentsID.size(); i++) {
         gpa[i]->setTargetpos(rolePosition[i]);
         gpa[i]->setTargetdir(wm->field->oppGoal());
         agentsID[i]->action = gpa[i];

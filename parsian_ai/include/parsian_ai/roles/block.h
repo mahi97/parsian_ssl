@@ -7,10 +7,10 @@
 class CRoleBlockInfo : public CRoleInfo
 {
 public:
-    CRoleBlockInfo(QString _roleName);
+	explicit CRoleBlockInfo(QString _roleName);
 	void findPos( bool blockGoal );
     Vector2D blockPosition;
-    void reset(){}
+
 };
 
 class CRoleBlock : public CRole
@@ -19,7 +19,7 @@ protected:
     GotopointavoidAction* gotopoint;
     static CRoleBlockInfo* roleInfo;
 public:
-    CRoleBlock(Agent *_agent);
+    explicit CRoleBlock(Agent *_agent);
     ~CRoleBlock();
     void execute();
     double progress();

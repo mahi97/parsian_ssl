@@ -13,17 +13,20 @@
 class OnetouchAction : public Action {
 
 public:
-
+    OnetouchAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(OnetouchAction, bool, Chip, chip);
     SkillProperty(OnetouchAction, double, Kickspeed, kickSpeed);
     SkillProperty(OnetouchAction, bool, Shottoemptyspot, shotToEmptySpot);
+    SkillProperty(OnetouchAction, bool, Fastestpoint, fastestPoint);
+    SkillProperty(OnetouchAction, double, Reachbeforeballtime, reachBeforeBallTime);
     SkillProperty(OnetouchAction, Vector2D, Waitpos, waitPos);
     SkillProperty(OnetouchAction, Vector2D, Target, target);
 

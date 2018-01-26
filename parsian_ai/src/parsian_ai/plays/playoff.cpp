@@ -7,7 +7,7 @@ CPlayOff::CPlayOff() : CMasterPlay()
     blockerState=0;
     blockerID=-1;
     blockerStopStates=Diversion;
-    qDebug() << "Bring yourself back online playoff";
+    ROS_INFO("Bring yourself back online playoff");
 
     decidePlan = true;
     agentSize = 1;
@@ -62,12 +62,7 @@ CPlayOff::~CPlayOff()
 bool CPlayOff:: isBlockDisturbing(){
     if(blockerState == 7)
         return true;
-    else if(conf.UseForcedBlock){
-//        blockerID=knowledge->nearestOppToBall; // TODO : FIX
-        return true;
-    }
-    else
-    return false;
+    return conf.UseForcedBlock;
 
 }
 
@@ -85,7 +80,6 @@ void CPlayOff::globalExecute() {
         }
 
 
-        Q_ASSERT(masterPlan != nullptr);
         if(masterPlan != nullptr) {
             DBUG(QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
 
@@ -110,8 +104,10 @@ void CPlayOff::globalExecute() {
                     staticExecute();
                 }
             }
-            else
+            else {
                 staticExecute();
+
+            }
 
 
         } else {
@@ -1828,6 +1824,7 @@ void CPlayOff::reset(){
     blockerStep = S0;
 
     DBUG(QString("reset Plan"),D_MAHI);
+    ROS_INFO("reset Plan");
 }
 
 void CPlayOff::init(const QList<Agent*>& _agents){

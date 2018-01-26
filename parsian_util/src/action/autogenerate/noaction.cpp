@@ -2,6 +2,10 @@
 
 #include <parsian_util/action/autogenerate/noaction.h>
 
+NoAction::NoAction() {
+       waithere = false;
+}
+
 void NoAction::setMessage(const void* _msg) {
     parsian_msgs::parsian_skill_no msg = *((parsian_msgs::parsian_skill_no*)_msg);
         waithere = msg.waithere;
@@ -17,7 +21,10 @@ void* NoAction::getMessage() {
 
 
 QString NoAction::getActionName(){
-    static QString name("NoAction");
-    return name;
+    return SActionName();
+}
+
+QString NoAction::SActionName(){
+    return QString{"NoAction"};
 }
 

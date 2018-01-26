@@ -24,11 +24,13 @@ void CommunicationNodelet::onInit() {
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
     statusPub  = n.advertise<parsian_msgs::parsian_robots_status>("/robots_status",1000);
     robotPacketSub   = n.subscribe("/packets" , 10000, &CommunicationNodelet::callBack, this);
+    team_config_sub = n.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& CommunicationNodelet::teamConfigCb, this, _1));
+
 
     communicator.reset(new CCommunicator);
     /////connect serial
     while(!communicator->isSerialConnected()){
-        communicator->connectSerial("/dev/ttyUSB0");
+        communicator->connectSerial(conf.serial_connect.c_str());
     }
 
     server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
@@ -50,7 +52,8 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
-    communicator->packetCallBack(_packet);
+    if (realGame)
+        communicator->packetCallBack(_packet);
 
 }
 
@@ -74,6 +77,12 @@ void CommunicationNodelet::recTimerCb(const ros::TimerEvent &event) {
 
 void CommunicationNodelet::ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level)
 {
-  ROS_INFO_STREAM("callback called! with" << config.test_param);
+  conf = config;
 }
+
+void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+{
+    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
+}
+
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);

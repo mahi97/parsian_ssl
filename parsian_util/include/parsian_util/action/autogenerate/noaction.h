@@ -13,12 +13,13 @@
 class NoAction : public Action {
 
 public:
-
+    NoAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(NoAction, bool, Waithere, waithere);

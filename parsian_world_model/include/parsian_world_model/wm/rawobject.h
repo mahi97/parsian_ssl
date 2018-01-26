@@ -8,18 +8,18 @@
 #include <parsian_util/geom/geom.h>
 #include <parsian_world_model/wm/movingobject.h>
 
-class CMovingObject;
+class MovingObject;
 
 class CRawObject
 {
 public:
-    CRawObject(int frameCnt, Vector2D _pos, double orientation, int _ID, double _confidence,CMovingObject* _ref= nullptr, int _cam_id=0, double t=0.0);
+    CRawObject(int frameCnt, Vector2D _pos, double orientation, int _ID, double _confidence,MovingObject* _ref= nullptr, int _cam_id=0, double t=0.0);
     CRawObject();
     Vector2D pos, dir;
     int frameCount;
     int ID;
     int cam_id;
-    CMovingObject* ref;
+    MovingObject* ref;
     bool updated;
     double confidence;
     double time;

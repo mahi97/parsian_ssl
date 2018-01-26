@@ -13,12 +13,13 @@
 class {{action_name}} : {{#has_base}}public {{base_action}} {{/has_base}}{{^has_base}}public Action{{/has_base}} {
 
 public:
-
+    {{action_name}}();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
 {{#properties}}

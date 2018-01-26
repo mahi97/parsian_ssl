@@ -5,8 +5,9 @@ GameState *gameState;
 GameState::GameState()
 {
     state= States::PlayOff;
-    ourScore=0;
-    theirScore=0;
+    ourScore = 0;
+    theirScore = 0;
+    command_ctr = 0;
 }
 
 int GameState::getOurScore(){return ourScore;}
@@ -14,9 +15,15 @@ int GameState::getTheirScore(){ return theirScore;}
 
 void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
+
+    if(ref_wrapper->command_counter == command_ctr)
+        return;
+    command_ctr = ref_wrapper->command_counter;
     ///////////////////// when we are ready any command means force start
-    if(isReady && state != States::PlayOn){
+    if(isReady && (state != States::PlayOn) && (ref_wrapper->command.command != ssl_refree_command::HALT)
+            && (ref_wrapper->command.command != ssl_refree_command::STOP)){
         state = States::PlayOn;
+        isReady = false;
         return;
     }
 
@@ -29,12 +36,13 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
     case ssl_refree_stage::POST_GAME:
         state = States::PostGame;
         return;
+        default:break;
     }
 
     switch (ref_wrapper->command.command) {
     case ssl_refree_command::FORCE_START:
         state = States::PlayOn;
-        isReady=true;
+        isReady=false;
         return;
     case ssl_refree_command::HALT:
         state = States::Halt;
@@ -104,7 +112,9 @@ void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
         state= (ref_wrapper->stage.stage==ssl_refree_stage::PENALTY_SHOOTOUT)?
                States::OurPenaltyShootOut : States::OurPenaltyKick;
         return;
+        default:break;
     }
+
 }
 
 bool GameState::isPlayOn() { return state == States::PlayOn; }
@@ -150,7 +160,13 @@ bool GameState::theirPenaltyShootout(){return state == States::TheirPenaltyShoot
 bool GameState::ready(){
     return isReady;
 }
+
 /////
 States GameState::getState(){
     return state;
+}
+
+void GameState::setState(const States &s, bool isReady) {
+    state = s;
+    this->isReady = isReady;
 }

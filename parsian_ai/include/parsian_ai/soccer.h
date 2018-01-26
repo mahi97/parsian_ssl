@@ -30,13 +30,16 @@ public:
 
     virtual void customControl(bool& custom);
 
-    CWorldModel* wm;
+    CCoach* getCoach();
 
     Agent **agents;
     CCoach *coach;
     clock_t realTimeTime;
     struct timeval t1, t2;
 private:
+    KickAction* kick ;
+    GotopointavoidAction* gtp ;
+
 
 };
 

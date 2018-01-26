@@ -1,13 +1,9 @@
-//
-// Created by parsian-ai on 9/22/17.
-//
-
 #include <parsian_ai/ai.h>
 
 AI::AI() {
-    soccer = new CSoccer();
     wm = new WorldModel();
-    gameState =new GameState();
+    gameState = new GameState();
+    soccer = new CSoccer();
 }
 
 AI::~AI() {
@@ -21,69 +17,96 @@ void AI::execute() {
 }
 
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
-    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
-        if (wm->our.activeAgentID(i) == robotID) {
-            if (soccer->agents[robotID]->action->getActionName() == KickAction::getActionName()) {
+    if (wm->our.data->activeAgents.contains(robotID) != nullptr) {
+        if (soccer->agents[robotID]->action != nullptr) {
+            ROS_INFO_STREAM("robot ID : "<< robotID << "task : " << soccer->agents[robotID]->action->getActionName().toStdString());
+            if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
                 task = reinterpret_cast<parsian_skill_kick *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].kickTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].KICK;
 
-            } else if (soccer->agents[robotID]->action->getActionName() == GotopointavoidAction::getActionName()) {
+            } else if (soccer->agents[robotID]->action->getActionName() == GotopointavoidAction::SActionName()) {
                 parsian_msgs::parsian_skill_gotoPointAvoid *task;
                 task = reinterpret_cast<parsian_skill_gotoPointAvoid *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].gotoPointAvoidTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].GOTOPOINTAVOID;
 
-            } else if (soccer->agents[robotID]->action->getActionName() == GotopointAction::getActionName()) {
+            } else if (soccer->agents[robotID]->action->getActionName() == GotopointAction::SActionName()) {
                 parsian_msgs::parsian_skill_gotoPoint *task;
                 task = reinterpret_cast<parsian_skill_gotoPoint *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].gotoPointTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].GOTOPOINT;
 
-            } else if (soccer->agents[robotID]->action->getActionName() == ReceivepassAction::getActionName()) {
+            } else if (soccer->agents[robotID]->action->getActionName() == ReceivepassAction::SActionName()) {
                 parsian_msgs::parsian_skill_receivePass *task;
                 task = reinterpret_cast<parsian_skill_receivePass *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].receivePassTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].RECIVEPASS;
 
-            } else if (soccer->agents[robotID]->action->getActionName() == OnetouchAction::getActionName()) {
+            } else if (soccer->agents[robotID]->action->getActionName() == OnetouchAction::SActionName()) {
                 parsian_msgs::parsian_skill_oneTouch *task;
                 task = reinterpret_cast<parsian_skill_oneTouch *>(soccer->agents[robotID]->action->getMessage());
                 robotsTask[robotID].oneTouchTask = *task;
                 robotsTask[robotID].select = robotsTask[robotID].ONETOUCH;
+
+            } else if (soccer->agents[robotID]->action->getActionName() == NoAction::SActionName()) {
+                parsian_msgs::parsian_skill_no *task;
+                task = reinterpret_cast<parsian_skill_no*>(soccer->agents[robotID]->action->getMessage());
+                robotsTask[robotID].noTask = *task;
+                robotsTask[robotID].select = robotsTask[robotID].NOTASK;
             }
+        } else {
+            auto *task = new parsian_skill_no;
+            task->waithere = static_cast<unsigned char>(false);
+            robotsTask[robotID].noTask = *task;
+            robotsTask[robotID].select = robotsTask[robotID].NOTASK;
+
         }
     }
+
     return robotsTask[robotID];
 }
-
 
 void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 
 }
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
-
     wm->update(_wm);
-
+    for(int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
+        soccer->agents[i]->self = *wm->our[i];
+    }
 }
 
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
-    if(gameState->ready()) {
-        DEBUG("is ready", D_MAHI);
-    }
+//    if(_ref->command.command == ssl_refree_command::STOP)
+//    {
+//        ROS_INFO_STREAM("ref vaghean halte");
+//    }
+//    if(gameState->ready()) {
+//        ROS_INFO_STREAM("ref ready");
+//    }
+    ROS_INFO_STREAM("ref count : "<< _ref->command_counter);
+
     if(gameState->isPlayOff()) {
-        DEBUG("is play off", D_MAHI);
+        ROS_INFO_STREAM("ref play off");
     }
     if(gameState->isPlayOn()) {
-        DEBUG("is play on", D_MAHI);
+        ROS_INFO_STREAM("ref play on");
     }
-    if(gameState->canMove()) {
-        DEBUG("is not halt", D_MAHI);
+    if(gameState->ourDirectKick()) {
+        ROS_INFO_STREAM("ref our Direct");
     }
-    DEBUG("is running", D_MAHI);
 
-    soccer->updateTask();
+    if(gameState->canMove()) {
+        ROS_INFO_STREAM("ref !halt");
+    }
+
+
+}
+
+CSoccer* AI::getSoccer() {
+    return soccer;
 }

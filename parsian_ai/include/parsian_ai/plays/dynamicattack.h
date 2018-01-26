@@ -5,6 +5,7 @@
 
 //#define _MAX_REGION 7
 
+
 struct SDynamicAgent {
 
     void init(DynamicEnums::DynamicSkill _skill,

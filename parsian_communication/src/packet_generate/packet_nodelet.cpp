@@ -23,27 +23,17 @@ void PacketNodelet::onInit() {
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("debugs",1000);
     packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets",1000);
 
-    robotPacketSub0   = n.subscribe("robot_command0"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub1   = n.subscribe("robot_command1"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub2   = n.subscribe("robot_command2"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub3   = n.subscribe("robot_command3"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub4   = n.subscribe("robot_command4"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub5   = n.subscribe("robot_command5"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub6   = n.subscribe("robot_command6"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub7   = n.subscribe("robot_command7"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub8   = n.subscribe("robot_command8"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub9   = n.subscribe("robot_command9"  , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub10  = n.subscribe("robot_command10" , 10000, &PacketNodelet::callBack, this);
-    robotPacketSub11  = n.subscribe("robot_command11" , 10000, &PacketNodelet::callBack, this);
+    for ( int i = 0 ; i < _MAX_ROBOT_NUM; i++) {
+        robotPacketSub[i]   = n.subscribe(QString("/agent_%1/command").arg(i).toStdString(), 10, &PacketNodelet::callBack, this);
+    }
+
 
 
     visinSub  = n.subscribe("world_model" , 1000, &PacketNodelet::syncData, this);
 
-    for(int i = 0 ; i < _MAX_ROBOT_NUM ; i ++ )
-    {
-        for (int j = 0 ; j < _ROBOT_PACKET_SIZE ; j ++ )
-        {
-            robotPackets[i][j] = 255;
+    for (auto &robotPacket : robotPackets) {
+        for (unsigned char &j : robotPacket) {
+            j = 255;
         }
     }
     visionCounter= 0;
@@ -55,10 +45,10 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     ROS_INFO("miad inja");
     unsigned char outputBuffer[_ROBOT_PACKET_SIZE] = {0};
     unsigned char robotId = _packet->robot_id;
-    int kickNumber = round(_packet->kickSpeed);
+    int kickNumber = static_cast<int>(round(_packet->kickSpeed));
 
     outputBuffer[0] = 0x99;
-    outputBuffer[1] = robotId & 0x0F;
+    outputBuffer[1] = robotId & static_cast<unsigned char>(0x0F);
     if (_packet->roller_speed != 0)
         outputBuffer[1] = outputBuffer[1] | ((_packet->roller_speed & 0x07) << 4);
     outputBuffer[2] = kickNumber & 0x7F;
@@ -129,15 +119,14 @@ void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_p
     robotPacks.value.clear();
     parsian_msgs::parsian_robot_packet temp;
     bool validPack = false;
-    for(int k = 0 ; k < _MAX_ROBOT_NUM ; k++)
-    {
+    for (auto &robotPacket : robotPackets) {
         temp.packets.clear();
         validPack = false;
         for (int i = 0 ; i < _ROBOT_PACKET_SIZE ; i ++)
         {
-            if(robotPackets[k][i] != 255)
+            if(robotPacket[i] != 255)
             {
-                temp.packets.push_back(robotPackets[k][i]);
+                temp.packets.push_back(robotPacket[i]);
                 validPack = true;
             }
         }
@@ -146,14 +135,14 @@ void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_p
             robotPacks.value.push_back(temp);
         }
     }
-
+    robotPacks.header.stamp = ros::Time::now();
     packetPub.publish(robotPacks);
 }
 
 void PacketNodelet::timerCb(const ros::TimerEvent &event) {
     if (drawer != nullptr){
         drawPub.publish(drawer->draws);
-        ROS_INFO_STREAM("paket draw "<<drawer);
+        ROS_INFO_STREAM("packet draw "<<drawer);
     }
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);

@@ -1,14 +1,11 @@
 #include <parsian_agent/agent.h>
 #include <parsian_agent/skills.h>
 #include <parsian_agent/config.h>
-//#define debug_train
-//#define skuba_control
-//#define use_ANN
 
 #define errlen 100
 
 
-double Agent::getVar(double *data) {
+double Agent::getVar(const double *data) {
     double mean = 0.0;
     for( int i = 0 ; i < errlen ; i++ )
     {
@@ -28,7 +25,7 @@ double Agent::getVar(double *data) {
     return var;
 }
 
-Matrix tansig( Matrix n )
+Matrix tansig(const Matrix &n )
 {
     for(int i=0 ; i<n.nrows() ; i++ )
         for( int j=0 ; j<n.ncols() ; j++ )
@@ -114,7 +111,7 @@ Matrix Agent::ANN_forward( Matrix input )
     return output;
 }
 
-Agent::Agent(int _ID) : planner(_ID)
+Agent::Agent(int _ID)
 {
     srand48(time(nullptr));
     packetNum = 0;
@@ -167,7 +164,6 @@ Agent::Agent(int _ID) : planner(_ID)
     agentStopTime.start();
 
     changeIsNeeded = false;
-
 
 }
 
@@ -384,7 +380,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     //        lastVn = velnorm;
     //    }
 
-    if(vel().length() > 0.2)
+   /* if(vel().length() > 0.2)
     {
         agentStopTime.restart();
         timerReset = false;
@@ -396,7 +392,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         agentStopTime.restart();
         timerReset = true;
     }
-
+*/
     double lastV,commandV;
     double vCoef = 1;
     double tempVf = vforward , tempVn = vnormal;
@@ -537,7 +533,7 @@ Vector2D Agent::dir()
 
 bool Agent::shootSensor()
 {
-    return 0 ; //wm->our[selfID]->shootSensor;
+    return false; //wm->our[selfID]->shootSensor;
 }
 
 void Agent::setShootSensor(bool b)
@@ -698,10 +694,10 @@ void Agent::jacobian(double vx, double vy, double w, double &v1, double &v2, dou
 void Agent::jacobianInverse(double v1, double v2, double v3, double v4, double &vx, double &vy, double &w)
 {
     float motorMaxRadPerSec = getMotorMaxRadPerSec();
-    double dw1 = ((double)v1)*motorMaxRadPerSec*self()->wheelRadius()/(double)_BIT_RESOLUTION;
-    double dw2 = ((double)v2)*motorMaxRadPerSec*self()->wheelRadius()/(double)_BIT_RESOLUTION;
-    double dw3 = ((double)v3)*motorMaxRadPerSec*self()->wheelRadius()/(double)_BIT_RESOLUTION;
-    double dw4 = ((double)v4)*motorMaxRadPerSec*self()->wheelRadius()/(double)_BIT_RESOLUTION;
+    double dw1 = v1 * motorMaxRadPerSec * self()->wheelRadius() / (double)_BIT_RESOLUTION;
+    double dw2 = v2 * motorMaxRadPerSec * self()->wheelRadius() / (double)_BIT_RESOLUTION;
+    double dw3 = v3 * motorMaxRadPerSec * self()->wheelRadius() / (double)_BIT_RESOLUTION;
+    double dw4 = v4 * motorMaxRadPerSec * self()->wheelRadius() / (double)_BIT_RESOLUTION;
     vx = (-0.3464 * dw1) + (-0.2828 * dw2) + ( 0.2828 * dw3) + ( 0.3464 * dw4);
     vy = ( 0.4142 * dw1) + (-0.4142 * dw2) + (-0.4142 * dw3) + ( 0.4142 * dw4);
     w = ( 0.2929 * dw1) + ( 0.2071 * dw2) + ( 0.2071 * dw3) + ( 0.2929 * dw4);
@@ -733,17 +729,7 @@ Agent::Status::Status() {
 
 double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
 {
-    //todo
-    //if (wm->getIsSimulMode())
-    {
-        return value;
-    }
-    //else
-    {
-        int sp = spinner?1:0;
-        int v = round(value);
-        return shotProfile[v][sp];
-    }
+    return value; // TODO : fix
 }
 
 double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
@@ -925,23 +911,34 @@ void Agent::setGyroZero()
 }
 void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList,
                         const QList<int> &_oppRelaxList, const bool &_avoidPenaltyArea, const bool &_avoidCenterCircle,
-                        const double &_ballObstacleRadius){
-    //  timer.start();
-    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
-    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
-    //ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-
-//    this->pathPlannerResult.assign(planner.getResultModified().begin(),planner.getResultModified().end());
-//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-//    this->plannerAverageDir=planner.getAverageDir().norm();
-//    ROS_INFO_STREAM("SIZE: " << planner.getResultModified().size());
-
-    //  debug(QString("%1) InitPlanner Time1: %2").arg(knowledge->frameCount).arg(timer.elapsed()) , D_MASOOD);
+                        const double &_ballObstacleRadius) {
+    parsian_msgs::parsian_get_planPtr plan{new parsian_msgs::parsian_get_plan};
+    plan->robotID = this->id();
+    plan->goal = _target.toParsianMessage();
+    plan->start = this->pos().toParsianMessage();
+    Q_FOREACH(const int &id, _ourRelaxList) {
+            plan->ourRelaxList.push_back(id);
+        }
+    Q_FOREACH(const int&id, _oppRelaxList) {
+            plan->oppRelaxList.push_back(id);
+        }
+    plan->avoidCenterCircle = _avoidCenterCircle;
+    plan->ballObstacleRadius = _ballObstacleRadius;
+    plan->avoidPenaltyArea = _avoidPenaltyArea;
+    plan->header.stamp = ros::Time::now();
+    // TODO : Add Virtual Obstacle to This
+    planner_pub.publish(plan);
+    ROS_INFO_STREAM("PUBLISHED");
+    // TODO : remove below kindly
+//    planner.initPathPlanner(_target , _ourRelaxList , _oppRelaxList ,  _avoidPenaltyArea, _avoidCenterCircle, _ballObstacleRadius);
+//    getPathPlannerResult(planner.getResultModified(), planner.getAverageDir());
 }
 
 void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {
+    pathPlannerResult.clear();
     pathPlannerResult.assign(_result.begin() , _result.end());
     plannerAverageDir = _averageDir.norm();
+    ROS_INFO_STREAM("SUBS");
 }
 
 void Agent::execute() {
@@ -985,6 +982,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     else
         command->kickspeedz=0;
     command->spinner= static_cast<unsigned char>(false);
-
+    command->header.stamp = ros::Time::now();
     return command;
 }

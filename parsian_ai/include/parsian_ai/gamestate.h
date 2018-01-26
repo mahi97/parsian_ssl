@@ -9,27 +9,27 @@
 
 
 enum class States{
-    Halt,
-    PlayOff,
-    PlayOn,
+    Halt = 0,
+    PlayOff = 1,
+    PlayOn = 2,
 
-    HalfTime,
-    PostGame,
+    HalfTime = 3,
+    PostGame = 4,
 
-    OurBallPlacement, /// start of restart & our
-    OurDirectKick,
-    OurIndirectKick,
-    OurPenaltyKick,
-    OurPenaltyShootOut,
-    OurKickOff,
+    OurBallPlacement = 5, /// start of restart & our
+    OurDirectKick = 6,
+    OurIndirectKick = 7,
+    OurPenaltyKick = 8,
+    OurPenaltyShootOut = 9,
+    OurKickOff = 10,
 
 
-    TheirBallPlacement,/// start of their
-    TheirDirectKick,
-    TheirIndirectKick,
-    TheirPenaltyKick,
-    TheirPenaltyShootOut,
-    TheirKickOff,
+    TheirBallPlacement = 11,/// start of their
+    TheirDirectKick = 12,
+    TheirIndirectKick = 13,
+    TheirPenaltyKick = 14,
+    TheirPenaltyShootOut = 15,
+    TheirKickOff = 16,
 
 
 };
@@ -40,6 +40,7 @@ using namespace  parsian_msgs;
 
 class GameState {
 private:
+    int command_ctr;
     States state;
     int ourScore,theirScore;
     bool isReady;
@@ -84,6 +85,7 @@ public:
     bool theirPenaltyShootout();
 
     States getState();
+    void setState(const States& s, bool isReady = false);
 };
 extern GameState *gameState;
 #endif

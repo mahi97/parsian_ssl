@@ -13,12 +13,13 @@
 class ReceivepassAction : public Action {
 
 public:
-
+    ReceivepassAction();
     void setMessage(const void* _msg);
 
     void* getMessage();
 
-    static QString getActionName();
+    QString getActionName() override;
+    static QString SActionName();
 
 
     SkillProperty(ReceivepassAction, bool, Slow, slow);
