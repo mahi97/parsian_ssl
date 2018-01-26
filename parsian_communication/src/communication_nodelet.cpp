@@ -30,7 +30,7 @@ void CommunicationNodelet::onInit() {
     communicator.reset(new CCommunicator);
     /////connect serial
     while(!communicator->isSerialConnected()){
-        communicator->connectSerial(conf.serial_connect.c_str());
+        communicator->connectSerial("/dev/ttyUSB1");//conf.serial_connect.c_str());
     }
 
     server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
@@ -52,7 +52,7 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
-    if (realGame)
+    //if (realGame)
         communicator->packetCallBack(_packet);
 
 }
@@ -82,7 +82,7 @@ void CommunicationNodelet::ConfigServerCallBack(const communication_config::comm
 
 void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
 {
-    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
+//    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
 }
 
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);
