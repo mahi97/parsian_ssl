@@ -1487,13 +1487,13 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
         receivedPlan = req.response;
 
         NGameOff::SPlan *thePlan = planMsgToSPlan(receivedPlan, _ourplayers.size());
+
         matchPlan(thePlan, _ourplayers); //Match The Plan
 
 //        checkGUItoRefineMatch(thePlan, _ourplayers);
         ourPlayOff->setMasterPlan(thePlan);
         ourPlayOff->analyseShoot(); // should call after setmasterplan
-//        ourPlayOff->analysePass();  // should call after setmasterplan
-//        ROS_INFO("initStaticPlay: pass analyzed");
+        ourPlayOff->analysePass();  // should call after setmasterplan
         ourPlayOff->setInitial(true);
         ourPlayOff->lockAgents = true;
 //        lastPlan = thePlan;
@@ -1535,6 +1535,42 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
     for (int j = 0; j < planMsg.the_plan.agentSize; j++) {
         plan->matching.initPos.agents.push_back(planMsg.the_plan.agentInitPos[j]);
     }
+
+    QList< QList<playOffRobot> > agpln;
+    for (int i = 0; i < planMsg.the_plan.agentSize; i++) {
+        ROS_INFO_STREAM("agent "<<i<<" pos "<<planMsg.the_plan.agents.at(i).posSize);
+        QList<playOffRobot>  ag;
+        ag.clear();
+        for (int j = 0; j < planMsg.the_plan.agents.at(i).posSize; j++) {
+
+            ROS_INFO_STREAM("agent "<<i<<" pos "<<planMsg.the_plan.agents.at(i).posSize<<"-> "<<j);
+            playOffRobot* po = new playOffRobot();
+
+            po->pos.x = planMsg.the_plan.agents.at(i).positions.at(j).pos.x;
+            po->pos.y = planMsg.the_plan.agents.at(i).positions.at(j).pos.y;
+            po->angle = (AngleDeg)planMsg.the_plan.agents.at(i).positions.at(j).angel;
+            po->tolerance = planMsg.the_plan.agents.at(i).positions.at(j).tolerance;
+
+
+
+            QList<playOffSkill> sk;
+            sk.clear();
+            for (int k = 0; k < planMsg.the_plan.agents.at(i).positions.at(j).skillSize; k++) {
+                playOffSkill *p = new playOffSkill();
+                p->data[0] = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).primary;
+                p->data[1] = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).secondry;
+                p->targetAgent = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).agent;
+                p->targetIndex = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).index;
+//                p->name = (planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).name).c_str();
+                sk.append(*p);
+            }
+            po->skill = sk;
+            ag.append(*po);
+        }
+        agpln.append(ag);
+
+    }
+    plan->execution.AgentPlan = agpln;
 
     return plan;
 }

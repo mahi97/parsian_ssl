@@ -232,7 +232,8 @@ class Handler(FileSystemEventHandler):
                         and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                         and plan["planMode"] == plan_mode:
                     print("matched: " + plan["filename"].split("plans/")[1]
-                          + " --> num agents: " + str(len(plan["agentInitPos"])))
+                          + " --> num agents: " + str(len(plan["agentInitPos"])) +
+                          ", pos size ag0: " + str(len(plan["agents"][0]["positions"])))
                     sublist.append(plan)
 
         if len(sublist) > 0:
@@ -254,7 +255,7 @@ class Handler(FileSystemEventHandler):
                             and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                             and plan["planMode"] == "INDIRECT":
                         print("MATCHED: " + plan["filename"].split("plans/")[1]
-                              + " --> num agents: " + str(len(plan["agentInitPos"])))
+                              + " --> num agents: " + str(len(plan["agentInitPos"]))+"pos size"+str(len(plan["agents"][0]["positions"])))
                         sublist.append(plan)
             if len(sublist) > 0:
                 # i = self.__shuffleCount % len(sublist)
@@ -331,6 +332,7 @@ class Handler(FileSystemEventHandler):
         k = 0
         for agent in plan_dict["agents"]:
             plan_msg.agents[i].id = agent["ID"]
+            plan_msg.agents[i].posSize = len(agent["positions"])
             j = 0
             for pos in agent["positions"]:
                 # print ("---------------------------------------------pos "+str(i))
@@ -338,6 +340,7 @@ class Handler(FileSystemEventHandler):
                 plan_msg.agents[i].positions[j].pos.x = pos["pos-x"]
                 plan_msg.agents[i].positions[j].pos.y = pos["pos-y"]
                 plan_msg.agents[i].positions[j].tolerance = pos["tolerance"]
+                plan_msg.agents[i].positions[j].skillSize = len(pos["skills"])
                 k = 0
                 for skill in pos["skills"]:
                     plan_msg.agents[i].positions[j].skills[k].flag = skill["flag"]
