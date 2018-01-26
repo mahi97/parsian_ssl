@@ -325,6 +325,35 @@ class Handler(FileSystemEventHandler):
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
         plan_msg.planRepeat = plan_dict["planRepeat"]
         plan_msg.successRate = plan_dict["successRate"]
+
+        i = 0
+        j = 0
+        k = 0
+        for agent in plan_dict["agents"]:
+            plan_msg.agents[i].id = agent["ID"]
+            j = 0
+            for pos in agent["positions"]:
+                # print ("---------------------------------------------pos "+str(i))
+                plan_msg.agents[i].positions[j].angel = pos["angel"]
+                plan_msg.agents[i].positions[j].pos.x = pos["pos-x"]
+                plan_msg.agents[i].positions[j].pos.y = pos["pos-y"]
+                plan_msg.agents[i].positions[j].tolerance = pos["tolerance"]
+                k = 0
+                for skill in pos["skills"]:
+                    plan_msg.agents[i].positions[j].skills[k].flag = skill["flag"]
+                    plan_msg.agents[i].positions[j].skills[k].name = skill["name"]
+                    plan_msg.agents[i].positions[j].skills[k].primary = skill["primary"]
+                    plan_msg.agents[i].positions[j].skills[k].secondry = skill["secondary"]
+                    if "target" in skill:
+                        plan_msg.agents[i].positions[j].skills[k].agent = skill["target"]["agent"]
+                        plan_msg.agents[i].positions[j].skills[k].index = skill["target"]["index"]
+                    else:
+                        plan_msg.agents[i].positions[j].skills[k].agent = -1
+                        plan_msg.agents[i].positions[j].skills[k].index = -1
+                    k += 1
+                j += 1
+            i += 1
+
         i = 0
         for pos in plan_dict["agentInitPos"]:
             plan_msg.agentInitPos[i].x = pos["x"]
