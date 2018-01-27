@@ -32,8 +32,8 @@ void CSoccer::execute() {
     customControl(custom);
     if (! custom) {
         coach->execute();
-    }
 
+    }
 }
 
 void CSoccer::updateTask(){
