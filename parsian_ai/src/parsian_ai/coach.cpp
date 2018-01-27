@@ -1481,7 +1481,7 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 //        planRequest.plan_req.hint.push_back(hint[i]);
 //    }
 
-    parsian_msgs::plan_service req;
+    parsian_msgs::plan_service req{};
     req.request = planRequest;
 
     if (plan_client.call(req)) {
@@ -1510,7 +1510,7 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 }
 
 NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize) {
-    SPlan *plan = new NGameOff::SPlan();
+    auto *plan = new NGameOff::SPlan();
 
 //    for (int i = 0; i < planMsg.the_plan.tags.size(); i++) {
 //        plan->common.tags.push_back((planMsg.the_plan.tags.at(i)).c_str());
@@ -1563,7 +1563,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
                 p->data[1] = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).secondry;
                 p->targetAgent = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).agent;
                 p->targetIndex = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).index;
-//                p->name = (planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).name).c_str();
+                p->name = strToEnum(planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).name);
                 sk.append(*p);
             }
             po->skill = sk;
@@ -1576,6 +1576,24 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
 
     return plan;
 }
+
+POffSkills CCoach::strToEnum(const std::string& _str) {
+    if       (_str == "NoSkill"           ) return NoSkill;
+    else if  (_str == "Mark"              ) return Mark;
+    else if  (_str == "Goalie"            ) return Goalie;
+    else if  (_str == "Support"           ) return Support;
+    else if  (_str == "Defense"           ) return Defense;
+    else if  (_str == "Position"          ) return Position;
+    else if  (_str == "MoveSkill"         ) return MoveSkill;
+    else if  (_str == "PassSkill"         ) return PassSkill;
+    else if  (_str == "OneTouchSkill"     ) return OneTouchSkill;
+    else if  (_str == "ChipToGoalSkill"   ) return ChipToGoalSkill;
+    else if  (_str == "ShotToGoalSkill"   ) return ShotToGoalSkill;
+    else if  (_str == "ReceivePassSkill"  ) return ReceivePassSkill;
+    else if  (_str == "ReceivePassIASkill") return ReceivePassIASkill;
+    else                                    return NoSkill;
+}
+
 
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     MWBM matcher;
