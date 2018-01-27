@@ -36,7 +36,7 @@ CCoach::CCoach(Agent**_agents)
     theirKickOff        = new CTheirKickOff;
     theirPenalty        = new CTheirPenalty;
     theirIndirect       = new CTheirIndirect;
-    //    ourBallPlacement    = new COurBallPlacement;
+    ourBallPlacement    = new COurBallPlacement;
     //    halfTimeLineup    = new CHalftimeLineup;
     theirBallPlacement  = new CTheirBallPlacement;
 
@@ -1204,6 +1204,7 @@ void CCoach::checkTransitionToForceStart(){
 void CCoach::execute()
 {
 
+
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();
@@ -1380,7 +1381,7 @@ void CCoach::decideStart(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurBallPlacement(QList<int> &_ourPlayers) {
-    //    selectedPlay = ourBallPlacement;
+       selectedPlay = ourBallPlacement;
 }
 
 void CCoach::decideTheirBallPlacement(QList<int> &_ourPlayers) {
