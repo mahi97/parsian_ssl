@@ -1187,6 +1187,7 @@ void CCoach::execute()
 {
 //    gameState->setState(States::OurIndirectKick, true);
 
+    checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     virtualTheirPlayOffState();
     decidePreferedDefenseAgentsCountAndGoalieAgent();
