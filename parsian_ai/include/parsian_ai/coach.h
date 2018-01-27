@@ -205,6 +205,6 @@ private:
     QList <CRobot*> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
+    POffSkills strToEnum(const std::string& _str);
 };
-
 #endif //PARSIAN_AI_COACH_H
