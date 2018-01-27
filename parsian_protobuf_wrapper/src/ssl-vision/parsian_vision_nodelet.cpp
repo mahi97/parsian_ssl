@@ -46,7 +46,7 @@ void VisionNodelet::reconnect()
 void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level){
     visionConfig.vision_multicast_ip = config.vision_multicast_ip;
     visionConfig.vision_multicast_port = config.vision_multicast_port;
-    isOurColorYellow = config.is_yellow;
+    //isOurColorYellow = config.is_yellow;
     reconnect();
 
 }
