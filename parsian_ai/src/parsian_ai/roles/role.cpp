@@ -23,14 +23,7 @@ CRoleInfo::CRoleInfo(QString _roleName)
 
 Agent* CRoleInfo::robot(int i)
 {
-    int k=0;
-    for (int j=0;j < _MAX_NUM_PLAYERS;j++) {
-        if (soccer->agents[j]->roleName == roleName && (wm->our[j]->inSight > 0)) {
-            if (k == i) return soccer->agents[j];
-            k++;
-        }
-    }
-    return nullptr;
+    return agents[i];
 
 }
 
@@ -51,4 +44,8 @@ void CRoleInfo::addAgent(Agent* agent) {
 
 QString CRoleInfo::getRoleName() {
     return roleName;
+}
+
+void CRoleInfo::reset() {
+    agents.clear();
 }

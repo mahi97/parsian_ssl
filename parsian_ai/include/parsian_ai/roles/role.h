@@ -39,8 +39,7 @@ public:
     virtual int count();
     virtual int index(CRole* me);
     virtual void addAgent(Agent* agent);
-
-    virtual void reset(){}
+    virtual void reset();
 };
 
 
