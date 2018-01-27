@@ -4,9 +4,9 @@
 
 #include <QVariant>
 
-#include <parsian_ai/util/planloader.h>
+#include <plan_server/util/planloader.h>
 #include <parsian_util/tools/debuger.h>
-#include <parsian_ai/plays/playoff.h>
+#include "../../planstruct.h"
 #include <parsian_util/geom/geom.h>
 #include <qjson/parser.h>
 
@@ -33,13 +33,13 @@ protected:
     //All of Them !
     QList<NGameOff::SPlan*> m_plans;
     bool readPlan(const QVariantMap& _map, const QString& _file);
-    void fillMatching(NGameOff::SMatching& _matching, const QVariantMap& _plan, bool& _parsedOK = 0);
-    void fillCommon(NGameOff::SCommon& _common, const QVariantMap& _plan, bool& _parsedOk = 0);
-    void fillExecution(NGameOff::SExecution& _execution, const QVariantMap& _plan, bool& _parsedOk = 0);
-    void fillGUI(NGameOff::SGUI& _gui, const QFileInfo& _fileInfo, bool& _parsedOk = 0);
+    void fillMatching(NGameOff::SMatching& _matching, const QVariantMap& _plan, bool&& _parsedOK = 0);
+    void fillCommon(NGameOff::SCommon& _common, const QVariantMap& _plan, bool&& _parsedOk = 0);
+    void fillExecution(NGameOff::SExecution& _execution, const QVariantMap& _plan, bool&& _parsedOk = 0);
+    void fillGUI(NGameOff::SGUI& _gui, const QFileInfo& _fileInfo, bool&& _parsedOk = 0);
     POffSkills strToEnum(const QString& _str);
     QString getPackageName(QString _path);
-    Vector2D findShotPos(SPlan* &_plan);
+    Vector2D findShotPos(NGameOff::SPlan* &_plan);
 
 private:
 

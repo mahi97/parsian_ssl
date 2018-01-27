@@ -85,8 +85,9 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
             this->agent->kickSpeed = 0;
             this->agent->roller = 0;
             gotoPointAvoid->setMessage(&_task->gotoPointAvoidTask);
+//            gotoPointAvoid->setNoavoid(true);
             skill = gotoPointAvoid;
-            //ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
+            ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
             break;
         case parsian_msgs::parsian_robot_task::KICK:
             skillKick->setMessage(&_task->kickTask);

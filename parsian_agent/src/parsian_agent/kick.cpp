@@ -137,7 +137,7 @@ kckMode CSkillKick::decideMode()
     robotKickArea.addVertex(agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*distCoef);
 
     // TODO : knowledge
-    if(/*(!knowledge->isOurNonPlayOnKick())&&*/(passProfiler || kickWithCenterOfDribbler)) {
+    if(0 &&/*(!knowledge->isOurNonPlayOnKick())&&*/(passProfiler || kickWithCenterOfDribbler)) {
         kickerOn = dribblerArea.contains(ballPos) && robotKickArea.contains(ballPos);
     }
     else kickerOn = dribblerArea.contains(ballPos);
@@ -489,7 +489,7 @@ void CSkillKick::jTurn()
     Vector2D movementThSpeed,movementThPos;
     double movementDir = ((ballPos - agentPos).th() - kickFinalDir).degree();
     double shift = 0;
-    double distCoef = 0.15;
+    double distCoef = 0.20;
 
     idealPass = (ballPos - agentPos).norm()*distCoef;
     /*
@@ -546,43 +546,43 @@ void CSkillKick::jTurn()
 
 */
 
-    if(movementDir < 20 && movementDir > -20)
+    if(movementDir < 10 && movementDir > -10)
         shift = 0;
     else if(movementDir > 50)
-        shift = 15 + (1-agentPos.dist(ballPos))*61;
+        shift = 45 + (1-agentPos.dist(ballPos))*61;
     else if(movementDir < -50)
-        shift = -15 - (1-agentPos.dist(ballPos))*61;
+        shift = -45 - (1-agentPos.dist(ballPos))*61;
     else if(movementDir > 30) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 5 + (1-agentPos.dist(ballPos))*10;
+            shift = 35 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =5 + (1-agentPos.dist(ballPos))*35;
+            shift =45 + (1-agentPos.dist(ballPos))*35;
         distCoef = 0.17;
     }
     else if(movementDir < -30){
         if(wm->ball->vel.length() < 0.1)
-            shift = -5 - (1-agentPos.dist(ballPos))*10;
+            shift = -25 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -5 - (1-agentPos.dist(ballPos))*35;
+            shift = -35 - (1-agentPos.dist(ballPos))*35;
 
         distCoef = 0.17;
     }
     else if(movementDir > 0) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 5 + (1-agentPos.dist(ballPos))*10;
+            shift = 25 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =5 + (1-agentPos.dist(ballPos))*20;
+            shift =35 + (1-agentPos.dist(ballPos))*20;
         distCoef = 0.17;
     }
     else if(movementDir < 0){
         if(wm->ball->vel.length() < 0.1)
-            shift = -5 - (1-agentPos.dist(ballPos))*10;
+            shift = -25 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -5 - (1-agentPos.dist(ballPos))*20;
+            shift = -35 - (1-agentPos.dist(ballPos))*20;
 
         distCoef = 0.17;
     }
-
+distCoef = 0.20;
     idealPass.rotate(shift);
     targetForJturnSpeed = agentPos + idealPass;
 
@@ -657,7 +657,7 @@ void CSkillKick::jTurn()
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
-    speedPid->kp = 6 +2.1*agentPos.dist(ballPos) + dirReduce;
+    speedPid->kp = 4;
 
 
     if(!jTurnFromBack)
@@ -873,6 +873,7 @@ double CSkillKick::oneTouchAngle(Vector2D pos,
     else ang = ang1 - th1;
 
     return ang;
+
 }
 
 void CSkillKick::findPosToGo()
@@ -887,6 +888,7 @@ void CSkillKick::findPosToGo()
     Circle2D robotArea(agentPos,1);
 
     gpa->setAddvel(Vector2D(0,0));
+
     if(agentPos.dist(ballPos) < 1.5) {
         robotArea.assign(agentPos,max(agentPos.dist(ballPos) - 0.1, 0.01));
     }
@@ -903,7 +905,6 @@ void CSkillKick::findPosToGo()
 
             finalPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
             agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos,conf->VelMax,ourRelax,oppRelax,!goalieMode,0.2,true);
-
             if(agentTime < i )
             {
                 break;
@@ -924,6 +925,7 @@ void CSkillKick::findPosToGo()
         finalPos = ballPos - (target-finalPos).norm() * 0.15;
         finalDir = Vector2D(cos(kickFinalDir.radian()),sin(kickFinalDir.radian()));
     }
+
     Vector2D oneTouchPos = ballPath.nearestPoint(agentPos);
     Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
     bool canOneTouch = false;
@@ -959,14 +961,13 @@ void CSkillKick::findPosToGo()
 
     Circle2D oppPenalty(wm->field->oppGoal() + Vector2D(0.2 , 0),1.4);
     gpa->setOnetouchmode(false);
-//
     if(oppPenalty.contains(ballPos))
     {
         finalPos = finalPos - (target-finalPos).norm() * 0.15;
     }
     if(finalPos.x > wm->field->_FIELD_WIDTH)
     {
-        finalPos = CKnowledge::getReflectPos(*wm->field, wm->field->oppGoal(), 3, wm->ball->pos);
+        finalPos = CKnowledge::getReflectPos(*wm->field,wm->field->oppGoal(), 3,wm->ball->pos);
     }
 
     if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
@@ -975,15 +976,15 @@ void CSkillKick::findPosToGo()
     }
     Vector2D s1,s2;
     Circle2D finalPosArea;
-//    draw(finalPosArea,QColor(Qt::blue));
+    drawer->draw(finalPosArea,QColor(Qt::blue));
 
     Segment2D directPath(agentPos,finalPos);
-//    draw(directPath);
+    drawer->draw(directPath);
     finalPosArea.assign(ballPos ,0.145);
 //    if(finalPosArea.intersection(directPath,&s1,&s2))
 //    {
 //        gpa->setOnetouchmode(false);
-//
+
 //        finalPosArea.assign(ballPos ,0.245);
 //        finalPosArea.tangent(agentPos,&s1,&s2);
 //        if(s2.dist(target) >= s1.dist(target))

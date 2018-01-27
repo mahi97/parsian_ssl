@@ -10,6 +10,9 @@
 #include <parsian_msgs/parsian_skill_receivePass.h>
 #include <parsian_msgs/parsian_skill_kick.h>
 
+#include <parsian_msgs/parsian_plan.h>
+#include <parsian_msgs/parsian_ai_plan_request.h>
+
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_team_config.h>
@@ -35,6 +38,8 @@ namespace parsian_ai {
         ros::Publisher *robTask;
 
         ros::Timer timer_;
+
+        ros::ServiceClient plan_client;
 
         //config server setup
         boost::shared_ptr<dynamic_reconfigure::Server<ai_config::aiConfig>> server;

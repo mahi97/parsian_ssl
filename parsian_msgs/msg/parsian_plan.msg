@@ -1,0 +1,13 @@
+string planFile
+bool isActive
+bool isMaster
+uint32 agentSize
+float64 chance
+float64 lastDist
+string[] tags
+string planMode
+vector2D ballInitPos
+int32 successRate
+int32 planRepeat
+vector2D[8] agentInitPos
+parsian_msgs/parsian_plan_agent[8] agents

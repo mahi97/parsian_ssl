@@ -13,6 +13,8 @@ protected:
     QTime* timeAfterForceKick;
 private:
     Vector2D findMostPossible();
+    Vector2D ballLastVel;
+    Vector2D lastInterceptPos;
 public:
     static double oneTouchAngle(Vector2D pos, Vector2D vel, Vector2D ballVel, Vector2D ballDir, Vector2D goal, double landa, double gamma);
     DEF_SKILL(CSkillKickOneTouch);

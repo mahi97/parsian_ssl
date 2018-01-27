@@ -8,8 +8,8 @@ void GrsimNodelet::GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstP
 {
     grSim_Robot_Command* GrsimRobotCommand = GrsimCommand->add_robot_commands();
     GrsimRobotCommand->set_id(msg->robot_id);
-    GrsimRobotCommand->set_kickspeedx(msg->kickSpeed);
-    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz);
+    GrsimRobotCommand->set_kickspeedx(msg->kickSpeed / 100);
+    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz / 200);
     GrsimRobotCommand->set_veltangent(0);
     GrsimRobotCommand->set_velnormal(0);
     GrsimRobotCommand->set_velangular(0);
@@ -52,10 +52,8 @@ bool GrsimNodelet::GrsimBallReplacesrv(parsian_msgs::grsim_ball_replacement::Req
 /*----------creating a full grSim_Packet protocol buffer and sending it----------*/
 void GrsimNodelet::send()
 {
-//    std::string color;
-//    ros::param::get("team_color", color);
-//    bool col = ! (color == "yellow");          //check if it is true!
-    GrsimCommand->set_isteamyellow(color);
+
+    GrsimCommand->set_isteamyellow(isYellow);
     GrsimCommand->set_timestamp(0.0);                       //should fix this
     packet.set_allocated_commands(GrsimCommand);
     packet.set_allocated_replacement(GrsimReplacement);
@@ -113,10 +111,7 @@ void GrsimNodelet::onInit()
     GrsimCommand = new grSim_Commands;
     GrsimReplacement = new grSim_Replacement;
 
-    std::string col;
-    ros::param::get("team_color", color);
-    color = (col == "yellow");          //check if it is true!
-//    color = false;
+
     n = getNodeHandle();
     pn = getPrivateNodeHandle();
     sub0 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_0/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
@@ -125,6 +120,8 @@ void GrsimNodelet::onInit()
     sub3 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_3/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub4 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_4/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub5 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_5/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
+    team_config_sub = n.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& GrsimNodelet::teamConfigCb, this, _1));
+
 
 
     service0 = n.advertiseService<parsian_msgs::grsim_robot_replacementRequest,
@@ -142,6 +139,12 @@ void GrsimNodelet::onInit()
     //timer_ = n.createTimer(ros::Duration(1.0), boost::bind(& GrsimNodelet::timerCb, this, _1));
 
 }
+
+void GrsimNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+{
+    isYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
+}
+
 
 
 

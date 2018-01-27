@@ -10,14 +10,16 @@ void VisionNodelet::onInit() {
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
 
-    ros::param::get("/team_color", teamColor);
-    isOurColorYellow = (teamColor == "yellow");
+    //ros::param::get("/team_color", teamColor);
     packs = 0;
 
     timer = nh.createTimer(ros::Duration(.004), boost::bind(&VisionNodelet::timerCb, this, _1));
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
+    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& VisionNodelet::teamConfigCb, this, _1));
+
+
 //    ssl_wrapper_pub = nh.advertise<parsian_msgs::ssl_vision_wrapper>("vision", 1000);
     //ROS_INFO("on init");
     vision = nullptr;
@@ -44,6 +46,7 @@ void VisionNodelet::reconnect()
 void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config , uint32_t level){
     visionConfig.vision_multicast_ip = config.vision_multicast_ip;
     visionConfig.vision_multicast_port = config.vision_multicast_port;
+    isOurColorYellow = config.is_yellow;
     reconnect();
 
 }
@@ -51,11 +54,12 @@ void VisionNodelet::configCb(const protobuf_wrapper_config::visionConfig &config
 void VisionNodelet::timerCb(const ros::TimerEvent &event) {
 
     while (vision->receive(vision_packet)) {
-        ROS_INFO("v");
+        //ROS_INFO("v");
         if (vision_packet.has_detection()) {
             parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
             *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
 //            wrapper->detections.push_back(detection);
+            detection->header.stamp = ros::Time::now();
             ssl_detection_pub.publish(detection);
         }
 
@@ -66,8 +70,10 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
             ssl_geometry_pub.publish(geometry);
         }
     }
+}
 
-
-
+void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+{
+        isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
 }
 

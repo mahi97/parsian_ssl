@@ -21,6 +21,8 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 
+#include <parsian_msgs/plan_service.h>
+
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
     WEHAVETHEBALL = 1,
@@ -42,7 +44,22 @@ public:
     BallPossesion isBallOurs();
     BallPossesion ballPState;
 
+    bool requestForPlan = false;
+    parsian_msgs::plan_serviceRequest planRequest;
+    parsian_msgs::plan_serviceResponse receivedPlan;
+
+    plan_serviceRequest getPlanRequest();
+    void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
+
+    ros::ServiceClient plan_client;
+    void setPlanClient(ros::ServiceClient _plan_client);
+
+
 private:
+    /////////////////////transition to force start
+     void checkTransitionToForceStart();
+     QList <Vector2D> ballHist;
+    //////////////////////////
     bool lastASWasCritical;
     Vector2D passPos;
     bool passPlayMake;
@@ -97,6 +114,9 @@ private:
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
     QList <Agent*> lastDefenseAgents;
+
+    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
+    NGameOff::SPlan* planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
 
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
@@ -185,6 +205,6 @@ private:
     QList <CRobot*> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
+    POffSkills strToEnum(const std::string& _str);
 };
-
 #endif //PARSIAN_AI_COACH_H
