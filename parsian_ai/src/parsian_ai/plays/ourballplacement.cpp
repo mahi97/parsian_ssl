@@ -43,7 +43,7 @@ void COurBallPlacement::execute_x(){
     //start
 
     Vector2D pos;
-    Vector2D ballpos = Vector2D(wm->ball->pos.x - 0.5 , wm->ball->pos.y);
+    Vector2D ballpos = Vector2D(wm->ball->pos.x - 0.1 , wm->ball->pos.y);
     double dist  = 0;
     double mindist = 10000;
     static int minIndex = 0;
@@ -65,12 +65,12 @@ void COurBallPlacement::execute_x(){
     pass->setKickspeed(300);
     pass->setChip(1);
     pass->setSpin(3);
- //   if(agentsID[minIndex]->pos().equalsWeakly(ballpos)){
+    if(agentsID[minIndex]->pos().dist(ballpos) < 0.1){
         agentsID[minIndex]->action = pass;
- //   }
-//    else {
-//        agentsID[minIndex]->action = gpa;
-//    }
+    }
+    else {
+        agentsID[minIndex]->action = gpa;
+    }
     auto* gp = new  KickAction;
     //gp->setSpin(3);
     auto* passr = new  ReceivepassAction;
@@ -79,8 +79,9 @@ void COurBallPlacement::execute_x(){
     passr->setReceiveradius(0.1);
 
     if(lastminIndex != minIndex) {
-        //cagentsID[lastminIndex]->action = gp;
-        agentsID[lastminIndex]->action = passr;//!!!!!!!!!!!!!!!!!!!
+        //agentsID[lastminIndex]->action = gp;
+        if (agentsID.size() > lastminIndex)
+            agentsID[lastminIndex]->action = passr;//!!!!!!!!!!!!!!!!!!!
     }
     ROS_INFO_STREAM(lastminIndex);
     ROS_INFO_STREAM(minIndex);
