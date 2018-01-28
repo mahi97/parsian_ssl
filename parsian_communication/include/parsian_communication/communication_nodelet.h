@@ -50,6 +50,8 @@ namespace parsian_communication {
 
         void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
         bool realGame = false;
+        int cbCount;
+        bool sim_handle_flag;
 
     };
 }
