@@ -12,9 +12,14 @@ namespace rqt_parsian_gui
         side  = TeamSide::LEFT;
         mode  = GameMode::SIMULATION;
 
-        loadTeamConfig();
+        team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("/team_config",1000);
 
-        team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("team_config",1000);
+        team_config.reset(new parsian_msgs::parsian_team_config);
+        team_config->color = static_cast<unsigned char>(color);
+        team_config->mode  = static_cast<unsigned char>(mode);
+        team_config->side  = static_cast<unsigned char>(side);
+
+        loadTeamConfig();
 
         colorStr[0] = "YELLOW";
         colorStr[1] = "BLUE";
@@ -52,6 +57,8 @@ namespace rqt_parsian_gui
         connect(modePB , SIGNAL(clicked(bool))  , this, SLOT(toggleMode()));
         connect(modeAct, SIGNAL(triggered(bool)), this, SLOT(toggleMode()));
 
+        team_config_pub.publish(team_config);
+
 
 
     }
@@ -84,8 +91,6 @@ namespace rqt_parsian_gui
 
     void ModeChooserWidget::sendTeamConfig()
     {
-
-        parsian_msgs::parsian_team_configPtr team_config{new parsian_msgs::parsian_team_config};
         team_config->color = static_cast<unsigned char>(color);
         team_config->mode  = static_cast<unsigned char>(mode);
         team_config->side  = static_cast<unsigned char>(side);

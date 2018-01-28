@@ -61,6 +61,7 @@ void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& 
 {
     isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
     isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
+    wm->setMode(msg->mode == parsian_msgs::parsian_team_config::SIMULATION);
 }
 
 //void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
