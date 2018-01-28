@@ -61,20 +61,24 @@ void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr&
         communicator->packetCallBack(_packet);
         sim_handle_flag = true;
     } else if (cbCount < 40 && sim_handle_flag) {
-        auto  sim_handle_packet = _packet;
-        for (auto & robot_packet : sim_handle_packet->value)
-        {
-            for (int i = 0; i < 14; i++ )
-            {
-                if (i!= 11 || i!=1)
-                    robot_packet.packets[i] = 0;
-            }
-        }
-        communicator->packetCallBack(sim_handle_packet);
+        communicator->packetCallBack(modeChangePacket(_packet));
         cbCount++;
     }
-
-
+}
+parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)
+{
+    parsian_msgs::parsian_packetsPtr packet_{new parsian_msgs::parsian_packets};
+    auto  sim_handle_packet = *_packet;
+    for (auto & robot_packet : sim_handle_packet.value)
+    {
+        for (int i = 0; i < 14; i++ )
+        {
+            if (i!= 11 || i!=1)
+                robot_packet.packets[i] = 0;
+        }
+    }
+    *packet_ = sim_handle_packet;
+    return packet_;
 }
 
 void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {

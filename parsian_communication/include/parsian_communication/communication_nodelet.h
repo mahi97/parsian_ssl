@@ -52,6 +52,8 @@ namespace parsian_communication {
         bool realGame = false;
         int cbCount;
         bool sim_handle_flag;
+        parsian_msgs::parsian_packetsPtr modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet);
+
 
     };
 }
