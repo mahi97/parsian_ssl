@@ -7,6 +7,7 @@ using namespace parsian_world_model;
 void WMNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
+    std::cout << "sag tush";
 
 
     wm.reset(new WorldModel);
@@ -57,12 +58,12 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
 }
 
 
-void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_configPtr& msg)
+void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
     isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
     isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
     wm->setMode(msg->mode == parsian_msgs::parsian_team_config::SIMULATION);
-    ROS_INFO_STREAM("team config received!");
+    NODELET_INFO("team config received!");
 }
 
 //void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
