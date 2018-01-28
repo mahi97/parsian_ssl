@@ -36,7 +36,7 @@ public:
                              parsian_msgs::grsim_ball_replacement::Response& res);
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
                               parsian_msgs::grsim_robot_replacement::Response& res);
-    void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+    void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
 
 
     boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;

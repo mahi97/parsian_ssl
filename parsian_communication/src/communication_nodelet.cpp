@@ -24,7 +24,7 @@ void CommunicationNodelet::onInit() {
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
     statusPub  = n.advertise<parsian_msgs::parsian_robots_status>("/robots_status",1000);
     robotPacketSub   = n.subscribe("/packets" , 10000, &CommunicationNodelet::callBack, this);
-    team_config_sub = n.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& CommunicationNodelet::teamConfigCb, this, _1));
+    team_config_sub = n.subscribe("/team_config", 1000, & CommunicationNodelet::teamConfigCb, this);
 
 
     communicator.reset(new CCommunicator);
@@ -80,7 +80,7 @@ void CommunicationNodelet::ConfigServerCallBack(const communication_config::comm
   conf = config;
 }
 
-void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
     realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
 }

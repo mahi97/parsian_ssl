@@ -120,7 +120,7 @@ void GrsimNodelet::onInit()
     sub3 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_3/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub4 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_4/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
     sub5 = n.subscribe<parsian_msgs::parsian_robot_command>("agent_5/command", 5, boost::bind(& GrsimNodelet::GrsimBotCmd, this, _1));
-    team_config_sub = n.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& GrsimNodelet::teamConfigCb, this, _1));
+    team_config_sub = n.subscribe("/team_config", 1000, & GrsimNodelet::teamConfigCb, this);
 
 
 
@@ -140,7 +140,7 @@ void GrsimNodelet::onInit()
 
 }
 
-void GrsimNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void GrsimNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
     isYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
 }

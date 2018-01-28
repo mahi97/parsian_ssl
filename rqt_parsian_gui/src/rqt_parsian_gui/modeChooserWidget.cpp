@@ -14,7 +14,6 @@ namespace rqt_parsian_gui
 
         team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("/team_config",1000);
 
-        team_config.reset(new parsian_msgs::parsian_team_config);
         team_config->color = static_cast<unsigned char>(color);
         team_config->mode  = static_cast<unsigned char>(mode);
         team_config->side  = static_cast<unsigned char>(side);

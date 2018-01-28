@@ -39,7 +39,7 @@ namespace parsian_world_model {
         void geomCb(const parsian_msgs::ssl_vision_geometryConstPtr& _geom);
         void detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr& _detection);
         void robotsCommandCb(const parsian_msgs::parsian_robot_commandConstPtr& _robotCommad);
-        void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+        void teamConfigCb(const parsian_msgs::parsian_team_configPtr& msg);
 
 
         boost::shared_ptr<WorldModel> wm;
