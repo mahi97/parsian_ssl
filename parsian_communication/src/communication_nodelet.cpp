@@ -29,14 +29,18 @@ void CommunicationNodelet::onInit() {
 
     communicator.reset(new CCommunicator);
     /////connect serial
+
+    server.reset(new dynamic_reconfigure::Server<communication::communicationConfig>(private_nh));
+    dynamic_reconfigure::Server<communication::communicationConfig>::CallbackType f;
+    f = boost::bind(&CommunicationNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
+
+
     while(!communicator->isSerialConnected()){
         communicator->connectSerial(conf.serial_connect.c_str());
     }
 
-    server.reset(new dynamic_reconfigure::Server<communication_config::communicationConfig>(private_nh));
-    dynamic_reconfigure::Server<communication_config::communicationConfig>::CallbackType f;
-    f = boost::bind(&CommunicationNodelet::ConfigServerCallBack,this, _1, _2);
-    server->setCallback(f);
+
 //    ros::Rate loop_rate(62);
 //
 //    while (ros::ok()) {
@@ -52,7 +56,7 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
-    if (cbCount >= 40) {
+    if (cbCount >= 60) {
         cbCount = 0;
         sim_handle_flag = false;
     }
@@ -60,9 +64,11 @@ void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr&
     if (realGame){
         communicator->packetCallBack(_packet);
         sim_handle_flag = true;
-    } else if (cbCount < 40 && sim_handle_flag) {
+        cbCount = 0;
+    } else if (cbCount < 60 && sim_handle_flag) {
         communicator->packetCallBack(modeChangePacket(_packet));
         cbCount++;
+        ROS_INFO_STREAM("Cc:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
     }
 }
 parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)
@@ -73,7 +79,7 @@ parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const pa
     {
         for (int i = 0; i < 14; i++ )
         {
-            if (i!= 11 || i!=1)
+            if (i != 11 && i != 1 && i != 0)
                 robot_packet.packets[i] = 0;
         }
     }
@@ -99,7 +105,7 @@ void CommunicationNodelet::recTimerCb(const ros::TimerEvent &event) {
     }
 }
 
-void CommunicationNodelet::ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level)
+void CommunicationNodelet::ConfigServerCallBack(const communication::communicationConfig &config, uint32_t level)
 {
   conf = config;
 }
