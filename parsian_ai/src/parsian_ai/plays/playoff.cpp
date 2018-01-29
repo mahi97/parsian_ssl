@@ -225,7 +225,9 @@ bool CPlayOff::BlockerExecute(int agentID){
 
 
 void CPlayOff::staticExecute() {
+    ROS_INFO("Static");
     if (initial) {
+        ROS_INFO_STREAM("task assigned: " << agentsID.size());
         assignTasks();
 
     } else {
@@ -235,13 +237,19 @@ void CPlayOff::staticExecute() {
             fillRoleProperties();
             posExecute();
             checkEndState();
-            DBUG(QString("ID : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            DBUG(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            ROS_INFO(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber).toStdString().c_str());
+
             if(masterPlan->common.currentSize > 1 && havePassInPlan) {
                 passManager();
+                ROS_INFO("Pass");
+
             }
 
             if(isPlanEnd()) {
                 playOnFlag = true;
+                ROS_INFO("Ends");
+
             }
 
         } else {
@@ -1312,7 +1320,7 @@ void CPlayOff::checkEndState() {
                     continue;
                 }
                 positionAgent[i].stateNumber++;
-                DBUG(QString("ID : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
+                DBUG(QString("IDDD : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
             } else {
                 //                positionAgent[i].zombie = true;
                 ///Temp
@@ -1332,6 +1340,7 @@ void CPlayOff::fillRoleProperties() {
 
                 roleAgent[i]->setFirstMove((positionAgent[i].stateNumber == 0));
                 roleAgent[i]->setAgent(soccer->agents[masterPlan->common.matchedID.value(i)]);
+
                 // handle onetouch faster
                 if (positionAgent[i].stateNumber + 1 < positionAgent[i].positionArg.size()) {
                     if (positionAgent[i].getArgs().staticSkill == MoveSkill && positionAgent[i].getArgs(1).staticSkill == OneTouchSkill) {
@@ -1342,6 +1351,7 @@ void CPlayOff::fillRoleProperties() {
                 roleAgent[i]->setRoleUpdate(true);
                 roleAgent[i]->resetTime();
                 assignTask(roleAgent[i], positionAgent[i]);
+                ROS_INFO_STREAM("NEWTASK: " << roleAgent[i]->getTarget().x << roleAgent[i]->getTarget().y);
             }
 
         } else {
@@ -1356,7 +1366,6 @@ void CPlayOff::fillRoleProperties() {
 }
 
 void CPlayOff::assignTask(CRolePlayOff* _roleAgent, const SPositioningAgent& _positionAgent) {
-
     switch(_positionAgent.getArgs().staticSkill) {
     case PassSkill:
         assignPass(_roleAgent, _positionAgent);
@@ -1490,7 +1499,6 @@ void CPlayOff::assignMove(CRolePlayOff* _roleAgent,
         _roleAgent -> setMaxVelocity(static_cast<float>(getMaxVel(_roleAgent, _posAgent.getArgs())));
 
     }
-
     _roleAgent -> setSelectedSkill(RoleSkill::GotopointAvoid);
 }
 

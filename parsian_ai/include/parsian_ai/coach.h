@@ -51,6 +51,9 @@ public:
     plan_serviceRequest getPlanRequest();
     void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
 
+    ros::ServiceClient plan_client;
+    void setPlanClient(ros::ServiceClient _plan_client);
+
 
 private:
     /////////////////////transition to force start
@@ -93,8 +96,9 @@ private:
 
     CStopPlay            *stopPlay;
 
-
+public:
     CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+private:
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
@@ -111,6 +115,9 @@ private:
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
     QList <Agent*> lastDefenseAgents;
+
+    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
+    NGameOff::SPlan* planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
 
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
@@ -199,6 +206,6 @@ private:
     QList <CRobot*> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
+    POffSkills strToEnum(const std::string& _str);
 };
-
 #endif //PARSIAN_AI_COACH_H

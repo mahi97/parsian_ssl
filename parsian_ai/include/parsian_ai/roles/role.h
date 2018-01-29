@@ -39,12 +39,7 @@ public:
     virtual int count();
     virtual int index(CRole* me);
     virtual void addAgent(Agent* agent);
-
-    virtual void reset(){ agents.clear(); }
+    virtual void reset();
 };
-
-
-
-
 
 #endif // ROLE_H
