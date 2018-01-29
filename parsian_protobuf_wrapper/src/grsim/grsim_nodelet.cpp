@@ -8,8 +8,14 @@ void GrsimNodelet::GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstP
 {
     grSim_Robot_Command* GrsimRobotCommand = GrsimCommand->add_robot_commands();
     GrsimRobotCommand->set_id(msg->robot_id);
-    GrsimRobotCommand->set_kickspeedx(msg->kickSpeed / 100);
-    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz / 200);
+    int offset = 0;
+    int offsetz = 0;
+    if(msg->kickSpeed != 0)
+    	offset = 3;
+    if(msg->kickspeedz != 0)
+		offsetz = 3;
+    GrsimRobotCommand->set_kickspeedx(msg->kickSpeed / 100 + offset);
+    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz / 100 + offsetz);
     GrsimRobotCommand->set_veltangent(0);
     GrsimRobotCommand->set_velnormal(0);
     GrsimRobotCommand->set_velangular(0);
