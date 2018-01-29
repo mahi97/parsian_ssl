@@ -96,8 +96,9 @@ private:
 
     CStopPlay            *stopPlay;
 
-
+public:
     CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+private:
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 

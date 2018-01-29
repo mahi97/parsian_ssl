@@ -5,7 +5,7 @@ const double StopRadius = 0.55;//0.70;//1.02;//0.78;
 CRoleStopInfo* CRoleStop::m_info = new CRoleStopInfo("stop");
 
 CRoleStopInfo::CRoleStopInfo(QString _roleName)
-    : CRoleInfo(_roleName)
+        : CRoleInfo(_roleName)
 {
     //	inCorner = -1;
 }
@@ -106,7 +106,6 @@ void CRoleStop::execute()
         agent->action = noAction;
         return;
     }
-    info()->findPositions();
     gotopoint->setTargetpos(target);
     gotopoint->setTargetdir(Vector2D(1.0, 0.0));
     gotopoint->setLookat(wm->ball->pos);
@@ -117,6 +116,8 @@ void CRoleStop::execute()
     drawer->draw(QString("%1").arg(kkk) , target);
     ROS_INFO_STREAM("DDD " << agent->id());
     agent->action = gotopoint;
+
+
 }
 
 void CRoleStop::parse(QStringList params)
@@ -138,9 +139,9 @@ CRoleStopInfo* CRoleStop::info()
     return m_info;
 }
 
-void CRoleStop::assign(Agent *agent) {
-    CRole::assign(agent);
-    if(agent != NULL)
+void CRoleStop::assign(Agent *_agent) {
+    CRole::assign(_agent);
+    if(agent != nullptr)
     {
         agent->roleName = m_info->getRoleName();
         m_info->addAgent(agent);
