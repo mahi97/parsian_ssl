@@ -6,21 +6,18 @@
 CField::CField()
 {
 //    if(!ros::param::get("/field_width", _FIELD_WIDTH)) _FIELD_WIDTH = 9.0;
-    ros::param::get("/field_height"            , _FIELD_HEIGHT);
+    ros::param::get("/field_height"          , _FIELD_HEIGHT);
     ros::param::get("/field_width"           , _FIELD_WIDTH);
-    ros::param::get("/field_margin_height"    , _FIELD_MARGIN_HEIGHT);
-    ros::param::get("/field_margin_width"     , _FIELD_MARGIN_WIDTH);
-    ros::param::get("/field_penalty"          , _FIELD_PENALTY);
-    ros::param::get("/goal_width"             , _GOAL_WIDTH);
-    ros::param::get("/goal_rad"               , _GOAL_RAD);
-    ros::param::get("/goal_depth"      , _GOAL_DEPTH);
-    ros::param::get("/penalty_width"    , _PENALTY_WIDTH);
-    ros::param::get("/center_circle_rad"             , _CENTER_CIRCLE_RAD);
-    ros::param::get("/penalty_area_circle_x"          , _PENALTY_AREA_CIRCLE_X);
-    ros::param::get("/penalty_area_circle_rad"      , _PENALTY_AREA_CIRCLE_RAD);
+    ros::param::get("/field_margin_height"   , _FIELD_MARGIN_HEIGHT);
+    ros::param::get("/field_margin_width"    , _FIELD_MARGIN_WIDTH);
+    ros::param::get("/field_penalty_point"   , _FIELD_PENALTY_POINT);
+    ros::param::get("/goal_width"            , _GOAL_WIDTH);
+    ros::param::get("/goal_depth"            , _GOAL_DEPTH);
+    ros::param::get("/penalty_depth"         , _PENALTY_DEPTH);
+    ros::param::get("/penalty_width"         , _PENALTY_WIDTH);
+    ros::param::get("/center_circle_rad"     , _CENTER_CIRCLE_RAD);
 
     _MAX_DIST = sqrt(_FIELD_WIDTH * _FIELD_WIDTH + _FIELD_HEIGHT * _FIELD_HEIGHT);
-
 
     fCenter = Vector2D(0.0 , 0.0);
     fOurGoal = Vector2D(- _FIELD_WIDTH/2.0 , 0.0);
@@ -29,18 +26,18 @@ CField::CField()
     fOurCornerR = Vector2D(- _FIELD_WIDTH/2.0 , - _FIELD_HEIGHT/2.0);
     fOppCornerL = Vector2D(_FIELD_WIDTH/2.0 , _FIELD_HEIGHT/2.0);
     fOppCornerR = Vector2D(_FIELD_WIDTH/2.0 , - _FIELD_HEIGHT/2.0);
-    fOurPenalty = Vector2D(_FIELD_PENALTY - _FIELD_WIDTH/2.0 , 0.0);
-    fOppPenalty = Vector2D(_FIELD_WIDTH/2.0 - _FIELD_PENALTY , 0.0);
+    fOurPenalty = Vector2D(_FIELD_PENALTY_POINT - _FIELD_WIDTH/2.0 , 0.0);
+    fOppPenalty = Vector2D(_FIELD_WIDTH/2.0 - _FIELD_PENALTY_POINT , 0.0);
     fOurGoalL = Vector2D( - _FIELD_WIDTH/2.0, _GOAL_WIDTH / 2.0);
     fOurGoalR = Vector2D( - _FIELD_WIDTH/2.0, -_GOAL_WIDTH / 2.0);
     fOppGoalL = Vector2D(  _FIELD_WIDTH/2.0, _GOAL_WIDTH / 2.0);
     fOppGoalR = Vector2D(  _FIELD_WIDTH/2.0, -_GOAL_WIDTH / 2.0);
     fFieldRect = Rect2D(fOurCornerR+Vector2D(-0.005,-0.005),fOppCornerL+Vector2D(+0.005,+0.005));
     fMarginedFieldRect = Rect2D(fOurCornerR+Vector2D(-0.25,-0.25),fOppCornerL+Vector2D(+0.25,+0.25));
-    fOurPenaltyRect  = Rect2D(Vector2D(ourGoal().x,ourGoal().y + 1.25),
-                              Vector2D(ourGoal().x + _GOAL_RAD,ourGoal().y - 1.25));
-    fOppPenaltyRect  = Rect2D(Vector2D(oppGoal().x - _GOAL_RAD,oppGoal().y + 1.25),
-                              Vector2D(oppGoal().x ,oppGoal().y - 1.25));
+    fOurPenaltyRect  = Rect2D(Vector2D(ourGoal().x, ourGoal().y + _PENALTY_WIDTH/2),
+                              Vector2D(ourGoal().x + _PENALTY_DEPTH, ourGoal().y - _PENALTY_WIDTH/2));
+    fOppPenaltyRect  = Rect2D(Vector2D(oppGoal().x - _PENALTY_DEPTH,oppGoal().y + _PENALTY_WIDTH/2),
+                              Vector2D(oppGoal().x ,oppGoal().y - _PENALTY_WIDTH/2));
     fOurOneThirdL = Vector2D(-_FIELD_WIDTH / 2.0 + _FIELD_WIDTH / 3.0, _FIELD_HEIGHT / 2.0);
     fOurOneThirdR = Vector2D(-_FIELD_WIDTH / 2.0 + _FIELD_WIDTH / 3.0, -_FIELD_HEIGHT / 2.0);
     fOppOneThirdL = Vector2D(+_FIELD_WIDTH / 2.0 - _FIELD_WIDTH / 3.0, _FIELD_HEIGHT / 2.0);
@@ -153,410 +150,127 @@ Vector2D CField::oppOneThirdR() const
 
 QList<Vector2D> CField::ourPAreaIntersect(Line2D line) const
 {
+    Vector2D a,b;
+    a.invalidate(); b.invalidate();
+    int c = fOurPenaltyRect.intersection(line, &a, &b);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOurGoal + Vector2D(+_GOAL_RAD,-_GOAL_WIDTH/4),fOurGoal + Vector2D(+_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,0,90,"blue",false);
-//    draw(c2,90,180,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
+    if (c == 2) results << a << b;
+    if (c == 1) {
+        if (a.isValid()) results << a;
+        else results << b;
     }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    vSol1 = s.intersection(line);
-    if(vSol1.valid())
-    {
-        results.append(vSol1);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
     return results;
 }
 
+//TODO: fix this
 QList<Vector2D> CField::ourBigPAreaIntersect(Line2D line, double scale, float bias) const
 {
-    if (scale < 0)
-        scale = (0.975+0.16) / 0.975;
+//    if (scale < 0)
+//        scale = (0.975+0.16) / 0.975;
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4)*scale,_GOAL_RAD*scale + bias);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4)*scale,_GOAL_RAD*scale + bias);
-    Segment2D s(fOurGoal + Vector2D(+_GOAL_RAD + bias,-_GOAL_WIDTH/4)*scale,fOurGoal + Vector2D(+_GOAL_RAD + bias,+_GOAL_WIDTH/4)*scale);
-//    draw(c1,0,90,"blue",false);
-//    draw(c2,90,180,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    vSol1 = s.intersection(line);
-    if(vSol1.valid())
-    {
-        results.append(vSol1);
-    }
-
-//    for(int i=0; i<results.count(); i++)
+//    results.clear();
+//    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4)*scale,_GOAL_RAD*scale + bias);
+//    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4)*scale,_GOAL_RAD*scale + bias);
+//    Segment2D s(fOurGoal + Vector2D(+_GOAL_RAD + bias,-_GOAL_WIDTH/4)*scale,fOurGoal + Vector2D(+_GOAL_RAD + bias,+_GOAL_WIDTH/4)*scale);
+////    draw(c1,0,90,"blue",false);
+////    draw(c2,90,180,"blue",false);
+////    draw(s,"blue");
+//    int n;
+//    Vector2D vSol1,vSol2;
+//    n = c1.intersection(line,&vSol1,&vSol2);
+//    if(n==1)
 //    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
+//        double th = (vSol1 - c1.center()).th().degree();
+//        if( (th < 0) && (th > -90) )
+//        {
+//            results.append(vSol1);
+//        }
 //    }
-
+//    if(n==2)
+//    {
+//        double th;
+//        th = (vSol1 - c1.center()).th().degree();
+//        if( (th < 0) && (th > -90) )
+//        {
+//            results.append(vSol1);
+//        }
+//        th = (vSol2 - c1.center()).th().degree();
+//        if( (th < 0) && (th > -90) )
+//        {
+//            results.append(vSol2);
+//        }
+//    }
+//
+//    n = c2.intersection(line,&vSol1,&vSol2);
+//    if(n==1)
+//    {
+//        double th = (vSol1 - c2.center()).th().degree();
+//        if( (th > 0) && (th < 90) )
+//        {
+//            results.append(vSol1);
+//        }
+//    }
+//    if(n==2)
+//    {
+//        double th;
+//        th = (vSol1 - c2.center()).th().degree();
+//        if( (th > 0) && (th < 90) )
+//        {
+//            results.append(vSol1);
+//        }
+//        th = (vSol2 - c2.center()).th().degree();
+//        if( (th > 0) && (th < 90) )
+//        {
+//            results.append(vSol2);
+//        }
+//    }
+//
+//    vSol1 = s.intersection(line);
+//    if(vSol1.valid())
+//    {
+//        results.append(vSol1);
+//    }
+//
+////    for(int i=0; i<results.count(); i++)
+////    {
+////        draw(Circle2D(results[i],0.05),0,360,"purple",true);
+////    }
+//
     return results;
 }
-
-
-
-
 
 QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment) const
 {
+    Vector2D v[2];
+    for (auto& vec : v) vec.invalidate();
+    fOurPenaltyRect.intersection(segment, &v[0], &v[1]);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOurGoal + Vector2D(+_GOAL_RAD,-_GOAL_WIDTH/4),fOurGoal + Vector2D(+_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,0,90,"blue",false);
-//    draw(c2,90,180,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(segment,&vSol1,&vSol2);
-    if(n==1)
-    {
-
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(segment,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    vSol1 = s.intersection(segment);
-    if(vSol1.valid())
-    {
-        results.append(vSol1);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
+    for (const auto& vec : v) results.append(vec);
     return results;
 }
 
 QList<Vector2D> CField::ourPAreaIntersect(Circle2D circle) const
 {
+    Vector2D v[4];
+    for (auto& vec : v) vec.invalidate();
+    fOurPenaltyRect.intersection(circle, &v[0], &v[1], &v[2], &v[3]);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOurGoal + Vector2D(+_GOAL_RAD,-_GOAL_WIDTH/4),fOurGoal + Vector2D(+_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,0,90,"blue",false);
-//    draw(c2,90,180,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(circle,&vSol1,&vSol2);
-    if(n==1)
-    {
-
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(circle,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = circle.intersection(s,&vSol1,&vSol2);
-    if(n==1)
-    {
-        results.append(vSol1);
-    }
-    if(n==2)
-    {
-        results.append(vSol1);
-        results.append(vSol2);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
+    for (const auto& vec : v) results.append(vec);
     return results;
 }
 
 bool CField::isInOurPenaltyArea(Vector2D point) const
 {
-    Circle2D c1(fOurGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOurGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Rect2D r(fOurGoal + Vector2D(+0,-_GOAL_WIDTH/4),fOurGoal + Vector2D(+_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,0,90,"blue",false);
-//    draw(c2,90,180,"blue",false);
-//    draw(r,"blue");
-    if (r.contains(point))
-        return true;
-    if (c1.contains(point))
-    {
-        double th = (point - c1.center()).th().degree();
-        if( (th < 0) && (th > -90) )
-            return true;
-    }
-    if (c2.contains(point))
-    {
-        double th = (point - c2.center()).th().degree();
-        if( (th > 0) && (th < 90) )
-            return true;
-    }
-    return false;
+    return fOurPenaltyRect.contains(point);
 }
 
 QList<Vector2D> CField::oppPAreaIntersect(Line2D line) const
 {
+    Vector2D v[2];
+    for (auto& vec : v) vec.invalidate();
+    fOppPenaltyRect.intersection(line, &v[0], &v[1]);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOppGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOppGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOppGoal + Vector2D(-_GOAL_RAD,-_GOAL_WIDTH/4),fOppGoal + Vector2D(-_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,270,360,"blue",false);
-//    draw(c2,180,270,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(line,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    vSol1 = s.intersection(line);
-    if(vSol1.valid())
-    {
-        results.append(vSol1);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
+    for (const auto& vec : v) results.append(vec);
     return results;
 }
 
@@ -564,185 +278,27 @@ QList<Vector2D> CField::oppPAreaIntersect(Line2D line) const
 
 QList<Vector2D> CField::oppPAreaIntersect(Segment2D segment) const
 {
+    Vector2D v[2];
+    for (auto& vec : v) vec.invalidate();
+    fOppPenaltyRect.intersection(segment, &v[0], &v[1]);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOppGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOppGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOppGoal + Vector2D(-_GOAL_RAD,-_GOAL_WIDTH/4),fOppGoal + Vector2D(-_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,270,360,"blue",false);
-//    draw(c2,180,270,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(segment,&vSol1,&vSol2);
-    if(n==1)
-    {
-
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(segment,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    vSol1 = s.intersection(segment);
-    if(vSol1.valid())
-    {
-        results.append(vSol1);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
+    for (const auto& vec : v) results.append(vec);
     return results;
 }
 
 QList<Vector2D> CField::oppPAreaIntersect(Circle2D circle) const
 {
+    Vector2D v[4];
+    for (auto& vec : v) vec.invalidate();
+    fOurPenaltyRect.intersection(circle, &v[0], &v[1], &v[2], &v[3]);
     QList<Vector2D> results;
-    results.clear();
-    Circle2D c1(fOppGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOppGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Segment2D s(fOppGoal + Vector2D(-_GOAL_RAD,-_GOAL_WIDTH/4),fOppGoal + Vector2D(-_GOAL_RAD,+_GOAL_WIDTH/4));
-//    draw(c1,270,360,"blue",false);
-//    draw(c2,180,270,"blue",false);
-//    draw(s,"blue");
-    int n;
-    Vector2D vSol1,vSol2;
-    n = c1.intersection(circle,&vSol1,&vSol2);
-    if(n==1)
-    {
-
-        double th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = c2.intersection(circle,&vSol1,&vSol2);
-    if(n==1)
-    {
-        double th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-    }
-    if(n==2)
-    {
-        double th;
-        th = (vSol1 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol1);
-        }
-        th = (vSol2 - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-        {
-            results.append(vSol2);
-        }
-    }
-
-    n = circle.intersection(s,&vSol1,&vSol2);
-    if(n==1)
-    {
-        results.append(vSol1);
-    }
-    if(n==2)
-    {
-        results.append(vSol1);
-        results.append(vSol2);
-    }
-
-//    for(int i=0; i<results.count(); i++)
-//    {
-//        draw(Circle2D(results[i],0.05),0,360,"purple",true);
-//    }
-
+    for (const auto& vec : v) results.append(vec);
     return results;
 }
 
 bool CField::isInOppPenaltyArea(Vector2D point) const
 {
-    Circle2D c1(fOppGoal + Vector2D(0,-_GOAL_WIDTH/4),_GOAL_RAD);
-    Circle2D c2(fOppGoal + Vector2D(0,+_GOAL_WIDTH/4),_GOAL_RAD);
-    Rect2D r(fOppGoal + Vector2D(-0,-_GOAL_WIDTH/4),fOppGoal + Vector2D(-_GOAL_RAD,+_GOAL_WIDTH/4));
-    Rect2D Back(fOppGoal + Vector2D(-0,-_GOAL_WIDTH/2) + Vector2D(-0,-0.75),fOppGoal + Vector2D(0.05,+_GOAL_WIDTH/2)+Vector2D(-0,+0.75));
-//    draw(c1,270,360,"blue",false);
-//    draw(c2,180,270,"blue",false);
-//    draw(r,"blue");
-//
-//    draw(Back,"red");
-    if (r.contains(point))
-        return true;
-    if (c1.contains(point))
-    {
-        double th = (point - c1.center()).th().degree();
-        if( (th < -90) && (th > -180) )
-            return true;
-    }
-    if (c2.contains(point))
-    {
-        double th = (point - c2.center()).th().degree();
-        if( (th > 90) && (th < 180) )
-            return true;
-    }
-    return Back.contains(point);
+    return fOppPenaltyRect.contains(point);
 }
 
 Rect2D   CField::getRegion(Region region, double k) const
