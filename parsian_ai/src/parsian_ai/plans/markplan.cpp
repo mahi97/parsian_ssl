@@ -928,7 +928,7 @@ QList<QPair<Vector2D, double> > CMarkPlan::sortdangerpassplayoff(QList<Vector2D>
     double KA=1; //Angle Coefficient
     double KDB=1;  //Distance To Ball
     double KDG=1;  //Distnce To Goal
-    double RangeofAngle = Vector2D::angleOf(wm->field->ourGoalR(),Vector2D(-1.0 * (wm->field->_FIELD_WIDTH / 2 - wm->field->_GOAL_RAD), 0), wm->field->ourGoalL()).degree();
+    double RangeofAngle = Vector2D::angleOf(wm->field->ourGoalR(),Vector2D(-1.0 * (wm->field->_FIELD_WIDTH / 2 - wm->field->_P), 0), wm->field->ourGoalL()).degree();
     //drawer->draw(Vector2D(-1.0 * (wm->field->_FIELD_WIDTH - _GOAL_WIDTH), 0), QColor(Qt::red));
     // double RangeofAngle2 = Vector2D::angleOf(wm->field->ou,Vector2D(0, -1.0 * (wm->field->_FIELD_WIDTH - _GOAL_WIDTH)), wm->field->ourGoalL()).degree();
 

@@ -52,7 +52,7 @@ namespace parsian_protobuf_wrapper {
 
         void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
 
-        bool isOurColorYellow = false;
+        bool isOurColorYellow = false, isOurSideLeft = false;
         RoboCupSSLClient *vision;
         protobuf_wrapper_config::visionConfig visionConfig;
         SSL_WrapperPacket vision_packet;

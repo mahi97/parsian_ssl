@@ -20,18 +20,18 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     //lastCamera = -1;
 //    float ourTeamSide=(ourSide==_SIDE_RIGHT)? -1.0f : 1.0f;
 
-//   if(!config.camera_one_active){
-//       if (packet->camera_id==0) return;
-//   }
-//   if(!config.camera_two_active){
-//       if (packet->camera_id==1) return;
-//   }
-//   if(!config.camera_three_active){
-//       if (packet->camera_id==2) return;
-//   }
-//   if(!config.camera_four_active){
-//       if (packet->camera_id==3) return;
-//   }
+   if(!config.camera_one_active){
+       if (packet->camera_id==0) return;
+   }
+   if(!config.camera_two_active){
+       if (packet->camera_id==1) return;
+   }
+   if(!config.camera_three_active){
+       if (packet->camera_id==2) return;
+   }
+   if(!config.camera_four_active){
+       if (packet->camera_id==3) return;
+   }
 
 
     frameCnt ++;
@@ -123,8 +123,8 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     for (const auto &i : packet->them) {
         int rob_id = i.robot_id;
         if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) continue;
-        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x, i.pos.y),
-                                    i.orientation*180.0f/M_PI
+        CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x*ourSide, i.pos.y*ourSide),
+                                    i.orientation*180.0f/M_PI+(1.0-ourSide)*90
                 ,rob_id ,i.confidence, nullptr, id);
         for (int k=0;k<v[id].oppTeam[rob_id].count();k++)
         {
