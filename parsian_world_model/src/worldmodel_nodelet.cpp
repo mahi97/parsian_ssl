@@ -49,7 +49,7 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
     if (packs >= 4) {
         packs = 0;
         wm->merge(frame);
-        parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel(isOurColorYellow, isOurSideLeft);
+        parsian_msgs::parsian_world_modelPtr temp = wm->getParsianWorldModel();
         temp->header.stamp = ros::Time::now();
         temp->header.frame_id = std::to_string(_detection->frame_number);
         wm_pub.publish(temp);
@@ -60,7 +60,6 @@ void WMNodelet::detectionCb(const parsian_msgs::ssl_vision_detectionConstPtr &_d
 
 void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
-    isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
     isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
     wm->setMode(msg->mode == parsian_msgs::parsian_team_config::SIMULATION);
     NODELET_INFO("team config received!");
