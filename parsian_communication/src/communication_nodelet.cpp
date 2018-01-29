@@ -24,7 +24,7 @@ void CommunicationNodelet::onInit() {
     debugPub   = n.advertise<parsian_msgs::parsian_debugs>("/debugs",1000);
     statusPub  = n.advertise<parsian_msgs::parsian_robots_status>("/robots_status",1000);
     robotPacketSub   = n.subscribe("/packets" , 10000, &CommunicationNodelet::callBack, this);
-    team_config_sub = n.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& CommunicationNodelet::teamConfigCb, this, _1));
+    team_config_sub = n.subscribe("/team_config", 1000, & CommunicationNodelet::teamConfigCb, this);
 
 
     communicator.reset(new CCommunicator);
@@ -52,9 +52,33 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
-    if (realGame)
-        communicator->packetCallBack(_packet);
+    if (cbCount >= 40) {
+        cbCount = 0;
+        sim_handle_flag = false;
+    }
 
+    if (realGame){
+        communicator->packetCallBack(_packet);
+        sim_handle_flag = true;
+    } else if (cbCount < 40 && sim_handle_flag) {
+        communicator->packetCallBack(modeChangePacket(_packet));
+        cbCount++;
+    }
+}
+parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)
+{
+    parsian_msgs::parsian_packetsPtr packet_{new parsian_msgs::parsian_packets};
+    auto  sim_handle_packet = *_packet;
+    for (auto & robot_packet : sim_handle_packet.value)
+    {
+        for (int i = 0; i < 14; i++ )
+        {
+            if (i!= 11 || i!=1)
+                robot_packet.packets[i] = 0;
+        }
+    }
+    *packet_ = sim_handle_packet;
+    return packet_;
 }
 
 void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
@@ -80,7 +104,7 @@ void CommunicationNodelet::ConfigServerCallBack(const communication_config::comm
   conf = config;
 }
 
-void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
     realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
 }

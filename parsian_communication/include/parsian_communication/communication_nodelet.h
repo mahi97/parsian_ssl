@@ -48,8 +48,12 @@ namespace parsian_communication {
         void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level);
         communication_config::communicationConfig conf;
 
-        void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+        void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
         bool realGame = false;
+        int cbCount;
+        bool sim_handle_flag;
+        parsian_msgs::parsian_packetsPtr modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet);
+
 
     };
 }

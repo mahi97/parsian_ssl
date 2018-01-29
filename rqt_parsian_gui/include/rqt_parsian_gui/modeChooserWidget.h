@@ -58,6 +58,7 @@ namespace rqt_parsian_gui
         Color color;
         TeamSide side;
         GameMode mode;
+        parsian_msgs::parsian_team_configPtr team_config{new parsian_msgs::parsian_team_config};
 
         ros::Publisher team_config_pub;
     };
