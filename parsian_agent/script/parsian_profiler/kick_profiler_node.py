@@ -74,11 +74,12 @@ class KickProfiler():
         self.robot1_restPos = point.Point(0, 0)             #point.Point(-4, -2.5)                 #GUI
         self.robot2_restPos = point.Point(0, 0)             #point.Point(-3.6, 2.5)                #GUI
         self.realspeedmax = 0                                                                      #GUI
+        self.ischip = False                                                                        #GUI
 
         self.stepnum = 0
         self.robot1_overspeed = False
         self.robot2_overspeed = False
-        self.startingkickspeed = 200
+        self.startingkickspeed = 400
         self.endingkickspeed = 1023
         self.current_speed = self.startingkickspeed
 
@@ -118,6 +119,10 @@ class KickProfiler():
         self.srv = Server(kick_profilerConfig, self.cfg_callback)
 
     def resetvalues(self):
+
+        self.current_speed = 400
+        self.speed_step = 100
+        self.endingkickspeed = 1023
         self.current_speed = self.startingkickspeed
         self.realspeedmax = 0                                                                      #GUI
         self.stepnum = 0
@@ -234,6 +239,8 @@ class KickProfiler():
         self.realspeedmax = config.Real_speed_max                     #0                                     #GUI
         self.spinner = config.Spinner                                 #0                                     #GUI
         self.gui_debug = config.GUI_Debug                             #False                                 #GUI
+        self.ischip = config.Chip
+
         self.startingpoint1.x = config.Robot1_start_pos_x             #point.Point(0, -1.5)                  #GUI
         self.startingpoint1.y = config.Robot1_start_pos_y             #point.Point(0, -1.5)                  #GUI
         self.startingpoint2.x = config.Robot2_start_pos_x             #point.Point(2, +1.5 )                 #GUI
@@ -513,7 +520,7 @@ class KickProfiler():
             current_task1 = parsian_robot_task()
             current_task1.select = parsian_robot_task.KICK
             task1 = parsian_skill_kick()
-            task1.chip = False
+            task1.chip = self.ischip
             task1.spin = self.spinner
             task1.iskickchargetime = True
             task1.kickchargetime = self.current_speed
@@ -539,7 +546,7 @@ class KickProfiler():
             current_task2 = parsian_robot_task()
             current_task2.select = parsian_robot_task.KICK
             task2 = parsian_skill_kick()
-            task2.chip = False
+            task2.chip = self.ischip
             task2.spin = self.spinner
             task2.iskickchargetime = True
             task2.kickchargetime = self.current_speed
@@ -667,7 +674,7 @@ class KickProfiler():
             if self.current_speed > self.endingkickspeed:  #1023 WTF: i added this
                 self.state = State.FINISHED
                 return 1
-            if self.robot1_overspeed and self.robot2_overspeed:
+            if self.robot1_overspeed and self.robot2_overspeed and not self.ischip:
                 self.state = State.FINISHED
                 return 1
             self.robot1_vels[self.current_speed] = []
@@ -678,22 +685,26 @@ class KickProfiler():
 
     #save the datas after profiling done
     def save(self):
+        if self.ischip:
+            prefix = "chip"
+        else:
+            prefix = "kick"
         if self.spinner > 0:
             file1 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid1) + "_" +
-                                           str(int(round(time.time()/10))) + "(spin_" + str(self.spinner) + ")_kick.profile"), "w+")
+                                           str(int(round(time.time()/10))) + "(spin_" + str(self.spinner) + ")_"+prefix+".profile"), "w+")
             file1.write(str(self.robot1_vels))
             file1.close()
             file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
-                                           str(int(round(time.time()/10))) + + "(spin_" + str(self.spinner) + ")_kick.profile"), "w+")
+                                           str(int(round(time.time()/10))) + + "(spin_" + str(self.spinner) + ")_"+prefix+".profile"), "w+")
             file2.write(str(self.robot2_vels))
             file2.close()
         if self.spinner == 0:
             file1 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid1) + "_" +
-                                           str(int(round(time.time()/10))) + "_kick(nospin).profile"), "w+")
+                                           str(int(round(time.time()/10))) + "_"+prefix+"(nospin).profile"), "w+")
             file1.write(str(self.robot1_vels))
             file1.close()
             file2 = open(path.abspath(rospkg.RosPack().get_path("parsian_agent")+ "/profiler_data/" + str(self.robotid2) + "_" +
-                                           str(int(round(time.time()/10))) + "_kick(nospin).profile"), "w+")
+                                           str(int(round(time.time()/10))) + "_"+prefix+"(nospin).profile"), "w+")
             file2.write(str(self.robot2_vels))
             file2.close()
         rospy.loginfo("saved!!")
