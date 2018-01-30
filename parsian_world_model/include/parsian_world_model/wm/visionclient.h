@@ -15,6 +15,8 @@
 #include <parsian_msgs/ssl_vision_detection.h>
 
 #include <parsian_world_model/wm/visionbelief.h>
+#include <parsian_world_model/config.h>
+#include <parsian_msgs/parsian_team_config.h>
 
 //#include "parsian_world_model/world_modelConfig.h"
 

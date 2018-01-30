@@ -7,8 +7,6 @@ using namespace parsian_world_model;
 void WMNodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    std::cout << "sag tush";
-
 
     wm.reset(new WorldModel);
 
@@ -23,10 +21,10 @@ void WMNodelet::onInit() {
     }
 //    vision_geom_sub = nh.subscribe("vision_geom", 10, boost::bind(& WMNodelet::geomCb, this, _1));
 
-//    server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>(private_nh));
-//    dynamic_reconfigure::Server<world_model_config::world_modelConfig>::CallbackType f;
-//    f = boost::bind(&WMNodelet::ConfigServerCallBack,this, _1, _2);
-//    server->setCallback(f);
+    server.reset(new dynamic_reconfigure::Server<world_model_config::world_modelConfig>(private_nh));
+    dynamic_reconfigure::Server<world_model_config::world_modelConfig>::CallbackType f;
+    f = boost::bind(&WMNodelet::ConfigServerCallBack,this, _1, _2);
+    server->setCallback(f);
 
 }
 
@@ -65,11 +63,11 @@ void WMNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& ms
     NODELET_INFO("team config received!");
 }
 
-//void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
-//{
-//  m_config.active_cam_num = config.active_cam_num;
-//  m_config.camera_one_active = config.camera_one_active;
-//  m_config.camera_two_active = config.camera_two_active;
-//  m_config.camera_three_active = config.camera_three_active;
-//  m_config.camera_four_active = config.camera_four_active;
-//}
+void WMNodelet::ConfigServerCallBack(const world_model_config::world_modelConfig &config, uint32_t level)
+{
+  m_config.active_cam_num = config.active_cam_num;
+  m_config.camera_one_active = config.camera_one_active;
+  m_config.camera_two_active = config.camera_two_active;
+  m_config.camera_three_active = config.camera_three_active;
+  m_config.camera_four_active = config.camera_four_active;
+}
