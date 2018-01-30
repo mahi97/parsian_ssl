@@ -1520,7 +1520,7 @@ void CDynamicAttack::assignRegion_6() {
     }
 
     //BackUp Line
-    guards[6][5].assign(-wm->field->_FIELD_WIDTH/2 + wm->field->_FIELD_PENALTY,        //top_X
+    guards[6][5].assign(-wm->field->_FIELD_WIDTH/2 + wm->field->_FIELD_PENALTY_POINT,        //top_X
                         wm->field->_PENALTY_WIDTH/2,                        //top_Y
                         wm->field->_FIELD_WIDTH/2 - 1 - wm->field->_CENTER_CIRCLE_RAD, //X_Length
                         wm->field->_PENALTY_WIDTH);                         //Y_Length

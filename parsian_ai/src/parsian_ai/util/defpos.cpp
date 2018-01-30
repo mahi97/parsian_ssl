@@ -192,9 +192,9 @@ Vector2D CDefPos::getIntersectionWithPenaltyAreaDef(double _tempBestRadius , Seg
     if(PAreaOffset < 0.12) {
         PAreaOffset = 0.15;
     }
-    Circle2D c1(wm->field->ourGoal() + Vector2D(0,-wm->field->_GOAL_WIDTH/4),wm->field->_GOAL_RAD + PAreaOffset);
-    Circle2D c2(fOurGoal + Vector2D(0,+wm->field->_GOAL_WIDTH/4),wm->field->_GOAL_RAD + PAreaOffset);
-    Rect2D r(fOurGoal + Vector2D(+0,-wm->field->_GOAL_WIDTH/4),fOurGoal + Vector2D(+wm->field->_GOAL_RAD + PAreaOffset,+wm->field->_GOAL_WIDTH/4));
+    Circle2D c1(wm->field->ourGoal() + Vector2D(0,-wm->field->_GOAL_WIDTH/4),wm->field->_PENALTY_DEPTH + PAreaOffset);
+    Circle2D c2(fOurGoal + Vector2D(0,+wm->field->_GOAL_WIDTH/4),wm->field->_PENALTY_DEPTH + PAreaOffset);
+    Rect2D r(fOurGoal + Vector2D(+0,-wm->field->_GOAL_WIDTH/4),fOurGoal + Vector2D(+wm->field->_PENALTY_DEPTH + PAreaOffset,+wm->field->_GOAL_WIDTH/4));
     drawer->draw(c1, 0, 90,QColor(Qt::black));
     drawer->draw(c2, 90, 180,QColor(Qt::black));
     drawer->draw(r,QColor(Qt::black));
