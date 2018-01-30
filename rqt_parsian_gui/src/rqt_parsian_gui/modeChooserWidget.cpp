@@ -12,9 +12,10 @@ namespace rqt_parsian_gui
         side  = TeamSide::LEFT;
         mode  = GameMode::SIMULATION;
 
-        loadTeamConfig();
+        team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("/team_config",1000);
+        wmsub = n.subscribe("/world_model", 1000, &ModeChooserWidget::wmCb, this);
 
-        team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("team_config",1000);
+        loadTeamConfig();
 
         colorStr[0] = "YELLOW";
         colorStr[1] = "BLUE";
@@ -53,7 +54,6 @@ namespace rqt_parsian_gui
         connect(modeAct, SIGNAL(triggered(bool)), this, SLOT(toggleMode()));
 
 
-
     }
 
     ModeChooserWidget::~ModeChooserWidget()
@@ -64,21 +64,21 @@ namespace rqt_parsian_gui
     {
         mode = (mode == GameMode::SIMULATION) ? GameMode::REAL : GameMode::SIMULATION;
         modePB->setText(modeStr[static_cast<int>(mode)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
     void ModeChooserWidget::toggleColor()
     {
         color = (color == Color::YELLOW) ? Color::BLUE : Color::YELLOW;
         colorPB->setText(colorStr[static_cast<int>(color)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
     void ModeChooserWidget::toggleSide()
     {
         side = (side == TeamSide::LEFT) ? TeamSide::RIGHT : TeamSide::LEFT;
         sidePB->setText(sideStr[static_cast<int>(side)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
 
@@ -125,4 +125,12 @@ namespace rqt_parsian_gui
         ROS_INFO_STREAM((int)color << (int)side << (int)mode);
         myFile.close();
     }
+
+    void ModeChooserWidget::wmCb(const parsian_msgs::parsian_world_modelConstPtr& msg)
+    {
+        sendTeamConfig();
+    }
+
 }
+
+
