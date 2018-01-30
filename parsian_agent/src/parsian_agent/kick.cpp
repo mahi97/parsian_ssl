@@ -366,7 +366,7 @@ void CSkillKick::avoidOppPenalty()
     Segment2D ballSeg;
     Segment2D ballPosSeg;
     Segment2D penaltyStraightLine;
-    penaltyStraightLine.assign(Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY -0.1,0.7 ),Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY-0.1 ,-0.7 ));
+    penaltyStraightLine.assign(Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY_POINT -0.1,0.7 ),Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY_POINT-0.1 ,-0.7 ));
     ballPosSeg.assign( wm->field->oppGoal(),wm->field->oppGoal() + tempVector.norm()*2);
     ballSeg.assign(ballPos,ballPos+wm->ball->vel.norm()*10);
     penaltyCircle.assign(wm->field->oppGoal() + Vector2D(0.15,0),1.4);
