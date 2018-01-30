@@ -44,26 +44,47 @@ void COurBallPlacement::execute_x(){
 
     Vector2D pos;
     Vector2D ballpos = Vector2D(wm->ball->pos.x - 0.1 , wm->ball->pos.y);
+
     double dist  = 0;
     double mindist = 10000;
     static int minIndex = 0;
     int lastminIndex = minIndex;
     for(int i = 0 ; i < agentsID.size() ; i++) {
-        if(agentsID[i]->isVisible()) {
-            dist = agentsID[i]->pos().dist(ballpos);
-            if (dist < mindist) {
-                mindist = dist;
-                minIndex = i;
-            }
+        dist = agentsID[i]->pos().dist(ballpos);
+        if (dist < mindist) {
+            mindist = dist;
+            minIndex = i;
         }
     }
+    dist = 0;
+    mindist = 10000;
+    static int minIndexPos = 0;
+    for(int i = 0 ; i < agentsID.size() ; i++) {
+        dist = agentsID[i]->pos().dist(pos);
+        if (dist < mindist) {
+            mindist = dist;
+            minIndexPos = i;
+        }
+    }
+
     auto* gpa = new  GotopointavoidAction();
     gpa->setBallobstacleradius(0.5);
-    gpa->setTargetpos(ballpos);
-    auto* pass = new  KickAction;
+    gpa->setTargetpos(pos);
+    gpa->setLookat(ballpos);
+    auto* posb = new GotopointavoidAction();
+    posb->setTargetpos(ballpos);
+    posb->setLookat(ballpos);
+    posb->setSlowmode(true);
+    posb->setRoller(5);///////////////////////////////////////////////r///////////////////drible kone
+    //auto* b;////////////////////////////////////////////////////////////////////////////sensore shoot
+    if(agentsID[minIndexPos]->pos().dist(pos) > 0.50)
+         agentsID[minIndexPos]->action = gpa;
+    else
+        agentsID[minIndexPos]->action = posb;
+    auto* pass = new  KickAction{};
     pass->setTarget(Vector2D(0 , 0));
     pass->setKickspeed(300);
-    pass->setChip(1);
+    pass->setChip(true);
     pass->setSpin(3);
     if(agentsID[minIndex]->pos().dist(ballpos) < 0.1){
         agentsID[minIndex]->action = pass;
@@ -71,6 +92,7 @@ void COurBallPlacement::execute_x(){
     else {
         agentsID[minIndex]->action = gpa;
     }
+
     auto* gp = new  KickAction;
     //gp->setSpin(3);
     auto* passr = new  ReceivepassAction;
@@ -83,6 +105,7 @@ void COurBallPlacement::execute_x(){
         if (agentsID.size() > lastminIndex)
             agentsID[lastminIndex]->action = passr;//!!!!!!!!!!!!!!!!!!!
     }
+
     ROS_INFO_STREAM(lastminIndex);
     ROS_INFO_STREAM(minIndex);
     /*
@@ -101,4 +124,19 @@ void COurBallPlacement::execute_x(){
     currentplan.passpos = pos;//ki//resid minIndex?
     */
     //end
+
+
+    switch (state) {
+        case BallPlacement::GO_FOR_BALL:
+
+
+            break;
+        case BallPlacement::NoState:break;
+        case BallPlacement::PASS:break;
+        case BallPlacement::RECIVE_AND_POS:break;
+        case BallPlacement::FINAL_POS:break;
+        case BallPlacement::DONE:break;
+    }
+    if
+
 }
