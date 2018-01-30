@@ -18,9 +18,6 @@
 #include <parsian_world_model/config.h>
 #include <parsian_msgs/parsian_team_config.h>
 
-//#include "parsian_world_model/world_modelConfig.h"
-
-
 
 #define CAMERA_NUM 4
 #define OUT_OF_SIGHT_THRESHOLD 40
