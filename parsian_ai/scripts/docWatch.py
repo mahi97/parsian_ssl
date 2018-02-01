@@ -223,16 +223,21 @@ class Handler(FileSystemEventHandler):
         rad = 0.9
         # normal checking:
         for plan in self.__final_dict:
-            if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
-                    or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
                 print("ball pos matched")
                 if len(plan["agentInitPos"]) >= player_num \
                         and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                         and plan["planMode"] == plan_mode:
-                    print("matched: " + plan["filename"].split("plans/")[1]
-                          + " --> num agents: " + str(len(plan["agentInitPos"])))
+                    print("matched: " + plan["filename"].split("plans/")[1])
                     sublist.append(plan)
-
+            if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+                print("ball pos matched")
+                if len(plan["agentInitPos"]) >= player_num \
+                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                        and plan["planMode"] == plan_mode:
+                    print("matched: " + plan["filename"].split("plans/")[1])
+                    plan["symmetry"] = True
+                    sublist.append(plan)
         if len(sublist) > 0:
             i = self.__shuffleCount % len(sublist)
             i += 1
@@ -242,18 +247,24 @@ class Handler(FileSystemEventHandler):
         elif plan_mode == "DIRECT":
             print ("searching for Indirect plans for direct mode...")
             for plan in self.__final_dict:
-                if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]) \
-                        or self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+                if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
                     print("ball pos matched")
                     if len(plan["agentInitPos"]) >= player_num \
                             and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                             and plan["planMode"] == "INDIRECT":
-                        print("matched: " + plan["filename"].split("plans/")[1]
-                              + " --> num agents: " + str(len(plan["agentInitPos"])))
+                        print("matched: " + plan["filename"].split("plans/")[1])
+                        sublist.append(plan)
+                if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+                    print("ball pos matched")
+                    if len(plan["agentInitPos"]) >= player_num \
+                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                            and plan["planMode"] == "INDIRECT":
+                        print("matched: " + plan["filename"].split("plans/")[1])
+                        plan["symmetry"] = True
                         sublist.append(plan)
             if len(sublist) > 0:
                 i = self.__shuffleCount % len(sublist)
-                i += 1
+                self.__shuffleCount += 1
                 return self.message_generator(sublist[i])
             else:
                 print ("\nNO PLAN MATCHED!\n")
@@ -302,6 +313,7 @@ class Handler(FileSystemEventHandler):
                     dict1.update({"isActive": True})
                     dict1.update({"successRate": 0})
                     dict1.update({"planRepeat": 0})
+                    dict1.update({"symmetry": False})
                     self.__final_dict.append(dict1)
         return self.__final_dict
 
