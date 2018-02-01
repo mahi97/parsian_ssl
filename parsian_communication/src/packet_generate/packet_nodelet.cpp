@@ -42,6 +42,8 @@ void PacketNodelet::onInit() {
 
 void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &_packet) {
 
+    parsian_msgs::parsian_robot_command temp = *_packet;
+
     ROS_INFO("miad inja");
     unsigned char outputBuffer[_ROBOT_PACKET_SIZE] = {0};
     unsigned char robotId = _packet->robot_id;
@@ -50,13 +52,13 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     outputBuffer[0] = 0x99;
     outputBuffer[1] = robotId & static_cast<unsigned char>(0x0F);
     if (_packet->roller_speed != 0)
-        outputBuffer[1] = outputBuffer[1] | ((_packet->roller_speed & 0x07) << 4);
-    outputBuffer[2] = kickNumber & 0x7F;
-    outputBuffer[3] = (kickNumber >> 7) & 0x07;
+        outputBuffer[1] = static_cast<unsigned char>(outputBuffer[1] | ((_packet->roller_speed & 0x07) << 4));
+    outputBuffer[2] = static_cast<unsigned char>(kickNumber & 0x7F);
+    outputBuffer[3] = static_cast<unsigned char>((kickNumber >> 7) & 0x07);
 
-    int vforwardI = floor(_packet->vel_F * 487.0);
-    int vnormalI  = floor(_packet->vel_N * 487.0);
-    int vangularI  = (_packet->vel_w) * ((double)256.0 / (double) 360.0);
+    int vforwardI = static_cast<int>(floor(_packet->vel_F * 487.0));
+    int vnormalI  = static_cast<int>(floor(_packet->vel_N * 487.0));
+    int vangularI  = static_cast<int>((_packet->vel_w) * ((double)256.0 / (double) 360.0));
 
     if (vforwardI > 2047) vforwardI = 2047;
     if (vforwardI < -2047) vforwardI = -2047;
@@ -71,15 +73,15 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     int vforwardAbs = abs(vforwardI);
     int vnormalAbs  = abs(vnormalI);
 
-    outputBuffer[3] = (((vangularAbs >> 7) & 0x0F) << 3) | outputBuffer[3];
+    outputBuffer[3] = static_cast<unsigned char>((((vangularAbs >> 7) & 0x0F) << 3) | outputBuffer[3]);
 
-    outputBuffer[4] = vforwardAbs & 0x7F;
-    outputBuffer[5] = vnormalAbs & 0x7F;
-    outputBuffer[6] = (vforwardAbs >> 7) & 0x0F;
-    if (vforwardI < 0) outputBuffer[6] = outputBuffer[6] | 0x10;
-    if (vnormalI < 0) outputBuffer[6] = outputBuffer[6] | 0x20;
+    outputBuffer[4] = static_cast<unsigned char>(vforwardAbs & 0x7F);
+    outputBuffer[5] = static_cast<unsigned char>(vnormalAbs & 0x7F);
+    outputBuffer[6] = static_cast<unsigned char>((vforwardAbs >> 7) & 0x0F);
+    if (vforwardI < 0) outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x10);
+    if (vnormalI < 0) outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x20);
 
-    outputBuffer[7] = vangularAbs & 0x7F;
+    outputBuffer[7] = static_cast<unsigned char>(vangularAbs & 0x7F);
 
     if (_packet->release)
     {

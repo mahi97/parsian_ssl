@@ -373,13 +373,13 @@ namespace rqt_parsian_gui
         glCallList(drawLine(field.left(), field.top(), field.left(), field.bottom()));
         glCallList(drawLine(field.right(), field.top(), field.right(), field.bottom()));
 
-        glCallList(drawArc(leftPenalty.left(), -1*(leftPenalty.bottom()-leftPenalty.width()), leftPenalty.width(), 0, 90));
-        glCallList(drawArc(leftPenalty.left(), -1*(leftPenalty.top()+leftPenalty.width()), leftPenalty.width(), 90, 180));
-        glCallList(drawLine(leftPenalty.left()+leftPenalty.width(), leftPenalty.bottom()-leftPenalty.width(), field.left()+leftPenalty.width(), leftPenalty.top()+leftPenalty.width() ));
+        glCallList(drawLine(leftPenalty.left(),leftPenalty.bottom(), leftPenalty.right(),leftPenalty.bottom()));
+        glCallList(drawLine(leftPenalty.right(),leftPenalty.bottom(),leftPenalty.right(),leftPenalty.top()));
+        glCallList(drawLine(leftPenalty.right(),leftPenalty.top(), leftPenalty.left(),leftPenalty.top()));
 
-        glCallList(drawArc(rightPenalty.right(), -1*(rightPenalty.bottom()-rightPenalty.width()), rightPenalty.width(), 270, 360));
-        glCallList(drawArc(rightPenalty.right(), -1*(rightPenalty.top()+rightPenalty.width()), rightPenalty.width(), 180, 270));
-        glCallList(drawLine(rightPenalty.right()-rightPenalty.width(), rightPenalty.bottom()-rightPenalty.width(), rightPenalty.right()-rightPenalty.width(), rightPenalty.top()+rightPenalty.width() ));
+        glCallList(drawLine(rightPenalty.right(),rightPenalty.bottom(), rightPenalty.left(),rightPenalty.bottom()));
+        glCallList(drawLine(rightPenalty.left(),rightPenalty.bottom(),rightPenalty.left(),rightPenalty.top()));
+        glCallList(drawLine(rightPenalty.left(),rightPenalty.top(), rightPenalty.right(),rightPenalty.top()));
 
         glCallList(drawLine(field.left(), - _GOAL_WIDTH / 2.0, field.left() , _GOAL_WIDTH / 2.0, QColor("black")));
         glCallList(drawLine(field.right(), - _GOAL_WIDTH / 2.0, field.right() , _GOAL_WIDTH / 2.0, QColor("black")));
