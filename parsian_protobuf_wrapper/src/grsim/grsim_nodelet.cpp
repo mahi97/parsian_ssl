@@ -9,8 +9,7 @@ void GrsimNodelet::GrsimBotCmd(const parsian_msgs::parsian_robot_command::ConstP
     grSim_Robot_Command* GrsimRobotCommand = GrsimCommand->add_robot_commands();
     GrsimRobotCommand->set_id(msg->robot_id);
     GrsimRobotCommand->set_kickspeedx(convertkickchargetimetokickspeed(msg->robot_id, msg->kickSpeed));
-    ROS_INFO_STREAM("kian" << convertkickchargetimetokickspeed(msg->robot_id, msg->kickSpeed));
-    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz / 500);
+    GrsimRobotCommand->set_kickspeedz(msg->kickspeedz / 200.0);
     GrsimRobotCommand->set_veltangent(0);
     GrsimRobotCommand->set_velnormal(0);
     GrsimRobotCommand->set_velangular(0);
