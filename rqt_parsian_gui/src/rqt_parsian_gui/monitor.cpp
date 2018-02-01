@@ -25,7 +25,9 @@ namespace rqt_parsian_gui
 
         wm_sub = n.subscribe("/world_model", 1000, &Monitor::wmCb, this);
         draw_sub = n.subscribe("/draws", 1000, &Monitor::drawCb, this);
+        color_sub = n.subscribe("/team_config", 1000, &Monitor::drawCb, this);
         timer = n.createTimer(ros::Duration(0.080), &Monitor::timerCb, this);
+        parsian_msgs::parsian_team_configPtr team_config{new parsian_msgs::parsian_team_config};
         // access standalone command line arguments
         QStringList argv = context.argv();
         // create QWidget
@@ -39,6 +41,8 @@ namespace rqt_parsian_gui
 //        widget_->setLayout(l);
 
         widget_->setWindowTitle("nadia");
+        ourCol = QColor("blue");
+        oppCol = QColor("yellow");
 
 
 //        wm=new CWorldModel();
@@ -53,7 +57,22 @@ namespace rqt_parsian_gui
         context.addWidget(fieldWidget);
     }
 
+    void Monitor::colorCb(const parsian_msgs::parsian_team_configConstPtr& _color){
+        
+        mycolor=_color;
+        if(mycolor->color==0){
+                ourCol = QColor("yellow");
+                oppCol = QColor("blue");
+        }
+        else{
+                ourCol = QColor("blue");
+                oppCol = QColor("yellow");
+        }
+
+    }
+
     void Monitor::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
+
 
 
 
@@ -63,14 +82,7 @@ namespace rqt_parsian_gui
 
         drawer=new CguiDrawer();
 
-        if(mywm->isYellow){
-            ourCol = QColor("yellow");
-            oppCol = QColor("blue");
-        }
-        else{
-            ourCol = QColor("blue");
-            oppCol = QColor("yellow");
-        }
+
 
 
         drawer->guiBall.inSight=mywm->ball.inSight;

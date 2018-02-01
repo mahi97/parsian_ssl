@@ -489,7 +489,7 @@ void CSkillKick::jTurn()
     Vector2D movementThSpeed,movementThPos;
     double movementDir = ((ballPos - agentPos).th() - kickFinalDir).degree();
     double shift = 0;
-    double distCoef = 0.20;
+    double distCoef = 0.15;
 
     idealPass = (ballPos - agentPos).norm()*distCoef;
     /*
@@ -546,52 +546,48 @@ void CSkillKick::jTurn()
 
 */
 
-    if(movementDir < 10 && movementDir > -10)
+    if(movementDir < 20 && movementDir > -20)
         shift = 0;
     else if(movementDir > 50)
-        shift = 45 + (1-agentPos.dist(ballPos))*61;
+        shift = 15 + (1-agentPos.dist(ballPos))*61;
     else if(movementDir < -50)
-        shift = -45 - (1-agentPos.dist(ballPos))*61;
+        shift = -15 - (1-agentPos.dist(ballPos))*61;
     else if(movementDir > 30) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 35 + (1-agentPos.dist(ballPos))*10;
+            shift = 5 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =45 + (1-agentPos.dist(ballPos))*35;
+            shift =10 + (1-agentPos.dist(ballPos))*35;
         distCoef = 0.17;
     }
     else if(movementDir < -30){
         if(wm->ball->vel.length() < 0.1)
-            shift = -25 - (1-agentPos.dist(ballPos))*10;
+            shift = -5 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -35 - (1-agentPos.dist(ballPos))*35;
+            shift = -10 - (1-agentPos.dist(ballPos))*35;
 
         distCoef = 0.17;
     }
     else if(movementDir > 0) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 25 + (1-agentPos.dist(ballPos))*10;
+            shift = 5 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =35 + (1-agentPos.dist(ballPos))*20;
+            shift =10 + (1-agentPos.dist(ballPos))*20;
         distCoef = 0.17;
     }
     else if(movementDir < 0){
         if(wm->ball->vel.length() < 0.1)
-            shift = -25 - (1-agentPos.dist(ballPos))*10;
+            shift = -5 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -35 - (1-agentPos.dist(ballPos))*20;
+            shift = -10 - (1-agentPos.dist(ballPos))*20;
 
         distCoef = 0.17;
     }
-distCoef = 0.20;
+
     idealPass.rotate(shift);
     targetForJturnSpeed = agentPos + idealPass;
 
-    drawer->draw(targetForJturnSpeed);
-
     movementThSpeed = (targetForJturnSpeed - agentPos).norm();
-    drawer->draw(movementThSpeed);
-
-//    movementThPos = (targetForJturnPos - agentPos).norm();
+    movementThPos = (targetForJturnPos - agentPos).norm();
     double dirReduce = (fabs(movementDir)/70)*(fabs(movementDir)/70);
 
     speedPid->error  = targetForJturnSpeed.dist(agentPos);
@@ -672,7 +668,7 @@ distCoef = 0.20;
         speedPid->kp = 4;
     }
 
-    angPid->kp = 5;
+    angPid->kp = 3;
 
     double vx= movementThSpeed.x * speedPid->PID_OUT() + movementThPos.x * posPid->PID_OUT();
     double vy = movementThSpeed.y * speedPid->PID_OUT()+ movementThPos.y * posPid->PID_OUT();

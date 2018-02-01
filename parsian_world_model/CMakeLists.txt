@@ -92,6 +92,7 @@ add_library(${PROJECT_NAME}
 		src/wm/halfworld.cpp
 		src/wm/robot.cpp
 		src/wm/ball.cpp
+		src/config.cpp
 		)
 
 add_library(${PROJECT_NAME}_util
