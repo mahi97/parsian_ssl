@@ -73,7 +73,7 @@ private:
     QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
-    Vector2D defenseTargets[12];
+    Vector2D defenseTargets[_MAX_NUM_PLAYERS];
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
@@ -131,9 +131,9 @@ private:
     double shotToGoalthr ;
     void virtualTheirPlayOffState();
     bool transientFlag;
-    QTime trasientTimeOut;
+    QTime transientTimeOut;
     int translationTimeOutTime;
-    bool isBallcollide();
+    bool isBallCollide();
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
     int playmakeId;
@@ -188,7 +188,7 @@ private:
     void decideStart              (QList<int>&);
     void decideOurBallPlacement   (QList<int>&);
     void decideTheirBallPlacement (QList<int>&);
-    void decideHalfTimeLineUp   (QList<int>&);
+    void decideHalfTimeLineUp     (QList<int>&);
     void decideNull               (QList<int>&);
     /////////////////////////////////////
     QTextStream out;
