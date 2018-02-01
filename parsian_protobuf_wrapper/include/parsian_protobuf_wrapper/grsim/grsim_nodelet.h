@@ -17,6 +17,10 @@
 #include "parsian_msgs/grsim_robot_replacement.h"
 #include "parsian_msgs/grsim_ball_replacement.h"
 
+#include <parsian_msgs/parsian_team_config.h>
+
+#define MAX_ROBOT_NUM 12
+
 
 class GrsimNodelet : public nodelet::Nodelet
 {
@@ -33,6 +37,8 @@ public:
                              parsian_msgs::grsim_ball_replacement::Response& res);
     bool GrsimRobotReplacesrv(parsian_msgs::grsim_robot_replacement::Request& req,
                               parsian_msgs::grsim_robot_replacement::Response& res);
+    void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
+
 
     boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>> server;
     dynamic_reconfigure::Server<protobuf_wrapper_config::grsimConfig>::CallbackType f;
@@ -44,7 +50,7 @@ public:
     std::string ip;
     int port;
 
-    bool color;
+    bool isYellow;
 
     grSim_Packet packet;
     grSim_Commands* GrsimCommand;
@@ -56,15 +62,10 @@ public:
     ros::NodeHandle n;
     ros::NodeHandle pn;
     ros::Subscriber vision_sub;
-    //ros::Timer timer_;
-    ros::Subscriber sub0;
-    ros::Subscriber sub1;
-    ros::Subscriber sub2;
-    ros::Subscriber sub3;
-    ros::Subscriber sub4;
-    ros::Subscriber sub5;
-    ros::Subscriber sub_0;
+
+    ros::Subscriber robot_command_sub[MAX_ROBOT_NUM];
     ros::Subscriber _sub;
+    ros::Subscriber team_config_sub;
     ros::ServiceServer service0;
     ros::ServiceServer service1;
 };

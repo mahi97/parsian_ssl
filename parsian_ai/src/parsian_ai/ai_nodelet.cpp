@@ -28,6 +28,10 @@ void AINodelet::onInit() {
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
 //    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
+    plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
+
+    ai->getSoccer()->getCoach()->setPlanClient(plan_client);
+
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
@@ -58,21 +62,20 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     }
 
     /// handle plan request
-    if(ai->getSoccer()->getCoach()->requestForPlan){
-        parsian_msgs::plan_service req;
-        req.request = ai->getSoccer()->getCoach()->getPlanRequest();
-
-        if(plan_client.call(req)){
-            ai->getSoccer()->getCoach()->setPlanResponse(req.response);
-            ai->getSoccer()->getCoach()->requestForPlan = false;
-            ROS_INFO("ai requesting for plan...");
-
-        } else {
-            ROS_INFO("ERROR! in ai plan request");
-        }
-    } else {
-        ROS_INFO("No plan requested");
-    }
+//    if(ai->getSoccer()->getCoach()->requestForPlan){
+//        parsian_msgs::plan_service req;
+//        req.request = ai->getSoccer()->getCoach()->getPlanRequest();
+//        if(plan_client.call(req)){
+//            ai->getSoccer()->getCoach()->setPlanResponse(req.response);
+//            ai->getSoccer()->getCoach()->requestForPlan = false;
+//            ROS_INFO("ai requesting for plan...");
+//
+//        } else {
+//            ROS_INFO("ERROR! in ai plan request");
+//        }
+//    } else {
+//        ROS_INFO("No plan requested");
+//    }
 
 }
 

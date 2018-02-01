@@ -239,9 +239,10 @@ class Handler(FileSystemEventHandler):
                     plan["symmetry"] = True
                     sublist.append(plan)
         if len(sublist) > 0:
-            i = self.__shuffleCount % len(sublist)
-            i += 1
-            return self.message_generator(sublist[i])
+            # i = self.__shuffleCount % len(sublist)
+            # i += 1
+            # return self.message_generator(sublist[i])
+            return self.message_generator(sublist[0])
 
         # indirect plan can work for direct mode
         elif plan_mode == "DIRECT":
@@ -318,7 +319,6 @@ class Handler(FileSystemEventHandler):
         return self.__final_dict
 
     def message_generator(self, plan_dict):
-        plan_response = parsian_plan
         plan_msg = parsian_plan()
         plan_msg.isActive = plan_dict["isActive"]
         plan_msg.isMaster = plan_dict["isMaster"]
@@ -331,7 +331,43 @@ class Handler(FileSystemEventHandler):
         plan_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
         plan_msg.planRepeat = plan_dict["planRepeat"]
-        plan_msg.succesRate = plan_dict["successRate"]
+        plan_msg.successRate = plan_dict["successRate"]
+
+        i = 0
+        j = 0
+        k = 0
+        for agent in plan_dict["agents"]:
+            plan_msg.agents[i].id = agent["ID"]
+            plan_msg.agents[i].posSize = len(agent["positions"])
+            j = 0
+            for pos in agent["positions"]:
+                # print ("---------------------------------------------pos "+str(i))
+                plan_msg.agents[i].positions[j].angel = pos["angel"]
+                plan_msg.agents[i].positions[j].pos.x = pos["pos-x"]
+                plan_msg.agents[i].positions[j].pos.y = pos["pos-y"]
+                plan_msg.agents[i].positions[j].tolerance = pos["tolerance"]
+                plan_msg.agents[i].positions[j].skillSize = len(pos["skills"])
+                k = 0
+                for skill in pos["skills"]:
+                    plan_msg.agents[i].positions[j].skills[k].flag = skill["flag"]
+                    plan_msg.agents[i].positions[j].skills[k].name = skill["name"]
+                    plan_msg.agents[i].positions[j].skills[k].primary = skill["primary"]
+                    plan_msg.agents[i].positions[j].skills[k].secondry = skill["secondary"]
+                    if "target" in skill:
+                        plan_msg.agents[i].positions[j].skills[k].agent = skill["target"]["agent"]
+                        plan_msg.agents[i].positions[j].skills[k].index = skill["target"]["index"]
+                    else:
+                        plan_msg.agents[i].positions[j].skills[k].agent = -1
+                        plan_msg.agents[i].positions[j].skills[k].index = -1
+                    k += 1
+                j += 1
+            i += 1
+
+        i = 0
+        for pos in plan_dict["agentInitPos"]:
+            plan_msg.agentInitPos[i].x = pos["x"]
+            plan_msg.agentInitPos[i].y = pos["y"]
+            i += 1
         return plan_msg
 
 

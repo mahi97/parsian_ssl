@@ -45,6 +45,8 @@ void CRoleDynamic::update() {
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(chip);
             shotSkill->setVeryfine(veryFine);
 //       shotSkill->setShotToEmptySpot(emptySpot);
@@ -58,6 +60,8 @@ void CRoleDynamic::update() {
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(true);
             shotSkill->setVeryfine(veryFine);
             shotSkill->setDontkick(false);
@@ -70,6 +74,8 @@ void CRoleDynamic::update() {
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(chip);
             shotSkill->setDontkick(noKick);
             shotSkill->setVeryfine(veryFine);
