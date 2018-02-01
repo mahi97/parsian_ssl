@@ -50,9 +50,9 @@ namespace parsian_protobuf_wrapper {
         boost::shared_ptr<dynamic_reconfigure::Server<protobuf_wrapper_config::visionConfig> > configServer;
         parsian_msgs::ssl_vision_wrapperPtr wrapper;
 
-        void teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg);
+        void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
 
-        bool isOurColorYellow = false;
+        bool isOurColorYellow = false, isOurSideLeft = false;
         RoboCupSSLClient *vision;
         protobuf_wrapper_config::visionConfig visionConfig;
         SSL_WrapperPacket vision_packet;

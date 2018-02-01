@@ -17,7 +17,7 @@ namespace pr {
     /**
      * Converts an SSL DetectionFrame to the ROS version.
      */
-    parsian_msgs::ssl_vision_detection convert_detection_frame(SSL_DetectionFrame protoFrame, bool isYellow);
+    parsian_msgs::ssl_vision_detection convert_detection_frame(SSL_DetectionFrame protoFrame, bool isYellow, bool isLeft);
 
 
     /**

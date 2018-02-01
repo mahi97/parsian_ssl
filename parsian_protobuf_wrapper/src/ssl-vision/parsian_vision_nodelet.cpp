@@ -17,7 +17,7 @@ void VisionNodelet::onInit() {
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
-    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& VisionNodelet::teamConfigCb, this, _1));
+    team_config_sub = nh.subscribe("/team_config", 1000, & VisionNodelet::teamConfigCb, this);
 
 
 //    ssl_wrapper_pub = nh.advertise<parsian_msgs::ssl_vision_wrapper>("vision", 1000);
@@ -57,8 +57,7 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
         //ROS_INFO("v");
         if (vision_packet.has_detection()) {
             parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
-            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
-//            wrapper->detections.push_back(detection);
+            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow, isOurSideLeft);
             detection->header.stamp = ros::Time::now();
             ssl_detection_pub.publish(detection);
         }
@@ -66,14 +65,14 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
         if (vision_packet.has_geometry()) {
             parsian_msgs::ssl_vision_geometryPtr geometry{new parsian_msgs::ssl_vision_geometry};
             *geometry = pr::convert_geometry_data(vision_packet.geometry());
-//            wrapper->geometry.push_back(geometry);
             ssl_geometry_pub.publish(geometry);
         }
     }
 }
 
-void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
         isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
+        isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
 }
 
