@@ -140,54 +140,43 @@ void CCoach::checkGoalieInsight()
 
 
 
-void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
-
+void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     missMatchIds.clear();
-    if(first)
-    {
-        if(wm->our.activeAgentsCount() != 0)
-        {
+    if(first) {
+        if (wm->our.activeAgentsCount() != 0) {
             robotsIdHist.clear();
-            for(int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
-            {
+            for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
                 robotsIdHist.append(wm->our.active(i)->id);
             }
             first = false;
         }
     }
 
-    if(gameState->isPlayOff() || !gameState->canMove())
-    {
-        if(wm->our.activeAgentsCount() != 0u)
-        {
+    if(gameState->isPlayOff() || !gameState->canMove()) {
+        if (wm->our.activeAgentsCount() != 0u) {
             robotsIdHist.clear();
-            for(int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
-            {
+            for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
                 robotsIdHist.append(wm->our.active(i)->id);
             }
         }
-
     }
-    if(wm->our.activeAgentsCount() > 6)
-    {
+
+    if(wm->our.activeAgentsCount() > _NUM_PLAYERS) {
         missMatchIds.clear();
-        for(int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
-        {
-            for(int k = 0 ; k < robotsIdHist.count() ; k++)
-            {
-                if(robotsIdHist.at(k) == wm->our.active(i)->id)
-                {
+        for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
+            for (int k = 0; k < robotsIdHist.count(); k++) {
+                if (robotsIdHist.at(k) == wm->our.active(i)->id) {
                     break;
                 }
-                if(k == robotsIdHist.count() - 1)
-                {
+                if (k == robotsIdHist.count() - 1) {
                     missMatchIds.append(wm->our.active(i)->id);
                 }
             }
         }
     }
 
-    int agentsCount = wm->our.data->activeAgents.count();
+    wm->our.data;
+    int agentsCount = wm->our.activeAgentsCount();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -1198,7 +1187,7 @@ void CCoach::execute()
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();
     virtualTheirPlayOffState();
-    decidePreferedDefenseAgentsCountAndGoalieAgent();
+    decidePreferredDefenseAgentsCountAndGoalieAgent();
     /////////////////////////////////////// choose play maker
     double critAreaRadius = 1.6;
     Circle2D critArea(wm->field->ourGoal(), critAreaRadius);

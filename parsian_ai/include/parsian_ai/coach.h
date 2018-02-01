@@ -122,7 +122,7 @@ private:
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
-    void decidePreferedDefenseAgentsCountAndGoalieAgent();
+    void decidePreferredDefenseAgentsCountAndGoalieAgent();
     void decideAttack();
     void decideDefense();
     void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
@@ -199,7 +199,7 @@ private:
 
     // inter change
     void checkSensorShootFault();
-    int  faultDetectionCounter[12];
+    int  faultDetectionCounter[_MAX_NUM_PLAYERS];
 
 
     // MAHI ADD IN ROS
