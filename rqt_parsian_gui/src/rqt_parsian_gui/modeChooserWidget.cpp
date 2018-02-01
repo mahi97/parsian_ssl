@@ -13,10 +13,7 @@ namespace rqt_parsian_gui
         mode  = GameMode::SIMULATION;
 
         team_config_pub=n.advertise<parsian_msgs::parsian_team_config>("/team_config",1000);
-
-        team_config->color = static_cast<unsigned char>(color);
-        team_config->mode  = static_cast<unsigned char>(mode);
-        team_config->side  = static_cast<unsigned char>(side);
+        wmsub = n.subscribe("/world_model", 1000, &ModeChooserWidget::wmCb, this);
 
         loadTeamConfig();
 
@@ -56,9 +53,6 @@ namespace rqt_parsian_gui
         connect(modePB , SIGNAL(clicked(bool))  , this, SLOT(toggleMode()));
         connect(modeAct, SIGNAL(triggered(bool)), this, SLOT(toggleMode()));
 
-        team_config_pub.publish(team_config);
-
-
 
     }
 
@@ -70,26 +64,28 @@ namespace rqt_parsian_gui
     {
         mode = (mode == GameMode::SIMULATION) ? GameMode::REAL : GameMode::SIMULATION;
         modePB->setText(modeStr[static_cast<int>(mode)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
     void ModeChooserWidget::toggleColor()
     {
         color = (color == Color::YELLOW) ? Color::BLUE : Color::YELLOW;
         colorPB->setText(colorStr[static_cast<int>(color)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
     void ModeChooserWidget::toggleSide()
     {
         side = (side == TeamSide::LEFT) ? TeamSide::RIGHT : TeamSide::LEFT;
         sidePB->setText(sideStr[static_cast<int>(side)]);
-        sendTeamConfig();
+        //sendTeamConfig();
     }
 
 
     void ModeChooserWidget::sendTeamConfig()
     {
+
+        parsian_msgs::parsian_team_configPtr team_config{new parsian_msgs::parsian_team_config};
         team_config->color = static_cast<unsigned char>(color);
         team_config->mode  = static_cast<unsigned char>(mode);
         team_config->side  = static_cast<unsigned char>(side);
@@ -129,4 +125,12 @@ namespace rqt_parsian_gui
         ROS_INFO_STREAM((int)color << (int)side << (int)mode);
         myFile.close();
     }
+
+    void ModeChooserWidget::wmCb(const parsian_msgs::parsian_world_modelConstPtr& msg)
+    {
+        sendTeamConfig();
+    }
+
 }
+
+

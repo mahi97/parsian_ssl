@@ -34,7 +34,7 @@ public:
 
     double vForwardCmd[12],vNormalCmd[12],vAngCmd[12];
 
-    parsian_msgs::parsian_world_modelPtr getParsianWorldModel(bool colour_yellow, bool side_left);
+    parsian_msgs::parsian_world_modelPtr getParsianWorldModel();
     Robot* them[_MAX_NUM_PLAYERS];
     Robot* us[_MAX_NUM_PLAYERS];
 

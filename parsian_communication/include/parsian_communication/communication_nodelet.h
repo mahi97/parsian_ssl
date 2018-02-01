@@ -44,9 +44,9 @@ namespace parsian_communication {
 
         void recTimerCb(const ros::TimerEvent& event);
 
-        boost::shared_ptr<dynamic_reconfigure::Server<communication_config::communicationConfig>> server;
-        void ConfigServerCallBack(const communication_config::communicationConfig &config, uint32_t level);
-        communication_config::communicationConfig conf;
+        boost::shared_ptr<dynamic_reconfigure::Server<communication::communicationConfig>> server;
+        void ConfigServerCallBack(const communication::communicationConfig &config, uint32_t level);
+        communication::communicationConfig conf;
 
         void teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg);
         bool realGame = false;

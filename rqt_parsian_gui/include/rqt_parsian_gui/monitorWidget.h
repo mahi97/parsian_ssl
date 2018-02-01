@@ -24,14 +24,14 @@
 
 #define _PI         3.14159265358979323
 #define _DEG2RAD    (_PI/180.0)
-#define _GOAL_WIDTH             1.000
-#define _FIELD_WIDTH            9.0
-#define _FIELD_HEIGHT           6.00
-#define _CENTER_CIRCLE_RAD      0.500
-#define _PENALTY_WIDTH          2.500
-#define _GOAL_RAD               1.000
-#define _STADIUM_WIDTH   10.90
-#define _STADIUM_HEIGHT  7.70
+#define _GOAL_WIDTH             1.200
+#define _FIELD_WIDTH            12.0
+#define _FIELD_HEIGHT           9.00
+#define _CENTER_CIRCLE_RAD      0.600
+#define _PENALTY_WIDTH          2.400
+#define _GOAL_RAD               1.200
+#define _STADIUM_WIDTH   13.40
+#define _STADIUM_HEIGHT  10.40
 
 namespace rqt_parsian_gui
 {

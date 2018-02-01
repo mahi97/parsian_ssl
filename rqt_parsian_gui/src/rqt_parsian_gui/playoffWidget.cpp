@@ -99,24 +99,31 @@ void PlayOffWidget::updateModel() {
     QStringList last_path_dir;
     QString last_pkg;
     QStringList response_path_dir;
-    QString response_pkg;
+    QString response_pkg ;
     int index[theplans->response.allPlans.size()][3] ; // to use in f
 
     for (size_t i = 0;i < theplans->response.allPlans.size();i++) {
+
+
 
         index[i][0] = pkgCounter;
         index[i][1] = fileCounter;
         index[i][2] = planCounter;
 
-        if( i != 0) {
-            last_path_dir = QString::fromStdString(lastPlan->planFile).split("/");
-            last_pkg = last_path_dir[last_path_dir.size() - 2];
-        }else
-            last_pkg="";
-        response_path_dir = QString::fromStdString(theplans->response.allPlans[i].planFile).split("/");
-        response_pkg = response_path_dir[response_path_dir.size()-2];
+        if (i != 0) {
+            last_path_dir = response_path_dir;
+            last_pkg = response_pkg;
+        } else
+            last_pkg = "";
 
-        if (last_pkg != response_pkg ) {
+        response_path_dir = QString::fromStdString(theplans->response.allPlans[i].planFile).split("plans/")[1].
+                split("/");
+
+        response_pkg = "main";
+        for (int path_ctr = 0; path_ctr < response_path_dir.size() - 1; path_ctr++)
+            response_pkg += "." + response_path_dir[path_ctr];
+
+        if (response_pkg.compare(last_pkg)) {
             pkgCounter++;
             fileCounter++;
            // debugger->debug("PKG",D_ALI);
@@ -128,7 +135,7 @@ void PlayOffWidget::updateModel() {
             file->setToolTip("<html><img src="+temp.replace(".","/") + "/" + response_pkg + ".png" +"/></html>");
             pkg->appendRow(file);
         }
-        else if (response_path_dir.last() != last_path_dir.last()) {
+        else if (response_path_dir.last().compare(last_path_dir.last())) {
             fileCounter++;
 //            debugger->debug("PLAN",D_ALI);
             file = new QStandardItem(response_path_dir.last().left(response_path_dir.last().size()-5));
@@ -342,7 +349,6 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const Q
 //
             } else {
                 details[0]->setText(QString("Type : SubPlan !!"));
-
             }
         }
 
