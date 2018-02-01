@@ -56,6 +56,7 @@ void CommunicationNodelet::onInit() {
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   //ROS_INFO("salam");
+
     if (cbCount >= 60) {
         cbCount = 0;
         sim_handle_flag = false;
