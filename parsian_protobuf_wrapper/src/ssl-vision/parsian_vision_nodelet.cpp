@@ -17,7 +17,7 @@ void VisionNodelet::onInit() {
 
     ssl_geometry_pub  = nh.advertise<parsian_msgs::ssl_vision_geometry>("vision_geom", 1000);
     ssl_detection_pub = nh.advertise<parsian_msgs::ssl_vision_detection>("vision_detection", 1000);
-    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& VisionNodelet::teamConfigCb, this, _1));
+    team_config_sub = nh.subscribe("/team_config", 1000, & VisionNodelet::teamConfigCb, this);
 
 
 //    ssl_wrapper_pub = nh.advertise<parsian_msgs::ssl_vision_wrapper>("vision", 1000);
@@ -70,7 +70,7 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
     }
 }
 
-void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
         isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
         isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;

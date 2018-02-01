@@ -30,6 +30,7 @@ public:
     void execute();
     void merge(int frame);
     void init();
+    void setMode(bool isSimulation);
 
     double vForwardCmd[12],vNormalCmd[12],vAngCmd[12];
 

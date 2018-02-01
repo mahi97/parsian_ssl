@@ -192,3 +192,9 @@ void WorldModel::update(CHalfWorld* w0) {
     }
 
 }
+
+void WorldModel::setMode(bool isSimulation)
+{
+    simulationMode = isSimulation;
+}
+
