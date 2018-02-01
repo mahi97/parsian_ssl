@@ -332,6 +332,7 @@ class Handler(FileSystemEventHandler):
         plan_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
         plan_msg.planRepeat = plan_dict["planRepeat"]
         plan_msg.successRate = plan_dict["successRate"]
+        plan_msg.symmetry = plan_dict["symmetry"]
 
         i = 0
         j = 0

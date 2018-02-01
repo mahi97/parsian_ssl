@@ -137,7 +137,8 @@ kckMode CSkillKick::decideMode()
     robotKickArea.addVertex(agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*distCoef);
 
     // TODO : knowledge
-    if(0 &&/*(!knowledge->isOurNonPlayOnKick())&&*/(passProfiler || kickWithCenterOfDribbler)) {
+//    if(0 &&/*(!knowledge->isOurNonPlayOnKick())&&*/(passProfiler || kickWithCenterOfDribbler)) {
+    if(isPlayoff){
         kickerOn = dribblerArea.contains(ballPos) && robotKickArea.contains(ballPos);
     }
     else kickerOn = dribblerArea.contains(ballPos);
@@ -650,6 +651,10 @@ void CSkillKick::jTurn()
 //    {
 //        dirReduce -= 1;
 //    }
+    if(isPlayoff){
+        dirReduce -= 1;
+    }
+
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
@@ -689,7 +694,8 @@ void CSkillKick::turnForKick()
     agent->setRoller(0);
     double angReduce = 1;
 
-    if(false) //knowledge->isOurNonPlayOnKick()) TODO : Command
+//    if(false) //knowledge->isOurNonPlayOnKick()) TODO : Command
+    if(isPlayoff)
     {
         if(fabs((agentDir.th() - kickFinalDir).degree()) < 80)
             angReduce = 0.5;
