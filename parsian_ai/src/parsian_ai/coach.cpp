@@ -887,7 +887,7 @@ void CCoach::decideAttack()
 void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
 
     //Decide Plan
-    ROS_INFO_STREAM("playoff "<<firstTime);
+    ROS_INFO_STREAM("playoff: " << firstTime);
     firstIsFinished = ourPlayOff->isFirstFinished();
     if (firstTime) {
         NGameOff::EMode tempMode;
@@ -1175,7 +1175,7 @@ void CCoach::checkTransitionToForceStart(){
     if (gameState->ourRestart())
     {
         //transition to game on
-
+        ROS_INFO_STREAM("MAHIS: " << cyclesWaitAfterballMoved << " + " << selectedPlay->playOnFlag);
         if ( cyclesWaitAfterballMoved > 6 && selectedPlay->playOnFlag)
         {
             gameState->setState(States::PlayOn);
