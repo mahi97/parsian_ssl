@@ -148,7 +148,7 @@ struct GameStatePacket
 
 /* Defines */
 
-#define _NUM_PLAYERS    12
+#define _NUM_PLAYERS    8
 #define _MAX_NUM_PLAYERS 12
 
 
