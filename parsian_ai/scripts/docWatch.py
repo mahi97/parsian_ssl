@@ -9,6 +9,7 @@ import random
 import math
 
 from parsian_msgs.msg import parsian_plan
+from parsian_msgs.msg import parsian_plan_GUI
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -45,13 +46,14 @@ class Watcher:
 
 
     def get_all_plans(self):
-        return self.__event_handler.get_all_plans_msgs()
+        return self.__event_handler.get_all_plans_gui_msgs()
 
     def update_master_active(self, name_list, plan_index, is_master, is_active):
         if len(name_list) != len(plan_index):
             print("not all plans are indexed")
             return None
         return self.__event_handler.update_master_active(name_list, plan_index, is_master, is_active)
+
     def choose_plan(self, player_num, game_mode, ball_x, ball_y):
         return self.__event_handler.choose_plan(player_num, game_mode, ball_x, ball_y)
 
@@ -210,9 +212,7 @@ class Handler(FileSystemEventHandler):
         random.shuffle(alist)
 
     def choose_plan(self, player_num, game_mode, ball_x, ball_y):
-        DIRECT   = 1
-        INDIRECT = 2
-        KICKOFF  = 3
+        # DIRECT   = 1  INDIRECT = 2  KICKOFF  = 3
         plan_mode = ""
         if game_mode == 1:
             plan_mode = "DIRECT"
@@ -233,32 +233,20 @@ class Handler(FileSystemEventHandler):
             i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
             print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-            return self.message_generator(sublist[i])
+            return self.ai_message_generator(sublist[i])
 
-        # indirect plan can work for direct mode:
-        elif plan_mode == "DIRECT":
-            print ("searching for Indirect plans for direct mode...")
-            for plan in self.__final_dict:
-                if self.check_plan(plan, ball_x, ball_y, rad, player_num, INDIRECT):
-                    sublist.append(plan)
-
-            if len(sublist) > 0:
-                i = self.__shuffleCount % len(sublist)
-                self.__shuffleCount += 1
-                print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-                return self.message_generator(sublist[i])
-            else:
-                print("sab kon bbinm2")
-                return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
         else:
-            print("sab kon bbinm")
+            print ("of invalid plans")
             return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
 
     def check_plan(self, plan, ball_x, ball_y, rad, player_num, plan_mode):
+        DIRECT = 1
+        INDIRECT = 2
+        KICKOFF = 3
         if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                    and plan["planMode"] == plan_mode:
+                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT)):
                 plan["symmetry"] = True
                 return True
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
@@ -268,8 +256,6 @@ class Handler(FileSystemEventHandler):
                 plan["symmetry"] = False
                 return True
         return False
-
-
 
     def nearest_plan(self, player_num, game_mode, ball_x, ball_y):
         new_list = sorted(self.__final_dict, key=lambda x: self.ball_dist(x, x["ballInitPos"]["x"], x["ballInitPos"]["y"],
@@ -284,11 +270,10 @@ class Handler(FileSystemEventHandler):
             i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
             print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-            return self.message_generator(sublist[i])
+            return self.ai_message_generator(sublist[i])
         else:
             print ("\nNO PLAN MATCHED!\n")
             return None
-
 
     def circle_contains(self, x, y, r, point_x, point_y):
         if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
@@ -306,10 +291,10 @@ class Handler(FileSystemEventHandler):
             plan["symmetry"] = True
             return math.sqrt(b)
 
-    def get_all_plans_msgs(self):
+    def get_all_plans_gui_msgs(self):
         plans_msg = []
         for plan in self.__final_dict:
-            plans_msg.append(self.message_generator(plan))
+            plans_msg.append(self.gui_message_generator(plan))
         return plans_msg
 
     def update_master_active(self, name_list, plan_index, is_master, is_active):
@@ -319,7 +304,7 @@ class Handler(FileSystemEventHandler):
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
 
-        return self.get_all_plans_msgs()
+        return self.get_all_plans_gui_msgs()
 
     def plans_to_dict(self):
         self.__final_dict = []
@@ -340,7 +325,24 @@ class Handler(FileSystemEventHandler):
                     self.__final_dict.append(dict1)
         return self.__final_dict
 
-    def message_generator(self, plan_dict):
+    def gui_message_generator(self, plan_dict):
+        plan_gui_msg = parsian_plan_GUI()
+        plan_gui_msg.isActive = plan_dict["isActive"]
+        plan_gui_msg.isMaster = plan_dict["isMaster"]
+        plan_gui_msg.planFile = plan_dict["filename"]
+        plan_gui_msg.agentSize = len(plan_dict["agentInitPos"])
+        plan_gui_msg.chance = plan_dict["chance"]
+        plan_gui_msg.lastDist = plan_dict["lastDist"]
+        plan_gui_msg.tags = plan_dict["tags"]
+        plan_gui_msg.planMode = plan_dict["planMode"]
+        plan_gui_msg.ballInitPos.x = plan_dict["ballInitPos"]["x"]
+        plan_gui_msg.ballInitPos.y = plan_dict["ballInitPos"]["y"]
+        plan_gui_msg.planRepeat = plan_dict["planRepeat"]
+        plan_gui_msg.successRate = plan_dict["successRate"]
+
+        return plan_gui_msg
+
+    def ai_message_generator(self, plan_dict):
         plan_msg = parsian_plan()
         plan_msg.isActive = plan_dict["isActive"]
         plan_msg.isMaster = plan_dict["isMaster"]
@@ -391,6 +393,7 @@ class Handler(FileSystemEventHandler):
             plan_msg.agentInitPos[i].x = pos["x"]
             plan_msg.agentInitPos[i].y = pos["y"]
             i += 1
+
         return plan_msg
 
 
@@ -403,3 +406,4 @@ if __name__ == '__main__':
 
     event_handler = Handler(path)
     event_handler.nearest_plan(2, 2, 2, 1)
+    event_handler.get_all_plans_gui_msgs()
