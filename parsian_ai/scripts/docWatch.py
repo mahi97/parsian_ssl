@@ -6,6 +6,7 @@ import sys
 import re
 import json
 import random
+import math
 
 from parsian_msgs.msg import parsian_plan
 
@@ -84,9 +85,6 @@ class Handler(FileSystemEventHandler):
         if event.is_directory:
             return None
 
-            # elif event.event_type == 'created':
-            # print("Received created event - %s." % event.src_path)
-
         elif event.event_type == 'modified':
             # print("Received modified event - %s" % event.src_path)
             # self.add_plan(event.src_path)
@@ -94,8 +92,13 @@ class Handler(FileSystemEventHandler):
 
         elif event.event_type == 'deleted':
             # print("Received deleted event - %s" % event.src_path)
-            self.refresh()
             # self.remove_plan(event.src_path)
+            self.refresh()
+
+        elif event.event_type == 'created':
+            self.refresh()
+            # print("Received created event - %s." % event.src_path)
+
 
     def list_valid_plans(self, path):
         file_list = []
@@ -207,9 +210,9 @@ class Handler(FileSystemEventHandler):
         random.shuffle(alist)
 
     def choose_plan(self, player_num, game_mode, ball_x, ball_y):
-        # DIRECT   = 1
-        # INDIRECT = 2
-        # KICKOFF  = 3
+        DIRECT   = 1
+        INDIRECT = 2
+        KICKOFF  = 3
         plan_mode = ""
         if game_mode == 1:
             plan_mode = "DIRECT"
@@ -223,70 +226,85 @@ class Handler(FileSystemEventHandler):
         rad = 0.9
         # normal checking:
         for plan in self.__final_dict:
-            if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                print("ball pos matched")
-                if len(plan["agentInitPos"]) >= player_num \
-                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                        and plan["planMode"] == plan_mode:
-                    print("matched: " + plan["filename"].split("plans/")[1])
-                    plan["symmetry"] = False 
-                    sublist.append(plan)
-            if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                print("ball pos matched")
-                if len(plan["agentInitPos"]) >= player_num \
-                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                        and plan["planMode"] == plan_mode:
-                    print("matched: " + plan["filename"].split("plans/")[1])
-                    plan["symmetry"] = True
-                    sublist.append(plan)
-        if len(sublist) > 0:
-            # i = self.__shuffleCount % len(sublist)
-            # i += 1
-            # return self.message_generator(sublist[i])
-            return self.message_generator(sublist[0])
+            if self.check_plan(plan, ball_x, ball_y, rad, player_num, plan_mode):
+                sublist.append(plan)
 
-        # indirect plan can work for direct mode
+        if len(sublist) > 0:
+            i = self.__shuffleCount % len(sublist)
+            self.__shuffleCount += 1
+            print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
+            return self.message_generator(sublist[i])
+
+        # indirect plan can work for direct mode:
         elif plan_mode == "DIRECT":
             print ("searching for Indirect plans for direct mode...")
             for plan in self.__final_dict:
-                if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                    print("ball pos matched")
-                    if len(plan["agentInitPos"]) >= player_num \
-                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                            and plan["planMode"] == "INDIRECT":
-                        print("matched: " + plan["filename"].split("plans/")[1])
-                        plan["symmetry"] = False 
-                        sublist.append(plan)
-                if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                    print("ball pos matched")
-                    if len(plan["agentInitPos"]) >= player_num \
-                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                            and plan["planMode"] == "INDIRECT":
-                        print("matched: " + plan["filename"].split("plans/")[1])
-                        plan["symmetry"] = True
-                        sublist.append(plan)
+                if self.check_plan(plan, ball_x, ball_y, rad, player_num, INDIRECT):
+                    sublist.append(plan)
+
             if len(sublist) > 0:
                 i = self.__shuffleCount % len(sublist)
                 self.__shuffleCount += 1
+                print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
                 return self.message_generator(sublist[i])
             else:
-                print ("\nNO PLAN MATCHED!\n")
-                print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num) + "\n")
+                print("sab kon bbinm2")
+                return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
+        else:
+            print("sab kon bbinm")
+            return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
+
+    def check_plan(self, plan, ball_x, ball_y, rad, player_num, plan_mode):
+        if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            if len(plan["agentInitPos"]) >= player_num \
+                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                    and plan["planMode"] == plan_mode:
+                plan["symmetry"] = True
+                return True
+        if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            if len(plan["agentInitPos"]) >= player_num \
+                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                    and plan["planMode"] == plan_mode:
+                plan["symmetry"] = False
+                return True
+        return False
+
+
+
+    def nearest_plan(self, player_num, game_mode, ball_x, ball_y):
+        new_list = sorted(self.__final_dict, key=lambda x: self.ball_dist(x, x["ballInitPos"]["x"], x["ballInitPos"]["y"],
+                                                                          ball_x, ball_y))
+        sublist = []
+        for plan in new_list:
+            if len(plan["agentInitPos"]) >= player_num \
+                    and plan["chance"] > 0 and plan["lastDist"] >= 0:
+                sublist.append(plan)
+
+        if len(sublist) > 0:
+            i = self.__shuffleCount % len(sublist)
+            self.__shuffleCount += 1
+            print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
+            return self.message_generator(sublist[i])
         else:
             print ("\nNO PLAN MATCHED!\n")
-            print ("Required: mode: " + plan_mode + ", minimum agent size: " + str(player_num)+"\n")
-            # print ("All available plans:")
-            # for d in self.__final_dict:
-            #     print (d['filename'].split("/")[-1] + "\tagent size: "
-            #            + str(len(d["agentInitPos"])) + ", "+d["planMode"]
-            #            + ", chance: " + str(d["chance"])+", last dist: " + str(d["lastDist"]))
             return None
+
 
     def circle_contains(self, x, y, r, point_x, point_y):
         if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
             return False
         else:
             return True
+
+    def ball_dist(self, plan, x1, y1, x2, y2):
+        a = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)
+        b = (x1-x2)*(x1-x2) + (y1+y2)*(y1+y2)
+        if a < b:
+            plan["symmetry"] = False
+            return math.sqrt(a)
+        else:
+            plan["symmetry"] = True
+            return math.sqrt(b)
 
     def get_all_plans_msgs(self):
         plans_msg = []
@@ -305,6 +323,8 @@ class Handler(FileSystemEventHandler):
 
     def plans_to_dict(self):
         self.__final_dict = []
+        # print ("plans_to_dict")
+        # print (len(self.__final_list))
         for plan in self.__final_list:
             with open(str(plan)) as json_data:
                 tmp = json.load(json_data)
@@ -375,5 +395,11 @@ class Handler(FileSystemEventHandler):
 
 
 if __name__ == '__main__':
-    w = Watcher()
-    w.run()
+    # w = Watcher()
+    # w.run()
+    path = rospkg.RosPack().get_path("parsian_ai")
+    print ("pack path: " + path)
+    path += "/plans/"
+
+    event_handler = Handler(path)
+    event_handler.nearest_plan(2, 2, 2, 1)
