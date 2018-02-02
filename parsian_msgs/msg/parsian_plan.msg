@@ -1,6 +1,7 @@
 string planFile
 bool isActive
 bool isMaster
+bool symmetry
 uint32 agentSize
 float64 chance
 float64 lastDist

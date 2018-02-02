@@ -1508,6 +1508,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
 //    }
 
     plan->common.currentSize = _currSize;
+    plan->execution.symmetry = planMsg.the_plan.symmetry;
 
 //    plan->execution.AgentPlan
     if(planMsg.the_plan.planMode == "INDIRECT")
