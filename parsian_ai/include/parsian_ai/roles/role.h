@@ -42,8 +42,4 @@ public:
     virtual void reset();
 };
 
-
-
-
-
 #endif // ROLE_H

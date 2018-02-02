@@ -37,7 +37,7 @@ void CommunicationNodelet::onInit() {
 
 
     while(!communicator->isSerialConnected()){
-        communicator->connectSerial(conf.serial_connect.c_str());
+        communicator->connectSerial("/dev/ttyUSB0");//conf.serial_connect.c_str());
     }
 
 
@@ -55,21 +55,22 @@ void CommunicationNodelet::onInit() {
 }
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
-  //ROS_INFO("salam");
+  ROS_INFO("salam");
+
     if (cbCount >= 60) {
         cbCount = 0;
         sim_handle_flag = false;
     }
 
-    if (realGame){
+    //if (realGame){
         communicator->packetCallBack(_packet);
-        sim_handle_flag = true;
-        cbCount = 0;
-    } else if (cbCount < 60 && sim_handle_flag) {
-        communicator->packetCallBack(modeChangePacket(_packet));
-        cbCount++;
+    //    sim_handle_flag = true;
+    //    cbCount = 0;
+    //} else if (cbCount < 60 && sim_handle_flag) {
+    //    communicator->packetCallBack(modeChangePacket(_packet));
+    //    cbCount++;
         ROS_INFO_STREAM("Cc:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
-    }
+    //}
 }
 parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)
 {
@@ -112,7 +113,7 @@ void CommunicationNodelet::ConfigServerCallBack(const communication::communicati
 
 void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
-    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
+//    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
 }
 
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);

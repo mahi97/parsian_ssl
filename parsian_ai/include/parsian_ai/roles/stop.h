@@ -25,11 +25,11 @@ protected:
 public:
 	virtual void parse(QStringList params);
 
-    explicit CRoleStop(Agent *_agent);
+	explicit CRoleStop(Agent *_agent);
 	~CRoleStop();
-    void assign(Agent* _agent) override;
+	void assign(Agent* _agent) override;
 	void execute();
-    static CRoleStopInfo* info();
+	static CRoleStopInfo* info();
 	double progress();
 
 private:

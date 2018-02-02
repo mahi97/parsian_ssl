@@ -42,6 +42,7 @@ public:
     SkillProperty(KickAction, double, Kickangtol, kickAngTol);
     SkillProperty(KickAction, bool, Kickwithcenterofdribbler, kickWithCenterOfDribbler);
     SkillProperty(KickAction, bool, Playmakemode, playMakeMode);
+    SkillProperty(KickAction, bool, Isplayoff, isPlayoff);
     SkillProperty(KickAction, Vector2D, Target, target);
 
 
