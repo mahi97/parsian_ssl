@@ -1428,8 +1428,8 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setAvoidPenaltyArea(true);
     _roleAgent->setChip(chipOrNot(_posAgent.getArgs()));
     if (_roleAgent->getChip()) {
-        //        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
-        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
+        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
+        //_roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
         DBUG(QString("VALUE : %1").arg(static_cast <double> (_posAgent.getArgs().rightData)/200), D_MAHI);
     } else {
         _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData));

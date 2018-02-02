@@ -69,7 +69,7 @@ void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr&
     //} else if (cbCount < 60 && sim_handle_flag) {
     //    communicator->packetCallBack(modeChangePacket(_packet));
     //    cbCount++;
-        ROS_INFO_STREAM("Cc:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
+//        ROS_INFO_STREAM("Cc:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
     //}
 }
 parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)

@@ -77,7 +77,7 @@ public:
     inline bool getRoleUpdate () {return roleUpdate;}
 
     CRolePlayOff* setKickRealSpeed(double val) {
-        //kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false); TODO : NEW PROFILE
+        kickSpeed = val;
         DBUG(QString("[playoffrole] setkickrealspeed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
         updated = true;
         return this;
