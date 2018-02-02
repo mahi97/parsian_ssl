@@ -81,14 +81,8 @@ void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
 
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
-//    if(_ref->command.command == ssl_refree_command::STOP)
-//    {
-//        ROS_INFO_STREAM("ref vaghean halte");
-//    }
-//    if(gameState->ready()) {
-//        ROS_INFO_STREAM("ref ready");
-//    }
-    ROS_INFO_STREAM("ref count : "<< _ref->command_counter);
+
+    ROS_INFO_STREAM("refff count : "<< _ref->command_counter);
 
     if(gameState->isPlayOff()) {
         ROS_INFO_STREAM("ref play off");

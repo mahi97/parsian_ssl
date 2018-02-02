@@ -168,6 +168,7 @@ private:
     void setFirstPlay();
     void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
+    void checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers);
 
 
     int preferedShotSpot;
