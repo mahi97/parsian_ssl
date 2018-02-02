@@ -210,9 +210,9 @@ class Handler(FileSystemEventHandler):
         random.shuffle(alist)
 
     def choose_plan(self, player_num, game_mode, ball_x, ball_y):
-        # DIRECT   = 1
-        # INDIRECT = 2
-        # KICKOFF  = 3
+        DIRECT   = 1
+        INDIRECT = 2
+        KICKOFF  = 3
         plan_mode = ""
         if game_mode == 1:
             plan_mode = "DIRECT"
@@ -226,41 +226,22 @@ class Handler(FileSystemEventHandler):
         rad = 0.9
         # normal checking:
         for plan in self.__final_dict:
-            if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                if len(plan["agentInitPos"]) >= player_num \
-                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                        and plan["planMode"] == plan_mode:
-                    plan["symmetry"] = False 
-                    sublist.append(plan)
-            if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                if len(plan["agentInitPos"]) >= player_num \
-                        and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                        and plan["planMode"] == plan_mode:
-                    plan["symmetry"] = True
-                    sublist.append(plan)
+            if self.check_plan(plan, ball_x, ball_y, rad, player_num, plan_mode):
+                sublist.append(plan)
+
         if len(sublist) > 0:
             i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
             print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
             return self.message_generator(sublist[i])
 
-        # indirect plan can work for direct mode
+        # indirect plan can work for direct mode:
         elif plan_mode == "DIRECT":
             print ("searching for Indirect plans for direct mode...")
             for plan in self.__final_dict:
-                if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                    if len(plan["agentInitPos"]) >= player_num \
-                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                            and plan["planMode"] == "INDIRECT":
-                        plan["symmetry"] = False 
-                        sublist.append(plan)
-                if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-                    if len(plan["agentInitPos"]) >= player_num \
-                            and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                            and plan["planMode"] == "INDIRECT":
-                        print("matched: " + plan["filename"].split("plans/")[1])
-                        plan["symmetry"] = True
-                        sublist.append(plan)
+                if self.check_plan(plan, ball_x, ball_y, rad, player_num, INDIRECT):
+                    sublist.append(plan)
+
             if len(sublist) > 0:
                 i = self.__shuffleCount % len(sublist)
                 self.__shuffleCount += 1
@@ -272,6 +253,23 @@ class Handler(FileSystemEventHandler):
         else:
             print("sab kon bbinm")
             return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
+
+    def check_plan(self, plan, ball_x, ball_y, rad, player_num, plan_mode):
+        if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            if len(plan["agentInitPos"]) >= player_num \
+                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                    and plan["planMode"] == plan_mode:
+                plan["symmetry"] = True
+                return True
+        if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            if len(plan["agentInitPos"]) >= player_num \
+                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
+                    and plan["planMode"] == plan_mode:
+                plan["symmetry"] = False
+                return True
+        return False
+
+
 
     def nearest_plan(self, player_num, game_mode, ball_x, ball_y):
         new_list = sorted(self.__final_dict, key=lambda x: self.ball_dist(x, x["ballInitPos"]["x"], x["ballInitPos"]["y"],
