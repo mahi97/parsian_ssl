@@ -110,10 +110,10 @@ void CDynamicAttack::makePlan(int agentSize) {
         positionAgent.skill  = DynamicSkill::NoSkill;
     }
 
-//    bool notInFirst = true;
+    lastPMInitWasDribble = (currentPlan.playmake.skill == DynamicSkill::Dribble);
 
     //// We Don't have the ball -- counter-attack, blocking, move forward
-    if (isWeHaveBall) {
+    if (wm->ball->pos.x < 0) {
         currentPlan.mode = DynamicMode::NotWeHaveBall;
         if(conf.ChipForward)
             currentPlan.playmake.init(DynamicSkill::Chip, DynamicRegion::Forward);
@@ -134,9 +134,7 @@ void CDynamicAttack::makePlan(int agentSize) {
             currentPlan.positionAgents[i].skill  = DynamicSkill::Ready;
         }
     }
-
-    lastPMInitWasDribble = (currentPlan.playmake.skill == DynamicSkill::Dribble);
-    if(critical) {
+    else if(critical) {
         currentPlan.mode = DynamicMode::Critical;
         {
             oppRob = wm->field->oppGoal();
@@ -267,6 +265,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
     assignTasks();
     DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
+    ROS_INFO(QString("MODE : %1").arg(getString(currentPlan.mode)).toStdString().c_str());
     DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
 
     for(size_t i = 0;i < agentSize;i++) {
