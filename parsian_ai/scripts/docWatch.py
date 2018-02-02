@@ -229,6 +229,7 @@ class Handler(FileSystemEventHandler):
                         and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                         and plan["planMode"] == plan_mode:
                     print("matched: " + plan["filename"].split("plans/")[1])
+                    plan["symmetry"] = False 
                     sublist.append(plan)
             if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
                 print("ball pos matched")
@@ -254,6 +255,7 @@ class Handler(FileSystemEventHandler):
                             and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                             and plan["planMode"] == "INDIRECT":
                         print("matched: " + plan["filename"].split("plans/")[1])
+                        plan["symmetry"] = False 
                         sublist.append(plan)
                 if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
                     print("ball pos matched")

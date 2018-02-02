@@ -1483,7 +1483,7 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 
         matchPlan(thePlan, _ourplayers); //Match The Plan
 
-//        checkGUItoRefineMatch(thePlan, _ourplayers);
+        checkGUItoRefineMatch(thePlan, _ourplayers);
         ourPlayOff->setMasterPlan(thePlan);
         ourPlayOff->analyseShoot(); // should call after setmasterplan
         ourPlayOff->analysePass();  // should call after setmasterplan
@@ -1500,6 +1500,35 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 
 }
 
+void CCoach::checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers) {
+    if (conf.IDBasePasser && _ourplayers.contains(conf.PasserID)) {
+        int temp = _plan->matching.common->matchedID.value(0);
+        _plan->matching.common->matchedID[0] = conf.PasserID;
+        for (int i = 1;i < _plan->matching.common->matchedID.size(); i++) {
+            if (_plan->matching.common->matchedID[i] == conf.PasserID) {
+                _plan->matching.common->matchedID[i] = temp;
+                break;
+            }
+        }
+    }
+
+    if (conf.IDBaseOneToucher
+        && _ourplayers.contains(conf.OneToucherID)) {
+        int temp = _plan -> matching.common -> matchedID.value(1);
+        _plan -> matching.common -> matchedID[1] = conf.OneToucherID;
+        for (int i = 2;i < _plan->matching.common->matchedID.size(); i++) {
+            if (_plan->matching.common->matchedID[i] == conf.OneToucherID) {
+                _plan->matching.common->matchedID[i] = temp;
+                break;
+            }
+        }
+    }
+
+    qDebug() << "[coach] final Match : " << _plan->matching.common->matchedID;
+}
+
+
+
 NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize) {
     auto *plan = new NGameOff::SPlan();
 
@@ -1508,7 +1537,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
 //    }
 
     plan->common.currentSize = _currSize;
-    plan->execution.symmetry = planMsg.the_plan.symmetry;
+    plan->execution.symmetry = (planMsg.the_plan.symmetry) ? -1 : 1;
 
 //    plan->execution.AgentPlan
     if(planMsg.the_plan.planMode == "INDIRECT")
@@ -1596,9 +1625,9 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
             double weight;
             if (_plan->matching.initPos.agents.at(i).x == -100) {
-                weight = wm->our.active(j)->pos.dist(wm->ball->pos);
+                weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
             } else {
-                weight = _plan->matching.initPos.agents.at(i).dist(wm->our.active(j)->pos);
+                weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
             }
             matcher.setWeight(i, j, -(weight));
         }
