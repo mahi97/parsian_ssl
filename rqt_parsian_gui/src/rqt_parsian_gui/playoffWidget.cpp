@@ -10,8 +10,8 @@ PlayOffWidget::PlayOffWidget(ros::NodeHandle & n) : QWidget() {
 
     client = n.serviceClient<parsian_msgs::parsian_update_plans> ("/update_plans", true);
     theplans = new parsian_msgs::parsian_update_plans();
-    lastPlan = new parsian_msgs::parsian_plan();
-    chosen = new parsian_msgs::parsian_plan();
+    lastPlan = new parsian_msgs::parsian_plan_GUI();
+    chosen = new parsian_msgs::parsian_plan_GUI();
 
     mode = new QPushButton("Game Mode");
     update = new QPushButton("Update (Don't Worry! it will work fine :)");

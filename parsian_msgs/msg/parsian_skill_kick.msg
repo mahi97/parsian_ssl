@@ -17,3 +17,4 @@ bool goalieMode
 float64 kickAngTol
 bool kickWithCenterOfDribbler
 bool playMakeMode
+bool isPlayoff

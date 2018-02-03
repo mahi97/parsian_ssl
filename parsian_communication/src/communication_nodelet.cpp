@@ -37,7 +37,7 @@ void CommunicationNodelet::onInit() {
 
 
     while(!communicator->isSerialConnected()){
-        communicator->connectSerial("/dev/ttyUSB1");//conf.serial_connect.c_str());
+        communicator->connectSerial("/dev/ttyUSB0");//conf.serial_connect.c_str());
     }
 
 
@@ -55,8 +55,9 @@ void CommunicationNodelet::onInit() {
 }
 
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
-  //ROS_INFO("salam");
-    if (cbCount >= 60) {
+  ROS_INFO("salam");
+
+    if (cbCount >= 90) {
         cbCount = 0;
         sim_handle_flag = false;
     }
@@ -69,18 +70,42 @@ void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr&
         communicator->packetCallBack(modeChangePacket(_packet));
         cbCount++;
         ROS_INFO_STREAM("Cc:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
+    } else if (cbCount < 90 && sim_handle_flag) {
+        communicator->packetCallBack(modeChangePacketZero(_packet));
+        cbCount++;
+        ROS_INFO_STREAM("Ccz:" << cbCount << modeChangePacket(_packet).get()->value.at(2).packets.at(5));
     }
 }
 parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const parsian_msgs::parsian_packetsConstPtr& _packet)
 {
-    parsian_msgs::parsian_packetsPtr packet_{new parsian_msgs::parsian_packets};
     auto  sim_handle_packet = *_packet;
     for (auto & robot_packet : sim_handle_packet.value)
     {
         for (int i = 0; i < 14; i++ )
         {
-            if (i != 11 && i != 1 && i != 0)
+            if (i != 11 && i != 0)
                 robot_packet.packets[i] = 0;
+            if (i == 8)
+                robot_packet.packets[i] = 0x01;
+            if (i == 1)
+                robot_packet.packets[i] &= 0x0F;
+        }
+    }
+    *packet_ = sim_handle_packet;
+    return packet_;
+}
+
+parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacketZero(const parsian_msgs::parsian_packetsConstPtr& _packet)
+{
+    auto  sim_handle_packet = *_packet;
+    for (auto & robot_packet : sim_handle_packet.value)
+    {
+        for (int i = 0; i < 14; i++ )
+        {
+            if (i != 11 && i != 0)
+                robot_packet.packets[i] = 0;
+            if (i == 1)
+                robot_packet.packets[i] &= 0x0F;
         }
     }
     *packet_ = sim_handle_packet;
@@ -112,7 +137,7 @@ void CommunicationNodelet::ConfigServerCallBack(const communication::communicati
 
 void CommunicationNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
-//    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
+    realGame = msg->mode == parsian_msgs::parsian_team_config::REAL;
 }
 
 //PLUGINLIB_DECLARE_CLASS(parsian_communication,CommunicationNodelet,parsian_communication::CommunicationNodelet,nodelet::Nodelet);

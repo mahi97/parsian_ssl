@@ -5,5 +5,5 @@ bool isMaster
 
 ---
 
-parsian_plan[] allPlans
+parsian_plan_GUI[] allPlans
 
