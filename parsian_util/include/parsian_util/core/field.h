@@ -19,17 +19,12 @@ public:
     double _FIELD_HEIGHT;
     double _FIELD_MARGIN_HEIGHT;
     double _FIELD_MARGIN_WIDTH;
-    double _FIELD_PENALTY;
+    double _FIELD_PENALTY_POINT;
     double _GOAL_WIDTH;
-    double _GOAL_RAD;
     double _GOAL_DEPTH;
+    double _PENALTY_DEPTH;
     double _PENALTY_WIDTH;
     double _CENTER_CIRCLE_RAD;
-    double _PENALTY_AREA_CIRCLE_X;
-    double _PENALTY_AREA_CIRCLE_RAD;
-    double _PARSIAN_BOUNDERY;
-    double _MIXTEAM_FIELD_WIDTH;
-    double _MIXTEAM_FIELD_HEIGHT;
     double _MAX_DIST;
 
 

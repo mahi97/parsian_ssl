@@ -13,7 +13,7 @@ namespace pr {
     /**
      * Converts a protoBuf ssl_vision_detection to the ROS version.
      */
-    parsian_msgs::ssl_vision_detection convert_detection_frame(SSL_DetectionFrame protoFrame, bool isYellow) {
+    parsian_msgs::ssl_vision_detection convert_detection_frame(SSL_DetectionFrame protoFrame, bool isYellow, bool isLeft) {
         parsian_msgs::ssl_vision_detection rosFrame;
 
         rosFrame.frame_number = protoFrame.frame_number();
@@ -24,6 +24,7 @@ namespace pr {
         for (int i = 0; i < protoFrame.balls().size(); ++i) {
             SSL_DetectionBall protoBall = protoFrame.balls().Get(i);
             parsian_msgs::ssl_vision_detection_ball rosBall = convert_detection_ball(protoBall);
+
             rosFrame.balls.push_back(rosBall);
         }
 
