@@ -54,14 +54,11 @@ void CRolePlayOff::update() {
             updated = false;
             break;
         case RoleSkill::Kick:
+	    kickSkill->setIsplayoff(true);
             kickSkill->setTarget(target);
             kickSkill->setAvoidpenaltyarea(avoidPenaltyArea);
             kickSkill->setInterceptmode(intercept);
-            //debug(QString("[playoffRole] profile kickSpeed : %1 %2").arg(agent->id()).arg(knowledge->getProfile(agent->id(), static_cast<double>(kickSpeed)/130.0, !chip, false)), D_MAHI);
-//            if (wm->getIsSimulMode()) // TODO : FIX SIM
-                kickSkill->setKickspeed(4);
-//            else
-                kickSkill->setKickspeed(kickSpeed);
+            kickSkill->setKickspeed(kickSpeed);
             kickSkill->setChip(chip);
             kickSkill->setDontkick(!doPass);
             kickSkill->setTolerance(0.5);

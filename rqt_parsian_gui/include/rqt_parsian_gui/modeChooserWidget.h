@@ -14,6 +14,8 @@
 #include <QAction>
 #include <QKeySequence>
 #include <parsian_msgs/parsian_team_config.h>
+#include <parsian_msgs/parsian_world_model.h>
+
 
 enum class Color {
     YELLOW = 0,
@@ -58,8 +60,10 @@ namespace rqt_parsian_gui
         Color color;
         TeamSide side;
         GameMode mode;
+        void wmCb(const parsian_msgs::parsian_world_modelConstPtr& msg);
 
         ros::Publisher team_config_pub;
+        ros::Subscriber wmsub;
     };
 }
 

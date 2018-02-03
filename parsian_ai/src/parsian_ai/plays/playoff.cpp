@@ -225,7 +225,9 @@ bool CPlayOff::BlockerExecute(int agentID){
 
 
 void CPlayOff::staticExecute() {
+    ROS_INFO("Static");
     if (initial) {
+        ROS_INFO_STREAM("task assigned: " << agentsID.size());
         assignTasks();
 
     } else {
@@ -235,13 +237,19 @@ void CPlayOff::staticExecute() {
             fillRoleProperties();
             posExecute();
             checkEndState();
-            DBUG(QString("ID : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            DBUG(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            ROS_INFO(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber).toStdString().c_str());
+
             if(masterPlan->common.currentSize > 1 && havePassInPlan) {
                 passManager();
+                ROS_INFO("Pass");
+
             }
 
             if(isPlanEnd()) {
                 playOnFlag = true;
+                ROS_INFO("Ends");
+
             }
 
         } else {
@@ -1069,11 +1077,15 @@ bool CPlayOff::isPlanDone() {
     // Plan doesn't include a final shoot
     if (tLastState == -1 || tLastAgent == -1) {
         if (isAllTasksDone()) {
+            ROS_INFO ("MAHIS: all task");
+
             DBUG ("Done By Fully Tasks Done", D_MAHI);
             masterPlan->common.addHistory(10); //FULL
             return true;
         }
     } else if (isFinalShotDone()) {
+        ROS_INFO ("MAHIS: Final Shot");
+
         DBUG ("Done By Final Shot !", D_MAHI);
         // TODO : IF GOAL THEN 10 ELSE 9
         masterPlan->common.addHistory(10); //FULL
@@ -1087,13 +1099,17 @@ bool CPlayOff::isPlanFaild() {
     SFail fail = isAnyTaskFaild();
     if (isTimeOver()) {
         DBUG ("Faild By Time Over", D_MAHI);
+        ROS_INFO ("MAHIS: Faild By Time Over");
         //        masterPlan->common.addHistory(); // Not Changeing History
         return true;
     } else if (isBallDirChanged()) {
         DBUG ("Faild By Ball Dir Changed", D_MAHI);
+        ROS_INFO ("MAHIS: Faild By Ball Dir Changed");
         masterPlan->common.addHistory(0); // MIN
         return true;
     } else if (fail = isAnyTaskFaild(), fail.fail) {
+        ROS_INFO ("MAHIS: Faild By task");
+
         DBUG(QString("Task Fail : TaskID %1").arg(fail.taskID), D_MAHI);
         DBUG(QString("Task Fail : AgentID %1").arg(fail.agentID), D_MAHI);
         DBUG(QString("Task Fail : PlanID %1").arg(fail.planID), D_MAHI);
@@ -1134,8 +1150,8 @@ bool CPlayOff::isTimeOver() {
 
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
-        DBUG(QString("Time That Left: %1").arg(ros::Time::now().sec - tempStart), D_DEBUG);
-        if(ros::Time::now().sec - tempStart > 200*masterPlan->execution.passCount) { // 2 Second
+        ROS_INFO(QString("MAHIS: Time That Left: %1").arg(ros::Time::now().sec - tempStart).toStdString().c_str());
+        if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;
         }
@@ -1312,7 +1328,7 @@ void CPlayOff::checkEndState() {
                     continue;
                 }
                 positionAgent[i].stateNumber++;
-                DBUG(QString("ID : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
+                DBUG(QString("IDDD : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
             } else {
                 //                positionAgent[i].zombie = true;
                 ///Temp
@@ -1332,6 +1348,7 @@ void CPlayOff::fillRoleProperties() {
 
                 roleAgent[i]->setFirstMove((positionAgent[i].stateNumber == 0));
                 roleAgent[i]->setAgent(soccer->agents[masterPlan->common.matchedID.value(i)]);
+
                 // handle onetouch faster
                 if (positionAgent[i].stateNumber + 1 < positionAgent[i].positionArg.size()) {
                     if (positionAgent[i].getArgs().staticSkill == MoveSkill && positionAgent[i].getArgs(1).staticSkill == OneTouchSkill) {
@@ -1342,6 +1359,7 @@ void CPlayOff::fillRoleProperties() {
                 roleAgent[i]->setRoleUpdate(true);
                 roleAgent[i]->resetTime();
                 assignTask(roleAgent[i], positionAgent[i]);
+                ROS_INFO_STREAM("NEWTASK: " << roleAgent[i]->getTarget().x << roleAgent[i]->getTarget().y);
             }
 
         } else {
@@ -1356,7 +1374,6 @@ void CPlayOff::fillRoleProperties() {
 }
 
 void CPlayOff::assignTask(CRolePlayOff* _roleAgent, const SPositioningAgent& _positionAgent) {
-
     switch(_positionAgent.getArgs().staticSkill) {
     case PassSkill:
         assignPass(_roleAgent, _positionAgent);
@@ -1411,8 +1428,8 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setAvoidPenaltyArea(true);
     _roleAgent->setChip(chipOrNot(_posAgent.getArgs()));
     if (_roleAgent->getChip()) {
-        //        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
-        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
+        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
+        //_roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
         DBUG(QString("VALUE : %1").arg(static_cast <double> (_posAgent.getArgs().rightData)/200), D_MAHI);
     } else {
         _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData));
@@ -1490,7 +1507,6 @@ void CPlayOff::assignMove(CRolePlayOff* _roleAgent,
         _roleAgent -> setMaxVelocity(static_cast<float>(getMaxVel(_roleAgent, _posAgent.getArgs())));
 
     }
-
     _roleAgent -> setSelectedSkill(RoleSkill::GotopointAvoid);
 }
 

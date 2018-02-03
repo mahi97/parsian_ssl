@@ -10,6 +10,7 @@
 #include <rqt_parsian_gui/monitorWidget.h>
 #include <pluginlib/class_list_macros.h>
 #include <parsian_msgs/parsian_world_model.h>
+#include <parsian_msgs/parsian_team_config.h>
 #include <parsian_util/core/worldmodel.h>
 
 
@@ -33,20 +34,24 @@ namespace rqt_parsian_gui
 
         ros::NodeHandle n;
         ros::NodeHandle n_private;
+        ros::NodeHandle n_color;
 
         ros::Subscriber wm_sub;
         ros::Subscriber draw_sub;
+        ros::Subscriber color_sub;
 
         ros::Timer timer;
 
 
         double radius = 0.0215;
+        bool LogMode;
         QColor ourCol;
         QColor oppCol;
 
 
         void wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
         void drawCb(const parsian_msgs::parsian_drawConstPtr& _draw);
+        void colorCb(const parsian_msgs::parsian_team_configConstPtr& _color);
         void timerCb(const ros::TimerEvent& _timer);
 
         // Comment in to signal that the plugin has a way to configure it
@@ -57,6 +62,7 @@ namespace rqt_parsian_gui
 
         CguiDrawer* drawer;
         parsian_msgs::parsian_world_modelConstPtr mywm;
+        parsian_msgs::parsian_team_configConstPtr mycolor;
         MonitorWidget* fieldWidget;
     };
 }  // namespace rqt_example_cpp

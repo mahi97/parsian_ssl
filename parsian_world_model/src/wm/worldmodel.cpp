@@ -59,7 +59,7 @@ void WorldModel::toParsianMessage(const CBall* _ball) {
 
 }
 
-parsian_msgs::parsian_world_modelPtr WorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
+parsian_msgs::parsian_world_modelPtr WorldModel::getParsianWorldModel() {
 //    if (this->ball == nullptr) return rosWM;
 
     parsian_msgs::parsian_world_modelPtr rosWM{new parsian_msgs::parsian_world_model};
@@ -82,10 +82,6 @@ parsian_msgs::parsian_world_modelPtr WorldModel::getParsianWorldModel(bool colou
             rosWM->opp.push_back(rosRobots[i+12]);
         }
     }
-
-    // TODO : get from protobuf_wrapper_params
-    rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
-    rosWM->isLeft = static_cast<unsigned char>(side_left);
 
     return rosWM;
 }
@@ -196,3 +192,9 @@ void WorldModel::update(CHalfWorld* w0) {
     }
 
 }
+
+void WorldModel::setMode(bool isSimulation)
+{
+    simulationMode = isSimulation;
+}
+

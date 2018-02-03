@@ -970,7 +970,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     double w1,w2,w3,w4;
     jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
     command->wheelsspeed= static_cast<unsigned char>(true);
-    // todo wtf?
     command->wheel1= static_cast<float>(w1);
     command->wheel2= static_cast<float>(w2);
     command->wheel3= static_cast<float>(w3);

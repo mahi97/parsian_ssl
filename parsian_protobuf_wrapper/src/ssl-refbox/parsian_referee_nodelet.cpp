@@ -18,7 +18,7 @@ void RefreeNodelet::onInit() {
 
     ssl_referee_pub  = nh_private.advertise<parsian_msgs::ssl_refree_wrapper>("referee", 1000);
 
-    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/rqt_parsian_gui/team_config", 1000, boost::bind(& RefreeNodelet::teamConfigCb, this, _1));
+    team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/team_config", 1000, boost::bind(& RefreeNodelet::teamConfigCb, this, _1));
 
     refBox = nullptr;
     networkConfig.port = 10003;
@@ -59,7 +59,7 @@ void RefreeNodelet::timerCb(const ros::TimerEvent& event){
 
 }
 
-void RefreeNodelet::teamConfigCb(const parsian_msgs::parsian_team_config::ConstPtr& msg)
+void RefreeNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
     isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
 }

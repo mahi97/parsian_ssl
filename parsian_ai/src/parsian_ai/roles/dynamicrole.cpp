@@ -5,8 +5,28 @@ CRoleDynamic::CRoleDynamic() {
     receiveSkill  = new ReceivepassAction;
     moveSkill     = new GotopointavoidAction;
     oneTouchSkill = new OnetouchAction;
-    selectedSkill = DynamicEnums::NoSkill;
-    agent = NULL;
+    selectedSkill = DynamicSkill::NoSkill;
+    agent = nullptr;
+}
+
+CRoleDynamic::CRoleDynamic(const CRoleDynamic &_copy) {
+    shotSkill     = new KickAction;
+    receiveSkill  = new ReceivepassAction;
+    moveSkill     = new GotopointavoidAction;
+    oneTouchSkill = new OnetouchAction;
+    selectedSkill = _copy.selectedSkill;
+    agent = _copy.agent;
+//    shotSkill->setMessage(_copy.shotSkill->getMessage());
+}
+
+CRoleDynamic::CRoleDynamic(CRoleDynamic && _move) noexcept {
+    shotSkill     = new KickAction;
+    receiveSkill  = new ReceivepassAction;
+    moveSkill     = new GotopointavoidAction;
+    oneTouchSkill = new OnetouchAction;
+    selectedSkill = _move.selectedSkill;
+    agent = _move.agent;
+    shotSkill->setMessage(_move.shotSkill->getMessage());
 }
 
 CRoleDynamic::~CRoleDynamic() {
@@ -23,7 +43,7 @@ void CRoleDynamic::update() {
     shotSkill->setKickwithcenterofdribbler(true);
 
     switch(selectedSkill) {
-        case DynamicEnums::Ready:
+        case DynamicSkill::Ready:
             receiveSkill->setTarget(target);
             receiveSkill->setReceiveradius(receiveRadius);
             break;
@@ -41,10 +61,12 @@ void CRoleDynamic::update() {
 //               dribbleSkill->setKickSpeed(max(300, kickSpeed));
 //       }
 //       break;
-        case DynamicEnums::Shot:
+        case DynamicSkill::Shot:
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(chip);
             shotSkill->setVeryfine(veryFine);
 //       shotSkill->setShotToEmptySpot(emptySpot);
@@ -54,10 +76,12 @@ void CRoleDynamic::update() {
 //       else
             shotSkill->setKickspeed(std::max(900, kickSpeed));
             break;
-        case DynamicEnums::Chip:
+        case DynamicSkill::Chip:
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(true);
             shotSkill->setVeryfine(veryFine);
             shotSkill->setDontkick(false);
@@ -66,10 +90,12 @@ void CRoleDynamic::update() {
 //       else
             shotSkill->setKickspeed(std::max(200, kickSpeed));
             break;
-        case DynamicEnums::Pass:
+        case DynamicSkill::Pass:
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
+            shotSkill->setAvoidopppenaltyarea(true);
+            shotSkill->setPlaymakemode(true);
             shotSkill->setChip(chip);
             shotSkill->setDontkick(noKick);
             shotSkill->setVeryfine(veryFine);
@@ -82,7 +108,7 @@ void CRoleDynamic::update() {
             shotSkill->setKickspeed(std::max(300, kickSpeed));
 //       }
             break;
-        case DynamicEnums::CatchBall:
+        case DynamicSkill::CatchBall:
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
             shotSkill->setAvoidpenaltyarea(true);
@@ -94,19 +120,19 @@ void CRoleDynamic::update() {
 //       else
             shotSkill->setKickspeed(1023);
             break;
-        case DynamicEnums::Move:
+        case DynamicSkill::Move:
             moveSkill->setTargetpos(target);
             moveSkill->setTargetdir(targetDir);
             moveSkill->setAvoidpenaltyarea(true);
             moveSkill->setSlowmode(false);
             break;
-        case DynamicEnums::OneTouch:
+        case DynamicSkill::OneTouch:
             oneTouchSkill->setWaitpos(waitPos);
             oneTouchSkill->setTarget(target);
             break;
-        case DynamicEnums::Keep:
+        case DynamicSkill::Keep:
             break;
-        case DynamicEnums::NoSkill:
+        case DynamicSkill::NoSkill:
         default:
             break;
     }
@@ -122,25 +148,33 @@ void CRoleDynamic::execute() {
 
     ROS_INFO("seda mizane");
     switch(selectedSkill) {
-        case DynamicEnums::Ready:
+        case DynamicSkill::Ready:
             agent->action = receiveSkill;
             break;
-        case DynamicEnums::Shot:
-        case DynamicEnums::Chip:
-        case DynamicEnums::Pass:
-        case DynamicEnums::CatchBall:
+        case DynamicSkill::Shot:
+        case DynamicSkill::Chip:
+        case DynamicSkill::Pass:
+        case DynamicSkill::CatchBall:
             DBUG(QString("[dynamicRole] kickSpeed : %1").arg(kickSpeed), D_MAHI);
             agent->action = shotSkill;
             break;
-        case DynamicEnums::Move:
+        case DynamicSkill::Move:
             agent->action = moveSkill;
             break;
-        case DynamicEnums::OneTouch:
+        case DynamicSkill::OneTouch:
             break;
-        case DynamicEnums::NoSkill:
+        case DynamicSkill::NoSkill:
         default:
             break;
     }
 
+}
+
+CRoleDynamic& CRoleDynamic::operator=(CRoleDynamic &&_move) noexcept {
+    return *this;
+}
+
+CRoleDynamic& CRoleDynamic::operator=(const CRoleDynamic& _copy) {
+    return *this;
 }
 

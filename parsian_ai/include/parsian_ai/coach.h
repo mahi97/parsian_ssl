@@ -96,8 +96,9 @@ private:
 
     CStopPlay            *stopPlay;
 
-
+public:
     CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+private:
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
@@ -167,6 +168,7 @@ private:
     void setFirstPlay();
     void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
+    void checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers);
 
 
     int preferedShotSpot;
@@ -205,6 +207,6 @@ private:
     QList <CRobot*> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
+    POffSkills strToEnum(const std::string& _str);
 };
-
 #endif //PARSIAN_AI_COACH_H

@@ -136,8 +136,7 @@ kckMode CSkillKick::decideMode()
     robotKickArea.addVertex(agentPos+agent->dir().norm()*0.35-agent->dir().rotate(90).norm()*distCoef);
     robotKickArea.addVertex(agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*distCoef);
 
-    // TODO : knowledge
-    if(0 &&/*(!knowledge->isOurNonPlayOnKick())&&*/(passProfiler || kickWithCenterOfDribbler)) {
+    if(isPlayoff && (passProfiler || kickWithCenterOfDribbler)){
         kickerOn = dribblerArea.contains(ballPos) && robotKickArea.contains(ballPos);
     }
     else kickerOn = dribblerArea.contains(ballPos);
@@ -366,7 +365,7 @@ void CSkillKick::avoidOppPenalty()
     Segment2D ballSeg;
     Segment2D ballPosSeg;
     Segment2D penaltyStraightLine;
-    penaltyStraightLine.assign(Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY -0.1,0.7 ),Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY-0.1 ,-0.7 ));
+    penaltyStraightLine.assign(Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY_POINT -0.1,0.7 ),Vector2D(wm->field->_FIELD_WIDTH/2 - wm->field->_FIELD_PENALTY_POINT-0.1 ,-0.7 ));
     ballPosSeg.assign( wm->field->oppGoal(),wm->field->oppGoal() + tempVector.norm()*2);
     ballSeg.assign(ballPos,ballPos+wm->ball->vel.norm()*10);
     penaltyCircle.assign(wm->field->oppGoal() + Vector2D(0.15,0),1.4);
@@ -489,7 +488,7 @@ void CSkillKick::jTurn()
     Vector2D movementThSpeed,movementThPos;
     double movementDir = ((ballPos - agentPos).th() - kickFinalDir).degree();
     double shift = 0;
-    double distCoef = 0.20;
+    double distCoef = 0.15;
 
     idealPass = (ballPos - agentPos).norm()*distCoef;
     /*
@@ -546,52 +545,48 @@ void CSkillKick::jTurn()
 
 */
 
-    if(movementDir < 10 && movementDir > -10)
+    if(movementDir < 20 && movementDir > -20)
         shift = 0;
     else if(movementDir > 50)
-        shift = 45 + (1-agentPos.dist(ballPos))*61;
+        shift = 15 + (1-agentPos.dist(ballPos))*61;
     else if(movementDir < -50)
-        shift = -45 - (1-agentPos.dist(ballPos))*61;
+        shift = -15 - (1-agentPos.dist(ballPos))*61;
     else if(movementDir > 30) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 35 + (1-agentPos.dist(ballPos))*10;
+            shift = 5 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =45 + (1-agentPos.dist(ballPos))*35;
+            shift =10 + (1-agentPos.dist(ballPos))*35;
         distCoef = 0.17;
     }
     else if(movementDir < -30){
         if(wm->ball->vel.length() < 0.1)
-            shift = -25 - (1-agentPos.dist(ballPos))*10;
+            shift = -5 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -35 - (1-agentPos.dist(ballPos))*35;
+            shift = -10 - (1-agentPos.dist(ballPos))*35;
 
         distCoef = 0.17;
     }
     else if(movementDir > 0) {
         if(wm->ball->vel.length() < 0.1)
-            shift = 25 + (1-agentPos.dist(ballPos))*10;
+            shift = 5 + (1-agentPos.dist(ballPos))*10;
         else
-            shift =35 + (1-agentPos.dist(ballPos))*20;
+            shift =10 + (1-agentPos.dist(ballPos))*20;
         distCoef = 0.17;
     }
     else if(movementDir < 0){
         if(wm->ball->vel.length() < 0.1)
-            shift = -25 - (1-agentPos.dist(ballPos))*10;
+            shift = -5 - (1-agentPos.dist(ballPos))*10;
         else
-            shift = -35 - (1-agentPos.dist(ballPos))*20;
+            shift = -10 - (1-agentPos.dist(ballPos))*20;
 
         distCoef = 0.17;
     }
-distCoef = 0.20;
+
     idealPass.rotate(shift);
     targetForJturnSpeed = agentPos + idealPass;
 
-    drawer->draw(targetForJturnSpeed);
-
     movementThSpeed = (targetForJturnSpeed - agentPos).norm();
-    drawer->draw(movementThSpeed);
-
-//    movementThPos = (targetForJturnPos - agentPos).norm();
+    movementThPos = (targetForJturnPos - agentPos).norm();
     double dirReduce = (fabs(movementDir)/70)*(fabs(movementDir)/70);
 
     speedPid->error  = targetForJturnSpeed.dist(agentPos);
@@ -649,11 +644,10 @@ distCoef = 0.20;
     {
         dirReduce -= 2;
     }
-    // TODO : Game State Message
-//    if(knowledge->isOurNonPlayOnKick())
-//    {
-//        dirReduce -= 1;
-//    }
+    if(isPlayoff){
+        dirReduce -= 1;
+    }
+
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
@@ -672,7 +666,7 @@ distCoef = 0.20;
         speedPid->kp = 4;
     }
 
-    angPid->kp = 5;
+    angPid->kp = 3;
 
     double vx= movementThSpeed.x * speedPid->PID_OUT() + movementThPos.x * posPid->PID_OUT();
     double vy = movementThSpeed.y * speedPid->PID_OUT()+ movementThPos.y * posPid->PID_OUT();
@@ -693,7 +687,7 @@ void CSkillKick::turnForKick()
     agent->setRoller(0);
     double angReduce = 1;
 
-    if(false) //knowledge->isOurNonPlayOnKick()) TODO : Command
+    if(isPlayoff)
     {
         if(fabs((agentDir.th() - kickFinalDir).degree()) < 80)
             angReduce = 0.5;

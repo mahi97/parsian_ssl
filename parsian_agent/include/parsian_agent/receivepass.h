@@ -23,10 +23,11 @@ class CSkillReceivePass : public CSkill, public ReceivepassAction
 {
 private:
     CSkillGotoPointAvoid* gotopointavoid;
-    Vector2D kkBallPos;
+    Vector2D ballPos;
     Vector2D kkAgentPos;
     kkRPMode receivePassMode;
     kkRPMode decideMode();
+    Circle2D receiveArea;
     double cirThresh;
     double kickCirThresh;
 public:
