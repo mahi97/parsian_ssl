@@ -91,16 +91,20 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
             break;
         case parsian_msgs::parsian_robot_task::KICK:
             skillKick->setMessage(&_task->kickTask);
-//            ROS_INFO_STREAM("kian the process");
-            bool bool_spinner;
-            if (_task->kickTask.spin == 0)
-                bool_spinner = false;
+            if(!_task->kickTask.chip)
+            {
+                if (!_task->kickTask.iskickchargetime)
+                    skillKick->setKickspeed(agent->kickSpeedValue(_task->kickTask.kickSpeed,_task->kickTask.spin));
+                else
+                    skillKick->setKickspeed(_task->kickTask.kickchargetime);
+            }
             else
-                bool_spinner = true;
-            if (!_task->kickTask.iskickchargetime)
-                skillKick->setKickspeed(agent->kickSpeedValue(_task->kickTask.kickSpeed,bool_spinner));
-            else
-                skillKick->setKickspeed(_task->kickTask.kickchargetime);
+            {
+                if (!_task->kickTask.iskickchargetime)
+                    skillKick->setKickspeed(agent->chipDistanceValue(_task->kickTask.kickSpeed,_task->kickTask.spin));
+                else
+                    skillKick->setKickspeed(_task->kickTask.kickchargetime);
+            }
             skill = skillKick;
             //ROS_INFO("KICK executed!");
             break;

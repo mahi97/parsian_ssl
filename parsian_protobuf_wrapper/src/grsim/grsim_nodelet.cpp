@@ -150,7 +150,7 @@ void GrsimNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr&
 //kick profiler usage
 void GrsimNodelet::getprofilerdata()
 {
-    std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_kick.csv");
+    std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_kick_0.csv");
     if (!file.is_open())
         ROS_INFO_STREAM("profiler datas failed to open");
     else

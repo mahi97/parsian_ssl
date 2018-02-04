@@ -139,9 +139,9 @@ public:
 
     double getKickValue(bool chip, bool spin, double v);
     double kickValueSpeed(double value,bool spinner);
-    double kickSpeedValue(double speed,bool spinner);
-    double chipValueDistance(double value,bool spinner);
-    double chipDistanceValue(double distance,bool spinner);
+    double kickSpeedValue(double speed, int spinner);
+    double chipValueDistance(double value, bool spinner);
+    double chipDistanceValue(double distance,int spinner);
 
     int kickValueForDistance( double dist, double finalVel);
 
@@ -168,11 +168,16 @@ private:
     double getVar(const double* data);
     Matrix ANN_forward( Matrix input );
     //kick profiler usage
-    std::vector<std::vector<std::string>> dataList;
-    void getprofilerdata();
-    bool gotprofilerdatas;
-    float convertkickspeedtokickchargetime(float kickspeed);
-    float coef_a, coef_b, coef_c;
+    void getkickprofilerdata();
+    bool gotkickprofilerdatas;
+    float convertkickspeedtokickchargetime(float kickspeed, int spin);
+    float kick_coef_a[8], kick_coef_b[8], kick_coef_c[8];
+
+    void getchipprofilerdata();
+    bool gotchipprofilerdatas;
+    float convertchipdisttochipchargetime(float chipdist, int spin);
+    float chip_coef_a[8], chip_coef_b[8], chip_coef_c[8];
+
 public:
 
     ros::Publisher planner_pub;

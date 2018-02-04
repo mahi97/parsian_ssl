@@ -113,11 +113,23 @@ Matrix Agent::ANN_forward( Matrix input )
 
 Agent::Agent(int _ID)
 {
-    gotprofilerdatas = false;
-    coef_a = 0;
-    coef_b = 0;
-    coef_c = 0;
-    getprofilerdata();
+    gotkickprofilerdatas = false;
+    for(int i{}; i < 8; i++)
+    {
+        kick_coef_a[i] = 0;
+        kick_coef_b[i] = 0;
+        kick_coef_c[i] = 0;
+    }
+    getkickprofilerdata();
+
+    gotchipprofilerdatas = false;
+    for(int i{}; i < 8; i++)
+    {
+        chip_coef_a[i] = 0;
+        chip_coef_b[i] = 0;
+        chip_coef_c[i] = 0;
+    }
+    getchipprofilerdata();
 
     srand48(time(nullptr));
     packetNum = 0;
@@ -738,20 +750,12 @@ double Agent::kickValueSpeed(double value,bool spinner)//for onetouch
     return value; // TODO : fix
 }
 
-double Agent::kickSpeedValue(double speed,bool spinner)//for pass speed
+double Agent::kickSpeedValue(double speed,int spinner)//for pass speed
 {
     // TODO : Move Profiler Here
-//    ROS_INFO_STREAM("kian want to change too time");
-    if (gotprofilerdatas)
-    {
-//        ROS_INFO_STREAM("kian changed succes time");
-        return convertkickspeedtokickchargetime(speed);
-    }
-    else
-    {
-//        ROS_INFO_STREAM("kian couldnt change");
-        return speed;
-    }
+    ROS_INFO("kian kickspeed value");
+    return convertkickspeedtokickchargetime(speed, spinner);
+
 }
 
 double Agent::chipValueDistance(double value,bool spinner) //for chip recieve
@@ -844,8 +848,11 @@ double Agent::getKickValue(bool chip, bool spin, double v)
 
 
 // TODO : Fix it With Profiler
-double Agent::chipDistanceValue(double distance,bool spinner) {
-    return sqrt(distance * Gravity);
+double Agent::chipDistanceValue(double distance,int spinner) {
+    //return sqrt(distance * Gravity);
+    ROS_INFO("kian chipspeed value");
+    return convertchipdisttochipchargetime(distance, spinner);
+
 }
 
 int Agent::kickValueForDistance(double dist, double finalVel)
@@ -1002,45 +1009,140 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
 }
 
 //kick profiler usage
-void Agent::getprofilerdata()
+void Agent::getkickprofilerdata()
 {
-    std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_kick.csv");
-    if (!file.is_open())
-        ROS_INFO_STREAM("profiler datas failed to open");
-    else
+//    ROS_INFO("kian getpro");
+    for(int i{}; i <= 7; i++)
     {
-        ROS_INFO_STREAM("file opened");
-        std::string line = "";
-        // Iterate through each line and split the content using delimeter
-        while (getline(file, line))
+        std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_kick_"+ to_string(i) +".csv");
+        if (!file.is_open())
         {
-            std::vector<std::string> vec;
-            boost::algorithm::split(vec, line, boost::is_any_of(","));
-            dataList.push_back(vec);
-        }
-        // Close the File
-        file.close();
-        for(int i{1}; i<dataList.size(); i++)
-            if(atoi(dataList[i][0].c_str()) == id())
+            if(i == 0)
             {
-                coef_a = atof(dataList[i][1].c_str());
-                coef_b = atof(dataList[i][2].c_str());
-                coef_c = atof(dataList[i][3].c_str());
-                gotprofilerdatas = true;
+                ROS_INFO_STREAM("kick profiler datas no spin failed to open");
+                return;
             }
+            else {
+                kick_coef_a[i] = kick_coef_a[i-1];
+                kick_coef_b[i] = kick_coef_b[i-1];
+                kick_coef_c[i] = kick_coef_c[i-1];
+            }
+        }
+        else
+        {
+            std::vector<std::vector<std::string>> dataList;
+            dataList.clear();
+            std::string line = "";
+            // Iterate through each line and split the content using delimeter
+            while (getline(file, line))
+            {
+                std::vector<std::string> vec;
+                boost::algorithm::split(vec, line, boost::is_any_of(","));
+                dataList.push_back(vec);
+            }
+            // Close the File
+            file.close();
+            for(int j{1}; j<dataList.size(); j++)
+                if(atoi(dataList[j][0].c_str()) == id())
+                {
+                    //ROS_INFO_STREAM("readfrom datalist" << i << atof(dataList[j][1].c_str()));
+                    kick_coef_a[i] = atof(dataList[j][1].c_str());
+                    kick_coef_b[i] = atof(dataList[j][2].c_str());
+                    kick_coef_c[i] = atof(dataList[j][3].c_str());
+                    if(i == 0)
+                        gotkickprofilerdatas = true;
+                }
+        }
     }
 }
-float Agent::convertkickspeedtokickchargetime(float kickspeed)
+float Agent::convertkickspeedtokickchargetime(float kickspeed, int spin)
 {
-    if (gotprofilerdatas)
+//    ROS_INFO("kian convert");
+    if(spin < 0)
+        spin  = 0;
+    if(spin > 7)
+        spin = 7;
+    if (gotkickprofilerdatas)
     {
-        return coef_a*kickspeed*kickspeed + coef_b*kickspeed + coef_c;
+        return kick_coef_a[spin]*kickspeed*kickspeed + kick_coef_b[spin]*kickspeed + kick_coef_c[spin];
     }
     else
     {
-        ROS_INFO_STREAM("there was no result for this robot in profiler datas");
-        return -1;
+        ROS_INFO_STREAM("there was no result for this robot in kick profiler datas");
+        return 500;
     }
 
 
 }
+
+void Agent::getchipprofilerdata()
+{
+    //    ROS_INFO("kian getpro");
+        for(int i{}; i <= 7; i++)
+        {
+            std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_chip_"+ to_string(i) +".csv");
+            if (!file.is_open())
+            {
+                if(i == 0)
+                {
+                    ROS_INFO_STREAM("chip profiler datas no spin failed to open");
+                    return;
+                }
+                else {
+                    chip_coef_a[i] = chip_coef_a[i-1];
+                    chip_coef_b[i] = chip_coef_b[i-1];
+                    chip_coef_c[i] = chip_coef_c[i-1];
+                }
+            }
+            else
+            {
+                std::vector<std::vector<std::string>> dataList;
+                dataList.clear();
+                std::string line = "";
+                // Iterate through each line and split the content using delimeter
+                while (getline(file, line))
+                {
+                    std::vector<std::string> vec;
+                    boost::algorithm::split(vec, line, boost::is_any_of(","));
+                    dataList.push_back(vec);
+                }
+                // Close the File
+                file.close();
+                for(int j{1}; j<dataList.size(); j++)
+                    if(atoi(dataList[j][0].c_str()) == id())
+                    {
+                        //ROS_INFO_STREAM("readfrom datalist" << i << atof(dataList[j][1].c_str()));
+                        chip_coef_a[i] = atof(dataList[j][1].c_str());
+                        chip_coef_b[i] = atof(dataList[j][2].c_str());
+                        chip_coef_c[i] = atof(dataList[j][3].c_str());
+                        if(i == 0)
+                            gotchipprofilerdatas = true;
+                    }
+            }
+        }
+}
+
+float Agent::convertchipdisttochipchargetime(float chipdist, int spin)
+{
+    float chipspeed{};
+    //TODO calculate coef for converting dist to chip speed
+    float A{1}, B{1}, C{1};
+    chipspeed = A*chipdist*chipdist + B*chipdist + C;
+    //    ROS_INFO("kian convert");
+        if(spin < 0)
+            spin  = 0;
+        if(spin > 7)
+            spin = 7;
+        if (gotchipprofilerdatas)
+        {
+            return chip_coef_a[spin]*chipspeed*chipspeed + chip_coef_b[spin]*chipspeed + chip_coef_c[spin];
+        }
+        else
+        {
+            ROS_INFO_STREAM("there was no result for this robot in chip profiler datas");
+            return 500;
+        }
+
+}
+
+
