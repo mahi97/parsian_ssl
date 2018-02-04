@@ -666,12 +666,14 @@ void DefensePlan::setGoalKeeperState(){
     ////////////////////////////////////////////////////////////////////////////
     Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.2 , 0.1) , wm->field->ourGoalL() - Vector2D(0 , 0.1));
     Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.2 , 0.1) , wm->field->ourGoalR() - Vector2D(0 , 0.1));
+    Circle2D dangerCircle;
+    Circle2D dangerCircle1;
     drawer->draw(ourLeftPole);
     drawer->draw(ourRightPole);
     if(goalKeeperAgent != nullptr){
         if(wm->field->isInField(wm->ball->pos)){
             ballIsOutOfField = false;
-            Vector2D Solutions[2];
+            QList<Vector2D> solutions;
             Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm()*10);
             Segment2D goalLine(wm->field->ourGoal() + Vector2D(0 , 0.8) , wm->field->ourGoal() - Vector2D(0 , 0.8));
             QList<Circle2D> defs;
@@ -679,38 +681,49 @@ void DefensePlan::setGoalKeeperState(){
             for(int g=0;g<defenseAgents.count();g++){
                 defs.append(Circle2D(defenseAgents[g]->pos(), Robot::robot_radius_new));
             }
-            // TODO : FIX THIS
-//            know->getEmptyAngle(wm->ball->pos, wm->field->ourGoalL(), wm->field->ourGoalR(), defs, AZDangerPercent, AZBisecOpenAngle, AZBigestOpenAngle,false);
+
+            know->getEmptyAngle(wm->ball->pos, wm->field->ourGoalL(), wm->field->ourGoalR(), defs, AZDangerPercent, AZBisecOpenAngle, AZBigestOpenAngle,false);
             /////////////////////// Added danger mode for not switching between "ball behindGoalie && danger mode /////////////
-            Circle2D dangerCircle = Circle2D(Solutions[0].dist(wm->ball->pos) < Solutions[1].dist(wm->ball->pos) ? Solutions[0] : Solutions[1], 0.40);
-            Circle2D dangerCircle1 = Circle2D(Solutions[0].dist(wm->ball->pos) < Solutions[1].dist(wm->ball->pos) ? Solutions[0] : Solutions[1], 0.40);
-            if(wm->our.activeAgentsCount() > 0 || wm->opp.activeAgentsCount() > 0){
-                for(int i = 0; i < wm->our.activeAgentsCount() ; i++){
-                    if(wm->our.active(i)->id != goalKeeperAgent->id()){
-                        if(dangerCircle.contains(wm->our.active(i)->pos)){
-                            isCrowdedInFrontOfPenaltyAreaByOurAgents = true;
+            solutions = wm->field->ourPAreaIntersect(Segment2D(wm->ball->pos , wm->field->ourGoal()));
+            if(solutions.size()){
+                if(solutions.size() == 1){
+                    if(wm->field->isInField(solutions.at(0))){
+                         dangerCircle = Circle2D(solutions.at(0), 0.40);
+                         dangerCircle1 = Circle2D(solutions.at(0), 0.40);
+                    }
+                }
+                else if(solutions.size() == 2){
+                    dangerCircle = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
+                    dangerCircle1 = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
+                }
+                if(wm->our.activeAgentsCount() > 0 || wm->opp.activeAgentsCount() > 0){
+                    for(int i = 0; i < wm->our.activeAgentsCount() ; i++){
+                        if(wm->our.active(i)->id != goalKeeperAgent->id()){
+                            if(dangerCircle.contains(wm->our.active(i)->pos)){
+                                isCrowdedInFrontOfPenaltyAreaByOurAgents = true;
+                            }
+                        }
+                    }
+                    for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
+                        if(dangerCircle.contains(wm->opp.active(i)->pos)){
+                            isCrowdedInFrontOfPenaltyAreaByOppAgents = true;
                         }
                     }
                 }
-                for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
-                    if(dangerCircle.contains(wm->opp.active(i)->pos)){
-                        isCrowdedInFrontOfPenaltyAreaByOppAgents = true;
+                if(isCrowdedInFrontOfPenaltyAreaByOurAgents){
+                    DBUG("Crowded" , D_AHZ);
+                    if(dangerCircle.contains(wm->ball->pos)){
+                        dangerForGoalKeeperClearByOurAgents = true;
                     }
                 }
-            }
-            if(isCrowdedInFrontOfPenaltyAreaByOurAgents){
-                DBUG("Crowded" , D_AHZ);
-                if(dangerCircle.contains(wm->ball->pos)){
-                    dangerForGoalKeeperClearByOurAgents = true;
+                if(isCrowdedInFrontOfPenaltyAreaByOppAgents){
+                    if(dangerCircle1.contains(wm->ball->pos)){
+                        dangerForGoalKeeperClearByOppAgents = true;
+                    }
                 }
-            }
-            if(isCrowdedInFrontOfPenaltyAreaByOppAgents){
-                if(dangerCircle1.contains(wm->ball->pos)){
-                    dangerForGoalKeeperClearByOppAgents = true;
+                if(dangerForGoalKeeperClearByOurAgents || dangerForGoalKeeperClearByOppAgents){
+                    dangerForGoalKeeperClear = true;
                 }
-            }
-            if(dangerForGoalKeeperClearByOurAgents || dangerForGoalKeeperClearByOppAgents){
-                dangerForGoalKeeperClear = true;
             }
             ///////////////////////////////////////////////////////////////////////
             if(playOnMode && !dangerForGoalKeeperClear){
