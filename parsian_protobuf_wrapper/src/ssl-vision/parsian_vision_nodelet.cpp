@@ -57,8 +57,7 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
         //ROS_INFO("v");
         if (vision_packet.has_detection()) {
             parsian_msgs::ssl_vision_detectionPtr detection{new parsian_msgs::ssl_vision_detection};
-            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow);
-//            wrapper->detections.push_back(detection);
+            *detection = pr::convert_detection_frame(vision_packet.detection(), isOurColorYellow, isOurSideLeft);
             detection->header.stamp = ros::Time::now();
             ssl_detection_pub.publish(detection);
         }
@@ -66,7 +65,6 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
         if (vision_packet.has_geometry()) {
             parsian_msgs::ssl_vision_geometryPtr geometry{new parsian_msgs::ssl_vision_geometry};
             *geometry = pr::convert_geometry_data(vision_packet.geometry());
-//            wrapper->geometry.push_back(geometry);
             ssl_geometry_pub.publish(geometry);
         }
     }
@@ -75,5 +73,6 @@ void VisionNodelet::timerCb(const ros::TimerEvent &event) {
 void VisionNodelet::teamConfigCb(const parsian_msgs::parsian_team_configConstPtr& msg)
 {
         isOurColorYellow = msg->color == parsian_msgs::parsian_team_config::YELLOW;
+        isOurSideLeft = msg->side == parsian_msgs::parsian_team_config::LEFT;
 }
 

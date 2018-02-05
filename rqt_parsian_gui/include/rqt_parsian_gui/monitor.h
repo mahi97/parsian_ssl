@@ -25,12 +25,9 @@ namespace rqt_parsian_gui
     public:
 
         Monitor();
+        ~Monitor();
         virtual void initPlugin(qt_gui_cpp::PluginContext& context);
         virtual void shutdownPlugin();
-        virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings,
-                                  qt_gui_cpp::Settings& instance_settings) const;
-        virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
-                                     const qt_gui_cpp::Settings& instance_settings);
 
         ros::NodeHandle n;
         ros::NodeHandle n_private;
@@ -61,6 +58,7 @@ namespace rqt_parsian_gui
         QWidget* widget_;
 
         CguiDrawer* drawer;
+        CguiDrawer* lastdrawer;
         parsian_msgs::parsian_world_modelConstPtr mywm;
         parsian_msgs::parsian_team_configConstPtr mycolor;
         MonitorWidget* fieldWidget;

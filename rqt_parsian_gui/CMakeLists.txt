@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         rqt_gui_cpp
         std_msgs
         parsian_util
+        rosbag
         )
 
 ## System dependencies are found with CMake's conventions
@@ -129,6 +130,8 @@ set (${PROJECT_NAME}_SRCS
         src/${PROJECT_NAME}/modeChooserWidget.cpp
         src/${PROJECT_NAME}/playoffWidget.cpp
         src/${PROJECT_NAME}/playoff.cpp
+        src/${PROJECT_NAME}/parsian_logger.cpp
+        src/${PROJECT_NAME}/logger_widget.cpp
         )
 
 set(${PROJECT_NAME}_HDRS
@@ -141,6 +144,8 @@ set(${PROJECT_NAME}_HDRS
         include/${PROJECT_NAME}/modeChooserWidget.h
         include/${PROJECT_NAME}/playoffWidget.h
         include/${PROJECT_NAME}/playoff.h
+        include/${PROJECT_NAME}/parsian_logger.h
+        include/${PROJECT_NAME}/logger_widget.h
         )
 
 
@@ -219,6 +224,7 @@ install(FILES
         plugin1.xml
         plugin2.xml
         mode_plugin.xml
+        log_plugin.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
 

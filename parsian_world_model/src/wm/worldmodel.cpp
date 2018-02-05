@@ -83,10 +83,6 @@ parsian_msgs::parsian_world_modelPtr WorldModel::getParsianWorldModel() {
         }
     }
 
-    // TODO : get from protobuf_wrapper_params
-    //rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
-    //rosWM->isLeft =static_cast<unsigned char>(false);//static_cast<unsigned char>(side_left);
-
     return rosWM;
 }
 

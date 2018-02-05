@@ -1,6 +1,9 @@
 //
 // Created by rebinnaf on 10/19/17.
 //
+#ifndef RQT_PARSIAN_GUI_MONITORWIDGET_H
+#define RQT_PARSIAN_GUI_MONITORWIDGET_H
+
 #include "rqt_parsian_gui/guiDrawer.h"
 #include <ros/ros.h>
 #include <QWidget>
@@ -17,11 +20,6 @@
 
 
 
-
-#ifndef RQT_PARSIAN_GUI_MONITORWIDGET_H
-#define RQT_PARSIAN_GUI_MONITORWIDGET_H
-
-
 #define _PI         3.14159265358979323
 #define _DEG2RAD    (_PI/180.0)
 #define _GOAL_WIDTH             1.200
@@ -33,15 +31,17 @@
 #define _STADIUM_WIDTH   13.40
 #define _STADIUM_HEIGHT  10.40
 
+
+
+
 namespace rqt_parsian_gui
 {
-
-
     class MonitorWidget
             :public QOpenGLWidget {
         Q_OBJECT
     public:
         MonitorWidget();
+        ~MonitorWidget();
         void drawField();
         CguiDrawer *drawerBuffer;
         ros::NodeHandle n;
@@ -51,6 +51,8 @@ namespace rqt_parsian_gui
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
         int getViewportWidth();
+
+
     protected:
 
 
@@ -80,7 +82,6 @@ namespace rqt_parsian_gui
         double WH_RATIO;
         double coeff;
         Vector2D centralPoint;
-
 
 
         void qglClearColor(QColor clearColor);

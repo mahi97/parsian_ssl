@@ -7,6 +7,9 @@
 namespace rqt_parsian_gui
 {
 
+    MonitorWidget::~MonitorWidget(){
+
+    }
     MonitorWidget::MonitorWidget()
             :QOpenGLWidget()
 
@@ -138,9 +141,9 @@ namespace rqt_parsian_gui
 
         parsian_msgs::parsian_draw_circle arc;
 ////        CGraphicalArc arc;
-        while (!drawerBuffer->arcBuffer.isEmpty())
+        while (!drawerBuffer->arcBuffer->isEmpty())
         {
-            arc = drawerBuffer->arcBuffer.dequeue();
+            arc = drawerBuffer->arcBuffer->dequeue();
             QColor col=QColor(arc.color.r,arc.color.g,arc.color.b);
 
             drawArc(arc.circle.center.x,
@@ -155,8 +158,8 @@ namespace rqt_parsian_gui
 
 
         parsian_msgs::parsian_draw_polygon polygon;
-        while (!drawerBuffer->polygonBuffer.isEmpty()) {
-            polygon = drawerBuffer->polygonBuffer.dequeue();
+        while (!drawerBuffer->polygonBuffer->isEmpty()) {
+            polygon = drawerBuffer->polygonBuffer->dequeue();
             glColor4f(polygon.color.r, polygon.color.g, polygon.color.b, polygon.color.a);
             if (polygon.filled) {
                 glBegin(GL_TRIANGLE_FAN);
@@ -172,9 +175,9 @@ namespace rqt_parsian_gui
 
 
             parsian_msgs::parsian_draw_rect rec;
-            while(!drawerBuffer->rectBuffer.isEmpty())
+            while(!drawerBuffer->rectBuffer->isEmpty())
             {
-                rec = drawerBuffer->rectBuffer.dequeue();
+                rec = drawerBuffer->rectBuffer->dequeue();
 
                 QColor col=QColor(rec.color.r,rec.color.g,rec.color.b);
 
@@ -187,9 +190,9 @@ namespace rqt_parsian_gui
             }
 
             parsian_msgs::parsian_draw_segment seg;
-            while(!drawerBuffer->segBuffer.isEmpty())
+            while(!drawerBuffer->segBuffer->isEmpty())
             {
-                seg = drawerBuffer->segBuffer.dequeue();
+                seg = drawerBuffer->segBuffer->dequeue();
 
                 QColor col=QColor(seg.color.r,seg.color.g,seg.color.b);
 
@@ -201,10 +204,10 @@ namespace rqt_parsian_gui
 
             parsian_msgs::parsian_draw_vector pnt;
             //int sds=drawerBuffer->pointBuffer.size();
-            while(!drawerBuffer->pointBuffer.isEmpty())
+            while(!drawerBuffer->pointBuffer->isEmpty())
                 //while(sds>0)
             {
-                pnt = drawerBuffer->pointBuffer.dequeue();
+                pnt = drawerBuffer->pointBuffer->dequeue();
 
                 QColor col=QColor(pnt.color.r,pnt.color.g,pnt.color.b);
                 // pnt = drawerBuffer->pointBuffer[sds-1];
@@ -219,9 +222,9 @@ namespace rqt_parsian_gui
 
 
         parsian_msgs::parsian_draw_text txt;
-        while(!drawerBuffer->textBuffer.isEmpty())
+        while(!drawerBuffer->textBuffer->isEmpty())
         {
-            txt = drawerBuffer->textBuffer.dequeue();
+            txt = drawerBuffer->textBuffer->dequeue();
             QString str=QString::fromStdString(txt.value);
             QColor col=QColor(txt.color.r,txt.color.g,txt.color.b);
             drawText(txt.position.x, txt.position.y, str , col, txt.size);

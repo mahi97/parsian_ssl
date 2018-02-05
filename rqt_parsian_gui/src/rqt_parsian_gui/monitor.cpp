@@ -16,6 +16,9 @@ namespace rqt_parsian_gui
         // give QObjects reasonable names
         setObjectName("Nadia");
     }
+    Monitor::~Monitor(){
+
+    }
 
     void Monitor::initPlugin(qt_gui_cpp::PluginContext& context)
     {
@@ -25,7 +28,7 @@ namespace rqt_parsian_gui
 
         wm_sub = n.subscribe("/world_model", 1000, &Monitor::wmCb, this);
         draw_sub = n.subscribe("/draws", 1000, &Monitor::drawCb, this);
-        color_sub = n.subscribe("/team_config", 1000, &Monitor::drawCb, this);
+        color_sub = n.subscribe("/team_config", 1000, &Monitor::colorCb, this);
         timer = n.createTimer(ros::Duration(0.080), &Monitor::timerCb, this);
         parsian_msgs::parsian_team_configPtr team_config{new parsian_msgs::parsian_team_config};
         // access standalone command line arguments
@@ -33,6 +36,7 @@ namespace rqt_parsian_gui
         // create QWidget
         widget_ = new QWidget();
         drawer=new CguiDrawer();
+        lastdrawer=new CguiDrawer();
 
 //        QPushButton *startProf;
 //        startProf=new QPushButton("nnnn",widget_);
@@ -61,12 +65,12 @@ namespace rqt_parsian_gui
         
         mycolor=_color;
         if(mycolor->color==0){
-                ourCol = QColor("yellow");
-                oppCol = QColor("blue");
+            ourCol = QColor("blue");
+            oppCol = QColor("yellow");
         }
         else{
-                ourCol = QColor("blue");
-                oppCol = QColor("yellow");
+            ourCol = QColor("yellow");
+            oppCol = QColor("blue");
         }
 
     }
@@ -81,6 +85,11 @@ namespace rqt_parsian_gui
 
 
         drawer=new CguiDrawer();
+//        drawer->polygonBuffer=lastdrawer->polygonBuffer;
+//        drawer->rectBuffer=lastdrawer->rectBuffer;
+//        drawer->pointBuffer=lastdrawer->pointBuffer;
+//        drawer->segBuffer=lastdrawer->segBuffer;
+
 
 
 
@@ -127,29 +136,28 @@ namespace rqt_parsian_gui
     }
 
     void Monitor::drawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
-
-//        fieldWidget->drawerBuffer->clear();
+        
         for (parsian_msgs::parsian_draw_circle cir: _draw->circles) {
-            drawer->arcBuffer.append(cir);
+            lastdrawer->arcBuffer->append(cir);
 
         }
         for (parsian_msgs::parsian_draw_polygon polygon: _draw->polygons) {
-            drawer->polygonBuffer.append(polygon);
+            lastdrawer->polygonBuffer->append(polygon);
 
         }
         for (parsian_msgs::parsian_draw_rect rect: _draw->rects) {
-            drawer->rectBuffer.append(rect);
+            lastdrawer->rectBuffer->append(rect);
 
         }
         for (parsian_msgs::parsian_draw_segment seg: _draw->segments) {
-            drawer->segBuffer.append(seg);
+            lastdrawer->segBuffer->append(seg);
         }
         for (parsian_msgs::parsian_draw_text txt: _draw->texts) {
-            drawer->textBuffer.append(txt);
+            lastdrawer->textBuffer->append(txt);
 
         }
         for (parsian_msgs::parsian_draw_vector point: _draw->vectors) {
-            drawer->pointBuffer.append(point);
+            lastdrawer->pointBuffer->append(point);
 
         }
 //        fieldWidget->update();
@@ -158,12 +166,20 @@ namespace rqt_parsian_gui
 
     void Monitor::timerCb(const ros::TimerEvent &_timer) {
 
-        fieldWidget->drawerBuffer->clear();
-        fieldWidget->drawerBuffer=drawer;
+//        fieldWidget->drawerBuffer->clear();
+        drawer->arcBuffer=lastdrawer->arcBuffer;
+        drawer->segBuffer=lastdrawer->segBuffer;
+        drawer->pointBuffer=lastdrawer->pointBuffer;
+        drawer->textBuffer=lastdrawer->textBuffer;
+        drawer->rectBuffer=lastdrawer->rectBuffer;
+        drawer->polygonBuffer=lastdrawer->polygonBuffer;
+        lastdrawer=drawer;
+        fieldWidget->drawerBuffer=lastdrawer;
 
 //        fieldWidget->drawerBuffer->draw(Circle2D(ballpos, radius), 0, 360, QColor("orange"), true);
 
         fieldWidget->update();
+
 //        fieldWidget->drawerBuffer->robotBuffer.clear();
     }
 
@@ -171,29 +187,16 @@ namespace rqt_parsian_gui
     void Monitor::shutdownPlugin()
     {
         // unregister all publishers here
+        ROS_INFO("Monitor closed");
+        wm_sub.shutdown();
+        draw_sub.shutdown();
+        color_sub.shutdown();
+        timer.stop();
+        n.shutdown();
+        n_private.shutdown();
+
     }
 
-    void Monitor::saveSettings(qt_gui_cpp::Settings& plugin_settings,
-                               qt_gui_cpp::Settings& instance_settings) const
-    {
-        // instance_settings.setValue(k, v)
-    }
-
-    void Monitor::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
-                                  const qt_gui_cpp::Settings& instance_settings)
-    {
-        // v = instance_settings.value(k)
-    }
-
-/*bool hasConfiguration() const
-{
-  return true;
-}
-
-void triggerConfiguration()
-{
-  // Usually used to open a dialog to offer the user a set of configuration
-}*/
 
 }  // namespace rqt_example_cpp
 PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::Monitor, rqt_gui_cpp::Plugin)
