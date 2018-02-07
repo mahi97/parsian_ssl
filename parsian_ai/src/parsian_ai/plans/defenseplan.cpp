@@ -3094,13 +3094,15 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
     //// This function produces a point that block the pass path.Also if the
     //// resulted point is in the penalty area, this function geneates a suitable
     //// point.
-    bool playOff;
+    Vector2D solutions[2];
+    for(int i = 0 ; i < 2 ; i++){
+        solutions[i].invalidate();
+    }
     Segment2D tempSeg;
     QList<Vector2D> tempQlist;
     tempQlist.clear();
     tempSeg.assign(wm->ball->pos, wm->ball->pos + (opp - wm->ball->pos) * 10);
     Vector2D pos = wm->ball->pos + (opp - wm->ball->pos) * ratio;
-    CDefPos test;
     double distance = (wm->ball->pos - opp).length();
     Vector2D sol;
     Segment2D isInPenaltyArea;
@@ -3136,8 +3138,12 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
             return tempQlist;
         }
     }
-    if(!wm->AHZOurPAreaIntersect(isInPenaltyArea, "mark").isEmpty()){
-        tempVec.append(wm->AHZOurPAreaIntersect(tempSeg, "mark"));
+    if(ourBigPenaltyArea(1,0.15,0).intersection(isInPenaltyArea , &solutions[0] , &solutions[1])){
+        for(int i = 0 ; i < 2 ; i++){
+            if(solutions[i].isValid()){
+                tempVec.append(solutions[i]);
+            }
+        }
         if(tempVec.size() == 1)
         {
             tempQlist.append(tempVec.first());
@@ -3162,7 +3168,6 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
             }
             tempQlist.append(sol);
         }
-
         tempQlist.append( wm->ball->pos - opp);
         drawer->draw(tempSeg, "red");
         DBUG(QString("this is in the penalty area, Block pass Mode"), D_HAMED);
@@ -3176,7 +3181,7 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
     }
     Segment2D oppToGoal;
     oppToGoal.assign(wm->field->ourGoal(), opp);
-    if(wm->AHZOurPAreaIntersect(oppToGoal, "mark").isEmpty()){
+    if(!ourBigPenaltyArea(1,0.15,0).intersection(isInPenaltyArea , &solutions[0] , &solutions[1])){
         tempQlist.clear();
         Vector2D tempPos;
         tempPos = ShootBlockRatio(1, opp + (wm->ball->pos - opp).norm()*.1).first();
