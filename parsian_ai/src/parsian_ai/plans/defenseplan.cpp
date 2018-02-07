@@ -786,6 +786,8 @@ void DefensePlan::setGoalKeeperTargetPoint(){
     Vector2D oppPasser;
     Vector2D upBallRectanglePoint;
     Vector2D downBallRectanglePoint;
+    Circle2D dangerCircle;
+    Circle2D dangerCircle1;
     Vector2D goalKeeperTargetOffSet = Vector2D(0.2 , 0.0);
     QList<Vector2D> tempSol;
     QList<Vector2D> ballRectanglePoints;
@@ -876,7 +878,7 @@ void DefensePlan::setGoalKeeperTargetPoint(){
             goalKeeperPredictionModeInPlayOff = false;
             goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal() , ballPrediction(true) , 0.5);
             if(!wm->field->isInOurPenaltyArea(goalKeeperTarget)){
-                tempSol = wm->field.ourPAreaIntersection(Segment2D(goalKeeperTarget , wm->field->ourGoal()));
+                tempSol = wm->field->ourPAreaIntersect(Segment2D(goalKeeperTarget , wm->field->ourGoal()));
                 if(tempSol.size() == 1){
                     goalKeeperTarget = tempSol.at(0);
                 }
@@ -1046,7 +1048,7 @@ void DefensePlan::setGoalKeeperTargetPoint(){
                 DBUG("danger" , D_AHZ);
                 goalKeeperTarget = know->getPointInDirection(wm->ball->pos , wm->field->ourGoal() , 0.15);
                 if(!wm->field->isInOurPenaltyArea(goalKeeperTarget)){
-                    solutions = wm->field.ourPAreaIntersection(Line2D(wm->ball->pos , wm->field->ourGoal()));
+                    solutions = wm->field->ourPAreaIntersect(Line2D(wm->ball->pos , wm->field->ourGoal()));
                     if(solutions.size()){
                         if(solutions.size() == 1){
                             goalKeeperTarget = solutions.at(0);

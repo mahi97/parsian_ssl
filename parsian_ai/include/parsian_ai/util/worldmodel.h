@@ -12,6 +12,11 @@ public:
 
     ~WorldModel();
 
+    bool AHZIsInOurPenaltyArea(Vector2D point);
+    QList<Vector2D> AHZOurPAreaIntersect(Segment2D segment,QString role);
+
+
+
 
 private:
 
