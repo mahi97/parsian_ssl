@@ -66,7 +66,8 @@ protected:
     bool isPermissionTargetToChip(Vector2D aPoint);
     bool isAgentsStuckTogether(QList<Vector2D> agentsPosition);
     bool isInIndirectArea(Vector2D);
-    void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition,QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);    
+    void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition,QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);        
+    Rect2D ourBigPenaltyArea(double scale = 1 , double tolerance = 0 , bool doChangesWithScale  = 1);
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;
@@ -98,8 +99,7 @@ protected:
     Vector2D opponentPasserDirection;
     Vector2D tempBallRectanglePoint;
     Vector2D oppNearestToBallPossition;
-    Vector2D tempAHZ;
-    Vector2D noKickTarget;    
+    Vector2D tempAHZ;    
     QString lastStateForGoalKeeper;
     ///////////////////////////////////////////////////
     void executeGoalKeeper();    
