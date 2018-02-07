@@ -168,7 +168,7 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
         }
 
     }
-    if(wm->our.activeAgentsCount() > 6)
+    if(wm->our.activeAgentsCount() > _NUM_PLAYERS)
     {
         missMatchIds.clear();
         for(int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
@@ -800,7 +800,6 @@ void CCoach::decideAttack()
         }
     }
     selectedPlay->defensePlan.debugAgents("DEF : ");
-    selectedPlay->defensePlan.debugAgents("DEF : ");
     QString str;
     for (int ourPlayer : ourPlayers) {
         str += QString(" %1").arg(ourPlayer);
@@ -924,7 +923,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
 
     BallPossesion ballPState = isBallOurs();
 
-    if(playmakeId > -1 && playmakeId < 12) {
+    if(-1 < playmakeId && playmakeId < 12) {
         dynamicAttack->setPlayMake(agents[playmakeId]);
         ourPlayers.removeOne(playmakeId);
         debugger->debug(QString("playMake : %1").arg(playmakeId), D_MHMMD);
@@ -933,13 +932,13 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     dynamicAttack->setDefenseClear(false);
 
     if(wm->our[playmakeId] != nullptr)
-    {
+        {
         bool goodForKick = ((wm->ball->pos.dist(wm->field->oppGoal()) < 1.5) || (findMostPossible(wm->our[playmakeId]->pos) > (conf.DirectTrsh - shotToGoalthr)));
         if(goodForKick)
         {
             dynamicAttack->setDirectShot(true);
             if((findMostPossible(wm->our[playmakeId]->pos) > (conf.DirectTrsh - shotToGoalthr)))
-                shotToGoalthr = max(0, conf.DirectTrsh - 0.2);
+                shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.2);
         } else {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
@@ -956,17 +955,19 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     bool overdef;
     overdef = checkOverdef();
     int MarkNum = 0;
-    if(ballPState == BallPossesion::WEHAVETHEBALL) {
-        MarkNum = 0;
-    } else if(ballPState == BallPossesion::WEDONTHAVETHEBALL) {
-        MarkNum = (overdef) ? 3 : 2;
-
-    } else if(ballPState == BallPossesion::SOSOOUR) {
-        MarkNum = 2;
-
-    } else if(ballPState == BallPossesion::SOSOTHEIR) {
-        MarkNum = 2;
-
+    switch (ballPState) {
+        case BallPossesion::WEHAVETHEBALL:
+            MarkNum = 2;
+            break;
+        case BallPossesion::WEDONTHAVETHEBALL:
+            MarkNum = (overdef) ? 4 : 3;
+            break;
+        case BallPossesion::SOSOOUR:
+            MarkNum = 3;
+            break;
+        case BallPossesion::SOSOTHEIR:
+            MarkNum = 3;
+            break;
     }
 
     MarkNum = std::min(MarkNum, ourPlayers.count());
@@ -979,6 +980,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         ourPlayers = lastPlayers;
 
     } else {
+        // TODO : matching is based on ID, It should be Goal-Oriented
         qSort(ourPlayers.begin(), ourPlayers.end());
         for (int i = 0; i < MarkNum; i++) {
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
@@ -993,11 +995,13 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
 void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     if (agentSize < 2) {
         _mode = NGameOff::DynamicPlay;
+
     } else if (isFastPlay() && false) { // TODO : fastPlay should be completed!
         _mode = NGameOff::FastPlay;
 
     } else if (gameState->ourKickoff()) {
         _mode = NGameOff::StaticPlay;
+
     } else if (wm->ball->pos.x < -1) {
         _mode = NGameOff::DynamicPlay;
 
@@ -1361,7 +1365,7 @@ void CCoach::decideTheirPenalty(QList<int> &_ourPlayers) {
 
 void CCoach::decideStart(QList<int> &_ourPlayers) {
     if(gameState->penaltyShootout()){
-        selectedPlay=theirPenalty;
+        selectedPlay = theirPenalty;
         return;
     }
     selectedPlay = dynamicAttack;
