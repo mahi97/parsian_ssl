@@ -473,7 +473,7 @@ private:
     void assignReceive  (CRolePlayOff*, const SPositioningAgent&, bool _ignoreAngle);
     QPair<int, int> findTheLastShoot(const SExecution& _plan);
     void findThePasserandReciver(const SExecution&, QList<AgentPair> &_pairList);
-    int findReciver(int _passer, int _state);
+    int findReceiver(int _passer, int _state);
     QList<SBallOwner> ownerList;
     bool havePassInPlan;
     ////Dynamic

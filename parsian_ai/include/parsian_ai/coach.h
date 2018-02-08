@@ -44,15 +44,14 @@ public:
     BallPossesion isBallOurs();
     BallPossesion ballPState;
 
-    bool requestForPlan = false;
+    ////////////////////////////////////////////////////// PLAYOFF PLAN
     parsian_msgs::plan_serviceRequest planRequest;
     parsian_msgs::plan_serviceResponse receivedPlan;
 
-    plan_serviceRequest getPlanRequest();
-    void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
-
     ros::ServiceClient plan_client;
     void setPlanClient(ros::ServiceClient _plan_client);
+
+    parsian_msgs::plan_serviceResponse getLastPlan();
 
 
 private:

@@ -267,10 +267,9 @@ class Handler(FileSystemEventHandler):
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            i = self.__shuffleCount % len(sublist)
-            self.__shuffleCount += 1
-            print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-            return self.ai_message_generator(sublist[i])
+            print (sublist[0]["filename"].split("plans/")[1]+"  "+str(sublist[0]["planMode"]))
+            print (self.ai_message_generator(sublist[0]))
+            return self.ai_message_generator(sublist[0])
         else:
             print ("\nNO PLAN MATCHED!\n")
             return None

@@ -47,7 +47,7 @@ class getPlan:
             print ("time: "+str(t2)+" ms")
             return response
         else:
-            print ("No plan received")
+            print ("No plan sent :(")
 
 
 if __name__ == '__main__':

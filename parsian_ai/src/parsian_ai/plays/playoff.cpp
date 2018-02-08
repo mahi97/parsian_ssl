@@ -1726,41 +1726,45 @@ bool CPlayOff::isPathClear(Vector2D _pos1,
 }
 
 void CPlayOff::assignTasks() {
-    int& sym = masterPlan->execution.symmetry;
-    for(size_t i = 0;i < masterPlan->common.currentSize; i++) {
+    int &sym = masterPlan->execution.symmetry;
+    for (size_t i = 0; i < masterPlan->common.currentSize; i++) {
+        ROS_INFO_STREAM("-------------------DEBUGGING " << masterPlan->common.currentSize
+                                                        << " : " << masterPlan->execution.AgentPlan[i].size());
         positionAgent[i].positionArg.clear();
+
         Q_FOREACH(playOffRobot agentPlan, masterPlan->execution.AgentPlan[i]) {
-            SPositioningArg tempPosArg;
-            tempPosArg.staticPos          = agentPlan.pos;
-            tempPosArg.staticAng          = Vector2D::polar2vector(1, agentPlan.angle);
-            tempPosArg.staticAng.assign(tempPosArg.staticAng.x, -1*sym*tempPosArg.staticAng.y);
-            tempPosArg.staticPos.assign(tempPosArg.staticPos.x, sym*tempPosArg.staticPos.y);
-            tempPosArg.staticEscapeRadius = agentPlan.tolerance;
+                SPositioningArg tempPosArg;
+                ROS_INFO_STREAM("agentPlan.pos" << agentPlan.pos);
+                tempPosArg.staticPos = agentPlan.pos;
+                tempPosArg.staticAng = Vector2D::polar2vector(1, agentPlan.angle);
+                tempPosArg.staticAng.assign(tempPosArg.staticAng.x, -1 * sym * tempPosArg.staticAng.y);
+                tempPosArg.staticPos.assign(tempPosArg.staticPos.x, sym * tempPosArg.staticPos.y);
+                tempPosArg.staticEscapeRadius = agentPlan.tolerance;
 
-            Q_FOREACH(playOffSkill skill, agentPlan.skill) {
-                tempPosArg.leftData           = skill.data[0];
-                tempPosArg.rightData          = skill.data[1];
-                tempPosArg.staticSkill        = skill.name;
-                tempPosArg.PassToId           = skill.targetAgent;
-                tempPosArg.PassToState        = skill.targetIndex;
+                Q_FOREACH(playOffSkill skill, agentPlan.skill) {
+                        tempPosArg.leftData = skill.data[0];
+                        tempPosArg.rightData = skill.data[1];
+                        tempPosArg.staticSkill = skill.name;
+                        tempPosArg.PassToId = skill.targetAgent;
+                        tempPosArg.PassToState = skill.targetIndex;
 
-                if (skill.name == PassSkill && positionAgent[i].positionArg.back().staticSkill == MoveSkill) {
-                    positionAgent[i].positionArg.back().staticPos = POBALLPOS;
-                } else if (skill.name == ShotToGoalSkill
-                           || skill.name == ChipToGoalSkill
-                           || skill.name == OneTouchSkill) {
+                        if (skill.name == PassSkill && positionAgent[i].positionArg.back().staticSkill == MoveSkill) {
+                            positionAgent[i].positionArg.back().staticPos = POBALLPOS;
+                        } else if (skill.name == ShotToGoalSkill
+                                   || skill.name == ChipToGoalSkill
+                                   || skill.name == OneTouchSkill) {
 
-                    if (sym < 0) {
-                        tempPosArg.rightData = 1000 - tempPosArg.rightData;
+                            if (sym < 0) {
+                                tempPosArg.rightData = 1000 - tempPosArg.rightData;
+                            }
+                        }
+                        positionAgent[i].positionArg.append(tempPosArg);
                     }
-                }
-                positionAgent[i].positionArg.append(tempPosArg);
             }
-        }
     }
 }
 
-int CPlayOff::findReciver(int _passer, int _state) {
+int CPlayOff::findReceiver(int _passer, int _state) {
     if (_state == 0) {
         return 0;
     }
@@ -1770,8 +1774,8 @@ int CPlayOff::findReciver(int _passer, int _state) {
             temp.id = _passer;
             temp.state = i;
             ownerList.append(temp);
-            findReciver(positionAgent[_passer].getArgs(i).PassToId,
-                        positionAgent[_passer].getArgs(i).PassToState);
+            findReceiver(positionAgent[_passer].getArgs(i).PassToId,
+                         positionAgent[_passer].getArgs(i).PassToState);
         }
     }
 }

@@ -257,6 +257,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
+    preferedDefenseCounts = 0;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -1532,8 +1533,6 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
             po->angle = (AngleDeg)planMsg.the_plan.agents.at(i).positions.at(j).angel;
             po->tolerance = planMsg.the_plan.agents.at(i).positions.at(j).tolerance;
 
-
-
             QList<playOffSkill> sk;
             sk.clear();
             for (int k = 0; k < planMsg.the_plan.agents.at(i).positions.at(j).skillSize; k++) {
@@ -1549,7 +1548,6 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
             ag.append(*po);
         }
         agpln.append(ag);
-
     }
     plan->execution.AgentPlan = agpln;
 
@@ -1599,17 +1597,10 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     qDebug() << "[Coach] matched by" << _plan->common.matchedID;
 }
 
-
-plan_serviceRequest CCoach::getPlanRequest(){
-    requestForPlan = true;
-    return planRequest;
-
-}
-
-void CCoach::setPlanResponse(parsian_msgs::plan_serviceResponse planResponse){
-    receivedPlan.the_plan = planResponse.the_plan;
-}
-
 void CCoach::setPlanClient(ros::ServiceClient _plan_client) {
     plan_client = _plan_client;
+}
+
+parsian_msgs::plan_serviceResponse CCoach::getLastPlan() {
+    return receivedPlan;
 }
