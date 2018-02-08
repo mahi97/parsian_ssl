@@ -1547,6 +1547,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
             po->skill = sk;
             ag.append(*po);
         }
+        ROS_INFO_STREAM("msg: plan agent" << i << " : " << ag.size());
         agpln.append(ag);
     }
     plan->execution.AgentPlan = agpln;
