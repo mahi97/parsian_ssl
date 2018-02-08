@@ -36,7 +36,7 @@ class getPlan:
 
     def handle_plan_request(self, req):
         # type: (plan_serviceRequest) -> req
-
+        print("REQUEST:: #players: "+str(req.plan_req.playersNum)+" game mode: "+str(req.plan_req.gameMode)+"\n")
         t = int(round(time.time() * 1000000))
         response = plan_serviceResponse()
         out = self.__w.choose_plan(req.plan_req.playersNum, req.plan_req.gameMode, req.plan_req.ballPos.x, req.plan_req.ballPos.y)
