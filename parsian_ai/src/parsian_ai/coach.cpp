@@ -1222,11 +1222,6 @@ void CCoach::execute()
         stopRole->assign(nullptr);
     }
     decideAttack();
-    for(int i = 0 ; i < 8 ; i ++)
-    {
-        if(agents[i]->action != nullptr)
-            ROS_INFO_STREAM("robot ID decide: "<< i << "task : " << agents[i]->action->getActionName().toStdString());
-    }
 
     checkSensorShootFault();
     //// Checks whether the goalie is under the net or not if it is moves out
