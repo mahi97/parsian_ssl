@@ -1734,7 +1734,7 @@ void CPlayOff::assignTasks() {
 
         Q_FOREACH(playOffRobot agentPlan, masterPlan->execution.AgentPlan[i]) {
                 SPositioningArg tempPosArg;
-                ROS_INFO_STREAM("agentPlan.pos" << agentPlan.pos);
+                ROS_INFO_STREAM("agentPlan.pos " << agentPlan.pos);
                 tempPosArg.staticPos = agentPlan.pos;
                 tempPosArg.staticAng = Vector2D::polar2vector(1, agentPlan.angle);
                 tempPosArg.staticAng.assign(tempPosArg.staticAng.x, -1 * sym * tempPosArg.staticAng.y);

@@ -345,7 +345,7 @@ private:
 
     bool isPathClear(Vector2D _pos1, Vector2D _pos2, double _radius, double treshold);
 
-    SPositioningAgent positionAgent[6];
+    SPositioningAgent positionAgent[_NUM_PLAYERS];
 
     int agentSize;
     Vector2D getEmptyTarget(Vector2D _position, double _radius);

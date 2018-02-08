@@ -130,9 +130,9 @@ private:
     double shotToGoalthr ;
     void virtualTheirPlayOffState();
     bool transientFlag;
-    QTime transientTimeOut;
+    QTime trasientTimeOut;
     int translationTimeOutTime;
-    bool isBallCollide();
+    bool isBallcollide();
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
     int playmakeId;
