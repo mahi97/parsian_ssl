@@ -1438,7 +1438,7 @@ void DefensePlan::execute(){
             assignSkill(goalKeeperAgent , AHZSkills);
         }
         if(!defenseAgents.empty()){
-            if(wm->our.activeAgentsCount() < 7){
+            if(wm->our.activeAgentsCount() <= _NUM_PLAYERS){
                 if(playOnMode){
                     checkDefenseExeptions();
                     if(defExceptions.active && !know->variables["transientFlag"].toBool()){
