@@ -84,8 +84,9 @@ void CDynamicAttack::reset(){
 }
 
 void CDynamicAttack::execute_x() {
-    DBUG(QString("Dynamic Attack : %1").arg(agentsID.size()),D_MAHI);
-    globalExecute(agentsID.size());
+    DBUG(QString("Dynamic Attack : %1").arg(agents.size()),D_MAHI);
+    ROS_INFO(QString("Dynamic Attack : %1").arg(agents.size()).toStdString().c_str());
+    globalExecute(agents.size());
 }
 
 void CDynamicAttack::globalExecute(int agentSize) {
@@ -209,11 +210,11 @@ void CDynamicAttack::assignId() {
     guardIndexList.clear();
 
     MWBM matcher;
-    int n = agentsID.size();
+    int n = agents.size();
     matcher.create(n, n);
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < n; j++) {
-            matcher.setWeight(i, j, -1 * semiDynamicPosition[i].dist(agentsID.at(j)->pos()));
+            matcher.setWeight(i, j, -1 * semiDynamicPosition[i].dist(agents.at(j)->pos()));
         }
     }
     matcher.findMaxMinMatching();
@@ -223,7 +224,7 @@ void CDynamicAttack::assignId() {
         matchedIDList.append(tempIndex);
         guardIndexList.append(i);
         mahiAgentsID[i] = tempIndex;
-        mahiPositionAgents.append(agentsID.at(tempIndex));
+        mahiPositionAgents.append(agents.at(tempIndex));
     }
     for (auto mahiPoisitionAgent : mahiPositionAgents)
         DBUG(QString("1 : %2").arg(mahiPoisitionAgent->id()), D_MAHI);
@@ -252,21 +253,43 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
     makePlan(agentSize);
 
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
     if(agentSize > 0) {
         chooseBestPositons();
     }
     assignId();
-
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+        }
+    }
     if(agentSize > 0) {
         //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
     }
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
 
     assignTasks();
+
     DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
     ROS_INFO(QString("MODE : %1").arg(getString(currentPlan.mode)).toStdString().c_str());
     DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
-
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
     for(size_t i = 0;i < agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->execute();
@@ -274,12 +297,21 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             DBUG(QString("[dynamicAttack - %1] mahiAgentID buged").arg(__LINE__), D_MAHI);
         }
     }
-    ROS_INFO("seda mizane 2222");
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
 
+    ROS_INFO_STREAM("agent size: " << agents.size());
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            mahi->i = 100;
+            ROS_INFO_STREAM(i << ":: " << mahi->i);
+            ROS_INFO_STREAM(i << ":: " << mahi->getActionName().toStdString().c_str());
+        }
+    }
 
+    ROS_INFO_STREAM("6 : passed");
     for (auto i : semiDynamicPosition) {
         drawer->draw(i, QColor(Qt::black));
     }
@@ -290,7 +322,12 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
     showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
     showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
-
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
 
     // TODO : remove this
     if(isPlayMakeChanged()) {
@@ -299,6 +336,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         }
     }
 
+    ROS_INFO_STREAM("9 : tahe khat");
 }
 
 void CDynamicAttack::playMake() {
@@ -582,7 +620,7 @@ int CDynamicAttack::appropriateChipSpeed() {
 void CDynamicAttack::chooseBestPositons()
 {
     //it has three code of choosing best position that only one of them must be uncommented
-    int agentSize = agentsID.size();
+    int agentSize = agents.size();
     int cntD = 0;
     Vector2D ans;
     bool haveSupporter = false;
@@ -866,7 +904,7 @@ void CDynamicAttack::chooseBestPositons()
             if(nextBall.dist(points[j]) < 0.3)
                 canNot[j] = 1;
             Line2D ballToPoint = Line2D(ballPos, points[j]);
-            Segment2D goalLine;
+            Sement2D goalLine;
             goalLine = Segment2D(wm->field->oppGoalL(), wm->field->oppGoalR());
             if(goalLine.intersection(ballToPoint).x <= _FIELD_WIDTH / 2)
                 if(points[j].x > ballPos.x)
@@ -1072,7 +1110,7 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
 //    debug(QString("DIntention %3").arg(dribbleIntention.elapsed()), D_PARSA);
     //if we are dribbling
     int a = temp.size();
-    ROS_INFO("build shode");
+    ROS_INFO("build shode 2");
     if(dribbleIntention.elapsed() < 3000)
     {
         currentPlan.passPos =  temp[0];
@@ -1207,7 +1245,7 @@ void CDynamicAttack::managePasser() {
     //    if(repeatFlag && (counter < 100)) {
     //        counter++;
     //        repeatFlag = true;
-    //        for(size_t i = 0; i  < agentsID.size();i++) {
+    //        for(size_t i = 0; i  < agents.size();i++) {
     //            if(roleAgents[i]->getAgent()->id() == passerID)
     //                lastPasserRoleIndex = i;
     //        }

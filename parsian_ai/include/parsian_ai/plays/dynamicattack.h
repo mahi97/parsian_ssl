@@ -21,7 +21,7 @@ struct SDynamicAgent {
 struct SDynamicPlan {
     int agentSize;
     DynamicMode mode;
-    SDynamicAgent positionAgents[_NUM_PLAYERS - 1];
+    SDynamicAgent positionAgents[6];
     SDynamicAgent playmake;
     Vector2D passPos;
     int passID;
@@ -79,7 +79,7 @@ private:
     ///////////////////////30em 2015
 
     //[RegionCount][RegionIndex]
-    Rect2D* guards[6];
+    Rect2D* guards[7];
     void showRegions(unsigned int agentSize, QColor color = QColor(Qt::gray));
     void assignRegions();
     void assignRegion_0();
@@ -94,7 +94,7 @@ private:
     QList<Vector2D> markPositions;
 
     //[PositionAgentsCount][GuardIndex][LocationIndex]
-    Vector2D** guardLocations[6];
+    Vector2D** guardLocations[7];
     void showLocations(unsigned int agentSize, QColor color = QColor(Qt::gray));
     void assignLocations();
     void assignLocations_0();
@@ -133,7 +133,7 @@ private:
 
     QString getString(const DynamicMode& _mode) const;
 
-    CRoleDynamic *roleAgents[6 - 1];
+    CRoleDynamic *roleAgents[5];
     CRoleDynamic *roleAgentPM;
 
     ////////Plan Making
@@ -149,7 +149,7 @@ private:
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
     Agent* mahiPlayMaker;
-    int mahiAgentsID[6 - 1];
+    int mahiAgentsID[5];
     bool isBallInOurField;
 
     int playmakeID = -1;
@@ -159,7 +159,7 @@ private:
     Vector2D ballVel;
     Vector2D OppGoal;
 
-    bool goToDynamic[6];
+    bool goToDynamic[5];
     int lastPlayMakerId;
 
 

@@ -274,6 +274,7 @@ void CCoach::decidePreferedDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
+
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -876,7 +877,6 @@ void CCoach::decideAttack()
             stopRole->execute();
         }
     }
-
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
     lastPlayers.clear();
@@ -971,7 +971,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     }
 
     MarkNum = std::min(MarkNum, ourPlayers.count());
-
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
@@ -1159,7 +1158,7 @@ void CCoach::checkTransitionToForceStart(){
         lastPos = ballHist.at(ballHist.size()-10);
     }
     else{
-        if( ballHist.size() )
+        if( !ballHist.isEmpty() )
             lastPos = ballHist.first();
         else
             lastPos = wm->ball->pos;
@@ -1222,7 +1221,12 @@ void CCoach::execute()
         stopRole->assign(nullptr);
     }
     decideAttack();
-
+    for(int i = 0; i < _MAX_NUM_PLAYERS; i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
     checkSensorShootFault();
     //// Checks whether the goalie is under the net or not if it is moves out
     checkGoalieInsight();
@@ -1235,6 +1239,7 @@ void CCoach::execute()
             stopRole->execute();
         }
     }
+
 
     //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
 }
@@ -1266,7 +1271,7 @@ void CCoach::decideHalt(QList<int>& _ourPlayers) {
     cyclesWaitAfterballMoved = 0;
     _ourPlayers.clear();
     _ourPlayers.append(wm->our.data->activeAgents);
-    NoAction * a = new NoAction();
+    auto * a = new NoAction();
     for( int i = 0 ; i < _ourPlayers.count() ; i++ )
     {
 //        a->waithere();
