@@ -29,7 +29,7 @@ void CStopPlay::stopPosition() {
     executedCycles++;
     setFormation("Stop7");
 
-    for (int i = 0;i < 6 ; i++) {
+    for (int i = 0;i < _NUM_PLAYERS ; i++) {
 //        if(conf.LineUpPosition == "OurCornerL") {
 //            rolePosition[i] = Vector2D(0.25*i-0.5, wm->field->_FIELD_HEIGHT/2);
 //
