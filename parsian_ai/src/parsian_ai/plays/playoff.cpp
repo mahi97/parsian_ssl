@@ -101,7 +101,7 @@ void CPlayOff::globalExecute() {
             }
             DBUG(QString("policy:%1").arg(conf.UseBlockBlocker),D_NADIA);
             if(isBlockDisturbing() && conf.UseBlockBlocker){
-                agentsID.removeOne(soccer->agents[BlockerStopperID]);
+                agents.removeOne(soccer->agents[BlockerStopperID]);
                 if(BlockerExecute(BlockerStopperID)){
                     staticExecute();
                 }
@@ -229,7 +229,7 @@ bool CPlayOff::BlockerExecute(int agentID){
 void CPlayOff::staticExecute() {
     ROS_INFO("Static");
     if (initial) {
-        ROS_INFO_STREAM("task assigned: " << agentsID.size());
+        ROS_INFO_STREAM("task assigned: " << agents.size());
         assignTasks();
 
     } else {
@@ -828,7 +828,7 @@ void CPlayOff::firstExecute() {
     if (gameState->ourKickoff()) {
         //        kickOffStopModePlay(masterPlan->common.currentSize);
     } else {
-        firstPlayForOppCorner(agentsID.size());
+        firstPlayForOppCorner(agents.size());
 
     }
 
@@ -1361,7 +1361,7 @@ void CPlayOff::checkEndState() {
 }
 
 void CPlayOff::fillRoleProperties() {
-    for(int i = 0;i < agentsID.size(); i++) {
+    for(int i = 0;i < agents.size(); i++) {
         if (masterPlan->common.matchedID.contains(i)) {
             if (!roleAgent[i]->getRoleUpdate()) {
 
@@ -1384,7 +1384,7 @@ void CPlayOff::fillRoleProperties() {
         } else {
             qWarning() << "[Warning] coach -> Match function doesn't work :( ";
             if (!roleAgent[i]->getRoleUpdate()) {
-                roleAgent[i]->setAgent(agentsID.at(i));
+                roleAgent[i]->setAgent(agents.at(i));
                 assignTask(roleAgent[i], positionAgent[i]);
                 roleAgent[i]->setRoleUpdate(true);
             }

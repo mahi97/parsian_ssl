@@ -47,10 +47,10 @@ void CStopPlay::stopPosition() {
 
     }
 
-    for(auto i = 0; i < agentsID.size(); i++) {
+    for(auto i = 0; i < agents.size(); i++) {
         gpa[i]->setTargetpos(rolePosition[i]);
         gpa[i]->setTargetdir(wm->field->oppGoal());
-        agentsID[i]->action = gpa[i];
+        agents[i]->action = gpa[i];
     }
 
 }

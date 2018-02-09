@@ -25,7 +25,7 @@ void CTheirPenalty::init(const QList<Agent*>& _agents) {
 }
 
 void CTheirPenalty::execute_x(){
-    if (agentsID.empty()) return;
+    if (agents.empty()) return;
     executedCycles++;
     if (gameState->penaltyShootout()) choosePlayMaker();
     appendRemainingsAgents(positionAgents);
