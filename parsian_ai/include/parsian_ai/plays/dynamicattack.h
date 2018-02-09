@@ -61,7 +61,7 @@ private:
     Vector2D oppRob;
     double lastYDrib = 0;
     Vector2D lastPassPosLoc;
-    int lastGuards[6];
+    int lastGuards[_NUM_PLAYERS];
     int guardSize;
     QTime positioningIntention;
     QTime dribbleIntention;
