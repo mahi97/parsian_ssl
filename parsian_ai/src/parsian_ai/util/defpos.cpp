@@ -84,8 +84,8 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
     if (_size <= 0) {
         return tempDefPos;
     }
-    double ballDistLimit = _ballPos.dist(wm->field->ourGoal())/2;
-    double tempBestRadius = ballDistLimit;
+    //double ballDistLimit = _ballPos.dist(wm->field->ourGoal())/2;
+    double tempBestRadius = _ballPos.dist(wm->field->ourGoal())/2;
     if(findBestRadius(tempDefPos.size) != -1){
         tempBestRadius = findBestRadius(tempDefPos.size);
         isNearPenaltyArea = false;
@@ -142,6 +142,23 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
                 tempDefPos.pos[i] = getXYByAngle(defAngle, tempBestRadius);
                 defAngle += angleOffset + agentAngle;
             }
+        }
+        else if(_size == 3){
+            double angleOffset = openAngleAfterPositioning/(_size-1);
+            double defAngle = tempAngles.angle1 + agentAngle/2;
+            for (int i = 0; i < _size; i++) {
+                tempBestRadius = nearRadius[i];
+                tempDefPos.pos[i] = getXYByAngle(defAngle, tempBestRadius);
+                defAngle += angleOffset + agentAngle;
+            }
+            Segment2D robotConnectSegment = Segment2D(tempDefPos.pos[0], tempDefPos.pos[1]);
+            Line2D robotConnectBisector = robotConnectSegment.perpendicularBisector();
+            Vector2D middle = (tempDefPos.pos[0] + tempDefPos.pos[1])/2;
+            double biggerX = (tempDefPos.pos[0].x > tempDefPos.pos[1].x) ? tempDefPos.pos[0].x : tempDefPos.pos[1].x;
+            biggerX += 0.5;
+            double biggerY = robotConnectBisector.getY(biggerX);
+            tempDefPos.pos[2] = Vector2D(biggerX, biggerY);
+
         }
         else {
             oneDefThr = 0;
