@@ -263,20 +263,9 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         chooseBestPositons();
     }
     assignId();
-    for(int i = 0; i < agents.size(); i++ ) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-        }
-    }
     if(agentSize > 0) {
         //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
-    }
-    for(int i = 0; i < agents.size(); i++ ) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
-        }
     }
 
     assignTasks();
@@ -284,12 +273,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
     ROS_INFO(QString("MODE : %1").arg(getString(currentPlan.mode)).toStdString().c_str());
     DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
-    for(int i = 0; i < agents.size(); i++ ) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
-        }
-    }
     for(size_t i = 0;i < agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->execute();
@@ -300,18 +283,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
-
-    ROS_INFO_STREAM("agent size: " << agents.size());
-    for(int i = 0; i < agents.size(); i++ ) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-            mahi->i = 100;
-            ROS_INFO_STREAM(i << ":: " << mahi->i);
-            ROS_INFO_STREAM(i << ":: " << mahi->getActionName().toStdString().c_str());
-        }
-    }
-
-    ROS_INFO_STREAM("6 : passed");
     for (auto i : semiDynamicPosition) {
         drawer->draw(i, QColor(Qt::black));
     }
@@ -322,12 +293,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
 
     showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
     showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
-    for(int i = 0; i < agents.size(); i++ ) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
-        }
-    }
 
     // TODO : remove this
     if(isPlayMakeChanged()) {
@@ -336,7 +301,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         }
     }
 
-    ROS_INFO_STREAM("9 : tahe khat");
 }
 
 void CDynamicAttack::playMake() {
