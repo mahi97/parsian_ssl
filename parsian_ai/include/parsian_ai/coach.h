@@ -44,15 +44,14 @@ public:
     BallPossesion isBallOurs();
     BallPossesion ballPState;
 
-    bool requestForPlan = false;
+    ////////////////////////////////////////////////////// PLAYOFF PLAN
     parsian_msgs::plan_serviceRequest planRequest;
     parsian_msgs::plan_serviceResponse receivedPlan;
 
-    plan_serviceRequest getPlanRequest();
-    void setPlanResponse(parsian_msgs::plan_serviceResponse planResponse);
-
     ros::ServiceClient plan_client;
     void setPlanClient(ros::ServiceClient _plan_client);
+
+    parsian_msgs::plan_serviceResponse getLastPlan();
 
 
 private:
@@ -73,7 +72,7 @@ private:
     QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
-    Vector2D defenseTargets[12];
+    Vector2D defenseTargets[_MAX_NUM_PLAYERS];
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
@@ -122,7 +121,7 @@ private:
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
-    void decidePreferedDefenseAgentsCountAndGoalieAgent();
+    void decidePreferredDefenseAgentsCountAndGoalieAgent();
     void decideAttack();
     void decideDefense();
     void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
@@ -189,7 +188,7 @@ private:
     void decideStart              (QList<int>&);
     void decideOurBallPlacement   (QList<int>&);
     void decideTheirBallPlacement (QList<int>&);
-    void decideHalfTimeLineUp   (QList<int>&);
+    void decideHalfTimeLineUp     (QList<int>&);
     void decideNull               (QList<int>&);
     /////////////////////////////////////
     QTextStream out;
@@ -200,7 +199,7 @@ private:
 
     // inter change
     void checkSensorShootFault();
-    int  faultDetectionCounter[12];
+    int  faultDetectionCounter[_MAX_NUM_PLAYERS];
 
 
     // MAHI ADD IN ROS

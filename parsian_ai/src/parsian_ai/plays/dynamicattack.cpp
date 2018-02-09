@@ -45,9 +45,8 @@ CDynamicAttack::CDynamicAttack() {
 }
 
 CDynamicAttack::~CDynamicAttack() {
-    for(size_t i = 0;i  < 6;i++) {
-        delete roleAgents[i];
-    }
+    for (auto& roleAgent : roleAgents) delete roleAgent;
+
     delete roleAgentPM;
 
     delete   guards[0];
@@ -159,11 +158,11 @@ void CDynamicAttack::makePlan(int agentSize) {
         currentPlan.mode = DynamicMode::NoPositionAgent;
         currentPlan.playmake.init(DynamicSkill::Shot, DynamicRegion::Goal);
     }
-        // we have ball and
-        // shot prob isn't more than 50% and
-        // there isn't a critical situation and
-        // we have positioning agents
-        // it's needed to be fast
+    // we have ball and
+    // shot prob isn't more than 50% and
+    // there isn't a critical situation and
+    // we have positioning agents
+    // it's needed to be fast
     else if(fast) {
         oppRob = wm->field->oppGoal();
         currentPlan.mode = DynamicMode ::Fast;
@@ -281,12 +280,12 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
 
 
-    for (int i = 0; i < semiDynamicPosition.size(); i++) {
-        drawer->draw(semiDynamicPosition[i], QColor(Qt::black));
+    for (auto i : semiDynamicPosition) {
+        drawer->draw(i, QColor(Qt::black));
     }
 
-    for(int i = 0;i < dynamicPosition.size();i++) {
-        drawer->draw(Circle2D(dynamicPosition.at(i),0.2),QColor(Qt::red),false);
+    for (auto i : dynamicPosition) {
+        drawer->draw(Circle2D(i,0.2), QColor(Qt::red), false);
     }
 
     showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
@@ -1472,81 +1471,83 @@ void CDynamicAttack::assignLocations_1() {
 
 void CDynamicAttack::assignLocations_2() {
     //Top Opp Half
-    guardLocations[2][0][0].assign(1.15, 1.15);
-    guardLocations[2][0][1].assign(2.1 , 1.65);
-    guardLocations[2][0][2].assign(2.95, 2);
+    const int offset = 1;
+    guardLocations[2][0][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, wm->field->_FIELD_HEIGHT / 4);
+    guardLocations[2][0][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, wm->field->_FIELD_HEIGHT / 4);
+    guardLocations[2][0][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, wm->field->_FIELD_HEIGHT / 4);
 
     //Bottom Opp Half
-    guardLocations[2][1][0].assign(1.15, -1.15);
-    guardLocations[2][1][1].assign(2.1 , -1.65);
-    guardLocations[2][1][2].assign(2.95, -2  );
-//    guardLocations[2][1][0].assign(0, 0.3);
-//    guardLocations[2][1][1].assign(0, 0);
-//    guardLocations[2][1][2].assign(0, -0.3);
+    guardLocations[2][1][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -wm->field->_FIELD_HEIGHT / 4);
+    guardLocations[2][1][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -wm->field->_FIELD_HEIGHT / 4);
+    guardLocations[2][1][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -wm->field->_FIELD_HEIGHT / 4);
+
 }
 
 void CDynamicAttack::assignLocations_3() {
     //Top Opp Tertium
-    guardLocations[3][0][0].assign(1   , 1.5);
-    guardLocations[3][0][1].assign(2.25, 2);
-    guardLocations[3][0][2].assign(2.65, 1.85);
+    const int offset = 1;
+    guardLocations[3][0][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, wm->field->_FIELD_HEIGHT / 3);
+    guardLocations[3][0][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, wm->field->_FIELD_HEIGHT / 3);
+    guardLocations[3][0][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, wm->field->_FIELD_HEIGHT / 3);
     //Middle Opp Tertium
-    guardLocations[3][1][0].assign(0.5 , 0);
-    guardLocations[3][1][1].assign(1.75, 0);
-    guardLocations[3][1][2].assign(2.75, 0);
+    guardLocations[3][1][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, 0);
+    guardLocations[3][1][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, 0);
+    guardLocations[3][1][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, 0);
     //Bottom Opp Tertium
-    guardLocations[3][2][0].assign(1   , -1.5);
-    guardLocations[3][2][1].assign(2.25, -2);
-    guardLocations[3][2][2].assign(2.65, -1.85);
+    guardLocations[3][2][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -wm->field->_FIELD_HEIGHT / 3);
+    guardLocations[3][2][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -wm->field->_FIELD_HEIGHT / 3);
+    guardLocations[3][2][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -wm->field->_FIELD_HEIGHT / 3);
 }
 
 void CDynamicAttack::assignLocations_4() {
+    const int offset = 1;
     // Top Opp 1/4
-    guardLocations[4][0][0].assign(1.35, 2.05);
-    guardLocations[4][0][1].assign(2.5 , 2.25);
-    guardLocations[4][0][2].assign(2.95, 2.00);
+    guardLocations[4][0][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][0][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][0][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
     // Mid-Top Opp 1/4
 
-    guardLocations[4][1][0].assign(0.65, 0.9);
-    guardLocations[4][1][1].assign(2.03, 0.95);
-    guardLocations[4][1][2].assign(3.05, 0.9);
+    guardLocations[4][1][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][1][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][1][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, wm->field->_FIELD_HEIGHT / 8);
     // Mid-Bottom Opp 1/4
 
-    guardLocations[4][2][0].assign(0.65, -0.9);
-    guardLocations[4][2][1].assign(2.03, -0.95);
-    guardLocations[4][2][2].assign(3.05, -0.9);
+    guardLocations[4][2][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][2][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][2][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -wm->field->_FIELD_HEIGHT / 8);
 
     // Bottom Opp 1/4
-    guardLocations[4][3][0].assign(1.35, -2.05);
-    guardLocations[4][3][1].assign(2.5 , -2.25);
-    guardLocations[4][3][2].assign(2.95, -2.00);
+    guardLocations[4][3][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][3][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[4][3][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
 }
 
 void CDynamicAttack::assignLocations_5() {
+    const int offset = 1;
     // Top Opp 1/4
-    guardLocations[5][0][0].assign(1.75, 2.25);
-    guardLocations[5][0][1].assign(2.5, 2.5);
-    guardLocations[5][0][2].assign(3.6, 2.25);
+    guardLocations[5][0][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][0][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][0][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, 3*wm->field->_FIELD_HEIGHT / 8);
     // Mid-Top Opp 1/4
 
-    guardLocations[5][1][0].assign(1  , 1);
-    guardLocations[5][1][1].assign(2.5, 1);
-    guardLocations[5][1][2].assign(3.5, 0.9);
+    guardLocations[5][1][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][1][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][1][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, wm->field->_FIELD_HEIGHT / 8);
     // Mid-Bottom Opp 1/4
 
-    guardLocations[5][2][0].assign(1  , -1);
-    guardLocations[5][2][1].assign(2.5, -1);
-    guardLocations[5][2][2].assign(3.5, -0.9);
+    guardLocations[5][2][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][2][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][2][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -wm->field->_FIELD_HEIGHT / 8);
 
     // Bottom Opp 1/4
-    guardLocations[5][3][0].assign(1.75, -2.25);
-    guardLocations[5][3][1].assign(2.5, -2.5);
-    guardLocations[5][3][2].assign(3.6, -2.25);
+    guardLocations[5][3][0].assign((wm->field->_FIELD_WIDTH - offset)/3*1 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][3][1].assign((wm->field->_FIELD_WIDTH - offset)/3*2 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
+    guardLocations[5][3][2].assign((wm->field->_FIELD_WIDTH - offset)/3*3 + offset, -3*wm->field->_FIELD_HEIGHT / 8);
 
     // BackUp-Line
-    guardLocations[5][4][0].assign(-1 ,  2);
-    guardLocations[5][4][1].assign(-1 ,  0);
-    guardLocations[5][4][2].assign(-1 , -2);
+    guardLocations[5][4][0].assign(0, +wm->field->_FIELD_HEIGHT / 3);
+    guardLocations[5][4][1].assign(0, 0);
+    guardLocations[5][4][2].assign(0, -wm->field->_FIELD_HEIGHT / 3);
 
 }
 
@@ -1658,3 +1659,4 @@ void CDynamicAttack::setBallInOppJaw(bool _ballInOppJaw) {
 void CDynamicAttack::setFast(bool _fast) {
     fast = _fast;
 }
+

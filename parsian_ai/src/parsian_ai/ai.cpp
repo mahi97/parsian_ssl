@@ -19,7 +19,6 @@ void AI::execute() {
 parsian_msgs::parsian_robot_task AI::getTask(int robotID) {
     if (wm->our.data->activeAgents.contains(robotID) != nullptr) {
         if (soccer->agents[robotID]->action != nullptr) {
-            ROS_INFO_STREAM("robot ID : "<< robotID << "task : " << soccer->agents[robotID]->action->getActionName().toStdString());
             if (soccer->agents[robotID]->action->getActionName() == KickAction::SActionName()) {
                 parsian_msgs::parsian_skill_kick *task;
                 task = reinterpret_cast<parsian_skill_kick *>(soccer->agents[robotID]->action->getMessage());
