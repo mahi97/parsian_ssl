@@ -37,7 +37,7 @@ void CommunicationNodelet::onInit() {
 
 
     while(!communicator->isSerialConnected()){
-        communicator->connectSerial("/dev/ttyUSB0");//conf.serial_connect.c_str());
+        communicator->connectSerial(conf.serial_connect.c_str());//conf.serial_connect.c_str());
     }
 
 
@@ -57,12 +57,17 @@ void CommunicationNodelet::onInit() {
 void CommunicationNodelet::callBack(const parsian_msgs::parsian_packetsConstPtr& _packet) {
   ROS_INFO("salam");
 
+  if (!communicator->isSerialConnected())
+      communicator->connectSerial(conf.serial_connect.c_str());
+
+
     if (cbCount >= 90) {
         cbCount = 0;
         sim_handle_flag = false;
     }
 
     if (realGame){
+        ROS_INFO("real mode");
         communicator->packetCallBack(_packet);
         sim_handle_flag = true;
         cbCount = 0;
