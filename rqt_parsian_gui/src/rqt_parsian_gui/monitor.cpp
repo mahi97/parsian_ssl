@@ -345,9 +345,6 @@ namespace rqt_parsian_gui
     {
         // unregister all publishers here
         ROS_INFO("Monitor closed");
-        wm_sub.shutdown();
-        draw_sub.shutdown();
-        color_sub.shutdown();
         timer.stop();
         n.shutdown();
         n_private.shutdown();
