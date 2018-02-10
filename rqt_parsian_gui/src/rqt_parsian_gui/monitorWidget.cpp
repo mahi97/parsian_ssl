@@ -44,8 +44,8 @@ namespace rqt_parsian_gui
     {
         viewportWidth = width;
         viewportSize.setHeight(double(viewportWidth / WH_RATIO));
-        resizeGL(viewportWidth, ((double) viewportWidth)/WH_RATIO); //Dont care inputs
-        setFixedSize(viewportSize.width(), viewportSize.height());
+        resizeGL(((double) viewportWidth)/WH_RATIO,viewportWidth); //Dont care inputs
+        setFixedSize(viewportSize.width(),viewportSize.height());
     }
     int MonitorWidget::getViewportWidth()
     {
@@ -110,6 +110,7 @@ namespace rqt_parsian_gui
         glShadeModel(GL_SMOOTH);
         glLoadIdentity();
         glTranslated(cameraX, cameraY, -10.0);
+        glRotated(90.0,0.0,0.0,1.0);
         glScaled(scaleFactor,scaleFactor,1);
         drawField();
 
@@ -237,7 +238,7 @@ namespace rqt_parsian_gui
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(double(-1.0*stadiumSize.width()/2.0), double(stadiumSize.width()/2.0), double(stadiumSize.height()/2.0), double(-1*stadiumSize.height()/2.0), 4.0, 15.0);
+        glOrtho(double(-1.0*stadiumSize.height()/2.0), double(stadiumSize.height()/2.0), double(stadiumSize.width()/2.0), double(-1*stadiumSize.width()/2.0), 4.0, 15.0);
         glMatrixMode(GL_MODELVIEW);
     }
 
@@ -360,8 +361,8 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*coeff,
-                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*coeff,
+        painter.drawText(((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*coeff,
+                              ((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*coeff,
                          text);
         painter.end();
     }
