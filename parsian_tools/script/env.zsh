@@ -17,7 +17,8 @@ INSTALLPATH="/parsian"
 
 # Set up enviroment variable for catkin and ROS
 source "$PARSIAN_ROOT/devel/setup.zsh"
-export ROSCONSOLE_FORMAT='[${severity}][${node}->${function}]: ${message}'
+export ROSCONSOLE_FORMAT='[${severity}][${node}->${function}:${line}]: ${message}'
+
 
 
 function pullgit() {
@@ -28,7 +29,7 @@ function pullgit() {
 		if [[ $response == "y" || $response == "Y" ]]; then
 			echo "Yes: Ok, I'm temporarily stashing away those changes..."
 			git status
-			git stash save "Changes stashed by nimbro pull to allow a rebase" && {
+			git stash save "Changes stashed by parsian pull to allow a rebase" && {
 				git pull --rebase
 				git stash pop || echo "Couldn't pop the stashed changes! Please check 'git stash list'..."
 				echo "The stashed changes have been reapplied to the working directory!"
@@ -39,7 +40,67 @@ function pullgit() {
 	fi
 }
 
+function check() {
+	ps cax | grep $1 > /dev/null
+	if [ $? -eq 0 ]; then
+		echo "$1 is running."
+	else
+		echo "$1 is not running."
+		$1 > /dev/null &
+		echo "$1 is running ..."
+	fi
+	
+}
 
 function parsian() {
-	echo "Parsian Function"
+	TEMP_DIR=$(pwd)
+	cd $PARSIAN_ROOT
+	case "$1" in
+		run-grsim)
+			ps cax | grep grsim
+			if [ $? -eq 0 ]; then
+  				echo "Grsim is running."
+			else
+  				echo "Grsim is not running."
+				# TODO : Run Grsim.
+			fi
+			if [ $# -ge 2 ] && [[ "$2" == '--ai' ]];then
+				roslaunch parsian_tools grsim.launch & rosrun parsian_ai parsian_ai_node
+			else
+				roslaunch parsian_tools grsim.launch
+			fi
+			;;
+		run-real)
+			if [ $# -ge 2 ] && [[ "$2" == '--ai' ]];then
+				roslaunch parsian_tools real.launch
+			else
+				roslaunch parsian_tools real-with-ai.launch
+			fi
+			;;
+		rebuild)
+			catkin clean "${@:2}"
+			catkin build "${@:2}"
+			;;
+		help|-h|--help)
+			cat <<EOS
+Usage: parsian [command] [arg=optinal]
+Commands:
+  help			Display this help message
+  run-grsim		Run enough node to run a game in grsim  (arg=--ai run ai along with)
+  run-real		Run enough node to run a game in realworld (arg=--ai run ai along with)
+  rebuild		clean and then build the specified packages, if nothing mentioned rebuild all packages
+  [catkin]		If command is not valid for parsian, catkin will be run instead of parsian
+EOS
+			;;
+		*)
+			if [ $# -eq 0 ];then
+				echo "Unrecognised parsian command!"
+				echo "Try: parsian help"
+				break
+			fi
+			catkin "$@"
+esac
+
+cd $TEMP_DIR
+
 }
