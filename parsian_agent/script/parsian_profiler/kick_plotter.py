@@ -12,8 +12,9 @@ input_speeds = []
 all_real_raw_output_speeds = []
 all_coeffs = []
 
+
 # files_list : a list of file paths
-files_list = [file_token for file_token in os.listdir('.') if file_token.endswith('kick(nospin).profile')]
+files_list = [file_token for file_token in os.listdir('../../profiler_data/') if file_token.endswith('kick(nospin).profile')]
 file_count = len(files_list)
 
 for i in range (12):
@@ -22,6 +23,7 @@ for i in range (12):
     all_real_raw_output_speeds.append([])
     all_coeffs.append(-1)
 
+os.chdir('../../profiler_data/')
 
 # filling datas
 for i in range(12):
@@ -41,6 +43,13 @@ for i in range(12):
         input_speeds[i] = temp
 
 # getting the raw outputs
+
+for i in range(12):
+    if datas[i] != -1:
+        for speed in datas[i].keys():
+            if len(datas[i][speed]) == 0:
+                input_speeds[i].remove(speed)
+
 
 for i in range(12):
     if datas[i] != -1:
