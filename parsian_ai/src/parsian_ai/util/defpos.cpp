@@ -49,7 +49,7 @@ kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
     }
     Segment2D tempSeg1(wm->field->ourGoalL(), _ballPos);
     Segment2D tempSeg2(wm->field->ourGoalR(), _ballPos);
-    if(isNearPenaltyArea) {
+    if(isNearPenaltyArea){
         inter1 = getIntersectionWithPenaltyAreaDef(_radius , tempSeg1);
         inter2 = getIntersectionWithPenaltyAreaDef(_radius , tempSeg2);
         nearRadius[0] = (wm->field->ourGoal() - Vector2D(penaltyAreaOffset,0)).dist(inter1);
@@ -61,14 +61,14 @@ kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
         tempCircle.intersection(tempSeg2, &inter2, &inter3);
     }
 
-    drawer->draw(inter1,QColor(Qt::red));
-    drawer->draw(inter2,QColor(Qt::red));
-    drawer->draw(tempSeg1, QColor(Qt::black));
-    drawer->draw(tempSeg2, QColor(Qt::black));
+    //    drawer->draw(inter1,QColor(Qt::red));
+    //    drawer->draw(inter2,QColor(Qt::red));
+    //    drawer->draw(tempSeg1, QColor(Qt::black));
+    //    drawer->draw(tempSeg2, QColor(Qt::black));
 
     tempAngles.angle1 = getAngleByXY(inter1);
     tempAngles.angle2 = getAngleByXY(inter2);
-    if (tempAngles.angle1 > tempAngles.angle2) {
+    if(tempAngles.angle1 > tempAngles.angle2){
         double tempSwap;
         tempSwap = tempAngles.angle1;
         tempAngles.angle1 = tempAngles.angle2;
@@ -81,7 +81,7 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
 {
     //kkDefPos tempDefPos;
     tempDefPos.size = _size;
-    if (_size <= 0) {
+    if(_size <= 0){
         return tempDefPos;
     }
     //double ballDistLimit = _ballPos.dist(wm->field->ourGoal())/2;
@@ -118,10 +118,10 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
     double agentAngle = getRobotAngle(tempBestRadius);
     double openAngleAfterPositioning = tempOpenAngle - agentAngle*_size;
 
-    if (openAngleAfterPositioning > 0) {
+    if(openAngleAfterPositioning > 0){
         tempDefPos.overDef = 0;
         //        draw("POS", Vector2D(-1, _FIELD_HEIGHT/2 - 0.6));
-        if (_size <= 1) {
+        if(_size <= 1){
             if(isNearPenaltyArea) {
                 tempBestRadius = nearRadius[0];
             }
@@ -170,7 +170,7 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
             }
         }
     }
-    else {
+    else{
         oneDefThr = 0;
         tempDefPos.overDef = (agentAngle*_size/tempOpenAngle) - 1;
         //        draw("NEG", Vector2D(-1, _FIELD_HEIGHT/2 - 0.6));
@@ -187,13 +187,6 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
         }
     }
     return tempDefPos;
-}
-
-bool CDefPos::isInPenaltyAreaDef(double _tempBestRadius , Vector2D vec){
-    Segment2D tempSeg;
-    tempSeg.assign(vec, wm->field->ourGoal());
-    CDefPos test;
-    return !(test.getIntersectionWithPenaltyAreaDef(_tempBestRadius, tempSeg).isValid() || wm->field->isInField(test.getIntersectionWithPenaltyAreaDef(_tempBestRadius, tempSeg)) );
 }
 
 Vector2D CDefPos::getIntersectionWithPenaltyAreaDef(double _tempBestRadius , Segment2D _seg)
@@ -227,4 +220,103 @@ double CDefPos::findBestRadius(int _numOfDefs)
 
     return -1;
 
+}
+///////////////////////////// AHZ  /////////////////////////////////////////////
+//QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
+//    if(numberOfDefenseAgents == 2){
+
+//    }
+//}
+QList<Segment2D> CDefPos::getLinesOfBallTriangle(){
+    QList<Segment2D> linesOfBallTriangle;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    linesOfBallTriangle.append(Segment2D(ballPos , ourGoalL));
+    linesOfBallTriangle.append(Segment2D(ballPos , ourGoalR));
+    return linesOfBallTriangle;
+}
+
+Line2D CDefPos::getBestLineWithTalles(int defenseCount){
+    double robotDiameter = 2 * Robot::robot_radius_new;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Segment2D ourGoalLine(ourGoalL,ourGoalR);
+    Segment2D biggerFrontageOfTriangle;
+    Segment2D smallerFrontageOfTriangle;
+    if(getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()){
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+    }
+    else{
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+    }
+     Line2D aimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
+     Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
+    if(tempAimLessLine.length() > defenseCount * robotDiameter){
+        aimLessLine = Line2D(Vector2D(ballPos.x - (defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y),Vector2D(ballPos.x-(defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y - 0.1));
+    }
+    return aimLessLine;
+}
+
+double CDefPos::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
+    double bestOffsetForPenaltyArea = 0;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Segment2D biggerFrontageOfTriangle;
+    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
+    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
+    Segment2D smallerFrontageOfTriangle;
+    if(rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()){
+        biggerFrontageOfTriangle = rightFrontageOfTriangle;
+        smallerFrontageOfTriangle = leftFrontageOfTriangle;
+    }
+    else{
+        biggerFrontageOfTriangle = leftFrontageOfTriangle;
+        smallerFrontageOfTriangle = rightFrontageOfTriangle;
+    }
+    bestOffsetForPenaltyArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).y;
+    return bestOffsetForPenaltyArea;
+}
+
+int CDefPos::findNeededDefense(double downLimit , double upLimit){
+    int neededDefense = 0;
+    double robotDiameter = 2 * Robot::robot_radius_new;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Segment2D aimLessLine;
+    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
+    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
+    Segment2D ourGoalLine(ourGoalL,ourGoalR);
+    Segment2D biggerFrintageOfTriangle;
+    Segment2D smallerFrintageOfTriangle;
+    if(rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()){
+        biggerFrintageOfTriangle = rightFrontageOfTriangle;
+        smallerFrintageOfTriangle = leftFrontageOfTriangle;
+    }
+    else{
+        biggerFrintageOfTriangle = leftFrontageOfTriangle;
+        smallerFrintageOfTriangle = rightFrontageOfTriangle;
+    }
+    aimLessLine = Segment2D(ourGoalLine.intersection(smallerFrintageOfTriangle) , biggerFrintageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrintageOfTriangle)));
+    //////// with itterative algorithm /////////////////////////
+    if(aimLessLine.length() < robotDiameter){
+        neededDefense = 1; // must be refine
+    }
+    else{
+        for(int numOfDefenses = 2 ; numOfDefenses < 5 ; numOfDefenses++){
+            if(aimLessLine.length() <= (numOfDefenses + 1) * robotDiameter &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) >= downLimit &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) <= upLimit){
+                neededDefense = numOfDefenses;
+                break;
+            }
+        }
+
+    }
+    return neededDefense;
 }
