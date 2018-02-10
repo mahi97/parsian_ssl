@@ -21,7 +21,7 @@ struct SDynamicAgent {
 struct SDynamicPlan {
     int agentSize;
     DynamicMode mode;
-    SDynamicAgent positionAgents[5];
+    SDynamicAgent positionAgents[6];
     SDynamicAgent playmake;
     Vector2D passPos;
     int passID;
@@ -61,7 +61,7 @@ private:
     Vector2D oppRob;
     double lastYDrib = 0;
     Vector2D lastPassPosLoc;
-    int lastGuards[6];
+    int lastGuards[_NUM_PLAYERS];
     int guardSize;
     QTime positioningIntention;
     QTime dribbleIntention;
