@@ -58,7 +58,7 @@ private:
 
 protected:
 
-    QList <Agent*> agentsID;
+    QList <Agent*> agents;
 
     int executedCycles;
     int defenseN ;

@@ -61,6 +61,8 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
+    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+    ROS_INFO_STREAM("last plan name: "<<lastPlan.the_plan.planFile);
     /// handle plan request
 //    if(ai->getSoccer()->getCoach()->requestForPlan){
 //        parsian_msgs::plan_service req;
