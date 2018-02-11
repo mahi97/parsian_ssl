@@ -5,6 +5,119 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 
 ///////////////// AHZ is writing, have you my voice? ... ;) //////////////////
+QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
+    QList<Vector2D> defensePosiotion;
+    defensePosiotion.clear();
+    if(numberOfDefenseAgents == 3){
+        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
+                                 getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    }
+    else if(numberOfDefenseAgents == 2){
+        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+    }
+    else if(numberOfDefenseAgents == 1){
+        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
+                                 getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    }
+    return defensePosiotion;
+}
+
+QList<Segment2D> CDefPos::getLinesOfBallTriangle(){
+    QList<Segment2D> linesOfBallTriangle;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    linesOfBallTriangle.append(Segment2D(ballPos , ourGoalL));
+    linesOfBallTriangle.append(Segment2D(ballPos , ourGoalR));
+    return linesOfBallTriangle;
+}
+
+Line2D CDefPos::getBestLineWithTalles(int defenseCount){
+    double robotDiameter = 2 * Robot::robot_radius_new;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Segment2D ourGoalLine(ourGoalL,ourGoalR);
+    Segment2D biggerFrontageOfTriangle;
+    Segment2D smallerFrontageOfTriangle;
+    if(getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()){
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+    }
+    else{
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+    }
+    Line2D aimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
+    Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
+    if(tempAimLessLine.length() > defenseCount * robotDiameter){
+        aimLessLine = Line2D(Vector2D(ballPos.x - (defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y),Vector2D(ballPos.x-(defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y - 0.1));
+    }
+    return aimLessLine;
+}
+
+double CDefPos::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
+    double bestOffsetForPenaltyArea = 0;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Segment2D biggerFrontageOfTriangle;
+    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
+    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
+    Segment2D smallerFrontageOfTriangle;
+    if(rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()){
+        biggerFrontageOfTriangle = rightFrontageOfTriangle;
+        smallerFrontageOfTriangle = leftFrontageOfTriangle;
+    }
+    else{
+        biggerFrontageOfTriangle = leftFrontageOfTriangle;
+        smallerFrontageOfTriangle = rightFrontageOfTriangle;
+    }
+    bestOffsetForPenaltyArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).y;
+    return bestOffsetForPenaltyArea;
+}
+
+int CDefPos::findNeededDefense(double downLimit , double upLimit){
+    int neededDefense = 0;
+    double robotDiameter = 2 * Robot::robot_radius_new;
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D ourGoalL = wm->field->ourGoalL();
+    Vector2D ourGoalR = wm->field->ourGoalR();
+    Segment2D aimLessLine;
+    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
+    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
+    Segment2D ourGoalLine(ourGoalL,ourGoalR);
+    Segment2D biggerFrintageOfTriangle;
+    Segment2D smallerFrintageOfTriangle;
+    if(rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()){
+        biggerFrintageOfTriangle = rightFrontageOfTriangle;
+        smallerFrintageOfTriangle = leftFrontageOfTriangle;
+    }
+    else{
+        biggerFrintageOfTriangle = leftFrontageOfTriangle;
+        smallerFrintageOfTriangle = rightFrontageOfTriangle;
+    }
+    aimLessLine = Segment2D(ourGoalLine.intersection(smallerFrintageOfTriangle) , biggerFrintageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrintageOfTriangle)));
+    //////// with itterative algorithm /////////////////////////
+    if(aimLessLine.length() < robotDiameter){
+        neededDefense = 1; // must be refine
+    }
+    else{
+        for(int numOfDefenses = 2 ; numOfDefenses < 5 ; numOfDefenses++){
+            if(aimLessLine.length() <= (numOfDefenses + 1) * robotDiameter &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) >= downLimit &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) <= upLimit){
+                neededDefense = numOfDefenses;
+                break;
+            }
+        }
+
+    }
+    return neededDefense;
+}
 
 bool DefensePlan::isPermissionTargetToChip(Vector2D aPoint){
     Vector2D tempIntersection0;
@@ -1448,6 +1561,7 @@ void DefensePlan::execute(){
                     DBUG(QString("defense count : %1").arg(defenseCount) , D_AHZ);
                 }
                 if(defenseCount > 0){
+                    ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense(1.5,2.5)).toStdString().c_str());
                     realDefSize = defenseCount - decideNumOfMarks();
                     tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     DBUG(QString("real def size : %1").arg(realDefSize) , D_AHZ);
