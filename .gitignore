@@ -90,3 +90,5 @@ CATKIN_IGNORE
 */.idea/*
 */cmake-build-debug/*
 
+**/*.png
+

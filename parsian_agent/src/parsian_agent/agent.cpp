@@ -380,7 +380,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
     //        lastVn = velnorm;
     //    }
 
-    if(vel().length() > 0.2)
+   /* if(vel().length() > 0.2)
     {
         agentStopTime.restart();
         timerReset = false;
@@ -392,7 +392,7 @@ void Agent::accelerationLimiter(double vf,bool diveMode)
         agentStopTime.restart();
         timerReset = true;
     }
-
+*/
     double lastV,commandV;
     double vCoef = 1;
     double tempVf = vforward , tempVn = vnormal;
@@ -925,6 +925,7 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
     plan->avoidCenterCircle = _avoidCenterCircle;
     plan->ballObstacleRadius = _ballObstacleRadius;
     plan->avoidPenaltyArea = _avoidPenaltyArea;
+    plan->header.stamp = ros::Time::now();
     // TODO : Add Virtual Obstacle to This
     planner_pub.publish(plan);
     ROS_INFO_STREAM("PUBLISHED");
@@ -969,7 +970,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     double w1,w2,w3,w4;
     jacobian(vforward, vnormal, vangular * _DEG2RAD, w1, w2, w3, w4);
     command->wheelsspeed= static_cast<unsigned char>(true);
-    // todo wtf?
     command->wheel1= static_cast<float>(w1);
     command->wheel2= static_cast<float>(w2);
     command->wheel3= static_cast<float>(w3);
@@ -981,6 +981,6 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
     else
         command->kickspeedz=0;
     command->spinner= static_cast<unsigned char>(false);
-
+    command->header.stamp = ros::Time::now();
     return command;
 }

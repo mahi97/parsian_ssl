@@ -38,5 +38,13 @@ double CBall::getBallAcc() const {
 
 Vector2D CBall::getPosInFuture(double _t) const
 {
-    return pos + (-0.5*(getBallAcc())*_t*_t + vel.length()*_t)*vel.norm();
+    if(getBallAcc()*_t < vel.length())
+    {
+        return pos + (-0.5*(getBallAcc())*_t*_t + vel.length()*_t)*vel.norm();
+    }
+    else
+    {
+        return pos + (vel.length()*vel.length()/(2*getBallAcc()))*vel.norm();
+    }
 }
+

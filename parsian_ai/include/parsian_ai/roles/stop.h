@@ -14,7 +14,6 @@ public:
     QList <double> thR;
     QList <double> thP;
     QList <int> robotId;
-    void reset() override {}
 };
 
 class CRoleStop : public CRole
@@ -26,11 +25,11 @@ protected:
 public:
 	virtual void parse(QStringList params);
 
-    explicit CRoleStop(Agent *_agent);
+	explicit CRoleStop(Agent *_agent);
 	~CRoleStop();
-    void assign(Agent* agent);
+	void assign(Agent* _agent) override;
 	void execute();
-    CRoleStopInfo* info();
+	static CRoleStopInfo* info();
 	double progress();
 
 private:

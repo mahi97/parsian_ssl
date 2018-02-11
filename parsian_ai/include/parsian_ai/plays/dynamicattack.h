@@ -5,22 +5,23 @@
 
 //#define _MAX_REGION 7
 
+
 struct SDynamicAgent {
 
-    void init(DynamicEnums::DynamicSkill _skill,
-              DynamicEnums::DynamicRegion _region) {
+    void init(DynamicSkill _skill,
+              DynamicRegion _region) {
         skill  = _skill;
         region = _region;
     }
 
-    DynamicEnums::DynamicSkill skill;
-    DynamicEnums::DynamicRegion region;
+    DynamicSkill skill;
+    DynamicRegion region;
 };
 
 struct SDynamicPlan {
     int agentSize;
-    DynamicEnums::DynamicMode mode;
-    SDynamicAgent positionAgents[5];
+    DynamicMode mode;
+    SDynamicAgent positionAgents[6];
     SDynamicAgent playmake;
     Vector2D passPos;
     int passID;
@@ -37,8 +38,8 @@ public:
     CDynamicAttack();
     ~CDynamicAttack() override;
 
-    void execute_x();
-    void init(const QList <Agent*>& _agents);
+    void execute_x() override;
+    void init(const QList <Agent*>& _agents) override;
 
     void setDefenseClear(bool _isDefenseClearing);
     void setDirectShot(bool _directShot);
@@ -60,7 +61,7 @@ private:
     Vector2D oppRob;
     double lastYDrib = 0;
     Vector2D lastPassPosLoc;
-    int lastGuards[6];
+    int lastGuards[_NUM_PLAYERS];
     int guardSize;
     QTime positioningIntention;
     QTime dribbleIntention;
@@ -68,7 +69,6 @@ private:
     bool shotInPass;
 
     void playMake();
-    void choosePlayMaker();
     void positioning(QList <Vector2D> _points);
     void globalExecute(int agentSize);
     void dynamicPlanner(int agentSize);
@@ -131,7 +131,7 @@ private:
 
     void ballLocation();
 
-    QString getString(const DynamicEnums::DynamicMode& _mode) const;
+    QString getString(const DynamicMode& _mode) const;
 
     CRoleDynamic *roleAgents[5];
     CRoleDynamic *roleAgentPM;
@@ -145,8 +145,7 @@ private:
     bool passFlag,repeatFlag;
     int counter,passerID,lastPasserRoleIndex;
     long lastTime;
-    QList<Agent*> activeAgents;
-    QList<Agent*> mahiPoisitionAgents;
+    QList<Agent*> mahiPositionAgents;
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
     Agent* mahiPlayMaker;

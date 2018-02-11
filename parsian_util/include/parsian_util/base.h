@@ -34,50 +34,6 @@ enum ProfileMode {
     PONETOUCH
 };
 
-namespace DynamicEnums {
-
-enum DynamicMode {
-    NoMode,
-    CounterAttack,
-    DefenseClear,
-    NoPlanExeption,
-    HighProb,
-    Fast,
-    Critical,
-    NotWeHaveBall,
-    Plan,
-    BallInOurField,
-    NoPositionAgent,
-    BallInOppJaw
-};
-
-enum DynamicSkill {
-    NoSkill,
-    //PlayMake Skills
-    Pass,
-    CatchBall,
-    Shot,
-    Keep,
-    Chip,
-    //Positioning
-    Ready,
-    OneTouch,
-    Move,
-    Dribble
-};
-
-enum DynamicRegion {
-    NoMatter,
-    Near,
-    Forward,
-    Far,
-    Goal,
-    Reflect,
-    Best,
-    Supporter
-};
-
-}
 ////////////////////////////////////</MAHI>
 
 
@@ -148,7 +104,7 @@ struct GameStatePacket
 
 /* Defines */
 
-#define _NUM_PLAYERS    12
+#define _NUM_PLAYERS    8
 #define _MAX_NUM_PLAYERS 12
 
 

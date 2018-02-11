@@ -115,14 +115,21 @@ void CHalfWorld::update(CVisionBelief *v)
     {
         if (ourTeam[j].count() == 0)
         {
-            ourTeam[j].append(new CRobot(j,true,false));
+            ourTeam[j].append(new Robot(j,true,false));
         }
         else {
-            if (v->ourTeam[j].count()>0)
+            if (v->ourTeam[j].count()>0) {
+                ourTeam[j][0]->vForwardCmd = vForwardCmd[j];
+                ourTeam[j][0]->vNormalCmd  = vNormalCmd[j];
+                ourTeam[j][0]->vAngCmd     = vAngCmd[j];
                 ourTeam[j][0]->update(v->ourTeam[j][0]);
+            }
             else
             if (ourTeam[j][0]->inSight > 0)
             {
+                ourTeam[j][0]->vForwardCmd = vForwardCmd[j];
+                ourTeam[j][0]->vNormalCmd  = vNormalCmd[j];
+                ourTeam[j][0]->vAngCmd     = vAngCmd[j];
                 ourTeam[j][0]->update(CRawObject(0, ourTeam[j][0]->pos, ourTeam[j][0]->dir.th().degree(), -1, 0.0,
                                                  nullptr, v->cam_id, v->time));
             }
@@ -132,7 +139,7 @@ void CHalfWorld::update(CVisionBelief *v)
     {
         if (oppTeam[j].count() == 0)
         {
-            oppTeam[j].append(new CRobot(j,true,false));
+            oppTeam[j].append(new Robot(j, false,false));
         }
         else {
             if (v->oppTeam[j].count()>0)
@@ -162,7 +169,7 @@ void CHalfWorld::update(CHalfWorld *w)
         ourTeam[j].clear();
         for (int k=0;k<w->ourTeam[j].count();k++)
         {
-            ourTeam[j].append(new CRobot(j, true, true));
+            ourTeam[j].append(new Robot(j, true, true));
             ourTeam[j].back()->update(w->ourTeam[j][k]);
         }
     }
@@ -172,7 +179,7 @@ void CHalfWorld::update(CHalfWorld *w)
         oppTeam[j].clear();
         for (int k=0;k<w->oppTeam[j].count();k++)
         {
-            oppTeam[j].append(new CRobot(j, false, true));
+            oppTeam[j].append(new Robot(j, false, true));
             oppTeam[j].back()->update(w->oppTeam[j][k]);
         }
     }

@@ -3,35 +3,39 @@
 
 
 
-CWorldModel::CWorldModel(int c) {
+WorldModel::WorldModel() {
+    ROS_INFO("const");
     vc = new CVisionClient();
 //    vc->ourSide = _SIDE_LEFT;
     simulationMode = true;
     visionFPS = 61.0;
     ball = new CBall(false);
     for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
-        us[i] = new CRobot(i, true);
-        them[i] = new CRobot(i, false);
+        us[i] = new Robot(i, true);
+        them[i] = new Robot(i, false);
+        vForwardCmd[i] = 0;
+        vNormalCmd [i] = 0;
+        vAngCmd    [i] = 0;
     }
 
     packs = 0;
 
 }
 
-CWorldModel::~CWorldModel() {
+WorldModel::~WorldModel() {
     delete vc;
     vc = nullptr;
 }
 
-void CWorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr& _detection) {
+void WorldModel::updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr& _detection) {
     detection = _detection;
 }
 
-void CWorldModel::execute() {
+void WorldModel::execute() {
     run();
 }
 
-void CWorldModel::toParsianMessage(const CRobot* _robot, int id) {
+void WorldModel::toParsianMessage(const Robot* _robot, int id) {
     rosRobots[id].camera_id = static_cast<unsigned char>(_robot->cam_id);
     rosRobots[id].id = static_cast<unsigned char>(_robot->id);
     rosRobots[id].pos = _robot->pos.toParsianMessage();
@@ -43,7 +47,7 @@ void CWorldModel::toParsianMessage(const CRobot* _robot, int id) {
     rosRobots[id].obstacleRadius = _robot->obstacleRadius;
 }
 
-void CWorldModel::toParsianMessage(const CBall* _ball) {
+void WorldModel::toParsianMessage(const CBall* _ball) {
     rosBall.camera_id = static_cast<unsigned char>(_ball->cam_id);
     rosBall.pos = _ball->pos.toParsianMessage();
     rosBall.acc = _ball->acc.toParsianMessage();
@@ -55,7 +59,7 @@ void CWorldModel::toParsianMessage(const CBall* _ball) {
 
 }
 
-parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colour_yellow, bool side_left) {
+parsian_msgs::parsian_world_modelPtr WorldModel::getParsianWorldModel() {
 //    if (this->ball == nullptr) return rosWM;
 
     parsian_msgs::parsian_world_modelPtr rosWM{new parsian_msgs::parsian_world_model};
@@ -79,14 +83,10 @@ parsian_msgs::parsian_world_modelPtr CWorldModel::getParsianWorldModel(bool colo
         }
     }
 
-    // TODO : get from protobuf_wrapper_params
-    rosWM->isYellow  = static_cast<unsigned char>(colour_yellow);
-    rosWM->isLeft = static_cast<unsigned char>(side_left);
-
     return rosWM;
 }
 
-void CWorldModel::printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot)
+void WorldModel::printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot)
 {
     printf("CONF=%4.2f ", robot.confidence);
     printf("ID=%3d ",robot.robot_id);
@@ -96,7 +96,7 @@ void CWorldModel::printRobotInfo(const parsian_msgs::ssl_vision_detection_robot 
     printf("RAW=<%8.2f,%8.2f>\n",robot.pixel_pos.x, robot.pixel_pos.y);
 }
 
-void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &detection)
+void WorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &detection)
 {
     printf("-----Received Wrapper Packet---------------------------------------------\n");
     //see if the packet contains a robot detection frame:
@@ -137,8 +137,14 @@ void CWorldModel::testFunc(const parsian_msgs::ssl_vision_detectionConstPtr &det
     }
 }
 
-void CWorldModel::merge(int frame) {
+void WorldModel::merge(int frame) {
     packs = 0;
+    for(int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
+        mergedHalfWorld.vForwardCmd[i] = vForwardCmd[i];
+        mergedHalfWorld.vNormalCmd[i] = vNormalCmd[i];
+        mergedHalfWorld.vAngCmd[i] = vAngCmd[i];
+    }
+
     if (vc->lastCamera < CAMERA_NUM && vc->lastCamera >= 0)
     {
         vc->merge(4);
@@ -150,19 +156,22 @@ void CWorldModel::merge(int frame) {
     // UPDATE WM
     this->update(&mergedHalfWorld);
 
+
 }
 
 
 // This Function Run in a Loop
-void CWorldModel::run()
+void WorldModel::run()
 {
     if (vc == nullptr) return;
     vc->parse(detection);
 
 }
 
-void CWorldModel::update(CHalfWorld* w0) {
+void WorldModel::update(CHalfWorld* w0) {
     w.update(w0);
+
+
     if (w.ball.count()>0) {
         ball->update(w.ball[0]);
     } else {
@@ -183,3 +192,9 @@ void CWorldModel::update(CHalfWorld* w0) {
     }
 
 }
+
+void WorldModel::setMode(bool isSimulation)
+{
+    simulationMode = isSimulation;
+}
+

@@ -32,8 +32,8 @@ void CSoccer::execute() {
     customControl(custom);
     if (! custom) {
         coach->execute();
-    }
 
+    }
 }
 
 void CSoccer::updateTask(){
@@ -80,4 +80,8 @@ void CSoccer::customControl(bool &custom) {
     return;
     custom = true;
     updateTask();
+}
+
+CCoach* CSoccer::getCoach() {
+    return coach;
 }

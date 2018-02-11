@@ -21,6 +21,8 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 
+#include <parsian_msgs/plan_service.h>
+
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
     WEHAVETHEBALL = 1,
@@ -42,7 +44,21 @@ public:
     BallPossesion isBallOurs();
     BallPossesion ballPState;
 
+    ////////////////////////////////////////////////////// PLAYOFF PLAN
+    parsian_msgs::plan_serviceRequest planRequest;
+    parsian_msgs::plan_serviceResponse receivedPlan;
+
+    ros::ServiceClient plan_client;
+    void setPlanClient(ros::ServiceClient _plan_client);
+
+    parsian_msgs::plan_serviceResponse getLastPlan();
+
+
 private:
+    /////////////////////transition to force start
+     void checkTransitionToForceStart();
+     QList <Vector2D> ballHist;
+    //////////////////////////
     bool lastASWasCritical;
     Vector2D passPos;
     bool passPlayMake;
@@ -56,7 +72,7 @@ private:
     QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
     int preferedGoalieAgent;
-    Vector2D defenseTargets[12];
+    Vector2D defenseTargets[_MAX_NUM_PLAYERS];
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
@@ -79,8 +95,9 @@ private:
 
     CStopPlay            *stopPlay;
 
-
+public:
     CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
+private:
     QTime goalieTimer;
     bool goalieTrappedUnderGoalNet;
 
@@ -98,10 +115,13 @@ private:
     int cyclesWaitAfterballMoved;
     QList <Agent*> lastDefenseAgents;
 
+    void matchPlan(NGameOff::SPlan* _plan, const QList<int>& _ourplayers);
+    NGameOff::SPlan* planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
+
     void assignGoalieAgent(int goalieID);
     void assignDefenseAgents(int defenseCount);
     void checkGoalieInsight();
-    void decidePreferedDefenseAgentsCountAndGoalieAgent();
+    void decidePreferredDefenseAgentsCountAndGoalieAgent();
     void decideAttack();
     void decideDefense();
     void decidePlayOff(QList<int>& _ourPlayers, POMODE _mode = INDIRECT);
@@ -147,6 +167,7 @@ private:
     void setFirstPlay();
     void setFastPlay();
     bool firstTime, firstPlay, firstIsFinished;
+    void checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers);
 
 
     int preferedShotSpot;
@@ -167,7 +188,7 @@ private:
     void decideStart              (QList<int>&);
     void decideOurBallPlacement   (QList<int>&);
     void decideTheirBallPlacement (QList<int>&);
-    void decideHalfTimeLineUp   (QList<int>&);
+    void decideHalfTimeLineUp     (QList<int>&);
     void decideNull               (QList<int>&);
     /////////////////////////////////////
     QTextStream out;
@@ -178,13 +199,13 @@ private:
 
     // inter change
     void checkSensorShootFault();
-    int  faultDetectionCounter[12];
+    int  faultDetectionCounter[_MAX_NUM_PLAYERS];
 
 
     // MAHI ADD IN ROS
     QList <CRobot*> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
+    POffSkills strToEnum(const std::string& _str);
 };
-
 #endif //PARSIAN_AI_COACH_H

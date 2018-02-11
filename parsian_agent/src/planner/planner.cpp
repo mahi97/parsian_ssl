@@ -12,6 +12,7 @@ CPlanner::CPlanner(int _ID)
     flag = false;
     pointStep = 0.04;
     this->ID = _ID;
+    readyToPlan = false;
     qRegisterMetaType< vector<Vector2D> >("vector<Vector2D>");
     qRegisterMetaType< Vector2D >("Vector2D");
     qRegisterMetaType< QList<int> >("QList<int>");
@@ -338,15 +339,17 @@ void CPlanner::runPlanner(){
     }
     dirs.push_back(newDir);
 
-    for( int j=1 ; j<resultModified.size() ; j++ ){
-        drawer->draw(Segment2D(resultModified[j-1] , resultModified[j]) , QColor(
-                static_cast<int>(255 / (resultModified.size() / (double)j)),
-                static_cast<int>(255 / (resultModified.size() / (double)j)),
-                static_cast<int>(255 / (resultModified.size() / (double)j))));
+    if (conf->Draw_Path) {
+        for (int j = 1; j < resultModified.size(); j++) {
+            drawer->draw(Segment2D(resultModified[j - 1], resultModified[j]), QColor(
+                    static_cast<int>(255 / (resultModified.size() / (double) j)),
+                    static_cast<int>(255 / (resultModified.size() / (double) j)),
+                    static_cast<int>(255 / (resultModified.size() / (double) j))));
             drawer->draw(result[j]);
+        }
+        Draw();
+        obst.draw();
     }
-    Draw();
-    obst.draw();
 
 }
 
@@ -452,11 +455,7 @@ void CPlanner::initPathPlanner(Vector2D _goal,const QList<int>& _ourRelaxList,co
     Rnodes.first = new state(_goal , nullptr , Rresult);
     Rnodes.add(Rnodes.first);
     counter++;
-
-    generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius, goal);
-    runPlanner();
-    emitPlan(getResultModified(), getAverageDir());
-
+    readyToPlan = true;
 }
 
 double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vector2D posT){
@@ -635,6 +634,16 @@ void CPlanner::emitPlan(const vector<Vector2D>& _resultModified, const Vector2D&
     for(const auto& v : _resultModified) {
         path->results.push_back(v.toParsianMessage());
     }
+    path->header.stamp = ros::Time::now();
     path_pub.publish(path);
+}
+
+void CPlanner::run() {
+    if (readyToPlan) {
+        generateObstacleSpace(obst  , ourRelaxList , oppRelaxList , avoidPenaltyArea, avoidCenterArea , ballObstacleRadius, goal);
+        runPlanner();
+        emitPlan(getResultModified(), getAverageDir());
+        readyToPlan = false;
+    }
 }
 

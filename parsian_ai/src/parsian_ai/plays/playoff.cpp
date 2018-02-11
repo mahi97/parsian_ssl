@@ -12,10 +12,9 @@ CPlayOff::CPlayOff() : CMasterPlay()
     decidePlan = true;
     agentSize = 1;
     for (auto &i : positionAgent) i.stateNumber = 0;
-    for(int i = 0;i < 6;i++) {
+    for(int i = 0; i < _NUM_PLAYERS; i++) {
         roleAgent[i] = new CRolePlayOff();
         newRoleAgent[i] = new CRolePlayOff();
-
     }
     isBallIn = false;
     tempAgent = new CRolePlayOff();
@@ -26,12 +25,16 @@ CPlayOff::CPlayOff() : CMasterPlay()
 
     currentPlan = new SPlayOffPlan();
     masterPlan = nullptr;
-    kickOffPos[0] = Vector2D(wm->ball->pos.x - 0.3, wm->ball->pos.y);
-    kickOffPos[1] = Vector2D(-0.3,  2.5);
-    kickOffPos[2] = Vector2D(-0.3, -2.5);
-    kickOffPos[3] = Vector2D(-2  ,  0);
-    kickOffPos[4] = Vector2D(-0.5,  1);
-    kickOffPos[5] = Vector2D(-0.5, -1);
+    kickOffPos[0] = Vector2D(wm->ball->pos.x - 0.36, wm->ball->pos.y);
+    kickOffPos[1] = Vector2D(-0.36,  3);
+    kickOffPos[2] = Vector2D(-0.36, -3);
+    kickOffPos[3] = Vector2D(-2.4  ,  0);
+    kickOffPos[4] = Vector2D(-0.6,  1.2);
+    kickOffPos[5] = Vector2D(-0.6, -1.2);
+    // TODO : fill kickoffpos for rest of robots if needed
+//    kickOffPos[6] = Vector2D(-4, 1);
+//    kickOffPos[7] = Vector2D(-4, -1);
+
 
     initial    = true;
     playOnFlag = false;
@@ -51,23 +54,17 @@ CPlayOff::CPlayOff() : CMasterPlay()
 CPlayOff::~CPlayOff()
 {
     qDebug() << "Playoff is gone";
-    for(int i = 0;i < 6;i++) {
+    for(int i = 0; i < _NUM_PLAYERS; i++) {
         delete roleAgent[i];
         delete newRoleAgent[i];
     }
     delete tempAgent;
-
 }
 
 bool CPlayOff:: isBlockDisturbing(){
     if(blockerState == 7)
         return true;
-    else if(conf.UseForcedBlock){
-//        blockerID=knowledge->nearestOppToBall; // TODO : FIX
-        return true;
-    }
-    else
-    return false;
+    return conf.UseForcedBlock;
 
 }
 
@@ -85,7 +82,6 @@ void CPlayOff::globalExecute() {
         }
 
 
-        Q_ASSERT(masterPlan != nullptr);
         if(masterPlan != nullptr) {
             DBUG(QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
 
@@ -105,13 +101,15 @@ void CPlayOff::globalExecute() {
             }
             DBUG(QString("policy:%1").arg(conf.UseBlockBlocker),D_NADIA);
             if(isBlockDisturbing() && conf.UseBlockBlocker){
-                agentsID.removeOne(soccer->agents[BlockerStopperID]);
+                agents.removeOne(soccer->agents[BlockerStopperID]);
                 if(BlockerExecute(BlockerStopperID)){
                     staticExecute();
                 }
             }
-            else
+            else {
                 staticExecute();
+
+            }
 
 
         } else {
@@ -229,7 +227,9 @@ bool CPlayOff::BlockerExecute(int agentID){
 
 
 void CPlayOff::staticExecute() {
+    ROS_INFO("Static");
     if (initial) {
+        ROS_INFO_STREAM("task assigned: " << agents.size());
         assignTasks();
 
     } else {
@@ -239,13 +239,19 @@ void CPlayOff::staticExecute() {
             fillRoleProperties();
             posExecute();
             checkEndState();
-            DBUG(QString("ID : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            DBUG(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
+            ROS_INFO(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber).toStdString().c_str());
+
             if(masterPlan->common.currentSize > 1 && havePassInPlan) {
                 passManager();
+                ROS_INFO("Pass");
+
             }
 
             if(isPlanEnd()) {
                 playOnFlag = true;
+                ROS_INFO("Ends");
+
             }
 
         } else {
@@ -279,8 +285,8 @@ void CPlayOff::dynamicExecute() {
 
 
 void CPlayOff::dynamicAssignID() {
-    dynamicAgentSize = 6;
-    for (int i = 0;i < 6;i++) {
+    dynamicAgentSize = _NUM_PLAYERS;
+    for (int i = 0;i < _NUM_PLAYERS;i++) {
         if (dynamicMatch[i] != -1) {
             roleAgent[i] -> setAgent(soccer->agents[dynamicMatch[i]]);
             roleAgent[i] -> setAgentID(dynamicMatch[i]);
@@ -605,7 +611,7 @@ void CPlayOff::firstDegree() {
         newRoleAgent[0]->setTarget(wm->ball->pos-newRoleAgent[0]->getTargetDir().norm()*0.3);
         blockersPenaltyArea.clear();
 
-        for(int i=0;i<wm->opp.data->activeAgents.size();i++){
+        for(int i=0;i<wm->opp.activeAgentsCount();i++){
             if(Triangle2D(newRoleAgent[0]->getAgent()->pos()
                           ,wm->field->oppGoal()
                           ,wm->field->oppGoal()/2).contains(wm->opp.active(i)->pos)
@@ -636,7 +642,7 @@ void CPlayOff::secondDegree() {
         newRoleAgent[0]->setTarget(wm->ball->pos-newRoleAgent[0]->getTargetDir().norm()*0.3);
 
         blockersCentralRegion.clear();
-        for(int i=0;i<wm->opp.data->activeAgents.size();i++){
+        for(int i=0;i<wm->opp.activeAgentsCount();i++){
             if(Triangle2D(newRoleAgent[0]->getAgent()->pos()
                           ,wm->field->oppGoal()/2
                           ,Vector2D(0,0)).contains(wm->opp.active(i)->pos)
@@ -667,7 +673,7 @@ void CPlayOff::thirdDegree() {
         newRoleAgent[0]->setTarget(wm->ball->pos-newRoleAgent[0]->getTargetDir().norm()*0.3);
 
         blockersRoundRegion.clear();
-        for(int i=0;i<wm->opp.data->activeAgents.size();i++){
+        for(int i=0;i<wm->opp.activeAgentsCount();i++){
             if(Triangle2D(newRoleAgent[0]->getAgent()->pos()
                           ,Vector2D(0,0)
                           ,wm->field->ourGoal()).contains(wm->opp.active(i)->pos)
@@ -755,6 +761,12 @@ void CPlayOff::stayPoistioning() {
     newRoleAgent[4]->setTargetDir(wm->field->oppGoal());
     newRoleAgent[5]->setTarget(Vector2D(1+2*m, 2.5));
     newRoleAgent[5]->setTargetDir(wm->field->oppGoal());
+    // TODO : check newRoleAgent for new robots
+    newRoleAgent[6]->setTarget(Vector2D(1-3*m, 3.5));
+    newRoleAgent[6]->setTargetDir(wm->field->oppGoal());
+    newRoleAgent[7]->setTarget(Vector2D(1+3*m, 3.5));
+    newRoleAgent[7]->setTargetDir(wm->field->oppGoal());
+
 }
 
 void CPlayOff::movePositioning() {
@@ -771,6 +783,11 @@ void CPlayOff::movePositioning() {
     newRoleAgent[4]->setTargetDir(wm->field->oppGoal());
     newRoleAgent[5]->setTarget(Vector2D(2, 2.5));
     newRoleAgent[5]->setTargetDir(wm->field->oppGoal());
+    // TODO : check newRoleAgent for new robots
+    newRoleAgent[6]->setTarget(Vector2D(3, 3.5));
+    newRoleAgent[6]->setTargetDir(wm->field->oppGoal());
+    newRoleAgent[7]->setTarget(Vector2D(2.5, -3.5));
+    newRoleAgent[7]->setTargetDir(wm->field->oppGoal());
 
 }
 
@@ -787,7 +804,11 @@ void CPlayOff::donePositioning() {
     newRoleAgent[4]->setTargetDir(wm->field->oppGoal());
     newRoleAgent[5]->setTarget(Vector2D(2, 2.5));
     newRoleAgent[5]->setTargetDir(wm->field->oppGoal());
-
+    // TODO : check newRoleAgent for new robots
+    newRoleAgent[6]->setTarget(Vector2D(3, 3.5));
+    newRoleAgent[6]->setTargetDir(wm->field->oppGoal());
+    newRoleAgent[7]->setTarget(Vector2D(2.5, -3.5));
+    newRoleAgent[7]->setTargetDir(wm->field->oppGoal());
 }
 
 
@@ -807,7 +828,7 @@ void CPlayOff::firstExecute() {
     if (gameState->ourKickoff()) {
         //        kickOffStopModePlay(masterPlan->common.currentSize);
     } else {
-        firstPlayForOppCorner(agentsID.size());
+        firstPlayForOppCorner(agents.size());
 
     }
 
@@ -964,11 +985,13 @@ void CPlayOff::firstPlayForOppCorner(int _agentSize) {
             }
         }
         if(!conf.UseBlockBlocker)
-            blockerStep==S3;
+            blockerStep = S3;
 
         if (finisher == _agentSize-1) {
-            if (firstStepEnums == Stay && blockerStep==S3) firstStepEnums = Done;
-            else firstStepEnums = Done;
+            if (firstStepEnums == Stay && blockerStep==S3)
+                firstStepEnums = Done;
+            else
+                firstStepEnums = Done;
         }
         else if(newRoleAgent[0]->getTarget().dist(newRoleAgent[0]->getAgent()->pos()) < 0.1
                 && newRoleAgent[0]->getTargetDir().angleWith(newRoleAgent[0]->getAgent()->dir()).degree()<5){
@@ -1073,11 +1096,15 @@ bool CPlayOff::isPlanDone() {
     // Plan doesn't include a final shoot
     if (tLastState == -1 || tLastAgent == -1) {
         if (isAllTasksDone()) {
+            ROS_INFO ("MAHIS: all task");
+
             DBUG ("Done By Fully Tasks Done", D_MAHI);
             masterPlan->common.addHistory(10); //FULL
             return true;
         }
     } else if (isFinalShotDone()) {
+        ROS_INFO ("MAHIS: Final Shot");
+
         DBUG ("Done By Final Shot !", D_MAHI);
         // TODO : IF GOAL THEN 10 ELSE 9
         masterPlan->common.addHistory(10); //FULL
@@ -1091,13 +1118,17 @@ bool CPlayOff::isPlanFaild() {
     SFail fail = isAnyTaskFaild();
     if (isTimeOver()) {
         DBUG ("Faild By Time Over", D_MAHI);
+        ROS_INFO ("MAHIS: Faild By Time Over");
         //        masterPlan->common.addHistory(); // Not Changeing History
         return true;
     } else if (isBallDirChanged()) {
         DBUG ("Faild By Ball Dir Changed", D_MAHI);
+        ROS_INFO ("MAHIS: Faild By Ball Dir Changed");
         masterPlan->common.addHistory(0); // MIN
         return true;
     } else if (fail = isAnyTaskFaild(), fail.fail) {
+        ROS_INFO ("MAHIS: Faild By task");
+
         DBUG(QString("Task Fail : TaskID %1").arg(fail.taskID), D_MAHI);
         DBUG(QString("Task Fail : AgentID %1").arg(fail.agentID), D_MAHI);
         DBUG(QString("Task Fail : PlanID %1").arg(fail.planID), D_MAHI);
@@ -1138,8 +1169,8 @@ bool CPlayOff::isTimeOver() {
 
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
-        DBUG(QString("Time That Left: %1").arg(ros::Time::now().sec - tempStart), D_DEBUG);
-        if(ros::Time::now().sec - tempStart > 200*masterPlan->execution.passCount) { // 2 Second
+        ROS_INFO(QString("MAHIS: Time That Left: %1").arg(ros::Time::now().sec - tempStart).toStdString().c_str());
+        if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;
         }
@@ -1316,7 +1347,7 @@ void CPlayOff::checkEndState() {
                     continue;
                 }
                 positionAgent[i].stateNumber++;
-                DBUG(QString("ID : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
+                DBUG(QString("IDDD : %1, ST : %2").arg(i).arg(positionAgent[i].stateNumber), D_MAHI);
             } else {
                 //                positionAgent[i].zombie = true;
                 ///Temp
@@ -1330,12 +1361,13 @@ void CPlayOff::checkEndState() {
 }
 
 void CPlayOff::fillRoleProperties() {
-    for(int i = 0;i < agentsID.size(); i++) {
+    for(int i = 0;i < agents.size(); i++) {
         if (masterPlan->common.matchedID.contains(i)) {
             if (!roleAgent[i]->getRoleUpdate()) {
 
                 roleAgent[i]->setFirstMove((positionAgent[i].stateNumber == 0));
                 roleAgent[i]->setAgent(soccer->agents[masterPlan->common.matchedID.value(i)]);
+
                 // handle onetouch faster
                 if (positionAgent[i].stateNumber + 1 < positionAgent[i].positionArg.size()) {
                     if (positionAgent[i].getArgs().staticSkill == MoveSkill && positionAgent[i].getArgs(1).staticSkill == OneTouchSkill) {
@@ -1346,12 +1378,13 @@ void CPlayOff::fillRoleProperties() {
                 roleAgent[i]->setRoleUpdate(true);
                 roleAgent[i]->resetTime();
                 assignTask(roleAgent[i], positionAgent[i]);
+                ROS_INFO_STREAM("NEWTASK: " << roleAgent[i]->getTarget().x << roleAgent[i]->getTarget().y);
             }
 
         } else {
             qWarning() << "[Warning] coach -> Match function doesn't work :( ";
             if (!roleAgent[i]->getRoleUpdate()) {
-                roleAgent[i]->setAgent(agentsID.at(i));
+                roleAgent[i]->setAgent(agents.at(i));
                 assignTask(roleAgent[i], positionAgent[i]);
                 roleAgent[i]->setRoleUpdate(true);
             }
@@ -1360,7 +1393,6 @@ void CPlayOff::fillRoleProperties() {
 }
 
 void CPlayOff::assignTask(CRolePlayOff* _roleAgent, const SPositioningAgent& _positionAgent) {
-
     switch(_positionAgent.getArgs().staticSkill) {
     case PassSkill:
         assignPass(_roleAgent, _positionAgent);
@@ -1415,8 +1447,8 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setAvoidPenaltyArea(true);
     _roleAgent->setChip(chipOrNot(_posAgent.getArgs()));
     if (_roleAgent->getChip()) {
-        //        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
-        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
+        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData);
+        //_roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
         DBUG(QString("VALUE : %1").arg(static_cast <double> (_posAgent.getArgs().rightData)/200), D_MAHI);
     } else {
         _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData));
@@ -1494,7 +1526,6 @@ void CPlayOff::assignMove(CRolePlayOff* _roleAgent,
         _roleAgent -> setMaxVelocity(static_cast<float>(getMaxVel(_roleAgent, _posAgent.getArgs())));
 
     }
-
     _roleAgent -> setSelectedSkill(RoleSkill::GotopointAvoid);
 }
 
@@ -1695,41 +1726,45 @@ bool CPlayOff::isPathClear(Vector2D _pos1,
 }
 
 void CPlayOff::assignTasks() {
-    int& sym = masterPlan->execution.symmetry;
-    for(size_t i = 0;i < masterPlan->common.currentSize; i++) {
+    int &sym = masterPlan->execution.symmetry;
+    for (size_t i = 0; i < masterPlan->common.currentSize; i++) {
+        ROS_INFO_STREAM("-------------------DEBUGGING " << masterPlan->common.currentSize
+                                                        << " : " << masterPlan->execution.AgentPlan[i].size());
         positionAgent[i].positionArg.clear();
+
         Q_FOREACH(playOffRobot agentPlan, masterPlan->execution.AgentPlan[i]) {
-            SPositioningArg tempPosArg;
-            tempPosArg.staticPos          = agentPlan.pos;
-            tempPosArg.staticAng          = Vector2D::polar2vector(1, agentPlan.angle);
-            tempPosArg.staticAng.assign(tempPosArg.staticAng.x, -1*sym*tempPosArg.staticAng.y);
-            tempPosArg.staticPos.assign(tempPosArg.staticPos.x, sym*tempPosArg.staticPos.y);
-            tempPosArg.staticEscapeRadius = agentPlan.tolerance;
+                SPositioningArg tempPosArg;
+                ROS_INFO_STREAM("agentPlan.pos " << agentPlan.pos);
+                tempPosArg.staticPos = agentPlan.pos;
+                tempPosArg.staticAng = Vector2D::polar2vector(1, agentPlan.angle);
+                tempPosArg.staticAng.assign(tempPosArg.staticAng.x, -1 * sym * tempPosArg.staticAng.y);
+                tempPosArg.staticPos.assign(tempPosArg.staticPos.x, sym * tempPosArg.staticPos.y);
+                tempPosArg.staticEscapeRadius = agentPlan.tolerance;
 
-            Q_FOREACH(playOffSkill skill, agentPlan.skill) {
-                tempPosArg.leftData           = skill.data[0];
-                tempPosArg.rightData          = skill.data[1];
-                tempPosArg.staticSkill        = skill.name;
-                tempPosArg.PassToId           = skill.targetAgent;
-                tempPosArg.PassToState        = skill.targetIndex;
+                Q_FOREACH(playOffSkill skill, agentPlan.skill) {
+                        tempPosArg.leftData = skill.data[0];
+                        tempPosArg.rightData = skill.data[1];
+                        tempPosArg.staticSkill = skill.name;
+                        tempPosArg.PassToId = skill.targetAgent;
+                        tempPosArg.PassToState = skill.targetIndex;
 
-                if (skill.name == PassSkill && positionAgent[i].positionArg.back().staticSkill == MoveSkill) {
-                    positionAgent[i].positionArg.back().staticPos = POBALLPOS;
-                } else if (skill.name == ShotToGoalSkill
-                           || skill.name == ChipToGoalSkill
-                           || skill.name == OneTouchSkill) {
+                        if (skill.name == PassSkill && positionAgent[i].positionArg.back().staticSkill == MoveSkill) {
+                            positionAgent[i].positionArg.back().staticPos = POBALLPOS;
+                        } else if (skill.name == ShotToGoalSkill
+                                   || skill.name == ChipToGoalSkill
+                                   || skill.name == OneTouchSkill) {
 
-                    if (sym < 0) {
-                        tempPosArg.rightData = 1000 - tempPosArg.rightData;
+                            if (sym < 0) {
+                                tempPosArg.rightData = 1000 - tempPosArg.rightData;
+                            }
+                        }
+                        positionAgent[i].positionArg.append(tempPosArg);
                     }
-                }
-                positionAgent[i].positionArg.append(tempPosArg);
             }
-        }
     }
 }
 
-int CPlayOff::findReciver(int _passer, int _state) {
+int CPlayOff::findReceiver(int _passer, int _state) {
     if (_state == 0) {
         return 0;
     }
@@ -1739,13 +1774,13 @@ int CPlayOff::findReciver(int _passer, int _state) {
             temp.id = _passer;
             temp.state = i;
             ownerList.append(temp);
-            findReciver(positionAgent[_passer].getArgs(i).PassToId,
-                        positionAgent[_passer].getArgs(i).PassToState);
+            findReceiver(positionAgent[_passer].getArgs(i).PassToId,
+                         positionAgent[_passer].getArgs(i).PassToState);
         }
     }
 }
 
-void CPlayOff::getCostRec(double costArr[][6], int arrSize, QList<kkValue> &valueList, kkValue value, int size, int aId)
+void CPlayOff::getCostRec(double costArr[][_NUM_PLAYERS], int arrSize, QList<kkValue> &valueList, kkValue value, int size, int aId)
 {
     if(size <= 1) {
         int tIndex = kkGetIndex(value, 0);
@@ -1794,7 +1829,7 @@ void CPlayOff::reset(){
 
     decidePlan = true;
     agentSize = 1;
-    for(int i = 0;i < 6;i++) {
+    for(int i = 0; i < _NUM_PLAYERS; i++) {
         positionAgent[i].stateNumber = 0;
         roleAgent[i]->reset();
         newRoleAgent[i]->reset();

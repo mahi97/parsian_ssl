@@ -2,8 +2,8 @@
 // Created by noOne on 11/30/2017.
 //
 #include <rqt_parsian_gui/robotstatus_widget.h>
-
-
+#include <ros/package.h>
+#include <rospack/rospack.h>
 
 namespace rqt_parsian_gui
 {
@@ -11,13 +11,17 @@ namespace rqt_parsian_gui
 
         this->setFixedSize(400, 150);
 
-        QFile *file=new QFile("resource/style_sheet/check_box_fault.ssh");
+	    std::string s;
+        s = ros::package::getPath("rqt_parsian_gui");
+        QFile *file=new QFile((s+"/resource/style_sheet/check_box_fault.ssh").c_str());
+
         bool bOpened = file->open(QFile::ReadOnly);
         assert (bOpened);
         QString styleSheet_fault = QLatin1String(file->readAll());
         file->close();
-        file=new QFile("resource/style_sheet/check_box_status.ssh");
+        file=new QFile((s+"/resource/style_sheet/check_box_status.ssh").c_str());
         bOpened = file->open(QFile::ReadOnly);
+
         assert (bOpened);
         QString styleSheet_status = QLatin1String(file->readAll());
 
@@ -160,7 +164,9 @@ namespace rqt_parsian_gui
     }
 
     QString RobotStatusWidget::getFileName(){
-        return QString("resource/images/" + color + robot_id + ".png");
+        QString s;
+        s = QString::fromStdString(ros::package::getPath("rqt_parsian_gui"));
+        return QString(s + "/resource/images/" + color + robot_id + ".png");
     }
     void RobotStatusWidget::setMessage(const parsian_msgs::parsian_robot_status msg){
         robot_id = QString::number(msg.id);

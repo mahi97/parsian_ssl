@@ -21,8 +21,8 @@ void CTheirKickOff::init(const QList<Agent*>& _agents){
 }
 
 void CTheirKickOff::execute_x(){
-    if (agentsID.empty()) return;
+    if (agents.empty()) return;
     executedCycles++;
     chooseBlocker();
-    if (agentsID.size() > 1) appendRemainingsAgents(markAgents);
+    if (agents.size() > 1) appendRemainingsAgents(markAgents);
 }

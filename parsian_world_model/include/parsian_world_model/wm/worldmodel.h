@@ -20,40 +20,40 @@
 
 //#include "parsian_world_model/world_modelConfig.h"
 
-
-
-class CWorldModel : public QObject {
+class WorldModel {
 public:
-    CWorldModel(int c);
-    ~CWorldModel();
+    WorldModel();
+    ~WorldModel();
 
     void updateDetection(const parsian_msgs::ssl_vision_detectionConstPtr&);
     void updateGeom(const parsian_msgs::ssl_vision_geometryConstPtr&);
     void execute();
     void merge(int frame);
     void init();
+    void setMode(bool isSimulation);
 
-    parsian_msgs::parsian_world_modelPtr getParsianWorldModel(bool colour_yellow, bool side_left);
+    double vForwardCmd[12],vNormalCmd[12],vAngCmd[12];
+
+    parsian_msgs::parsian_world_modelPtr getParsianWorldModel();
+    Robot* them[_MAX_NUM_PLAYERS];
+    Robot* us[_MAX_NUM_PLAYERS];
+
 private:
     parsian_msgs::parsian_robot rosRobots[_MAX_NUM_PLAYERS*2];
-
     parsian_msgs::parsian_robot rosBall;
     CVisionClient *vc;
-    CHalfWorld* hw;
+
     CHalfWorld w;
-
     CHalfWorld mergedHalfWorld;
-    CBall* ball;
-    CRobot* us[_MAX_NUM_PLAYERS];
 
-    CRobot* them[_MAX_NUM_PLAYERS];
+    CBall* ball;
     bool simulationMode;
     void run();
     void update(CHalfWorld*);
     void testFunc(const parsian_msgs::ssl_vision_detectionConstPtr & packet);
     void printRobotInfo(const parsian_msgs::ssl_vision_detection_robot &robot);
 
-    void toParsianMessage(const CRobot* _robot, int id);
+    void toParsianMessage(const Robot* _robot, int id);
     void toParsianMessage(const CBall* _ball);
 
 

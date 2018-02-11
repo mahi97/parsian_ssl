@@ -695,7 +695,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
 
     while ( t < 20 && (result.ourF.size() < ourList.size() || result.oppF.size() < oppList.size()) )
     {
-        ballPredict = wm->ball->predict(t);
+        // ballPredict = wm->ball->predict(t);
 
         double tToVMax;
         Vector2D center;
@@ -778,7 +778,7 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
     double time = 0.f;
     f.catch_time = 1000;
     while (true) {
-        Vector2D ballPos = wm->ball->predict(min(time, f.catch_time));
+         Vector2D ballPos = wm->ball->pos;//(min(time, f.catch_time));
         //            draw(ballPos, 1, "red");
         if (wm->ball->vel.length() < 0.05)
             ballPos = wm->ball->pos;
@@ -882,7 +882,7 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
 
     while ( t < 20 && (result.ourF.size() < ourList.size() || result.oppF.size() < oppList.size()) )
     {
-        ballPredict = wm->ball->predict(t);
+        // ballPredict = wm->ball->predict(t);
 
         double tToVMax;
         Vector2D center;
