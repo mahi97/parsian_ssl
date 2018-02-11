@@ -222,11 +222,25 @@ double CDefPos::findBestRadius(int _numOfDefs)
 
 }
 ///////////////////////////// AHZ  /////////////////////////////////////////////
-//QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
-//    if(numberOfDefenseAgents == 2){
-
-//    }
-//}
+QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
+    QList<Vector2D> defensePosiotion;
+    defensePosiotion.clear();
+    if(numberOfDefenseAgents == 3){
+        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
+                                getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    }
+    else if(numberOfDefenseAgents == 2){
+        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+    }
+    else if(numberOfDefenseAgents == 1){
+        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
+                                getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    }
+    return defensePosiotion;
+}
 QList<Segment2D> CDefPos::getLinesOfBallTriangle(){
     QList<Segment2D> linesOfBallTriangle;
     Vector2D ballPos = wm->ball->pos;
