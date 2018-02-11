@@ -67,6 +67,12 @@ protected:
     bool isAgentsStuckTogether(QList<Vector2D> agentsPosition);
     bool isInIndirectArea(Vector2D);
     void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition,QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);            
+    int findNeededDefense(double downLimit , double upLimit);
+    double findBestOffsetForPenaltyArea(Line2D bestLineWithTalles);
+    Line2D getBestLineWithTalles(int defeneseCount);
+    QList<Segment2D> getLinesOfBallTriangle();
+    QList<Vector2D> newDefensePositioning(int numberOfDefenseAgents);
+
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;
