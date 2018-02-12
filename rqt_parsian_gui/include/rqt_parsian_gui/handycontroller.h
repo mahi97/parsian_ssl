@@ -11,9 +11,11 @@
 #include <QKeyEvent>
 #include <QString>
 #include <QIcon>
+#include <QTimer>
 #include <pluginlib/class_list_macros.h>
 #include <rqt_parsian_gui/ui_handycontroller.h>
 #include <parsian_msgs/parsian_robot_command.h>
+#include <parsian_msgs/parsian_world_model.h>
 #include <parsian_util/base.h>
 //#include <parsian_util/core/worldmodel.h>
 
@@ -53,6 +55,7 @@ namespace rqt_parsian_gui
 
 
         ros::Publisher publisher;
+        ros::Publisher wmpublisher;
         parsian_msgs::parsian_robot_commandPtr cmd;
 
 
@@ -75,18 +78,27 @@ namespace rqt_parsian_gui
         void kickspeedchanged(int);
         void chipkickspeedchanged(int);
         void rollerspeedchanged(int);
+        void wmtimedOut();
 
         // Comment in to signal that the plugin has a way to configure it
         // bool hasConfiguration() const;
         // void triggerConfiguration();
-    private:
+    public:
         QWidget* widget_;
         Ui::HandyController mUI;
         int agentID, speed, kickspeed, chipkickspeed, rollerspeed;
-        ros::NodeHandle* nh;
-        ros::NodeHandle* nh_private;
+        ros::NodeHandle nh;
+        ros::NodeHandle nh_private;
         ros::Timer timer_;
+        QTimer* wmTimer;
+        ros::Subscriber m_wm_sub;
+        void m_wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm);
+        bool wmtimedout;
         void timerCb(const ros::TimerEvent& event);
+
+    signals:
+        void startwmtimer(int);
+        void stopwmtimer();
 
 
 

@@ -240,10 +240,13 @@
     <item row="1" column="2">
      <widget class="QSlider" name="Speed_slide">
       <property name="maximum">
-       <number>500</number>
+       <number>5</number>
+      </property>
+      <property name="value">
+       <number>1</number>
       </property>
       <property name="sliderPosition">
-       <number>50</number>
+       <number>1</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -253,7 +256,7 @@
     <item row="1" column="3">
      <widget class="QLabel" name="Speed_show">
       <property name="text">
-       <string>50</string>
+       <string>1</string>
       </property>
      </widget>
     </item>
@@ -280,10 +283,13 @@
     <item row="2" column="2">
      <widget class="QSlider" name="Kickspeed_slide">
       <property name="maximum">
-       <number>500</number>
+       <number>15</number>
+      </property>
+      <property name="value">
+       <number>7</number>
       </property>
       <property name="sliderPosition">
-       <number>50</number>
+       <number>7</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -293,14 +299,14 @@
     <item row="2" column="3">
      <widget class="QLabel" name="Kickspeed_show">
       <property name="text">
-       <string>50</string>
+       <string>7</string>
       </property>
      </widget>
     </item>
     <item row="3" column="0">
      <widget class="QLabel" name="ChipKickSpeed_label">
       <property name="text">
-       <string>Chip Kick Speed :</string>
+       <string>Chip distance :</string>
       </property>
      </widget>
     </item>
@@ -320,10 +326,13 @@
     <item row="3" column="2">
      <widget class="QSlider" name="ChipKickSpeed_slide">
       <property name="maximum">
-       <number>500</number>
+       <number>5</number>
+      </property>
+      <property name="value">
+       <number>3</number>
       </property>
       <property name="sliderPosition">
-       <number>50</number>
+       <number>3</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -333,7 +342,7 @@
     <item row="3" column="3">
      <widget class="QLabel" name="ChipKickSpeed_show">
       <property name="text">
-       <string>50</string>
+       <string>3</string>
       </property>
      </widget>
     </item>
@@ -360,10 +369,13 @@
     <item row="4" column="2">
      <widget class="QSlider" name="RollerSpeed_slide">
       <property name="maximum">
-       <number>500</number>
+       <number>7</number>
+      </property>
+      <property name="value">
+       <number>2</number>
       </property>
       <property name="sliderPosition">
-       <number>50</number>
+       <number>2</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -373,7 +385,7 @@
     <item row="4" column="3">
      <widget class="QLabel" name="RollerSpeed_show">
       <property name="text">
-       <string>50</string>
+       <string>2</string>
       </property>
      </widget>
     </item>

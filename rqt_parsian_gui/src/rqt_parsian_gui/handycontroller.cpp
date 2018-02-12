@@ -22,6 +22,7 @@ namespace rqt_parsian_gui
     void HandyController::initPlugin(qt_gui_cpp::PluginContext& context)
     {
 
+        ROS_INFO("handy controller begin");
         // access standalone command line arguments
         QStringList argv = context.argv();
 
@@ -40,6 +41,9 @@ namespace rqt_parsian_gui
         cmd->wheelsspeed = true;
         cmd->spinner = false;
         cmd->chip = false;
+
+        wmTimer = new QTimer();
+        wmtimedout = false;
 
         //connect signal and slots
         connect(mUI.Speed_slide, SIGNAL(valueChanged(int)), mUI.Speed_show, SLOT(setNum(int)));
@@ -71,12 +75,21 @@ namespace rqt_parsian_gui
         connect(mUI.ChipKickSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(chipkickspeedchanged(int)));
         connect(mUI.RollerSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(rollerspeedchanged(int)));
 
-        timer_ = n.createTimer(ros::Duration(0.0166), boost::bind(& GrsimNodelet::timerCb, this, _1));
+
+
 
         //initial publishing
-        nh = &getNodeHandle();
-        nh_private = &getPrivateNodeHandle();
-        publisher  = nh->advertise<parsian_msgs::parsian_robot_command>("/agent_0/command", 1000);
+        nh = getNodeHandle();
+        nh_private = getPrivateNodeHandle();
+        timer_ = nh.createTimer(ros::Duration(0.0166), boost::bind(& HandyController::timerCb, this, _1));
+        m_wm_sub = nh.subscribe<parsian_msgs::parsian_world_model>("/worldmodel", 1000, boost::bind(& HandyController::m_wmCb, this, _1));
+        publisher  = nh.advertise<parsian_msgs::parsian_robot_command>("/agent_0/command", 1000);
+        wmpublisher  = nh.advertise<parsian_msgs::parsian_world_model>("/worldmodel", 1000);
+
+        connect(wmTimer, SIGNAL(timeout()), this, SLOT(wmtimedOut()));
+        wmTimer->start(2000);
+        connect(this, SIGNAL(startwmtimer(int)), wmTimer, SLOT(start(int)));
+        connect(this, SIGNAL(stopwmtimer()), wmTimer, SLOT(stop()));
 
 
         // add widget to the user interface
@@ -88,13 +101,43 @@ namespace rqt_parsian_gui
 
     void HandyController::timerCb(const ros::TimerEvent& event){
         // Using timers is the preferred 'ROS way' to manual threading
-//        send();
+        publisher.publish(cmd);
+        //ROS_INFO_STREAM(wmtimedout);
+        if(wmtimedout)
+        {
+            parsian_msgs::parsian_world_model wm;
+            wm.ball.id = 100;
+            wmpublisher.publish(wm);
+        }
+    }
+
+    void HandyController::m_wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm){
+        if(_wm->ball.id != 100)
+        {
+            ROS_INFO("wm in");
+            emit stopwmtimer();
+            wmtimedout = false;
+            emit startwmtimer(2000);
+        }
+
+    }
+
+    void HandyController::wmtimedOut()
+    {
+       // ROS_INFO("wmtimedout");
+        wmtimedout = true;
     }
 
     void HandyController::shutdownPlugin()
     {
         // unregister all publishers here
         publisher.shutdown();
+        m_wm_sub.shutdown();
+        wmpublisher.shutdown();
+        timer_.stop();
+
+
+
     }
 
     void HandyController::saveSettings(qt_gui_cpp::Settings& plugin_settings,
@@ -295,14 +338,14 @@ namespace rqt_parsian_gui
                 if(e->key() == Qt::Key_K || e->key() == Qt::Key_C || e->key() == Qt::Key_R)
                 {
                     takeAction(_STOP_OTHER);
-                    publisher.publish(cmd);
+                    //publisher.publish(cmd);
                     return true;
                 }
                 if(e->key() == Qt::Key_W || e->key() == Qt::Key_A || e->key() == Qt::Key_S
                         || e->key() == Qt::Key_D || e->key() == Qt::Key_Q || e->key() == Qt::Key_E)
                 {
                     takeAction(_STOP_NAVIGATION);
-                    publisher.publish(cmd);
+                    //publisher.publish(cmd);
                     return true;
                 }
 
@@ -315,56 +358,56 @@ namespace rqt_parsian_gui
     {
         ROS_INFO("leftclicked");
         takeAction(EActionType::_LEFT);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::uppressed()
     {
         ROS_INFO("upclicked");
         takeAction(EActionType::_FORWARD);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::rightpressed()
     {
         ROS_INFO("rightclicked");
         takeAction(EActionType::_RIGHT);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::downpressed()
     {
         ROS_INFO("downclicked");
         takeAction(EActionType::_BACKWARD);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle1pressed()
     {
         ROS_INFO("angle1clicked");
         takeAction(EActionType::_TURN_CCW);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle2pressed()
     {
         ROS_INFO("angle2clicked");
         takeAction(EActionType::_TURN_CW);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::kickpressed()
     {
         ROS_INFO("kickclicked");
         takeAction(EActionType::_KICK);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
        // cleanRobotKick();
     }
     void HandyController::chippressed()
     {
         ROS_INFO("chipclicked");
         takeAction(EActionType::_CHIP);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
         //cleanRobotChip();
     }
 
@@ -372,7 +415,7 @@ namespace rqt_parsian_gui
     {
         ROS_INFO("haltclicked");
         takeAction(EActionType::_STOP_ALL);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
     }
 
     void HandyController::rollerpressed()
@@ -384,19 +427,19 @@ namespace rqt_parsian_gui
     void HandyController::releasedother()
     {
         takeAction(_STOP_OTHER);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
     }
 
     void HandyController::releasednav()
     {
         takeAction(_STOP_NAVIGATION);
-        publisher.publish(cmd);
+        //publisher.publish(cmd);
     }
 
     void HandyController::agentidchanged(QString id)
     {
         agentID = id.toInt();
-        publisher  = nh->advertise<parsian_msgs::parsian_robot_command>("/agent_"+ id.toStdString() +"/command", 1000);
+        publisher  = nh.advertise<parsian_msgs::parsian_robot_command>("/agent_"+ id.toStdString() +"/command", 1000);
         cmd.reset(new parsian_msgs::parsian_robot_command);
         cmd->robot_id = agentID;
         cmd->kickSpeed = 0;//kickspeed;
