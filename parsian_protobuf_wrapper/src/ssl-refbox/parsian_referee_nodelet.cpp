@@ -14,9 +14,9 @@ void RefreeNodelet::onInit() {
     ros::NodeHandle& nh_private = getPrivateNodeHandle();
 
     //ros::param::get("/team_color", teamColor);
-    timer = nh.createTimer(ros::Duration(.062), boost::bind(&RefreeNodelet::timerCb, this, _1));
+    timer = nh.createTimer(ros::Duration(.010), boost::bind(&RefreeNodelet::timerCb, this, _1));
 
-    ssl_referee_pub  = nh_private.advertise<parsian_msgs::ssl_refree_wrapper>("referee", 1000);
+    ssl_referee_pub  = nh_private.advertise<parsian_msgs::ssl_refree_wrapper>("/referee", 1000);
 
     team_config_sub = nh.subscribe<parsian_msgs::parsian_team_config>("/team_config", 1000, boost::bind(& RefreeNodelet::teamConfigCb, this, _1));
 
