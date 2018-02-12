@@ -5,7 +5,7 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 
 ///////////////// AHZ is writing, have you my voice? ... ;) //////////////////
-QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
+QList<Vector2D> DefensePlan::newDefensePositioning(int numberOfDefenseAgents){
     QList<Vector2D> defensePosiotion;
     defensePosiotion.clear();
     if(numberOfDefenseAgents == 3){
@@ -25,7 +25,7 @@ QList<Vector2D> CDefPos::newDefensePositioning(int numberOfDefenseAgents){
     return defensePosiotion;
 }
 
-QList<Segment2D> CDefPos::getLinesOfBallTriangle(){
+QList<Segment2D> DefensePlan::getLinesOfBallTriangle(){
     QList<Segment2D> linesOfBallTriangle;
     Vector2D ballPos = wm->ball->pos;
     Vector2D ourGoalL = wm->field->ourGoalL();
@@ -35,7 +35,7 @@ QList<Segment2D> CDefPos::getLinesOfBallTriangle(){
     return linesOfBallTriangle;
 }
 
-Line2D CDefPos::getBestLineWithTalles(int defenseCount){
+Line2D DefensePlan::getBestLineWithTalles(int defenseCount){
     double robotDiameter = 2 * Robot::robot_radius_new;
     Vector2D ballPos = wm->ball->pos;
     Vector2D ourGoalL = wm->field->ourGoalL();
@@ -54,12 +54,17 @@ Line2D CDefPos::getBestLineWithTalles(int defenseCount){
     Line2D aimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
     Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
     if(tempAimLessLine.length() > defenseCount * robotDiameter){
-        aimLessLine = Line2D(Vector2D(ballPos.x - (defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y),Vector2D(ballPos.x-(defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y - 0.1));
+        if(ballPos.x - (defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()) >= (-4.5 + 1.4)){
+            aimLessLine = Line2D(Vector2D(ballPos.x - (defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y),Vector2D(ballPos.x-(defenseCount * robotDiameter * ballPos.x / tempAimLessLine.length()),ballPos.y - 0.1));
+        }
+        else{
+            aimLessLine = Line2D(Vector2D(-4.5 + 1.4,ballPos.y),Vector2D(-4.5 + 1.4,ballPos.y - 0.1));
+        }
     }
     return aimLessLine;
 }
 
-double CDefPos::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
+double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
     double bestOffsetForPenaltyArea = 0;
     Vector2D ballPos = wm->ball->pos;
     Vector2D ourGoalR = wm->field->ourGoalR();
@@ -76,12 +81,17 @@ double CDefPos::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
         biggerFrontageOfTriangle = leftFrontageOfTriangle;
         smallerFrontageOfTriangle = rightFrontageOfTriangle;
     }
-    bestOffsetForPenaltyArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).y;
+    bestOffsetForPenaltyArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).x;
+    //////////////// The position Isn't in penalty area /////////////////
+    if(bestOffsetForPenaltyArea <= (-4.5 + wm->field->_PENALTY_DEPTH)){
+        bestOffsetForPenaltyArea = wm->field->_PENALTY_DEPTH + 0.2;
+    }
     return bestOffsetForPenaltyArea;
 }
 
-int CDefPos::findNeededDefense(double downLimit , double upLimit){
+int DefensePlan::findNeededDefense(double downLimit , double upLimit){
     int neededDefense = 0;
+    int numOfDefenses;
     double robotDiameter = 2 * Robot::robot_radius_new;
     Vector2D ballPos = wm->ball->pos;
     Vector2D ourGoalL = wm->field->ourGoalL();
@@ -101,18 +111,25 @@ int CDefPos::findNeededDefense(double downLimit , double upLimit){
         smallerFrintageOfTriangle = rightFrontageOfTriangle;
     }
     aimLessLine = Segment2D(ourGoalLine.intersection(smallerFrintageOfTriangle) , biggerFrintageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrintageOfTriangle)));
+    ROS_INFO(QString("aimLessLine: %1").arg(aimLessLine.length()).toStdString().c_str());
     //////// with itterative algorithm /////////////////////////
-    if(aimLessLine.length() < robotDiameter){
-        neededDefense = 1; // must be refine
+    if(aimLessLine.length() <= robotDiameter){
+
+        neededDefense = 0; // must be refine
     }
     else{
-        for(int numOfDefenses = 2 ; numOfDefenses < 5 ; numOfDefenses++){
-            if(aimLessLine.length() <= (numOfDefenses + 1) * robotDiameter &&
-                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) >= downLimit &&
-                    findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefense)) <= upLimit){
-                neededDefense = numOfDefenses;
+//        ROS_INFO("is");
+        for(numOfDefenses = 1 ; numOfDefenses < 5 ; numOfDefenses++){
+            ROS_INFO(QString("best offset: %1").arg(findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses))).toStdString().c_str());
+            if(aimLessLine.length() <= (numOfDefenses + 1) * (robotDiameter) &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses)) >= (downLimit) &&
+                    findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses)) <= (upLimit)){
+                neededDefense = numOfDefenses;                
                 break;
-            }
+            }            
+        }
+        if(neededDefense == 0 && aimLessLine.length() > robotDiameter){
+            neededDefense = numOfDefenses;
         }
 
     }
@@ -1560,8 +1577,9 @@ void DefensePlan::execute(){
                     defenseCount = defenseAgents.size();
                     DBUG(QString("defense count : %1").arg(defenseCount) , D_AHZ);
                 }
+                ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense(1.4,4.5)).toStdString().c_str());
                 if(defenseCount > 0){
-                    ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense(1.5,2.5)).toStdString().c_str());
+
                     realDefSize = defenseCount - decideNumOfMarks();
                     tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     DBUG(QString("real def size : %1").arg(realDefSize) , D_AHZ);
