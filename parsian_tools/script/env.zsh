@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Save the directory this script is located in
-SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTS_DIR=$(builtin cd -q "`dirname "$0"`" > /dev/null && pwd)
 # Find the parent directory that corresponds to the Parsian root
 PARSIAN_ROOT="$SCRIPTS_DIR"
 while [[ ! -d "$PARSIAN_ROOT/.catkin_tools" ]]; do
@@ -11,7 +11,6 @@ while [[ ! -d "$PARSIAN_ROOT/.catkin_tools" ]]; do
 		return
 	fi
 done
-
 # Initialise other variables
 INSTALLPATH="/parsian"
 
