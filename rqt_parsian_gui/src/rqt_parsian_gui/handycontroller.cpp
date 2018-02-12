@@ -82,9 +82,9 @@ namespace rqt_parsian_gui
         nh = getNodeHandle();
         nh_private = getPrivateNodeHandle();
         timer_ = nh.createTimer(ros::Duration(0.0166), boost::bind(& HandyController::timerCb, this, _1));
-        m_wm_sub = nh.subscribe<parsian_msgs::parsian_world_model>("/worldmodel", 1000, boost::bind(& HandyController::m_wmCb, this, _1));
+        m_wm_sub = nh.subscribe<parsian_msgs::parsian_world_model>("/world_model", 1000, boost::bind(& HandyController::m_wmCb, this, _1));
         publisher  = nh.advertise<parsian_msgs::parsian_robot_command>("/agent_0/command", 1000);
-        wmpublisher  = nh.advertise<parsian_msgs::parsian_world_model>("/worldmodel", 1000);
+        wmpublisher  = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
 
         connect(wmTimer, SIGNAL(timeout()), this, SLOT(wmtimedOut()));
         wmTimer->start(2000);
