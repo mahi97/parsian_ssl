@@ -114,7 +114,7 @@ namespace rqt_parsian_gui
     void HandyController::m_wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm){
         if(_wm->ball.id != 100)
         {
-            ROS_INFO("wm in");
+            //ROS_INFO("wm in");
             emit stopwmtimer();
             wmtimedout = false;
             emit startwmtimer(2000);
@@ -135,6 +135,9 @@ namespace rqt_parsian_gui
         m_wm_sub.shutdown();
         wmpublisher.shutdown();
         timer_.stop();
+        wmTimer->disconnect();
+        nh.shutdown();
+        nh_private.shutdown();
 
 
 
@@ -205,12 +208,12 @@ namespace rqt_parsian_gui
 
         case EActionType::_TURN_CCW:
            // ccwBtn->setIcon(QIcon("./icons/small/green_ccw.png"));
-            setRobotVel(0.0, 0.0, speed/20 );
+            setRobotVel(0.0, 0.0, speed/20.0 );
             break;
 
         case EActionType::_TURN_CW:
            // cwBtn->setIcon(QIcon("./icons/small/green_cw.png"));
-            setRobotVel(0.0, 0.0, -speed/20);
+            setRobotVel(0.0, 0.0,-speed/20.0);
             break;
 
         case EActionType::_KICK:
@@ -257,6 +260,7 @@ namespace rqt_parsian_gui
         cmd->vel_F = _vtan;     cmd->vel_N = _vnorm;        cmd->vel_w = _w *_RAD2DEG;
         double wheel1, wheel2, wheel3, wheel4;
         jacobian(_vtan, _vnorm, _w *_RAD2DEG, wheel1, wheel2, wheel3, wheel4);
+        ROS_INFO_STREAM(_w<<", "<<_w *_RAD2DEG<<", "<<wheel1<<", "<<wheel2<<", "<< wheel3<<", "<<wheel4);
         cmd->wheel1 = static_cast<float>(wheel1);   cmd->wheel2 = static_cast<float>(wheel2);   cmd->wheel3 = static_cast<float>(wheel3);   cmd->wheel4 = static_cast<float>(wheel4);
     }
 
@@ -356,56 +360,56 @@ namespace rqt_parsian_gui
 
     void HandyController::leftpressed()
     {
-        ROS_INFO("leftclicked");
+        //ROS_INFO("leftclicked");
         takeAction(EActionType::_LEFT);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::uppressed()
     {
-        ROS_INFO("upclicked");
+        //ROS_INFO("upclicked");
         takeAction(EActionType::_FORWARD);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::rightpressed()
     {
-        ROS_INFO("rightclicked");
+        //ROS_INFO("rightclicked");
         takeAction(EActionType::_RIGHT);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::downpressed()
     {
-        ROS_INFO("downclicked");
+        //ROS_INFO("downclicked");
         takeAction(EActionType::_BACKWARD);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle1pressed()
     {
-        ROS_INFO("angle1clicked");
+        //ROS_INFO("angle1clicked");
         takeAction(EActionType::_TURN_CCW);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::angle2pressed()
     {
-        ROS_INFO("angle2clicked");
+        //ROS_INFO("angle2clicked");
         takeAction(EActionType::_TURN_CW);
         //publisher.publish(cmd);
         //cleanRobotVel();
     }
     void HandyController::kickpressed()
     {
-        ROS_INFO("kickclicked");
+        //ROS_INFO("kickclicked");
         takeAction(EActionType::_KICK);
         //publisher.publish(cmd);
        // cleanRobotKick();
     }
     void HandyController::chippressed()
     {
-        ROS_INFO("chipclicked");
+        //ROS_INFO("chipclicked");
         takeAction(EActionType::_CHIP);
         //publisher.publish(cmd);
         //cleanRobotChip();
@@ -413,14 +417,14 @@ namespace rqt_parsian_gui
 
     void HandyController::haltpressed()
     {
-        ROS_INFO("haltclicked");
+        //ROS_INFO("haltclicked");
         takeAction(EActionType::_STOP_ALL);
         //publisher.publish(cmd);
     }
 
     void HandyController::rollerpressed()
     {
-        ROS_INFO("Rollerclicked");
+        //ROS_INFO("Rollerclicked");
         takeAction(EActionType::_ROLLER);
     }
 
