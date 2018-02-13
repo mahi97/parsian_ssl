@@ -70,6 +70,7 @@ protected:
     int findNeededDefense(double downLimit , double upLimit);
     double findBestOffsetForPenaltyArea(Line2D bestLineWithTalles);
     Line2D getBestLineWithTalles(int defeneseCount);
+    Segment2D getBestSegmentWithTalles(int defenseCount);
     QList<Segment2D> getLinesOfBallTriangle();
     QList<Vector2D> newDefensePositioning(int numberOfDefenseAgents);
 
