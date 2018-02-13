@@ -234,14 +234,14 @@ namespace rqt_parsian_gui
                 //rollerBtn->setIcon(QIcon("./icons/small/roller_off.png"));
                 cmd->spinner = false;
                 cmd->roller_speed = 0;
-                ROS_INFO("spin off");
+                //ROS_INFO("spin off");
             }
             else
             {
                 //rollerBtn->setIcon(QIcon("./icons/small/roller_on.png"));
                 cmd->spinner = true;
                 cmd->roller_speed = rollerspeed;
-                ROS_INFO("spin on");
+                //ROS_INFO("spin on");
             }
             break;
 
@@ -260,7 +260,7 @@ namespace rqt_parsian_gui
         cmd->vel_F = _vtan;     cmd->vel_N = _vnorm;        cmd->vel_w = _w *_RAD2DEG;
         double wheel1, wheel2, wheel3, wheel4;
         jacobian(_vtan, _vnorm, _w *_RAD2DEG, wheel1, wheel2, wheel3, wheel4);
-        ROS_INFO_STREAM(_w<<", "<<_w *_RAD2DEG<<", "<<wheel1<<", "<<wheel2<<", "<< wheel3<<", "<<wheel4);
+        //ROS_INFO_STREAM(_w<<", "<<_w *_RAD2DEG<<", "<<wheel1<<", "<<wheel2<<", "<< wheel3<<", "<<wheel4);
         cmd->wheel1 = static_cast<float>(wheel1);   cmd->wheel2 = static_cast<float>(wheel2);   cmd->wheel3 = static_cast<float>(wheel3);   cmd->wheel4 = static_cast<float>(wheel4);
     }
 
