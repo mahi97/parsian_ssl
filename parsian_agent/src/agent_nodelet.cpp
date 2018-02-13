@@ -128,4 +128,3 @@ void AgentNodelet::plannerCb(const parsian_msgs::parsian_pathConstPtr & _path) {
     }
     agent->getPathPlannerResult(path, Vector2D(_path->averageDir));
 }
-
