@@ -34,7 +34,7 @@ namespace rqt_parsian_gui
         cameraX=0.0;
         cameraY=0.0;
         scaleFactor=1;
-        coeff=viewportSize.width()/stadiumSize.width();
+        coeff=viewportSize.height()/stadiumSize.width();
         centralPoint=Vector2D(viewportSize.width()/2,(viewportSize.width()/2)/WH_RATIO);
         monitor_pub = n.advertise<parsian_msgs::vector2D>("/mousePos", 1000);
         mousePos.reset(new parsian_msgs::vector2D);
@@ -341,7 +341,7 @@ namespace rqt_parsian_gui
             glCallList(drawArc(x, y, rad ,0, 360, QColor(0, 0, 0), false));
             glCallList(drawLine(x, y, x + rad*cos(ang*_DEG2RAD), y + rad*sin(ang*_DEG2RAD), QColor(0, 0, 0)));
         }
-        drawText(x,y+rad,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
+        drawText(x+rad,y,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
         if(comID!=-1){
             drawText(x,y-rad-0.100,QString::number(comID),QColor(255,0,0),10);
         }
@@ -361,8 +361,8 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*coeff,
-                              ((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*coeff,
+        painter.drawText(((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.width()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraX*coeff,
+                         ((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.height()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraY*coeff,
                          text);
         painter.end();
     }
