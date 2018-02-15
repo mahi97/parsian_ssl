@@ -4,6 +4,9 @@
       An example C++ GUI plugin to create a great user interface.
     </description>
     <qtgui>
+      <group>
+        <label>Parsian</label>
+      </group>
       <!-- optional grouping...
       <group>
         <label>Group</label>

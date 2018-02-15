@@ -4,6 +4,9 @@
       robot status widget to show robots incoming information
     </description>
     <qtgui>
+      <group>
+        <label>Parsian</label>
+      </group>
       <!-- optional grouping...
       <group>
         <label>Group</label>

@@ -4,9 +4,12 @@
       An C++ GUI plugin to change mode, color and sice.
     </description>
     <qtgui>
-     <label>Mode Chooser</label>
-      <icon type="theme">applications-utilities</icon>
-      <statustip>change mode, color or side </statustip>
+        <group>
+            <label>Parsian</label>
+        </group>
+        <label>Mode Chooser</label>
+        <icon type="theme">applications-utilities</icon>
+        <statustip>change mode, color or side </statustip>
     </qtgui>
   </class>
 </library>
