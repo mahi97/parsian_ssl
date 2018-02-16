@@ -63,6 +63,8 @@ namespace rqt_parsian_gui {
     }
 
     void RobotStatus::shutdownPlugin(){
+        n.shutdown();
+        n_private.shutdown();
 
     }
 
