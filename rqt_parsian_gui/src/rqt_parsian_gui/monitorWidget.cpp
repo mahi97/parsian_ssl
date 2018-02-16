@@ -7,6 +7,9 @@
 namespace rqt_parsian_gui
 {
 
+    MonitorWidget::~MonitorWidget(){
+
+    }
     MonitorWidget::MonitorWidget()
             :QOpenGLWidget()
 
@@ -31,7 +34,7 @@ namespace rqt_parsian_gui
         cameraX=0.0;
         cameraY=0.0;
         scaleFactor=1;
-        coeff=viewportSize.width()/stadiumSize.width();
+        coeff=viewportSize.height()/stadiumSize.width();
         centralPoint=Vector2D(viewportSize.width()/2,(viewportSize.width()/2)/WH_RATIO);
         monitor_pub = n.advertise<parsian_msgs::vector2D>("/mousePos", 1000);
         mousePos.reset(new parsian_msgs::vector2D);
@@ -41,8 +44,8 @@ namespace rqt_parsian_gui
     {
         viewportWidth = width;
         viewportSize.setHeight(double(viewportWidth / WH_RATIO));
-        resizeGL(viewportWidth, ((double) viewportWidth)/WH_RATIO); //Dont care inputs
-        setFixedSize(viewportSize.width(), viewportSize.height());
+        resizeGL(((double) viewportWidth)/WH_RATIO,viewportWidth); //Dont care inputs
+        setFixedSize(viewportSize.width(),viewportSize.height());
     }
     int MonitorWidget::getViewportWidth()
     {
@@ -63,8 +66,8 @@ namespace rqt_parsian_gui
 
 
 
-        centralPoint.x=400+cameraX*coeff;
-        centralPoint.y=400/WH_RATIO+cameraY*coeff;
+        centralPoint.y=400+cameraY*coeff;
+        centralPoint.x=400/WH_RATIO+cameraX*coeff;
         if( event->delta() > 0 ){
             if(scaleFactor > 3)
                 return;
@@ -107,6 +110,7 @@ namespace rqt_parsian_gui
         glShadeModel(GL_SMOOTH);
         glLoadIdentity();
         glTranslated(cameraX, cameraY, -10.0);
+        glRotated(90.0,0.0,0.0,1.0);
         glScaled(scaleFactor,scaleFactor,1);
         drawField();
 
@@ -138,9 +142,9 @@ namespace rqt_parsian_gui
 
         parsian_msgs::parsian_draw_circle arc;
 ////        CGraphicalArc arc;
-        while (!drawerBuffer->arcBuffer.isEmpty())
+        while (!drawerBuffer->arcBuffer->isEmpty())
         {
-            arc = drawerBuffer->arcBuffer.dequeue();
+            arc = drawerBuffer->arcBuffer->dequeue();
             QColor col=QColor(arc.color.r,arc.color.g,arc.color.b);
 
             drawArc(arc.circle.center.x,
@@ -155,8 +159,8 @@ namespace rqt_parsian_gui
 
 
         parsian_msgs::parsian_draw_polygon polygon;
-        while (!drawerBuffer->polygonBuffer.isEmpty()) {
-            polygon = drawerBuffer->polygonBuffer.dequeue();
+        while (!drawerBuffer->polygonBuffer->isEmpty()) {
+            polygon = drawerBuffer->polygonBuffer->dequeue();
             glColor4f(polygon.color.r, polygon.color.g, polygon.color.b, polygon.color.a);
             if (polygon.filled) {
                 glBegin(GL_TRIANGLE_FAN);
@@ -172,9 +176,9 @@ namespace rqt_parsian_gui
 
 
             parsian_msgs::parsian_draw_rect rec;
-            while(!drawerBuffer->rectBuffer.isEmpty())
+            while(!drawerBuffer->rectBuffer->isEmpty())
             {
-                rec = drawerBuffer->rectBuffer.dequeue();
+                rec = drawerBuffer->rectBuffer->dequeue();
 
                 QColor col=QColor(rec.color.r,rec.color.g,rec.color.b);
 
@@ -187,9 +191,9 @@ namespace rqt_parsian_gui
             }
 
             parsian_msgs::parsian_draw_segment seg;
-            while(!drawerBuffer->segBuffer.isEmpty())
+            while(!drawerBuffer->segBuffer->isEmpty())
             {
-                seg = drawerBuffer->segBuffer.dequeue();
+                seg = drawerBuffer->segBuffer->dequeue();
 
                 QColor col=QColor(seg.color.r,seg.color.g,seg.color.b);
 
@@ -201,10 +205,10 @@ namespace rqt_parsian_gui
 
             parsian_msgs::parsian_draw_vector pnt;
             //int sds=drawerBuffer->pointBuffer.size();
-            while(!drawerBuffer->pointBuffer.isEmpty())
+            while(!drawerBuffer->pointBuffer->isEmpty())
                 //while(sds>0)
             {
-                pnt = drawerBuffer->pointBuffer.dequeue();
+                pnt = drawerBuffer->pointBuffer->dequeue();
 
                 QColor col=QColor(pnt.color.r,pnt.color.g,pnt.color.b);
                 // pnt = drawerBuffer->pointBuffer[sds-1];
@@ -219,9 +223,9 @@ namespace rqt_parsian_gui
 
 
         parsian_msgs::parsian_draw_text txt;
-        while(!drawerBuffer->textBuffer.isEmpty())
+        while(!drawerBuffer->textBuffer->isEmpty())
         {
-            txt = drawerBuffer->textBuffer.dequeue();
+            txt = drawerBuffer->textBuffer->dequeue();
             QString str=QString::fromStdString(txt.value);
             QColor col=QColor(txt.color.r,txt.color.g,txt.color.b);
             drawText(txt.position.x, txt.position.y, str , col, txt.size);
@@ -234,7 +238,7 @@ namespace rqt_parsian_gui
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(double(-1.0*stadiumSize.width()/2.0), double(stadiumSize.width()/2.0), double(stadiumSize.height()/2.0), double(-1*stadiumSize.height()/2.0), 4.0, 15.0);
+        glOrtho(double(-1.0*stadiumSize.height()/2.0), double(stadiumSize.height()/2.0), double(stadiumSize.width()/2.0), double(-1*stadiumSize.width()/2.0), 4.0, 15.0);
         glMatrixMode(GL_MODELVIEW);
     }
 
@@ -337,9 +341,9 @@ namespace rqt_parsian_gui
             glCallList(drawArc(x, y, rad ,0, 360, QColor(0, 0, 0), false));
             glCallList(drawLine(x, y, x + rad*cos(ang*_DEG2RAD), y + rad*sin(ang*_DEG2RAD), QColor(0, 0, 0)));
         }
-        drawText(x,y+rad,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
+        drawText(x+rad,y,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
         if(comID!=-1){
-            drawText(x,y-rad-0.100,QString::number(comID),QColor(255,0,0),10);
+            drawText(x,y-rad+0.2,QString::number(comID),QColor(255,0,0),10);
         }
     }
 
@@ -357,8 +361,8 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.width()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraX*coeff,
-                         ((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.height()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraY*coeff,
+        painter.drawText(((y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.width()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraX*coeff,
+                         ((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.height()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraY*coeff,
                          text);
         painter.end();
     }

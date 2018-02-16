@@ -46,12 +46,12 @@ public:
 class CguiDrawer
 {
 public:
-    QQueue<parsian_msgs::parsian_draw_rect> rectBuffer;
-    QQueue<parsian_msgs::parsian_draw_circle> arcBuffer;
-    QQueue<parsian_msgs::parsian_draw_polygon> polygonBuffer;
-    QQueue<parsian_msgs::parsian_draw_segment> segBuffer;
-    QQueue<parsian_msgs::parsian_draw_vector> pointBuffer;
-    QQueue<parsian_msgs::parsian_draw_text> textBuffer;
+    QQueue<parsian_msgs::parsian_draw_rect> *rectBuffer;
+    QQueue<parsian_msgs::parsian_draw_circle> *arcBuffer;
+    QQueue<parsian_msgs::parsian_draw_polygon> *polygonBuffer;
+    QQueue<parsian_msgs::parsian_draw_segment> *segBuffer;
+    QQueue<parsian_msgs::parsian_draw_vector> *pointBuffer;
+    QQueue<parsian_msgs::parsian_draw_text> *textBuffer;
     QQueue<CGraphicalRobot> robotBuffer;
     struct GuiBall{
         Vector2D pos;

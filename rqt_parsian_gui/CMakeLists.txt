@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         rqt_gui_cpp
         std_msgs
         parsian_util
+        rosbag
         )
 
 ## System dependencies are found with CMake's conventions
