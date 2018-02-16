@@ -55,7 +55,7 @@ struct playOffRobot {
 
 struct POInitPos {
     Vector2D ball;
-    Vector2D Agent[6];
+    Vector2D Agent[_NUM_PLAYERS];
 };
 
 enum POMODE {
@@ -90,7 +90,7 @@ struct SPlayOffPlan {
         this->agentSize = _toCopy.agentSize;
         this->initPos   = _toCopy.initPos  ;
         this->config    = _toCopy.config   ;
-        for(int i = 0;i < 6;i++) {
+        for(int i = 0; i < _NUM_PLAYERS; i++) {
             this->AgentPlan[i].clear();
             for(int j = 0; j < _toCopy.AgentPlan[i].size(); j++) {
                 this->AgentPlan[i].append(_toCopy.AgentPlan[i].at(j));
@@ -103,7 +103,7 @@ struct SPlayOffPlan {
         this->agentSize = _insert.agentSize;
         this->initPos   = _insert.initPos  ;
         this->config    = _insert.config   ;
-        for(int i = 0;i < 6;i++) {
+        for(int i = 0; i < _NUM_PLAYERS; i++) {
             this->AgentPlan[i].clear();
             for(int j = 0;j < _insert.AgentPlan[i].size();j++) {
                 this->AgentPlan[i].append(_insert.AgentPlan[i].at(j));
@@ -111,7 +111,7 @@ struct SPlayOffPlan {
         }
     }
 
-    QList<playOffRobot> AgentPlan[6];
+    QList<playOffRobot> AgentPlan[_NUM_PLAYERS];
     POMODE planMode;
     int agentSize{};
     POInitPos initPos;
@@ -345,7 +345,7 @@ private:
 
     bool isPathClear(Vector2D _pos1, Vector2D _pos2, double _radius, double treshold);
 
-    SPositioningAgent positionAgent[6];
+    SPositioningAgent positionAgent[_NUM_PLAYERS];
 
     int agentSize;
     Vector2D getEmptyTarget(Vector2D _position, double _radius);
@@ -376,7 +376,7 @@ private:
 
 
     POMODE getPlayOffMode();
-    void getCostRec(double costArr[][6], int arrSize, QList<kkValue> &valueList, kkValue value, int size, int aId = 0);
+    void getCostRec(double costArr[][_NUM_PLAYERS], int arrSize, QList<kkValue> &valueList, kkValue value, int size, int aId = 0);
     int kkGetIndex(kkValue &value, int cIndex);
     bool chipOrNot(int passerID,int ReceiverID,int ReceiverState);
     bool chipOrNot(const SPositioningArg& _posArg);
@@ -408,13 +408,13 @@ private:
     Vector2D lastBallPos;
     long lastTime;
     bool decidePlan;
-    int kkAgentsID[6];
+    int kkAgentsID[_NUM_PLAYERS];
 
     SPlayOffPlan* currentPlan;
     QList<Agent*> activeAgents;
-    CRolePlayOff *roleAgent[6];
+    CRolePlayOff *roleAgent[_NUM_PLAYERS];
     CRolePlayOff *tempAgent;
-    CRolePlayOff *newRoleAgent[6];
+    CRolePlayOff *newRoleAgent[_NUM_PLAYERS];
     enum BlockerDetector{
         penaltyAreaBlock   = 0b001,
         centralRegionBlock = 0b010,
@@ -426,7 +426,7 @@ private:
     QList<int> blockersPenaltyArea;
     QList<int> blockersCentralRegion;
     QList<int> blockersRoundRegion;
-    Vector2D kickOffPos[6];
+    Vector2D kickOffPos[_NUM_PLAYERS];
 
     bool isBallIn;
     double debugs[10];
@@ -473,12 +473,12 @@ private:
     void assignReceive  (CRolePlayOff*, const SPositioningAgent&, bool _ignoreAngle);
     QPair<int, int> findTheLastShoot(const SExecution& _plan);
     void findThePasserandReciver(const SExecution&, QList<AgentPair> &_pairList);
-    int findReciver(int _passer, int _state);
+    int findReceiver(int _passer, int _state);
     QList<SBallOwner> ownerList;
     bool havePassInPlan;
     ////Dynamic
 public:
-    int dynamicMatch[6];
+    int dynamicMatch[_NUM_PLAYERS];
     DynamicSelect dynamicSelect;
 private:
     void dynamicAssignID();

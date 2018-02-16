@@ -239,6 +239,21 @@ QList<Vector2D> CField::ourBigPAreaIntersect(Line2D line, double scale, float bi
     return results;
 }
 
+Rect2D CField::ourBigPenaltyArea(double scale , double tolerance ,bool doChangesWithScale){
+    Rect2D penaltyArea;
+    if(doChangesWithScale){
+        penaltyArea = Rect2D(Vector2D(ourGoal().x, ourGoal().y +_PENALTY_WIDTH/2),
+                             _PENALTY_WIDTH * scale,
+                             _PENALTY_DEPTH * scale);
+    }
+    else{
+        penaltyArea = Rect2D(Vector2D(ourGoal().x, ourGoal().y + _PENALTY_WIDTH/2 + tolerance),
+                             Vector2D(ourGoal().x + _PENALTY_DEPTH + tolerance, ourGoal().y - _PENALTY_WIDTH/2 - tolerance));
+    }
+    return penaltyArea;
+}
+
+
 QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment) const
 {
     Vector2D v[2];

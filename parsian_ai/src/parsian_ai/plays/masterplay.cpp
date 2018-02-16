@@ -41,8 +41,8 @@ bool CMasterPlay::canScore(){
 
 
 void CMasterPlay::setAgentsID(const QList<Agent*>& _agentsID){
-    agentsID.clear();
-    agentsID.append(_agentsID);
+    agents.clear();
+    agents.append(_agentsID);
 }
 
 void CMasterPlay::setFormation(QString _formationName){
@@ -69,7 +69,7 @@ void CMasterPlay::appendRemainingsAgents(QList<Agent *> &_list){
 
     QList <Agent*> remainings;
 
-    for (auto i : agentsID) {
+    for (auto i : agents) {
         remainings.append(i);
     }
 
@@ -97,14 +97,14 @@ void CMasterPlay::choosePlayMaker(){
     int playMakeID = -1;
     QList <Agent *> playAgents;
     playAgents.clear();
-    for (auto i : agentsID) {
+    for (auto i : agents) {
         playAgents.append(i);
     }
 
 
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
 //        int id = knowledge->agentsWithIntention.at(i);
-//        if( agentsID.contains(id) ){
+//        if( agents.contains(id) ){
 //            Agent *agnt = knowledge->getAgent(id);
 //            if( agnt->intention->M_type == "playmake" ){
 //                playMakeID = id;
@@ -137,13 +137,13 @@ void CMasterPlay::chooseBlocker(){
     int blockID = -1;
     QList <Agent *> playAgents;
     playAgents.clear();
-    for (auto i : agentsID) {
+    for (auto i : agents) {
         playAgents.append(i);
     }
 
 //    for( int i=0 ; i<knowledge->agentsWithIntention.size() ; i++ ){
 //        int id = knowledge->agentsWithIntention.at(i);
-//        if( agentsID.contains(id) ){
+//        if( agents.contains(id) ){
 //            Agent *agnt = knowledge->getAgent(id);
 //            if( agnt->intention->M_type == "block" ){
 //                blockID = id;
@@ -263,8 +263,14 @@ double CMasterPlay::coveredArea( std::priority_queue < QPair< edgeMode , double 
 void CMasterPlay::execute() {
 
     execute_x();
+    for(int i = 0; i < agents.size(); i++ ) {
+        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
+            Action *mahi = agents[i]->action;
+            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+        }
+    }
     execPlay();
-    DBUG(QString("MasterPlay agentsID invalid size: %1!").arg(agentsID.count()) , D_ERROR);
+    DBUG(QString("MasterPlay agents invalid size: %1!").arg(agents.count()) , D_ERROR);
 }
 
 void CMasterPlay::execPlay(){

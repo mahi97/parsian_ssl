@@ -145,8 +145,6 @@ void CRoleDynamic::execute() {
         update();
     }*/
     update();
-
-    ROS_INFO("seda mizane");
     switch(selectedSkill) {
         case DynamicSkill::Ready:
             agent->action = receiveSkill;
@@ -162,12 +160,13 @@ void CRoleDynamic::execute() {
             agent->action = moveSkill;
             break;
         case DynamicSkill::OneTouch:
+            agent->action = oneTouchSkill;
             break;
         case DynamicSkill::NoSkill:
         default:
+            agent->action = nullptr;
             break;
     }
-
 }
 
 CRoleDynamic& CRoleDynamic::operator=(CRoleDynamic &&_move) noexcept {
