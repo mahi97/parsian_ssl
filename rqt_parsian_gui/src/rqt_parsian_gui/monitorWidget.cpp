@@ -66,8 +66,8 @@ namespace rqt_parsian_gui
 
 
 
-        centralPoint.x=400+cameraX*coeff;
-        centralPoint.y=400/WH_RATIO+cameraY*coeff;
+        centralPoint.y=400+cameraY*coeff;
+        centralPoint.x=400/WH_RATIO+cameraX*coeff;
         if( event->delta() > 0 ){
             if(scaleFactor > 3)
                 return;
@@ -343,7 +343,7 @@ namespace rqt_parsian_gui
         }
         drawText(x+rad,y,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
         if(comID!=-1){
-            drawText(x,y-rad-0.100,QString::number(comID),QColor(255,0,0),10);
+            drawText(x,y-rad+0.3,QString::number(comID),QColor(255,0,0),10);
         }
     }
 
@@ -361,7 +361,7 @@ namespace rqt_parsian_gui
 
         painter.setPen(color);
         painter.setFont(font);
-        painter.drawText(((-1.0*y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.width()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraX*coeff,
+        painter.drawText(((y*scaleFactor  + stadiumSize.height() / 2.0) * (double(viewportSize.width()) / double(stadiumSize.height())))+ stadiumSize.height() / 2.0+cameraX*coeff,
                          ((x*scaleFactor  + stadiumSize.width() / 2.0)* (double(viewportSize.height()) / double(stadiumSize.width())))+ stadiumSize.width() / 2.0+cameraY*coeff,
                          text);
         painter.end();

@@ -28,7 +28,7 @@
 #define _CENTER_CIRCLE_RAD      0.600
 #define _PENALTY_WIDTH          2.400
 #define _GOAL_RAD               1.200
-#define _STADIUM_WIDTH   13.40
+#define _STADIUM_WIDTH   13.80
 #define _STADIUM_HEIGHT  10.40
 
 
