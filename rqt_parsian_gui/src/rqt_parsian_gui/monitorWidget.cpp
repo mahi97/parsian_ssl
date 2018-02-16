@@ -343,7 +343,7 @@ namespace rqt_parsian_gui
         }
         drawText(x+rad,y,QString("%1 %2").arg(ID).arg(str),QColor(0,0,0),10);
         if(comID!=-1){
-            drawText(x,y-rad+0.3,QString::number(comID),QColor(255,0,0),10);
+            drawText(x,y-rad+0.2,QString::number(comID),QColor(255,0,0),10);
         }
     }
 
