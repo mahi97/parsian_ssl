@@ -39,7 +39,7 @@ double CDefPos::getAngleByXY(Vector2D _point)
 kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
 {
     kk2Angles tempAngles{};
-    Vector2D inter1, inter2, inter3;
+    Vector2D inter1, inter2, inter3;    
     Circle2D tempCircle(wm->field->ourGoal()-Vector2D(penaltyAreaOffset, 0), _radius);
     if (tempCircle.contains(_ballPos)){
         Segment2D tempSegment(wm->field->ourGoal(),
@@ -55,8 +55,7 @@ kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
         nearRadius[0] = (wm->field->ourGoal() - Vector2D(penaltyAreaOffset,0)).dist(inter1);
         nearRadius[1] = (wm->field->ourGoal()- Vector2D(penaltyAreaOffset,0)).dist(inter2);
     }
-
-    else {
+    else{
         tempCircle.intersection(tempSeg1, &inter1, &inter3);
         tempCircle.intersection(tempSeg2, &inter2, &inter3);
     }
@@ -77,6 +76,7 @@ kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius)
     return tempAngles;
 }
 
+
 kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, double _limit2)
 {
     //kkDefPos tempDefPos;
@@ -90,7 +90,7 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
         tempBestRadius = findBestRadius(tempDefPos.size);
         isNearPenaltyArea = false;
     }
-    if (tempBestRadius > _limit2){
+    if(tempBestRadius > _limit2){
         ///////////// Added By AHZ for One Defense better //////////////////////
         if(_size == 2){
             tempBestRadius = _limit2;
@@ -122,10 +122,10 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
         tempDefPos.overDef = 0;
         //        draw("POS", Vector2D(-1, _FIELD_HEIGHT/2 - 0.6));
         if(_size <= 1){
-            if(isNearPenaltyArea) {
+            if(isNearPenaltyArea){
                 tempBestRadius = nearRadius[0];
             }
-            if (_ballPos.y + wm->ball->vel.y < 0 + oneDefThr) {
+            if(_ballPos.y + wm->ball->vel.y < 0 + oneDefThr){
                 tempDefPos.pos[0] = getXYByAngle(tempAngles.angle1+agentAngle/2, tempBestRadius);
                 oneDefThr = 0.2;
             }
@@ -137,7 +137,7 @@ kkDefPos CDefPos::getDefPositions(Vector2D _ballPos, int _size, double _limit1, 
         else if(_size == 2 && isNearPenaltyArea){
             double angleOffset = openAngleAfterPositioning/(_size-1);
             double defAngle = tempAngles.angle1 + agentAngle/2;
-            for (int i = 0; i < _size; i++) {
+            for(int i = 0; i < _size; i++) {
                 tempBestRadius = nearRadius[i];
                 tempDefPos.pos[i] = getXYByAngle(defAngle, tempBestRadius);
                 defAngle += angleOffset + agentAngle;

@@ -72,7 +72,7 @@ protected:
     Line2D getBestLineWithTalles(int defeneseCount);
     Segment2D getBestSegmentWithTalles(int defenseCount);
     QList<Segment2D> getLinesOfBallTriangle();
-    QList<Vector2D> newDefensePositioning(int numberOfDefenseAgents);
+    QList<Vector2D> newDefensePositioning(int neededDefenseAgents , int allOfDefenseAgents);
 
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
@@ -107,6 +107,7 @@ protected:
     Vector2D oppNearestToBallPossition;
     Vector2D tempAHZ;    
     QString lastStateForGoalKeeper;
+    QList<Vector2D> AHZDefPoints;
     ///////////////////////////////////////////////////
     void executeGoalKeeper();    
     Vector2D strictFollowBall(Vector2D _ballPos);    

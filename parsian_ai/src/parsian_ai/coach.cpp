@@ -262,9 +262,9 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
         debugger->debug("UNKNOWN STATE", D_ERROR, QColor(Qt::red));
     }
 
-    //    if(policy()->Formation_StrictFormation()) {
-    //        preferedDefenseCounts = policy()->Formation_Defense();
-    //    }
+//        if(policy()->Formation_StrictFormation()) {
+//            preferedDefenseCounts = policy()->Formation_Defense();
+//        }
 
     if(gameState->halfTimeLineUp()){
         preferedGoalieAgent = -1;
@@ -274,7 +274,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-
+    //preferedDefenseCounts = 2;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 

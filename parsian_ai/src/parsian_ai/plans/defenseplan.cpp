@@ -4,23 +4,65 @@ using namespace std;
 
 #define LONG_CHIP_POWER 1023
 
-///////////////// AHZ is writing, have you my voice? ... ;) //////////////////
-QList<Vector2D> DefensePlan::newDefensePositioning(int numberOfDefenseAgents){
+///////////////// AHZ is writing, Do you have my voice? ... ;) //////////////////
+QList<Vector2D> DefensePlan::newDefensePositioning(int neededDefenseAgents,int allOfDefenseAgents){
     QList<Vector2D> defensePosiotion;
+    Vector2D sol[4];
     defensePosiotion.clear();
-    if(numberOfDefenseAgents == 3){
-        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
-        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
-        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
-                                 getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    ROS_INFO(QString("neededDefenseAgents: %1").arg(neededDefenseAgents).toStdString().c_str());
+    ROS_INFO(QString("allOfDefenseAgents: %1").arg(allOfDefenseAgents).toStdString().c_str());
+    double temp = fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2;
+    if(neededDefenseAgents == allOfDefenseAgents){
+        if(neededDefenseAgents == 2){
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(1) , &sol[2] , &sol[3]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+            defensePosiotion.append(sol[2].dist(wm->ball->pos) < sol[3].dist(wm->ball->pos) ? sol[2]:sol[3]);
+        }
+        else if(neededDefenseAgents == 1){
+            ROS_INFO(QString("shit of ahz: %1").arg(temp).toStdString().c_str());
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(1) , &sol[0] , &sol[1]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+        }
     }
-    else if(numberOfDefenseAgents == 2){
-        defensePosiotion.append(getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
-        defensePosiotion.append(getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents)));
+    else if(neededDefenseAgents < allOfDefenseAgents){
+        if(neededDefenseAgents == 2){
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(1) , &sol[2] , &sol[3]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+            defensePosiotion.append(sol[2].dist(wm->ball->pos) < sol[3].dist(wm->ball->pos) ? sol[2]:sol[3]);
+        }
+        else if(neededDefenseAgents == 1){
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+
+        }
+        for(int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++){
+            defensePosiotion.append(Vector2D(0,i));
+        }
     }
-    else if(numberOfDefenseAgents == 1){
-        defensePosiotion.append((getLinesOfBallTriangle().at(0).intersection(getBestLineWithTalles(numberOfDefenseAgents)) +
-                                 getLinesOfBallTriangle().at(1).intersection(getBestLineWithTalles(numberOfDefenseAgents))) / 2);
+    else{
+        if(allOfDefenseAgents == 2){
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(allOfDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(allOfDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(1) , &sol[2] , &sol[3]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+            defensePosiotion.append(sol[2].dist(wm->ball->pos) < sol[3].dist(wm->ball->pos) ? sol[2]:sol[3]);
+        }
+        else if(allOfDefenseAgents == 1){
+            wm->field->ourBigPenaltyArea(1,fabs(findBestOffsetForPenaltyArea(getBestLineWithTalles(allOfDefenseAgents)))-1.2,0).intersection(
+                        getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            defensePosiotion.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+
+        }
+
     }
     return defensePosiotion;
 }
@@ -145,6 +187,19 @@ double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles){
     if(bestOffsetForPenaltyArea <= (-6 + wm->field->_PENALTY_DEPTH)){
         bestOffsetForPenaltyArea = -6 + wm->field->_PENALTY_DEPTH + 0.2;
     }
+    if(bestOffsetForPenaltyArea >= (6 - wm->field->_PENALTY_DEPTH)){
+        bestOffsetForPenaltyArea = 6 - wm->field->_PENALTY_DEPTH - 0.2;
+    }
+    if(fabs(ballPos.x) > 6 - 1.4){
+        if(wm->field->ourBigPenaltyArea(1,fabs(bestOffsetForPenaltyArea) - wm->field->_PENALTY_WIDTH , 0).contains(ballPos)){
+            bestOffsetForPenaltyArea = fabs(ballPos.y) - 1.2;
+        }
+    }
+    else{
+        if(wm->field->ourBigPenaltyArea(1,fabs(bestOffsetForPenaltyArea) - wm->field->_PENALTY_DEPTH , 0).contains(ballPos)){
+            bestOffsetForPenaltyArea = fabs(ballPos.x) - 1.2;
+        }
+    }
     return bestOffsetForPenaltyArea;
 }
 
@@ -162,7 +217,7 @@ int DefensePlan::findNeededDefense(double downLimit , double upLimit){
     Segment2D biggerFrintageOfTriangle;
     Segment2D smallerFrintageOfTriangle;
     if(ballPos.x < -6 + upLimit){
-        upLimit = ballPos.x - 0.05;
+        upLimit = ballPos.x - 0.7;
     }
     if(rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()){
         biggerFrintageOfTriangle = rightFrontageOfTriangle;
@@ -181,7 +236,7 @@ int DefensePlan::findNeededDefense(double downLimit , double upLimit){
     }
     else{
         for(numOfDefenses = 1 ; numOfDefenses < 4 ; numOfDefenses++){
-            ROS_INFO(QString("best offset: %1").arg(findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses))).toStdString().c_str());
+            //ROS_INFO(QString("best offset: %1").arg(findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses))).toStdString().c_str());
             if(ballPos.x < -6 + wm->field->_PENALTY_DEPTH){
                 if(getBestSegmentWithTalles(numOfDefenses).length() <= (numOfDefenses + 1) * (robotDiameter)){
                     neededDefense = numOfDefenses;
@@ -198,11 +253,14 @@ int DefensePlan::findNeededDefense(double downLimit , double upLimit){
             }
         }
         if(neededDefense == 0 && aimLessLine.length() > robotDiameter){
-            neededDefense = numOfDefenses;
+            neededDefense = 2;
         }
     }
     return neededDefense;
 }
+
+
+
 
 bool DefensePlan::isPermissionTargetToChip(Vector2D aPoint){
     Vector2D tempIntersection0;
@@ -1476,9 +1534,10 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     }
     //////////////////////////////////////////////////////////////////////
     matchPoints.clear();
-    for(int i = 0 ; i < _defenseNum ; i++) {
+    for(int i = 0 ; i < AHZDefPoints.size() ; i++){
         drawer->draw(tempDefPos.pos[i],QColor(Qt::blue));
-        matchPoints.append(tempDefPos.pos[i]);
+        matchPoints.append(AHZDefPoints.at(i));
+        ROS_INFO(QString("pos: %1 %2").arg(AHZDefPoints.at(i).x).arg(AHZDefPoints.at(i).y).toStdString().c_str());
     }
     findOppAgentsToMark();
     findPos(decideNumOfMarks());
@@ -1642,13 +1701,15 @@ void DefensePlan::execute(){
                     know->variables["defenseClearMode"] = false;
                     know->variables["defenseOneTouchMode"] = false;
                     defenseCount = defenseAgents.size();
-                    DBUG(QString("defense count : %1").arg(defenseCount) , D_AHZ);
                 }
-                ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense(1.4,2.5)).toStdString().c_str());
+                ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense(1.4,2)).toStdString().c_str());
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
-                    DBUG(QString("real def size : %1").arg(realDefSize) , D_AHZ);
+                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
+                    ROS_INFO(QString("decideNumOfMarks: %1").arg(decideNumOfMarks()).toStdString().c_str());
+                    //                    tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
+                    AHZDefPoints = newDefensePositioning(findNeededDefense(1.4,2) , realDefSize);
+                    ROS_INFO(QString("newDefSize: %1").arg(AHZDefPoints.size()).toStdString().c_str());
                     matchingDefPos(realDefSize);
                 }
             }
@@ -2905,6 +2966,7 @@ int DefensePlan::decideNumOfMarks(){
     playOffMode = gameState->theirDirectKick()|| gameState->theirIndirectKick();
     if(defenseCount > 0){
         if(gameState->isPlayOff() && defenseCount >=2){
+            ROS_INFO_STREAM("is?");
             if(checkOverdef()){
                 return defenseCount - 1;
             }
@@ -2912,6 +2974,7 @@ int DefensePlan::decideNumOfMarks(){
                 return defenseCount - 2;
             }
         }
+
         if(playOffMode){
             return decideNumOfMarksInPlayOff(defenseCount);
         }
@@ -3123,7 +3186,7 @@ void DefensePlan::findPos(int _markAgentSize){
     }
     //////////////// Determine the plan of mark from GUI ////////////////////
     if(manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass){
-        if(playOff || stopMode){
+        if(playOff/* || stopMode*/){
             know->variables["stateForMark"] = QString("BlockPass");
             manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos,_markAgentSize , conf.PassRatioBlock / 100);
         }
@@ -3139,7 +3202,7 @@ void DefensePlan::findPos(int _markAgentSize){
         }
     }
     else{
-        if(playOff || stopMode){
+        if(playOff/* || stopMode*/){
             know->variables["stateForMark"] = QString("BlockShot");;
             manToManMarkBlockShotInPlayOff(_markAgentSize);
         }
