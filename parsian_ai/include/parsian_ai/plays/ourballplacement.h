@@ -16,13 +16,14 @@ class COurBallPlacement : public CMasterPlay{
 public:
         COurBallPlacement();
         ~COurBallPlacement();
-        void execute_x(Vector2D);
+        void execute_x();
         void init(const QList <Agent*>& _agents);
+
 private:
         void reset();
-    BallPlacement state;
-
-    void execute_x(int pos);
+        BallPlacement state;
+        bool flag = false;
+        void execute_x(int pos);
 };
 
 #endif // OURBALLPLACEMENT_H

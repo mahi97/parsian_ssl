@@ -1203,8 +1203,6 @@ void CCoach::checkTransitionToForceStart(){
 
 void CCoach::execute()
 {
-
-
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();

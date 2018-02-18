@@ -10,32 +10,39 @@ COurBallPlacement::~COurBallPlacement(){
 }
 
 void COurBallPlacement::reset(){
-
+    flag = false;
 }
 
 void COurBallPlacement::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
+    //CMasterPlay selectedPlay;
+   // selectedPlay.
+    //if(knowledge->getLastPlayExecuted() != OurBallPlacement ){
+    //    reset();
 
-//    if( knowledge->getLastPlayExecuted() != OurBallPlacement ){
-//        reset();
-//    }
-//    knowledge->setLastPlayExecuted(OurBallPlacement);
+    //}
+   // knowledge->setLastPlayExecuted(OurBallPlacement);
 }
 
 
-void COurBallPlacement::execute_x(Vector2D pos) {
+void COurBallPlacement::execute_x() {
     DBUG("execute_0 is running", D_ATOUSA);
     DBUG("ballPlacement execute_0", D_ERROR);
     ROS_INFO("Executaion X");
+    ROS_INFO_STREAM(flag);
     //ROS_INFO_STREAM(23 << "asdf" << 23.3)
+    if(agents.size() <= 0) {
+        return;
+    }
     Vector2D ballpos = Vector2D(wm->ball->pos.x, wm->ball->pos.y);
+    Vector2D pos = Vector2D(0,0);
     double dist = 0;
     double mindist = 10000;
     static int minIndexPos = 0;
-    static CAgent *ap = agents[0];
-    CAgent *pap = ap;
-    for (int i = 0; i < agents.size(); i++) {
+    static CAgent *ap;
+
+    for (int i = 0; i < agents.size() && flag == false ; i++) {
         dist = agents[i]->pos().dist(pos);
         if (dist < mindist) {
             mindist = dist;
@@ -43,6 +50,7 @@ void COurBallPlacement::execute_x(Vector2D pos) {
             ap = agents[i];
         }
     }
+    flag = true;
     mindist = 10000;
     static int minIndex = 0;
     static CAgent *a = agents[0];
@@ -56,15 +64,8 @@ void COurBallPlacement::execute_x(Vector2D pos) {
         }
     }
     auto *nothing = new NoAction;
-    if(agents.size() <= 0) {
-        return;
-    }
     if (pa->id() != a->id())
         pa->action = nothing;
-    ROS_INFO("Executaion Y");
-    if (pap->id() != ap->id())
-        pap->action = nothing;
-    ROS_INFO("Executaion !!!!!!!!!!!");
     auto *gp = new GotopointavoidAction();
     gp->setTargetpos(pos);
     gp->setLookat(ballpos);
@@ -80,7 +81,7 @@ void COurBallPlacement::execute_x(Vector2D pos) {
         agents[minIndexPos]->action = gp;
     auto *pass = new KickAction();
     pass->setTarget(pos);
-    int power = 100 * agents[minIndexPos]->pos().dist(ballpos);
+    int power = 100 * pos.dist(ballpos);
     ROS_INFO_STREAM(power);
     pass->setKickspeed(power);
     pass->setSpin(5);
@@ -92,7 +93,7 @@ void COurBallPlacement::execute_x(Vector2D pos) {
     gpa->setLookat(ballpos);
 
     ROS_INFO("Executaion !");
-    if (agents[minIndexPos]->pos().dist(ballpos) > 0.50 && wm->ball->vel.length() < 0.3){
+    if (agents[minIndexPos]->pos().dist(ballpos) > 0.2 && wm->ball->vel.length() < 0.3){
         if (agents[minIndex]->pos().dist(ballpos) > 0.3)
             agents[minIndex]->action = gpa;
         agents[minIndex]->action = pass;
@@ -100,21 +101,4 @@ void COurBallPlacement::execute_x(Vector2D pos) {
     else
         agents[minIndex]->action = nothing;
     ROS_INFO_STREAM(minIndexPos);
-
-    //end
-
-/*
-    switch (state) {
-        case BallPlacement::GO_FOR_BALL:
-
-
-            break;
-        case BallPlacement::NoState:break;
-        case BallPlacement::PASS:break;
-        case BallPlacement::RECIVE_AND_POS:break;
-        case BallPlacement::FINAL_POS:break;
-        case BallPlacement::DONE:break;
-    }*/
-    //if
-
 }
