@@ -62,17 +62,19 @@ protected:
     Segment2D getBisectorSegment(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     void manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsToBeMarkePossition , int ourMarkAgentsSize , double proportionOfDistance);
     void manToManMarkBlockShotInPlayOff(int _markAgentSize);
-    void agentsStuckTogether(QList<Vector2D> agentsPosition , QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);
-    bool isPermissionTargetToChip(Vector2D aPoint);
+    void agentsStuckTogether(QList<Vector2D> agentsPosition , QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);    
     bool isAgentsStuckTogether(QList<Vector2D> agentsPosition);
     bool isInIndirectArea(Vector2D);
     void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition,QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);            
     int findNeededDefense();
     double findBestOffsetForPenaltyArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
-    Line2D getBestLineWithTalles(int defeneseCount);
-    Segment2D getBestSegmentWithTalles(int defenseCount);
+    Line2D getBestLineWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
+    Segment2D getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     QList<Segment2D> getLinesOfBallTriangle();
-    QList<Vector2D> newDefensePositioning(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
+    QList<Vector2D> defenseFormation(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
+    QList<Vector2D> twoDefenseFormation(double downLimit , double upLimit);
+    QList<Vector2D> threeDefenseFormation(double downLimit , double upLimit);
+    Vector2D oneDefenseFormation(double downLimit , double upLimit);
 
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
