@@ -22,7 +22,7 @@ public:
 private:
         void reset();
         BallPlacement state;
-        bool flag = false;
+        bool flag;
         void execute_x(int pos);
 };
 

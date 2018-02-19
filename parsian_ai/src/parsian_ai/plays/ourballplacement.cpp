@@ -16,8 +16,6 @@ void COurBallPlacement::reset(){
 void COurBallPlacement::init(const QList<Agent*>& _agents){
     setAgentsID(_agents);
     initMaster();
-    //CMasterPlay selectedPlay;
-   // selectedPlay.
     //if(knowledge->getLastPlayExecuted() != OurBallPlacement ){
     //    reset();
 
@@ -36,7 +34,7 @@ void COurBallPlacement::execute_x() {
         return;
     }
     Vector2D ballpos = Vector2D(wm->ball->pos.x, wm->ball->pos.y);
-    Vector2D pos = Vector2D(0,0);
+    Vector2D pos = Vector2D(0 , 0);
     double dist = 0;
     double mindist = 10000;
     static int minIndexPos = 0;
@@ -76,9 +74,15 @@ void COurBallPlacement::execute_x() {
     rec->setTarget(pos);
     rec->setSlow(true);
     Circle2D c{agents[minIndexPos]->pos() + (agents[minIndexPos]->dir().norm() * 0.1), 0.1};
-    agents[minIndexPos]->action = rec;
-    if (c.contains(ballpos))
+    if (agents[minIndexPos]->pos().dist(pos) <= 0.15 && agents[minIndexPos]->pos().dist(ballpos) <= 0.15){
+        agents[minIndexPos]->action = nothing;
+        reset();
+    }
+    else
+        agents[minIndexPos]->action = rec;
+    if (c.contains(ballpos)) {
         agents[minIndexPos]->action = gp;
+    }
     auto *pass = new KickAction();
     pass->setTarget(pos);
     int power = 100 * pos.dist(ballpos);
@@ -87,7 +91,7 @@ void COurBallPlacement::execute_x() {
     pass->setSpin(5);
     pass->setSlow(true);
     auto *gpa = new GotopointavoidAction;
-    gpa->setTargetpos(Vector2D(wm->ball->pos.x - 0.15, wm->ball->pos.y));
+    gpa->setTargetpos(pos);
     gpa->setSlowmode(true);
     gpa->setBallobstacleradius(0.1);
     gpa->setLookat(ballpos);
