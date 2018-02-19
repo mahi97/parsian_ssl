@@ -3,6 +3,7 @@
 using namespace std;
 
 #define LONG_CHIP_POWER 1023
+
 Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit){
     Vector2D defensePosition;
     Vector2D sol[2];
@@ -34,21 +35,32 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
     return defensePosition;
 }
 
-//QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upLimit){
-//    QList<Vector2D> defensePosition;
-//    Vector2D sol[6];
-//    Vector2D ourGoalLeft = wm->field->ourGoalL();
-//    Vector2D ourGoalRight = wm->field->ourGoalR();
-//    Vector2D ballPosition = wm->ball->pos;
-//    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
-//    Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
-//    int numberOfDefenseAgents = 3;
-//    wm->field->ourBigPenaltyArea(1,upLimit - wm->field->_PENALTY_DEPTH,0).intersection(
-//                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
-//    wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
-//                getBisectorSegment(anIntesection , ballPosition , ourGoalLeft) , &sol[0] , &sol[1]);
-
-//}
+QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upLimit){
+    QList<Vector2D> defensePosition;    
+    Vector2D sol[8];
+    Vector2D ourGoalLeft = wm->field->ourGoalL();
+    Vector2D ourGoalRight = wm->field->ourGoalR();
+    Vector2D ballPosition = wm->ball->pos;
+    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
+    Vector2D downIntesection;
+    Vector2D upIntesection;
+    wm->field->ourBigPenaltyArea(1,upLimit - wm->field->_PENALTY_DEPTH,0).intersection(
+                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
+    Circle2D forwardDefense(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1] , Robot::robot_radius_new);
+    forwardDefense.tangent(ballPosition , &sol[2] , &sol[3]);
+    downIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y < ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
+                                                ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
+    upIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y > ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
+                                                ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
+    wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit),0).intersection(
+                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[4] , &sol[5]);
+    wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntesection , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
+                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[6] , &sol[7]);
+    defensePosition.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
+    defensePosition.append(sol[4].dist(wm->ball->pos) < sol[5].dist(wm->ball->pos) ? sol[4]:sol[5]);
+    defensePosition.append(sol[6].dist(wm->ball->pos) < sol[7].dist(wm->ball->pos) ? sol[6]:sol[7]);
+    return defensePosition;
+}
 
 QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfDefenseAgents , double downLimit , double upLimit){
     QList<Vector2D> defensePosiotion;
@@ -66,6 +78,9 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
         else if(neededDefenseAgents == 2){
             defensePosiotion = twoDefenseFormation(downLimit , upLimit);
         }
+        else if(neededDefenseAgents == 3){
+            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
+        }
     }
     else if(neededDefenseAgents < allOfDefenseAgents){
         if(neededDefenseAgents == 1){
@@ -73,6 +88,9 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
         }
         else if(neededDefenseAgents == 2){
             defensePosiotion = twoDefenseFormation(downLimit , upLimit);
+        }
+        else if(neededDefenseAgents == 3){
+            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
         }
         for(int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++){
             defensePosiotion.append(Vector2D(0,i));
@@ -84,6 +102,9 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
         }
         else if(allOfDefenseAgents == 2){
             defensePosiotion = twoDefenseFormation(downLimit , upLimit);
+        }
+        else if(allOfDefenseAgents == 3){
+            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
         }
     }
     return defensePosiotion;
@@ -272,6 +293,8 @@ int DefensePlan::findNeededDefense(){
             neededDefense = 2;
         }
     }
+
+    neededDefense = 3;
     ROS_INFO(QString("neededDefenseAgents: %1").arg(neededDefense).toStdString().c_str());
     return neededDefense;
 }
@@ -439,7 +462,7 @@ float getDegree(Vector2D pos1, Vector2D origin, Vector2D pos3){
 }
 
 bool DefensePlan::isInIndirectArea(Vector2D aPoint){
-    //// check that a point is in the circle around the ball
+    //// checks that a point is in the circle around the ball
     //// with 50cm radius or not.
 
     bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);
@@ -447,15 +470,14 @@ bool DefensePlan::isInIndirectArea(Vector2D aPoint){
 }
 
 Line2D DefensePlan::getBisectorLine(Vector2D firstPoint , Vector2D originPoint , Vector2D thirdPoint){
-    //// get the bisector line of an angle
+    //// gets the bisector line of an angle
     //// that is made up by this 3 points.
 
     Line2D bisectorLine (originPoint , AngleDeg::bisect((firstPoint - originPoint).th() , (thirdPoint - originPoint).th()));
     return bisectorLine;
 }
-
 Segment2D DefensePlan::getBisectorSegment(Vector2D firstPoint , Vector2D originPoint , Vector2D thirdPoint){
-    //// get the bisector segment of an angle
+    //// gets the bisector segment of an angle
     //// that is made up by this 3 points.
 
     Line2D bisectorLine (originPoint , AngleDeg::bisect((firstPoint - originPoint).th() , (thirdPoint - originPoint).th()));
@@ -464,7 +486,7 @@ Segment2D DefensePlan::getBisectorSegment(Vector2D firstPoint , Vector2D originP
 }
 
 void DefensePlan::manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsToBeMarkPossition , int ourMarkAgentsSize , double proportionOfDistance){
-    //// This function blocking the lines that are between ball &&
+    //// This function blocks the lines that are between ball &&
     //// opponent agents by a variable ratio along these lines.
     //// This is one of the mark plan for defending more flexible
 
