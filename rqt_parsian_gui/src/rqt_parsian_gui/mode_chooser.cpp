@@ -25,6 +25,8 @@ namespace rqt_parsian_gui
     void ModeChooser::shutdownPlugin() {
         ROS_INFO("Sddf");
         modeWidget->saveTeamConfig();
+        n.shutdown();
+        n_private.shutdown();
 
     }
 
