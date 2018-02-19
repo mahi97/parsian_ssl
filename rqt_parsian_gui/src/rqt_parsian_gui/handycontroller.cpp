@@ -29,6 +29,7 @@ namespace rqt_parsian_gui
         // create QWidget
         widget_ = new QWidget();
         widget_->setWindowTitle("handycontroller");
+        widget_->setFixedSize(450, 450);
         // extend the widget with all attributes and children from UI file
         mUI.setupUi(widget_);
 
@@ -44,6 +45,9 @@ namespace rqt_parsian_gui
 
         wmTimer = new QTimer();
         wmtimedout = false;
+
+        std::string path = ros::package::getPath("rqt_parsian_gui");
+        pkgPath = QString::fromStdString(path);
 
         //connect signal and slots
         connect(mUI.Speed_slide, SIGNAL(valueChanged(int)), mUI.Speed_show, SLOT(setNum(int)));
@@ -74,6 +78,17 @@ namespace rqt_parsian_gui
         connect(mUI.Kickspeed_slide, SIGNAL(valueChanged(int)), this, SLOT(kickspeedchanged(int)));
         connect(mUI.ChipKickSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(chipkickspeedchanged(int)));
         connect(mUI.RollerSpeed_slide, SIGNAL(valueChanged(int)), this, SLOT(rollerspeedchanged(int)));
+
+        mUI.Kick->setIcon(QIcon(pkgPath + "/resource/icons/kick_off.png"));
+        mUI.Chip->setIcon(QIcon(pkgPath + "/resource/icons/chip_off.png"));
+        mUI.Up->setIcon(QIcon(pkgPath + "/resource/icons/red_up.png"));
+        mUI.Left->setIcon(QIcon(pkgPath + "/resource/icons/red_left.png"));
+        mUI.Down->setIcon(QIcon(pkgPath + "/resource/icons/red_down.png"));
+        mUI.Right->setIcon(QIcon(pkgPath + "/resource/icons/red_right.png"));
+        mUI.Angle1->setIcon(QIcon(pkgPath + "/resource/icons/red_ccw.png"));
+        mUI.Angle2->setIcon(QIcon(pkgPath + "/resource/icons/red_cw.png"));
+        mUI.Roller->setIcon(QIcon(pkgPath + "/resource/icons/roller_off.png"));
+        mUI.Halt->setIcon(QIcon(pkgPath + "/resource/icons/stop_on.png"));
 
 
 
@@ -166,13 +181,13 @@ namespace rqt_parsian_gui
             waitHere();
             //cmd->roller_speed = r;
 
-//            haltBtn->setIcon(QIcon("./icons/small/stop_on.png"));
-//            upBtn->setIcon(QIcon("./icons/small/red_up.png"));
-//            leftBtn->setIcon(QIcon("./icons/small/red_left.png"));
-//            downBtn->setIcon(QIcon("./icons/small/red_down.png"));
-//            rightBtn->setIcon(QIcon("./icons/small/red_right.png"));
-//            ccwBtn->setIcon(QIcon("./icons/small/red_ccw.png"));
-//            cwBtn->setIcon(QIcon("./icons/small/red_cw.png"));
+            mUI.Halt->setIcon(QIcon(pkgPath + "/resource/icons/stop_on.png"));
+            mUI.Up->setIcon(QIcon(pkgPath + "/resource/icons/red_up.png"));
+            mUI.Left->setIcon(QIcon(pkgPath + "/resource/icons/red_left.png"));
+            mUI.Down->setIcon(QIcon(pkgPath + "/resource/icons/red_down.png"));
+            mUI.Right->setIcon(QIcon(pkgPath + "/resource/icons/red_right.png"));
+            mUI.Angle1->setIcon(QIcon(pkgPath + "/resource/icons/red_ccw.png"));
+            mUI.Angle2->setIcon(QIcon(pkgPath + "/resource/icons/red_cw.png"));
             break;
         }
         case EActionType::_STOP_OTHER:              //TODO better to be checked
@@ -181,49 +196,49 @@ namespace rqt_parsian_gui
 //            cmd->kickspeedz = 0;
 //            cmd->chip = false;
 
-//            kickBtn->setIcon(QIcon("./icons/small/kick_off.png"));
-//            chipBtn->setIcon(QIcon("./icons/small/chip_off.png"));
+            mUI.Kick->setIcon(QIcon(pkgPath + "/resource/icons/kick_off.png"));
+            mUI.Chip->setIcon(QIcon(pkgPath + "/resource/icons/chip_off.png"));
             break;
 
         case EActionType::_FORWARD:
-//            mUI.Up->setIcon(QIcon("resource/icons/green_up.png"));
+            mUI.Up->setIcon(QIcon(pkgPath + "/resource/icons/green_up.png"));
             setRobotVel(speed*4.2 / 127.0, 0.0, 0.0);
             break;
 
         case EActionType::_BACKWARD:
-            //downBtn->setIcon(QIcon("./icons/small/green_down.png"));
+            mUI.Down->setIcon(QIcon(pkgPath + "/resource/icons/green_down.png"));
             setRobotVel(-speed*4.2 / 127.0, 0.0, 0.0);
             break;
 
         case EActionType::_LEFT:
-            //leftBtn->setIcon(QIcon("./icons/small/green_left.png"));
+            mUI.Left->setIcon(QIcon(pkgPath + "/resource/icons/green_left.png"));
             setRobotVel(0.0, speed*4.2 / 127.0, 0.0);
 
             break;
 
         case EActionType::_RIGHT:
-            //rightBtn->setIcon(QIcon("./icons/small/green_right.png"));
+            mUI.Right->setIcon(QIcon(pkgPath + "/resource/icons/green_right.png"));
             setRobotVel(0.0, -speed*4.2 / 127.0, 0.0);
             break;
 
         case EActionType::_TURN_CCW:
-           // ccwBtn->setIcon(QIcon("./icons/small/green_ccw.png"));
+           mUI.Angle1->setIcon(QIcon(pkgPath + "/resource/icons/green_ccw.png"));
             setRobotVel(0.0, 0.0, speed/20.0 );
             break;
 
         case EActionType::_TURN_CW:
-           // cwBtn->setIcon(QIcon("./icons/small/green_cw.png"));
+           mUI.Angle2->setIcon(QIcon(pkgPath + "/resource/icons/green_cw.png"));
             setRobotVel(0.0, 0.0,-speed/20.0);
             break;
 
         case EActionType::_KICK:
 
-            // kickBtn->setIcon(QIcon("./icons/small/kick_on.png"));
+           mUI.Kick->setIcon(QIcon(pkgPath + "/resource/icons/kick_on.png"));
             cmd->kickSpeed = kickspeed;
             break;
 
         case EActionType::_CHIP:
-            // chipBtn->setIcon(QIcon("./icons/small/chip_on.png"));
+            mUI.Chip->setIcon(QIcon(pkgPath + "/resource/icons/chip_on.png"));
             cmd->chip = true;
             cmd->kickspeedz = chipkickspeed;
             break;
@@ -231,14 +246,14 @@ namespace rqt_parsian_gui
         case EActionType::_ROLLER:  //TODO some issue when robot id changes
             if ( cmd->spinner )
             {
-                //rollerBtn->setIcon(QIcon("./icons/small/roller_off.png"));
+                mUI.Roller->setIcon(QIcon(pkgPath + "/resource/icons/roller_off.png"));
                 cmd->spinner = false;
                 cmd->roller_speed = 0;
                 //ROS_INFO("spin off");
             }
             else
             {
-                //rollerBtn->setIcon(QIcon("./icons/small/roller_on.png"));
+                mUI.Roller->setIcon(QIcon(pkgPath + "/resource/icons/roller_on.png"));
                 cmd->spinner = true;
                 cmd->roller_speed = rollerspeed;
                 //ROS_INFO("spin on");
