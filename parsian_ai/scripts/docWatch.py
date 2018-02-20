@@ -140,7 +140,7 @@ class Handler(FileSystemEventHandler):
                     bad_files.append(f)
                     print("not json: " + str(f) + " --> removed!")
 
-        file_list2 = [f for f in file_list if not f in bad_files]
+        file_list2 = [f for f in file_list if f not in bad_files]
 
         # printfile_list2
 
@@ -198,7 +198,7 @@ class Handler(FileSystemEventHandler):
         for fil in new_file_list2:
             str_list = str(fil).split("/plans")
             if len(str_list) > 0:
-                print("\t" + [1])
+                print("\t" + str(fil).split("/plans")[1])
 
         last = [term for term in new_file_list if not term in new_file_list2]
 
@@ -232,7 +232,7 @@ class Handler(FileSystemEventHandler):
         if len(sublist) > 0:
             i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
-            print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
+            print ("\n"+sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
             return self.ai_message_generator(sublist[i])
 
         else:
@@ -244,16 +244,18 @@ class Handler(FileSystemEventHandler):
         INDIRECT = 2
         KICKOFF = 3
         if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            print("Ball Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT)):
-                plan["symmetry"] = True
+                plan["symmetry"] = False
                 return True
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
+            print("Ball Symm Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and plan["planMode"] == plan_mode:
-                plan["symmetry"] = False
+                plan["symmetry"] = True
                 return True
         return False
 
@@ -267,10 +269,9 @@ class Handler(FileSystemEventHandler):
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            i = self.__shuffleCount % len(sublist)
-            self.__shuffleCount += 1
-            print (sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-            return self.ai_message_generator(sublist[i])
+            print ("\n"+sublist[0]["filename"].split("plans/")[1]+"  "+str(sublist[0]["planMode"]))
+            # print (self.ai_message_generator(sublist[0]))
+            return self.ai_message_generator(sublist[0])
         else:
             print ("\nNO PLAN MATCHED!\n")
             return None

@@ -21,7 +21,7 @@ void AINodelet::onInit() {
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
 
-    refereeSub = nh.subscribe("/refbox/referee", 1000,  &AINodelet::refereeCallBack, this);
+    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
     teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
@@ -61,6 +61,8 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
+    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+    ROS_INFO_STREAM("last plan name: "<<lastPlan.the_plan.planFile);
     /// handle plan request
 //    if(ai->getSoccer()->getCoach()->requestForPlan){
 //        parsian_msgs::plan_service req;
