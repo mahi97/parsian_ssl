@@ -63,10 +63,11 @@ protected:
     void manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsToBeMarkePossition , int ourMarkAgentsSize , double proportionOfDistance);
     void manToManMarkBlockShotInPlayOff(int _markAgentSize);
     void agentsStuckTogether(QList<Vector2D> agentsPosition , QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);    
-    bool isAgentsStuckTogether(QList<Vector2D> agentsPosition);
+    bool areAgentsStuckTogether(QList<Vector2D> agentsPosition);
     bool isInIndirectArea(Vector2D);
     void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition,QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);            
     int findNeededDefense();
+    int defenseNumber();
     double findBestOffsetForPenaltyArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
     Line2D getBestLineWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Segment2D getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);

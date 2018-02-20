@@ -4,6 +4,19 @@ using namespace std;
 
 #define LONG_CHIP_POWER 1023
 
+int DefensePlan::defenseNumber(){
+    if(conf.StrictFormation){
+        if(conf.Defense > 3){
+            return 3;
+        }
+        else{
+            return conf.Defense;
+        }
+    }
+    else{
+        return findNeededDefense();
+    }
+}
 
 Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit){
     Vector2D defensePosition;
@@ -340,7 +353,7 @@ int DefensePlan::findNeededDefense(){
     return neededDefense;
 }
 
-bool DefensePlan::isAgentsStuckTogether(QList<Vector2D> agentsPosition){
+bool DefensePlan::areAgentsStuckTogether(QList<Vector2D> agentsPosition){
     //// If defense agents stuck together , this function
     for(int i = 0 ; i < agentsPosition.size() ; i++){
         for(int j = 0 ; j < agentsPosition.size() ; j++){
@@ -517,6 +530,7 @@ Line2D DefensePlan::getBisectorLine(Vector2D firstPoint , Vector2D originPoint ,
     Line2D bisectorLine (originPoint , AngleDeg::bisect((firstPoint - originPoint).th() , (thirdPoint - originPoint).th()));
     return bisectorLine;
 }
+
 Segment2D DefensePlan::getBisectorSegment(Vector2D firstPoint , Vector2D originPoint , Vector2D thirdPoint){
     //// gets the bisector segment of an angle
     //// that is made up by this 3 points.
@@ -1602,7 +1616,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     findPos(decideNumOfMarks());
     matchPoints.append(markPoses);
     /////////////// Stucking agents ///////////////////////////////////////////
-    if(isAgentsStuckTogether(matchPoints)){
+    if(areAgentsStuckTogether(matchPoints)){
         agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
         DBUG("Agents Stuck together" , D_AHZ);
         DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
@@ -1767,7 +1781,7 @@ void DefensePlan::execute(){
                     ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
                     ROS_INFO(QString("decideNumOfMarks: %1").arg(decideNumOfMarks()).toStdString().c_str());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
-                    AHZDefPoints = defenseFormation(findNeededDefense() , realDefSize , 1.4 ,2.5);
+                    AHZDefPoints = defenseFormation(defenseNumber() , realDefSize , 1.4 ,2.5);
                     ROS_INFO(QString("newDefSize: %1").arg(AHZDefPoints.size()).toStdString().c_str());
                     matchingDefPos(realDefSize);
                 }
@@ -3025,7 +3039,7 @@ int DefensePlan::decideNumOfMarks(){
     playOffMode = gameState->theirDirectKick()|| gameState->theirIndirectKick();
     if(defenseCount > 0){
         if(gameState->isPlayOff() && defenseCount >=2){
-            return defenseCount - findNeededDefense();
+            return defenseCount - defenseNumber();
         }
         if(playOffMode){
             return decideNumOfMarksInPlayOff(defenseCount);
