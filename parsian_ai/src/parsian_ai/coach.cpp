@@ -273,7 +273,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    //    preferedDefenseCounts = 6;
+//        preferedDefenseCounts = 6;
     ROS_INFO(QString("prefered defense: %1").arg(preferedDefenseCounts).toStdString().c_str());
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }

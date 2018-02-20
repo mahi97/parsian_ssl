@@ -4,6 +4,7 @@ using namespace std;
 
 #define LONG_CHIP_POWER 1023
 
+
 Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit){
     Vector2D defensePosition;
     Vector2D sol[2];
@@ -36,30 +37,69 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
 }
 
 QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upLimit){
-    QList<Vector2D> defensePosition;    
+    QList<Vector2D> defensePosition;
     Vector2D sol[8];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
     Vector2D ballPosition = wm->ball->pos;
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
-    Vector2D downIntesection;
+    Vector2D downIntersection;
     Vector2D upIntesection;
-    wm->field->ourBigPenaltyArea(1,upLimit - wm->field->_PENALTY_DEPTH,0).intersection(
-                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
-    Circle2D forwardDefense(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1] , Robot::robot_radius_new);
-    forwardDefense.tangent(ballPosition , &sol[2] , &sol[3]);
-    downIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y < ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
-                                                ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
-    upIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y > ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
-                                                ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
-    wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit),0).intersection(
-                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[4] , &sol[5]);
-    wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntesection , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
-                getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[6] , &sol[7]);
+    double forwardDefenseUpLimit = upLimit + 0.3;
+    double forwardDefenseBestOffset = forwardDefenseUpLimit - wm->field->_PENALTY_DEPTH;
+    if(fabs(ballPosition.x) >= 6 - wm->field->_PENALTY_DEPTH){
+        wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                    getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
+        wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                    getLinesOfBallTriangle().at(0), &sol[4] , &sol[5]);
+        wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                    getLinesOfBallTriangle().at(1) , &sol[6] , &sol[7]);
+    }
+    else{
+        if(wm->field->ourBigPenaltyArea(1,forwardDefenseBestOffset,0).contains(ballPosition)){
+            wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                        getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
+            wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                        getLinesOfBallTriangle().at(0), &sol[4] , &sol[5]);
+            wm->field->ourBigPenaltyArea(1,0.2,0).intersection(
+                        getLinesOfBallTriangle().at(1) , &sol[6] , &sol[7]);
+        }
+        else{
+            wm->field->ourBigPenaltyArea(1, forwardDefenseBestOffset,0).intersection(
+                        getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
+            Circle2D forwardDefense(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1] , Robot::robot_radius_new);
+            forwardDefense.tangent(ballPosition , &sol[2] , &sol[3]);
+            downIntersection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y <= ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
+                        ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
+            upIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y >= ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
+                        ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
+            ROS_INFO(QString("down: %1").arg(downIntersection.y).toStdString().c_str());
+            ROS_INFO(QString("up: %1").arg(upIntesection.y).toStdString().c_str());
+            ROS_INFO(QString("sol2: %1").arg(sol[2].y).toStdString().c_str());
+            ROS_INFO(QString("sol3: %1").arg(sol[3].y).toStdString().c_str());
+            if(upIntesection.isValid()){
+                wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit),0).intersection(
+                            getBisectorSegment(ourGoalLeft , ballPosition , upIntesection) , &sol[4] , &sol[5]);
+            }
+            else{
+                wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit),0).intersection(
+                            getLinesOfBallTriangle().at(0), &sol[4] , &sol[5]);
+            }
+            if(downIntersection.isValid()){
+                wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
+                            getBisectorSegment(ourGoalRight , ballPosition , downIntersection) , &sol[6] , &sol[7]);
+            }
+            else{
+                wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
+                            getLinesOfBallTriangle().at(1) , &sol[6] , &sol[7]);
+            }
+        }
+    }
     defensePosition.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0]:sol[1]);
     defensePosition.append(sol[4].dist(wm->ball->pos) < sol[5].dist(wm->ball->pos) ? sol[4]:sol[5]);
     defensePosition.append(sol[6].dist(wm->ball->pos) < sol[7].dist(wm->ball->pos) ? sol[6]:sol[7]);
     return defensePosition;
+
 }
 
 QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfDefenseAgents , double downLimit , double upLimit){
@@ -67,7 +107,7 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
     Vector2D ballPosition = wm->ball->pos;
-    defensePosiotion.clear();    
+    defensePosiotion.clear();
     ROS_INFO(QString("allOfDefenseAgents: %1").arg(allOfDefenseAgents).toStdString().c_str());
     double temp = findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit);
     ROS_INFO(QString("Best Offset for penalty area: %1").arg(temp).toStdString().c_str());
@@ -161,7 +201,7 @@ Line2D DefensePlan::getBestLineWithTalles(int defenseCount , Vector2D firstPoint
 }
 
 Segment2D DefensePlan::getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint){
-    double robotDiameter = 2 * Robot::robot_radius_new;    
+    double robotDiameter = 2 * Robot::robot_radius_new;
     Segment2D ourGoalLine(firstPoint,secondPoint);
     Segment2D biggerFrontageOfTriangle;
     Segment2D smallerFrontageOfTriangle;
@@ -219,8 +259,13 @@ double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , dou
         biggerFrontageOfTriangle = leftFrontageOfTriangle;
         smallerFrontageOfTriangle = rightFrontageOfTriangle;
     }
-    if(fabs(ballPos.x) >= 6 - upLimit){
-        upLimit = fabs(ballPos.x) - 0.7;
+    if(wm->field->ourBigPenaltyArea(1,upLimit - wm->field->_PENALTY_DEPTH , 0).contains(ballPos)){
+        if(fabs(ballPos.x) >= 6 - wm->field->_PENALTY_DEPTH){
+            upLimit = fabs(ballPos.y) - wm->field->_PENALTY_WIDTH/2 - 1;
+        }
+        else{
+            upLimit = 6 - fabs(ballPos.x) - 1;
+        }
     }
     //////////////// The position Isn't in penalty area ////////////////
     if(fabs(ballPos.x) >= 6 - wm->field->_PENALTY_DEPTH){
@@ -244,13 +289,12 @@ double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , dou
             bestOffsetForPenaltyArea = upLimit - wm->field->_PENALTY_DEPTH;
         }
     }
-    if(bestOffsetForPenaltyArea <= 0){
-        bestOffsetForPenaltyArea = 0.2;
-    }
     if(wm->field->ourBigPenaltyArea(1,0,0).contains(ballPos)){
         bestOffsetForPenaltyArea = 0.2;
     }
-
+    if(bestOffsetForPenaltyArea <= 0){
+        bestOffsetForPenaltyArea = 0.2;
+    }
     return bestOffsetForPenaltyArea;
 }
 
@@ -279,11 +323,10 @@ int DefensePlan::findNeededDefense(){
     ROS_INFO(QString("aimLessLine: %1").arg(aimLessLine.length()).toStdString().c_str());
     //////// with itterative algorithm /////////////////////////
     if(aimLessLine.length() <= robotDiameter){
-        neededDefense = 1; // must be refine
+        neededDefense = 1;
     }
     else{
-        for(numOfDefenses = 2 ; numOfDefenses < 3 ; numOfDefenses++){
-            //ROS_INFO(QString("best offset: %1").arg(findBestOffsetForPenaltyArea(getBestLineWithTalles(numOfDefenses))).toStdString().c_str());
+        for(numOfDefenses = 2 ; numOfDefenses < 4 ; numOfDefenses++){
             if(getBestSegmentWithTalles(numOfDefenses , ourGoalL , ballPos , ourGoalR).length() <= (numOfDefenses) * (robotDiameter)){
                 neededDefense = numOfDefenses;
                 break;
@@ -293,8 +336,6 @@ int DefensePlan::findNeededDefense(){
             neededDefense = 2;
         }
     }
-
-    neededDefense = 3;
     ROS_INFO(QString("neededDefenseAgents: %1").arg(neededDefense).toStdString().c_str());
     return neededDefense;
 }
@@ -1722,10 +1763,10 @@ void DefensePlan::execute(){
                 }
                 ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense()).toStdString().c_str());
                 if(defenseCount > 0){
-                    realDefSize = defenseCount;// - decideNumOfMarks();
+                    realDefSize = defenseCount - decideNumOfMarks();
                     ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
                     ROS_INFO(QString("decideNumOfMarks: %1").arg(decideNumOfMarks()).toStdString().c_str());
-                    //                    tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
+                    //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     AHZDefPoints = defenseFormation(findNeededDefense() , realDefSize , 1.4 ,2.5);
                     ROS_INFO(QString("newDefSize: %1").arg(AHZDefPoints.size()).toStdString().c_str());
                     matchingDefPos(realDefSize);
@@ -2984,15 +3025,8 @@ int DefensePlan::decideNumOfMarks(){
     playOffMode = gameState->theirDirectKick()|| gameState->theirIndirectKick();
     if(defenseCount > 0){
         if(gameState->isPlayOff() && defenseCount >=2){
-            ROS_INFO_STREAM("is?");
-            if(checkOverdef()){
-                return defenseCount - 1;
-            }
-            else{
-                return defenseCount - 2;
-            }
+            return defenseCount - findNeededDefense();
         }
-
         if(playOffMode){
             return decideNumOfMarksInPlayOff(defenseCount);
         }
@@ -3204,7 +3238,7 @@ void DefensePlan::findPos(int _markAgentSize){
     }
     //////////////// Determine the plan of mark from GUI ////////////////////
     if(manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass){
-        if(playOff/* || stopMode*/){
+        if(playOff || stopMode){
             know->variables["stateForMark"] = QString("BlockPass");
             manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos,_markAgentSize , conf.PassRatioBlock / 100);
         }
@@ -3220,7 +3254,7 @@ void DefensePlan::findPos(int _markAgentSize){
         }
     }
     else{
-        if(playOff/* || stopMode*/){
+        if(playOff || stopMode){
             know->variables["stateForMark"] = QString("BlockShot");;
             manToManMarkBlockShotInPlayOff(_markAgentSize);
         }
@@ -3338,19 +3372,6 @@ QList<Vector2D> DefensePlan::indirectAvoidPass(Vector2D opp){
     temp.append(sol);
     temp.append(wm->ball->pos - opp);
     return temp;
-}
-
-bool DefensePlan::checkOverdef(){
-    if((Vector2D::angleOf(wm->ball->pos,wm->field->ourGoal(),wm->field->ourCornerL()).abs() < 20 + overDefThr
-        ||Vector2D::angleOf(wm->ball->pos,wm->field->ourGoal(),wm->field->ourCornerR()).abs() < 20 + overDefThr)
-            && !Circle2D((wm->field->ourGoal() - Vector2D(0.2,0)),1.60).contains(wm->ball->pos)) {
-        overDefThr = 5;
-        return true;
-    }
-    else{
-        overDefThr = 0;
-        return false;
-    }
 }
 
 QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
