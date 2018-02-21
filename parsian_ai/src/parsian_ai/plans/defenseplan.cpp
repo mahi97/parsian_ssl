@@ -562,7 +562,7 @@ void DefensePlan::manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsT
     QList<QPair<Vector2D,double> > sortDangerAgentsToBeMarkBlockPassPlayOff;
     QList<QPair<Vector2D,double> > tempSortDangerAgentsToBeBlockPassPlayOff;
     //////////////////// Clear QLists for update the states ////////////////////
-    stopMode = gameState->isPlayOff();
+    stopMode = gameState->isStop();
     ourMarkAgentsPossition.clear();
     tempOpponentAgentsToBeMarkedPosition.clear();
     markPoses.clear();
@@ -870,7 +870,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize){
     //// opponent agents by a variable ratio along these lines.
     //// This is one of the mark plan for defending more flexible.
 
-    bool playOn = gameState->isPlayOn();
+    bool playOn = gameState->isStart();
     bool playOff = gameState->theirDirectKick() || gameState->theirIndirectKick();
     int count;
     oppmarkedpos.clear();
@@ -931,7 +931,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize){
         }
     }
     else if(_markAgentSize < oppAgentsToMarkPos.count()){
-        if(playOff || know->variables["transientFlag"].toBool() || gameState->isPlayOff()){
+        if(playOff || know->variables["transientFlag"].toBool() || gameState->isStop()){
             QList<QPair<Vector2D, double> > tempsorted = sortdangerpassplayoff(oppAgentsToMarkPos);
             for(int i = 0; i<_markAgentSize; i++){
                 markRoles.append(QString("shotBlocker"));
@@ -987,7 +987,7 @@ void DefensePlan::setGoalKeeperState(){
     dangerForGoalKeeperClearByOppAgents = false;
     isCrowdedInFrontOfPenaltyAreaByOppAgents = false;
     isCrowdedInFrontOfPenaltyAreaByOurAgents = false;
-    playOnMode = gameState->isPlayOn();
+    playOnMode = gameState->isStart();
     ////////////////////////////////////////////////////////////////////////////
     Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.2 , 0.1) , wm->field->ourGoalL() - Vector2D(0 , 0.1));
     Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.2 , 0.1) , wm->field->ourGoalR() - Vector2D(0 , 0.1));
@@ -1124,8 +1124,8 @@ void DefensePlan::setGoalKeeperTargetPoint(){
     isCrowdedInFrontOfPenaltyAreaByOppAgents = false;
     isCrowdedInFrontOfPenaltyAreaByOurAgents = false;
     playOffMode = gameState->theirDirectKick() || gameState->theirIndirectKick();
-    playOnMode = gameState->isPlayOn();
-    stopMode = gameState->isPlayOff();
+    playOnMode = gameState->isStart();
+    stopMode = gameState->isStop();
     tempSol.clear();
     ballRectanglePoints.clear();
     ///////////////////////////////////////////////////////////////////////////
@@ -1535,7 +1535,7 @@ void DefensePlan::preCalculate(){
     //// Actually this function is used in "execute()" function , before any
     //// work that will do.
 
-    stopMode = gameState->isPlayOff();
+    stopMode = gameState->isStop();
 
     announceClearing(false);
     isItPossibleToClear = true;
@@ -1546,7 +1546,7 @@ void DefensePlan::preCalculate(){
     for(int i = 0; i < count(); i++)
     {
         float dTheta = (float) (wm->ball->pos - agent(i)->pos()).th().degree();
-        if(gameState->isPlayOn()
+        if(gameState->isStart()
                 && (wm->ball->pos.dist(agent(i)->pos()) < 1.0)
                 && (fabs(dTheta) < goalieKickThreshold)){
             // todo : robot Command moved
@@ -1583,7 +1583,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     QList <int> stuckIndexs;
     QList <int> matchResult;
     Vector2D tempPoint;
-    stopMode = gameState->isPlayOff();
+    stopMode = gameState->isStop();
     ourAgents.clear();
     ourAgents.append(defenseAgents);
     if(defExceptions.active){
@@ -1725,7 +1725,7 @@ void DefensePlan::execute(){
         ballPosHistory.removeLast();
     }
     //////////////////////////////////////
-    playOnMode = gameState->isPlayOn(); // knowledge->isStart();
+    playOnMode = gameState->isStart(); // knowledge->isStart();
     DBUG(QString("defense oneTouch mode : %1").arg(know->variables["defenseOneTouchMode"].toBool()) , D_AHZ);
     DBUG(QString("defense clear mode : %1").arg(know->variables["defenseClearMode"].toBool()) , D_AHZ);
     if(gameState->theirPenaltyKick() && !gameState->penaltyShootout()){
@@ -1744,7 +1744,7 @@ void DefensePlan::execute(){
         lastBallPosition = wm->ball->pos;
         return;
     }
-    if(gameState->isPlayOn()/*knowledge->getGameMode() == CKnowledge::Start*/ && gameState->penaltyShootout()){
+    if(gameState->isStart()/*knowledge->getGameMode() == CKnowledge::Start*/ && gameState->penaltyShootout()){
         penaltyShootOutMode();
     }
     else{
@@ -2196,8 +2196,8 @@ void DefensePlan::executeGoalKeeper(){
     //// we have some mode for handling the goalkeeper behavior.
 
     playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick();
-    playOnMode = gameState->isPlayOn();
-    stopMode = gameState->isPlayOff();
+    playOnMode = gameState->isStart();
+    stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
     if(goalKeeperAgent != nullptr){
@@ -2694,7 +2694,7 @@ bool DefensePlan::defenseClearOrNot(){
     bool isOutOfPenaltyArea = true;
     bool ballVelOrDirection = true;
     bool isOurAgentNearestToTheBall = false;
-    bool isGameStarted = gameState->isPlayOn();
+    bool isGameStarted = gameState->isStart();
     if(ballPos.dist(wm->field->ourGoal()) > 3.5){
         distClearHysteresis = false;
     }
@@ -3035,10 +3035,10 @@ int DefensePlan::decideNumOfMarks(){
     Vector2D ourGoal = wm->field->ourGoal();
     Vector2D leftCorner = wm->field->ourCornerL();
     Vector2D rightCorner = wm->field->ourCornerR();
-    playOnMode = gameState->isPlayOn();
+    playOnMode = gameState->isStart();
     playOffMode = gameState->theirDirectKick()|| gameState->theirIndirectKick();
     if(defenseCount > 0){
-        if(gameState->isPlayOff() && defenseCount >=2){
+        if(gameState->isStop() && defenseCount >=2){
             return defenseCount - defenseNumber();
         }
         if(playOffMode){
@@ -3143,7 +3143,7 @@ void DefensePlan::findOppAgentsToMark(){
         }
     }
 
-    if(gameState->theirRestart() || gameState->isPlayOff()){
+    if(gameState->theirPlayOffKick() || gameState->isStop()){
         //Ommiting nearest to ball
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
@@ -3173,7 +3173,7 @@ void DefensePlan::findOppAgentsToMark(){
             }
         }
     }
-    else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isPlayOff() || know->variables["transientFlag"].toBool()){
+    else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isStop() || know->variables["transientFlag"].toBool()){
         for(int i = 0; i < oppAgentsToMark.count(); i++){
             if(oppAgentsToMark[i]->pos.x > conf.OppOmitLimitPlayoff){
                 oppAgentsToMark.removeOne(oppAgentsToMark[i]);
@@ -3226,12 +3226,12 @@ void DefensePlan::findPos(int _markAgentSize){
     //// conditions && states.Some flags are used to stay in previous state && for
     //// not switching between PlayOff && PlayOn.
 
-    bool playOn = gameState->isPlayOn();
+    bool playOn = gameState->isStart();
     bool playOff = ((gameState->theirDirectKick())/*|| (knowledge->getGameState() == CKnowledge::TheirKickOff)*/|| (gameState->theirIndirectKick()));
     bool MantoManAllTransientFlag = conf.ManToManAllTransiant;
     xLimitForblockingPass = 0;
     manToManMarkBlockPassFlag = conf.PlayOffManToMan;
-    stopMode = gameState->isPlayOff();
+    stopMode = gameState->isStop();
     markPoses.clear();
     markAngs.clear();
     ///////////////// Man To Man AllTransiant Mode for Mark ////////////////////
@@ -3410,7 +3410,7 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp){
     Segment2D posToGoal;
     posToGoal.assign(pos,wm->field->ourGoal());
     DBUG(QString("Dist %1").arg(distance), D_HAMED);
-    if(gameState->theirRestart() || gameState->isPlayOff())
+    if(gameState->theirPlayOffKick() || gameState->isStop())
     {
         if(distance > 1){
             if((pos - wm->ball->pos).length() > 0.7){
