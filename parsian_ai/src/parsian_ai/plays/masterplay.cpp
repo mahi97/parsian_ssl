@@ -275,7 +275,7 @@ void CMasterPlay::execute() {
 
 void CMasterPlay::execPlay(){
 
-    if( blockAgent ){
+    if( blockAgent && 0){
         blockRole.parse();
         blockRole.assign(blockAgent);
         blockRole.setStop(true);

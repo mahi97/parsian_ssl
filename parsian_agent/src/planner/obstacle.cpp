@@ -101,7 +101,7 @@ void CObstacles::add_rectangle(double cx,double cy,double w,double h)
     if(!testRect.contains(targetPosition)) {
         drawer->draw(testRect,QColor(Qt::red));
 
-        //obs.append(temp);
+        obs.append(temp);
     }
 
 }

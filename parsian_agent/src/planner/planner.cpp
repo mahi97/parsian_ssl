@@ -594,15 +594,16 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         obs.add_circle(wm->ball->pos.x,wm->ball->pos.y,ballObstacleRadius,wm->ball->vel.x , wm->ball->vel.y);
 
     if( avoidPenaltyArea ){
-        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
-        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-        obs.add_rectangle(-1*(field._FIELD_WIDTH / 2)+0.5,0,1,0.5);
-    }
+//        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
+//        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
+//        obs.add_rectangle(-1*(field._FIELD_WIDTH / 2)+0.5,0,1,0.5);
 
+    }
+    obs.add_rectangle(-1*(field._FIELD_WIDTH/2) + 0.6 , 0 , 1.2 , 2.4);
     ////////////////////test opPenalty
-    obs.add_circle(1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
-    obs.add_circle(1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-    obs.add_rectangle(1*(field._FIELD_WIDTH / 2) - 0.5,0,1,0.5);
+//    obs.add_circle(1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
+//    obs.add_circle(1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
+//    obs.add_rectangle(1*(field._FIELD_WIDTH / 2) - 0.5,0,1,0.5);
 
 
     obs.add_rectangle(0,0,0.5,0.5);
