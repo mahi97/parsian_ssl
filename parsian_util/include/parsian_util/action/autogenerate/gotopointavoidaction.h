@@ -21,7 +21,6 @@ public:
     QString getActionName() override;
     static QString SActionName();
 
-
     SkillProperty(GotopointavoidAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
     SkillProperty(GotopointavoidAction, bool, Noavoid, noAvoid);
     SkillProperty(GotopointavoidAction, bool, Avoidcentercircle, avoidCenterCircle);
