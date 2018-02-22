@@ -3,6 +3,12 @@
 
 COurBallPlacement::COurBallPlacement(){
 
+    minIndexPos = 0;
+    ap = nullptr;
+    minIndex = 0;
+    a = nullptr;
+    first = true;
+    state = BallPlacement :: GO_FOR_BALL;
 }
 
 COurBallPlacement::~COurBallPlacement(){
@@ -11,6 +17,7 @@ COurBallPlacement::~COurBallPlacement(){
 
 void COurBallPlacement::reset(){
     flag = false;
+    first = false;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 void COurBallPlacement::init(const QList<Agent*>& _agents){
@@ -20,69 +27,73 @@ void COurBallPlacement::init(const QList<Agent*>& _agents){
     //    reset();
 
     //}
-   // knowledge->setLastPlayExecuted(OurBallPlacement);
+    // knowledge->setLastPlayExecuted(OurBallPlacement);
 }
 
 
-void COurBallPlacement::execute_x() {
-    DBUG("execute_0 is running", D_ATOUSA);
-    DBUG("ballPlacement execute_0", D_ERROR);
+void COurBallPlacement::execute_x(){
+
     ROS_INFO("Executaion X");
     ROS_INFO_STREAM(flag);
-    //ROS_INFO_STREAM(23 << "asdf" << 23.3)
-    if(agents.size() <= 0) {
+    if(agents.size() <= 0)
         return;
+
+    if (first) {
+        a = ap = agents[0];
+        first = false;
     }
+
+    lockAgents = true;
     Vector2D ballpos = Vector2D(wm->ball->pos.x, wm->ball->pos.y);
-    Vector2D pos = Vector2D(0 , 0);
+    Vector2D pos = wm->ballplacementPoint();
     double dist = 0;
     double mindist = 10000;
-    static int minIndexPos = 0;
-    static CAgent *ap;
+    CAgent *pap = ap;
 
-    for (int i = 0; i < agents.size() && flag == false ; i++) {
+    for(int i = 0 ; i < agents.size()   ; i++){
         dist = agents[i]->pos().dist(pos);
-        if (dist < mindist) {
+        if (dist < mindist){
             mindist = dist;
             minIndexPos = i;
             ap = agents[i];
         }
     }
-    flag = true;
     mindist = 10000;
-    static int minIndex = 0;
-    static CAgent *a = agents[0];
     CAgent *pa = a;
-    for (int i = 0; i < agents.size(); i++) {
+    for(int i = 0 ; i < agents.size() ; i++){
         dist = agents[i]->pos().dist(ballpos);
-        if (dist < mindist && minIndexPos != i) {
+        if(dist < mindist && minIndexPos != i){
             mindist = dist;
             minIndex = i;
             a = agents[i];
         }
     }
+    ROS_INFO("Executaion 1");
     auto *nothing = new NoAction;
-    if (pa->id() != a->id())
+    if (pap->id() != ap->id())
+        pap->action = nothing;
+    ROS_INFO("Executaion 1.2");
+    if (pa->id() != a->id()) {
         pa->action = nothing;
-    auto *gp = new GotopointavoidAction();
-    gp->setTargetpos(pos);
-    gp->setLookat(ballpos);
-    gp->setSlowmode(true);
-    gp->setRoller(7);
+        if(state == BallPlacement :: PASS){
+            state = BallPlacement :: GO_FOR_BALL;
+        }
+    }
+    ROS_INFO("Executaion 1.5");
+
+    //GO_FOR_BALL
     auto *rec = new ReceivepassAction();
-    rec->setReceiveradius(0.5);
+    rec->setReceiveradius(1);
     rec->setTarget(pos);
     rec->setSlow(true);
-    Circle2D c{agents[minIndexPos]->pos() + (agents[minIndexPos]->dir().norm() * 0.1), 0.1};
-    if (agents[minIndexPos]->pos().dist(pos) <= 0.15 && agents[minIndexPos]->pos().dist(ballpos) <= 0.15){
-        agents[minIndexPos]->action = nothing;
-        reset();
-    }
-    else
-        agents[minIndexPos]->action = rec;
-    if (c.contains(ballpos)) {
-        agents[minIndexPos]->action = gp;
-    }
+    auto *gpa = new GotopointavoidAction;
+    Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
+    gpa->setTargetpos(behindBall);
+    gpa->setSlowmode(true);
+    gpa->setBallobstacleradius(0.5);
+    gpa->setLookat(pos);
+
+    //PASS
     auto *pass = new KickAction();
     pass->setTarget(pos);
     int power = 100 * pos.dist(ballpos);
@@ -90,19 +101,103 @@ void COurBallPlacement::execute_x() {
     pass->setKickspeed(power);
     pass->setSpin(5);
     pass->setSlow(true);
-    auto *gpa = new GotopointavoidAction;
-    gpa->setTargetpos(pos);
-    gpa->setSlowmode(true);
-    gpa->setBallobstacleradius(0.1);
-    gpa->setLookat(ballpos);
+
+    //RECIVE_AND_POS
+    auto *recSpin = new ReceivepassAction();
+    recSpin->setReceiveradius(0.5);
+    recSpin->setTarget(pos);
+    recSpin->setSlow(true);
+        //spin
+
+    //FINAL_POS
+    auto *gpas = new GotopointavoidAction();
+    gpas->setTargetpos(pos);
+    gpas->setLookat(ballpos);
+    gpas->setSlowmode(true);
+    gpas->setRoller(7);
+
+    Circle2D cir{pos , 0.95};
+    Vector2D sol1, sol2;
+    drawer->draw(Segment2D(ballpos , ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 1.5) , QColor(Qt ::blue));
+    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.1 && agents[minIndex]->pos().dist(behindBall) < 0.1){
+        state = BallPlacement :: PASS;
+    }
+    if(state == BallPlacement :: PASS &&
+    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 2),&sol1,&sol2) > 0)){
+        state = BallPlacement :: RECIVE_AND_POS;
+    }
+    if(state == BallPlacement :: RECIVE_AND_POS &&
+    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 2),&sol1,&sol2) > 0)){
+        state = BallPlacement :: GO_FOR_BALL;
+    }
+
+    switch(state){
+        case BallPlacement :: NoState:
+            //:)
+            break;
+        case BallPlacement :: GO_FOR_BALL://noghtash doroste vali mikhore be top:-?
+            ROS_INFO_STREAM("GFB");
+            agents[minIndexPos]->action = rec;
+            agents[minIndex]->action = gpa;
+            break;
+        case BallPlacement :: PASS:
+            ROS_INFO_STREAM("PASS");
+            agents[minIndexPos]->action = rec;
+            agents[minIndex]->action = pass;
+            break;
+        case BallPlacement :: RECIVE_AND_POS:
+            ROS_INFO_STREAM("RAP");
+            agents[minIndexPos]->action = recSpin;
+            agents[minIndex]->action = nothing;
+            break;
+        case BallPlacement :: FINAL_POS:
+            ROS_INFO_STREAM("FP");
+            agents[minIndexPos]->action = gpas;
+            agents[minIndex]->action = nothing;
+            break;
+        case BallPlacement :: DONE:
+            ROS_INFO_STREAM("DONE");
+            agents[minIndexPos]->action = nothing;
+            agents[minIndex]->action = nothing;
+            break;
+        defult:
+            break;
+    }
+    //////////////////////////////////////////////////
+    /*
+    auto *gp = new GotopointavoidAction();
+    gp->setTargetpos(pos);
+    gp->setLookat(ballpos);
+    gp->setSlowmode(true);
+    gp->setRoller(7);
+    ROS_INFO("Executaion 2");
+    Circle2D c{agents[minIndexPos]->pos() + (agents[minIndexPos]->dir().norm() * 0.1), 0.1};
+    if (c.contains(ballpos))
+        agents[minIndexPos]->action = gp;
+    else
+        agents[minIndexPos]->action = rec;
+    ROS_INFO("Executaion 3");
+    auto *pass = new KickAction();
+    pass->setTarget(pos);
+    int power = 100 * pos.dist(ballpos);
+    ROS_INFO_STREAM(power);
+    pass->setKickspeed(power);
+    pass->setSpin(5);
+    pass->setSlow(true);
 
     ROS_INFO("Executaion !");
-    if (agents[minIndexPos]->pos().dist(ballpos) > 0.2 && wm->ball->vel.length() < 0.3){
-        if (agents[minIndex]->pos().dist(ballpos) > 0.3)
+    Circle2D cir{agents[minIndexPos]->pos(), 0.5};
+    Vector2D sol1, sol2;//dorost nist
+    if (agents[minIndexPos]->pos().dist(ballpos) > 0.2 && cir.intersection(Ray2D(ballpos, wm->ball->dir.norm() * wm->ball->vel.length()),&sol1,&sol2) == 0
+     //&& wm->ball->vel.length() < 0.3
+     ){
+        if(agents[minIndex]->pos().dist(ballpos - Segment2D(ballpos , pos).length() * wm->ball->dir.norm()) > 0.2)
             agents[minIndex]->action = gpa;
-        agents[minIndex]->action = pass;
+        else
+            agents[minIndex]->action = pass;
     }
     else
         agents[minIndex]->action = nothing;
     ROS_INFO_STREAM(minIndexPos);
+    */
 }

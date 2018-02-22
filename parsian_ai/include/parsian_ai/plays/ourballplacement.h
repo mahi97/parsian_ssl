@@ -23,7 +23,11 @@ private:
         void reset();
         BallPlacement state;
         bool flag;
-        void execute_x(int pos);
+        int minIndexPos;
+        CAgent *ap;
+        int minIndex;
+        CAgent *a;
+        bool first;
 };
 
 #endif // OURBALLPLACEMENT_H
