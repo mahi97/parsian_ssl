@@ -96,7 +96,7 @@ void COurBallPlacement::execute_x(){
     //PASS
     auto *pass = new KickAction();
     pass->setTarget(pos);
-    int power = 100 * pos.dist(ballpos);
+    int power = 50 * pos.dist(ballpos);
     ROS_INFO_STREAM(power);
     pass->setKickspeed(power);
     pass->setSpin(5);
@@ -118,16 +118,16 @@ void COurBallPlacement::execute_x(){
 
     Circle2D cir{pos , 0.95};
     Vector2D sol1, sol2;
-    drawer->draw(Segment2D(ballpos , ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 1.5) , QColor(Qt ::blue));
-    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.1 && agents[minIndex]->pos().dist(behindBall) < 0.1){
+    drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
+    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
         state = BallPlacement :: PASS;
     }
     if(state == BallPlacement :: PASS &&
-    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 2),&sol1,&sol2) > 0)){
+    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
         state = BallPlacement :: RECIVE_AND_POS;
     }
     if(state == BallPlacement :: RECIVE_AND_POS &&
-    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->dir.norm() * wm->ball->vel.length() * 2),&sol1,&sol2) > 0)){
+    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
         state = BallPlacement :: GO_FOR_BALL;
     }
 
