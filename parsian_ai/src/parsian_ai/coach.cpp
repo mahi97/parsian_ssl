@@ -142,6 +142,11 @@ void CCoach::checkGoalieInsight()
 
 void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
+
+    preferedDefenseCounts = 0;
+    preferedGoalieAgent = -1;
+    return;
+
     missMatchIds.clear();
     if(first)
     {
@@ -197,6 +202,12 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     else {
         preferedGoalieAgent = wm->our.data->goalieID;
     }
+
+    if (selectedPlay != nullptr && selectedPlay->lockAgents) {
+        preferedDefenseCounts = lastPreferredDefenseCounts;
+        return;
+    }
+
 
     // handle stop
     if (gameState->isStop()) {
@@ -273,8 +284,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-//        preferedDefenseCounts = 6;
-    ROS_INFO(QString("prefered defense: %1").arg(preferedDefenseCounts).toStdString().c_str());
+
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -507,6 +517,12 @@ BallPossesion CCoach::isBallOurs()
 
 void CCoach::assignDefenseAgents(int defenseCount){
 
+
+    if (selectedPlay != nullptr && selectedPlay->lockAgents) {
+        defenseAgents.clear();
+        defenseAgents.append(lastDefenseAgents);
+        return;
+    }
 
     QList<int> ids = wm->our.data->activeAgents;
     if( goalieAgent != nullptr) {
@@ -809,6 +825,7 @@ void CCoach::decideAttack()
 
     switch (gameState->getState()) { // GAMESTATE
 
+<<<<<<< ed56530840a8517df72ef03d210e43668daf7758
     case States::Halt:
         decideHalt(ourPlayers);
         return;
@@ -865,6 +882,65 @@ void CCoach::decideAttack()
         decideNull(ourPlayers);
         return;
         break;
+=======
+        case States::Halt:
+            decideHalt(ourPlayers);
+            return;
+            break;
+        case States::PlayOff:
+            selectedPlay->reset();
+            decideStop(ourPlayers);
+            return;
+            break;
+
+        case States::OurKickOff:
+            decideOurKickOff(ourPlayers);
+            break;
+
+        case States::TheirKickOff:
+            decideTheirKickOff(ourPlayers);
+            break;
+
+        case States::OurDirectKick:
+            decideOurDirect(ourPlayers);
+            break;
+
+        case States::TheirDirectKick:
+            decideTheirDirect(ourPlayers);
+            break;
+
+        case States::OurIndirectKick:
+            decideOurIndirect(ourPlayers);
+            break;
+
+        case States::TheirIndirectKick:
+            decideTheirIndirect(ourPlayers);
+            break;
+
+        case States::OurPenaltyKick:
+            decideOurPenalty(ourPlayers);
+            break;
+
+        case States::TheirPenaltyKick:
+            decideTheirPenalty(ourPlayers);
+            break;
+        case States::PlayOn:
+            decideStart(ourPlayers);
+            break;
+        case States::OurBallPlacement:
+            decideOurBallPlacement(ourPlayers);
+            break;
+        case States::TheirBallPlacement:
+            decideStop(ourPlayers);
+            break;
+        case States::HalfTime:
+            decideHalfTimeLineUp(ourPlayers);
+            break;
+        default:
+            decideNull(ourPlayers);
+            return;
+            break;
+>>>>>>> mahi commit all Lhum's code
     }
     QList<Agent*> ourAgents;
     for(auto& ourPlayer : ourPlayers) {
