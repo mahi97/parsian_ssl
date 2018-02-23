@@ -155,7 +155,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             first = false;
         }
     }
-    if(gameState->isPlayOff() || !gameState->canMove())
+    if(gameState->isStop() || !gameState->canMove())
     {
         if(wm->our.activeAgentsCount() != 0u)
         {
@@ -199,7 +199,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     }
 
     // handle stop
-    if (gameState->isPlayOff()) {
+    if (gameState->isStop()) {
         if (wm->ball->pos.x < 0){
             preferedDefenseCounts = agentsCount - 1;
 
@@ -208,7 +208,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             preferedDefenseCounts = conf.Defense;
         }
     }
-    else if (gameState->isPlayOn()) {
+    else if (gameState->isStart()) {
         if (transientFlag) {
             if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
@@ -244,7 +244,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             }
         }
     }
-    else if (gameState->ourRestart()) {
+    else if (gameState->ourPlayOffKick()) {
         if (wm->ball->pos.x < -1)  {
             preferedDefenseCounts = (checkOverdef()) ? 1 : 2;
 
@@ -254,7 +254,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
         }
 
     }
-    else if (gameState->theirRestart()) {
+    else if (gameState->theirPlayOffKick()) {
         if (gameState->theirKickoff()) {
             preferedDefenseCounts = 2;
         } else {
@@ -570,7 +570,7 @@ void CCoach::virtualTheirPlayOffState()
     States currentState;
     currentState = gameState->getState();
     if(lastState == States::TheirDirectKick || lastState == States::TheirIndirectKick /*|| lastState == States::TheirKickOff*/) {
-        if(currentState == States::PlayOn){
+        if(currentState == States::Start){
             transientFlag = true;
         }
     }
@@ -813,7 +813,7 @@ void CCoach::decideAttack()
         decideHalt(ourPlayers);
         return;
         break;
-    case States::PlayOff:
+    case States::Stop:
         decideStop(ourPlayers);
         return;
         break;
@@ -849,7 +849,7 @@ void CCoach::decideAttack()
     case States::TheirPenaltyKick:
         decideTheirPenalty(ourPlayers);
         break;
-    case States::PlayOn:
+    case States::Start:
         decideStart(ourPlayers);
         break;
     case States::OurBallPlacement:
@@ -1173,7 +1173,7 @@ void CCoach::checkTransitionToForceStart(){
 
     double ballChangedPosDist = wm->ball->pos.dist(lastPos);
 
-    if(!gameState->isPlayOn()){
+    if(!gameState->isStart()){
         if( cyclesWaitAfterballMoved == 0 && ballChangedPosDist > 0.05 ){
             cyclesWaitAfterballMoved = 1;
         }
@@ -1182,21 +1182,21 @@ void CCoach::checkTransitionToForceStart(){
         }
     }
     ///////////////////////////////////// by DON
-    if (gameState->ourRestart())
+    if (gameState->ourPlayOffKick())
     {
         //transition to game on
         ROS_INFO_STREAM("MAHIS: " << cyclesWaitAfterballMoved << " + " << selectedPlay->playOnFlag);
         if ( cyclesWaitAfterballMoved > 6 && selectedPlay->playOnFlag)
         {
-            gameState->setState(States::PlayOn);
+            gameState->setState(States::Start);
         }
     }
 
-    if( gameState->theirRestart() ){
+    if( gameState->theirPlayOffKick() ){
         //transition to game on
         if ( cyclesWaitAfterballMoved > 0 )
         {
-            gameState->setState(States::PlayOn);
+            gameState->setState(States::Start);
         }
     }
 }
