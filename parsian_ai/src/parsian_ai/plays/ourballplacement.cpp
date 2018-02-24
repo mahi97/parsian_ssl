@@ -81,13 +81,30 @@ void COurBallPlacement::execute_x(){
     }
     ROS_INFO("Executaion 1.5");
 
+    Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
+    Circle2D cir{pos , max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1)};
+    Vector2D sol1, sol2;
+    drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
+
+    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
+        state = BallPlacement :: PASS;
+        passballpos = ballpos;
+    }
+    if(state == BallPlacement :: PASS &&
+    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+        state = BallPlacement :: RECIVE_AND_POS;
+    }
+    if(state == BallPlacement :: RECIVE_AND_POS &&
+    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+        state = BallPlacement :: GO_FOR_BALL;
+    }
+
     //GO_FOR_BALL
     auto *rec = new ReceivepassAction();
-    rec->setReceiveradius(1);
+    rec->setReceiveradius(max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1));
     rec->setTarget(pos);
     rec->setSlow(true);
     auto *gpa = new GotopointavoidAction;
-    Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
     gpa->setTargetpos(behindBall);
     gpa->setSlowmode(true);
     gpa->setBallobstacleradius(0.5);
@@ -104,10 +121,10 @@ void COurBallPlacement::execute_x(){
 
     //RECIVE_AND_POS
     auto *recSpin = new ReceivepassAction();
-    recSpin->setReceiveradius(0.5);
+    recSpin->setReceiveradius(max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1));
     recSpin->setTarget(pos);
     recSpin->setSlow(true);
-        //spin
+    //spin
 
     //FINAL_POS
     auto *gpas = new GotopointavoidAction();
@@ -116,27 +133,12 @@ void COurBallPlacement::execute_x(){
     gpas->setSlowmode(true);
     gpas->setRoller(7);
 
-    Circle2D cir{pos , 0.95};
-    Vector2D sol1, sol2;
-    drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
-    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
-        state = BallPlacement :: PASS;
-    }
-    if(state == BallPlacement :: PASS &&
-    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
-        state = BallPlacement :: RECIVE_AND_POS;
-    }
-    if(state == BallPlacement :: RECIVE_AND_POS &&
-    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
-        state = BallPlacement :: GO_FOR_BALL;
-    }
-
     switch(state){
         case BallPlacement :: NoState:
             //:)
             break;
         case BallPlacement :: GO_FOR_BALL://noghtash doroste vali mikhore be top:-?
-            ROS_INFO_STREAM("GFB");
+            ROS_INFO_STREAM("GO_FOR_BALL");
             agents[minIndexPos]->action = rec;
             agents[minIndex]->action = gpa;
             break;
@@ -146,12 +148,12 @@ void COurBallPlacement::execute_x(){
             agents[minIndex]->action = pass;
             break;
         case BallPlacement :: RECIVE_AND_POS:
-            ROS_INFO_STREAM("RAP");
+            ROS_INFO_STREAM("RECIVE_AND_POS");
             agents[minIndexPos]->action = recSpin;
             agents[minIndex]->action = nothing;
             break;
         case BallPlacement :: FINAL_POS:
-            ROS_INFO_STREAM("FP");
+            ROS_INFO_STREAM("FINAL_POS");
             agents[minIndexPos]->action = gpas;
             agents[minIndex]->action = nothing;
             break;
@@ -160,7 +162,7 @@ void COurBallPlacement::execute_x(){
             agents[minIndexPos]->action = nothing;
             agents[minIndex]->action = nothing;
             break;
-        defult:
+        default:
             break;
     }
     //////////////////////////////////////////////////

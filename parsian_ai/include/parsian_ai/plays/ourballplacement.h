@@ -23,6 +23,7 @@ private:
         void reset();
         BallPlacement state;
         bool flag;
+        Vector2D passballpos;
         int minIndexPos;
         CAgent *ap;
         int minIndex;
