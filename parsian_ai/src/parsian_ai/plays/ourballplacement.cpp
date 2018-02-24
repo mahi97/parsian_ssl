@@ -82,7 +82,7 @@ void COurBallPlacement::execute_x(){
     ROS_INFO("Executaion 1.5");
 
     Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
-    Circle2D cir{pos , max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1)};
+    Circle2D cir{pos , 1 - 0.1};
     Vector2D sol1, sol2;
     drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
 
@@ -99,9 +99,10 @@ void COurBallPlacement::execute_x(){
         state = BallPlacement :: GO_FOR_BALL;
     }
 
+
     //GO_FOR_BALL
     auto *rec = new ReceivepassAction();
-    rec->setReceiveradius(max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1));
+    rec->setReceiveradius(1);
     rec->setTarget(pos);
     rec->setSlow(true);
     auto *gpa = new GotopointavoidAction;
@@ -119,9 +120,17 @@ void COurBallPlacement::execute_x(){
     pass->setSpin(5);
     pass->setSlow(true);
 
+    //GO_FOR_VALID_PASS
+    auto *vrec = new ReceivepassAction();
+    vrec->setReceiveradius(0.2);
+    vrec->setTarget(pos);
+    vrec->setSlow(true);
+
+    //VALID_PASS
+
     //RECIVE_AND_POS
     auto *recSpin = new ReceivepassAction();
-    recSpin->setReceiveradius(max(0 , agents[minIndexPos]->pos().dist(passballpos) - 0.1));
+    recSpin->setReceiveradius(agents[minIndexPos]->pos().dist(passballpos));
     recSpin->setTarget(pos);
     recSpin->setSlow(true);
     //spin
@@ -145,6 +154,16 @@ void COurBallPlacement::execute_x(){
         case BallPlacement :: PASS:
             ROS_INFO_STREAM("PASS");
             agents[minIndexPos]->action = rec;
+            agents[minIndex]->action = pass;
+            break;
+        case BallPlacement :: GO_FOR_VALID_PASS:
+            ROS_INFO_STREAM("GO_FOR_VALID_PASS");
+            agents[minIndexPos]->action = vrec;
+            agents[minIndex]->action = gpa;
+            break;
+        case BallPlacement :: VALID_PASS:
+            ROS_INFO_STREAM("VALID_PASS");
+            agents[minIndexPos]->action = vrec;
             agents[minIndex]->action = pass;
             break;
         case BallPlacement :: RECIVE_AND_POS:

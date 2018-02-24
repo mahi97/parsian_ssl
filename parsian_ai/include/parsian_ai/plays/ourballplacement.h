@@ -6,10 +6,12 @@
 enum class BallPlacement {
     NoState = 0,
     GO_FOR_BALL = 1,
-    PASS  =2,
-    RECIVE_AND_POS = 3,
-    FINAL_POS = 4,
-    DONE = 5
+    PASS  = 2,
+    GO_FOR_VALID_PASS = 3,
+    VALID_PASS = 4,
+    RECIVE_AND_POS = 5,
+    FINAL_POS = 6,
+    DONE = 7
 };
 
 class COurBallPlacement : public CMasterPlay{
