@@ -880,142 +880,100 @@ void CSkillKick::findPosToGo()
     Segment2D ballPath(ballPos,ballPos + wm->ball->vel.norm()*10);
     Circle2D dribblerArea(agentPos+agentDir.norm()*0.1,0.25);
     Circle2D robotArea(agentPos,1);
-
     gpa->setAddvel(Vector2D(0,0));
-
-    if(agentPos.dist(ballPos) < 1.5) {
-        robotArea.assign(agentPos,max(agentPos.dist(ballPos) - 0.1, 0.01));
-    }
-
-    if(agentPos.dist(ballPos) < 0.15)
-    {
-        agentNearArea.assign(agentPos,agentPos.dist(ballPos) - 0.01);
-    }
-
+    kickerArea.assign(agentPos + agent->dir().norm()*0.09 , 0.05);
+    Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
+    Vector2D dummy;
+    Segment2D targetNormalSeg(target + wm->ball->vel.norm().rotate(90),target - wm->ball->vel.norm().rotate(90));
+    drawer->draw(targetNormalSeg,QColor("red"));
+    drawer->draw(target);
     if(wm->ball->vel.length() > 0.2 )
     {
-        for(double i = 0 ; i < 5 ; i += 0.1)
-        {
+//
+//           /* if(Circle2D(agentPos,0.1).intersection(Segment2D(ballPos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy))
+//            {
+//                finalPos = ballPath.nearestPoint(kickerPoint);
+//            }
+//            else
+//            {
+//                bool posFound  = false;
+//                for(double i = 0 ; i < 5 ; i += 0.1)
+//                {
+//
+//                    intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
+//                    QList <int> dummy;
+//                    agentTime = CSkillGotoPointAvoid::timeNeeded(agent,intersectPos + addVec,conf->VelMax,dummy,dummy,false,0,true);
+//
+//
+//                    if(agentTime < (i - (reachBeforeBallTime) ))
+//                    {
+//                        posFound  = true;
+//                        break;
+//                    }
+//                }
+//
+//                if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(intersectPos + addVec))
+//                {
+//                    intersectPos = ballPath.nearestPoint(kickerPoint);
+//                }
+//            }
+//        //        intersectPos = ballPath.nearestPoint(kickerPoint);
+//        drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
+//
+//
+//        if(wm->field->isInOppPenaltyArea(intersectPos) || oppPenaltyAreaWP.contains(waitPos))
+//        {
+//            if(oppPenaltyArea.intersection(ballLine,&sol1,&sol2) != 0)
+//            {
+//                if(sol1.dist(waitPos) > sol2.dist(waitPos))
+//                {
+//                    sol1 = sol2;
+//                }
+//                intersectPos = sol1;
+//            }
+//        }
 
-            finalPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
-            agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos,conf->VelMax,ourRelax,oppRelax,!goalieMode,0.2,true);
-            if(agentTime < i )
-            {
-                break;
-            }
-        }
-        if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60) )
-        {
-            finalDir = Vector2D(cos(kickFinalDir.radian()),sin(kickFinalDir.radian()));
-        }
-        else
-        {
-            finalDir = Vector2D(cos(kickFinalDir.radian()),sin(kickFinalDir.radian()));
-        }
     }
-
     else
     {
+        if(ballPos.dist(agentPos) < 0.5)
+        {
+            if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && kickerArea.contains(ballPos))
+            {
+                turnForKick();
+            }
+            else
+            {
+                jTurn();
+            }
+            return;
+        }
         finalPos = ballPos - (target-finalPos).norm() * 0.15;
         finalDir = Vector2D(cos(kickFinalDir.radian()),sin(kickFinalDir.radian()));
     }
 
-    Vector2D oneTouchPos = ballPath.nearestPoint(agentPos);
-    Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
-    bool canOneTouch = false;
-    if(robotArea.intersection(ballPath,&sol1,&sol2) > 1 && wm->ball->vel.length() > 0.5 )
-    {
-        for(double i = 0 ; i < 5 ; i+=0.1)
-        {
-            if(wm->ball->getPosInFuture(i).dist(oneTouchPos) <= 0.2)
-            {
-                if(CSkillGotoPointAvoid::timeNeeded(agent,oneTouchPos,conf->VelMax,ourRelax,oppRelax,!goalieMode,0,true) <= i+0.1)
-                {
-                    canOneTouch =true;
-                    break;
-                }
-            }
-        }
-
-        if(agentPos.dist(ballPos) < 0.5)
-        {
-            if((canOneTouch || kickerSeg.intersection(ballPath).isValid()) && !sagMode )
-            {
-//                debug("oneTOUCH",D_MHMMD);
-                if( ( fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60 ))
-                    waitAndKick();
-                else
-                    kWaitForTurn();
-
-
-                return;
-            }
-        }
-    }
-
-    Circle2D oppPenalty(wm->field->oppGoal() + Vector2D(0.2 , 0),1.4);
-    gpa->setOnetouchmode(false);
-    if(oppPenalty.contains(ballPos))
-    {
-        finalPos = finalPos - (target-finalPos).norm() * 0.15;
-    }
-    if(finalPos.x > wm->field->_FIELD_WIDTH)
-    {
-        finalPos = CKnowledge::getReflectPos(*wm->field,wm->field->oppGoal(), 3,wm->ball->pos);
-    }
-
-    if((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
-    {
-        finalPos = finalPos - (target-finalPos).norm() * 0.1;
-    }
+    //Todo: Penalty red
     Vector2D s1,s2;
     Circle2D finalPosArea;
-    drawer->draw(finalPosArea,QColor(Qt::blue));
-
     Segment2D directPath(agentPos,finalPos);
     drawer->draw(directPath);
     finalPosArea.assign(ballPos ,0.145);
-//    if(finalPosArea.intersection(directPath,&s1,&s2))
-//    {
-//        gpa->setOnetouchmode(false);
-
-//        finalPosArea.assign(ballPos ,0.245);
-//        finalPosArea.tangent(agentPos,&s1,&s2);
-//        if(s2.dist(target) >= s1.dist(target))
-//            s1 = s2;
-//        s1 = s1 + (s1 - agentPos).norm()*(finalPos.dist(ballPos))*1.5;
-//        finalPos = s1;
-//        //gpa->setAddVel(wm->ball->vel);
-//    }
-//    else
-//    {
-//        gpa->setAddvel(Vector2D(0,0));
-//    }
+    if(finalPosArea.intersection(directPath,&s1,&s2))
+    {
+        finalPosArea.assign(ballPos ,0.245);
+        finalPosArea.tangent(agentPos,&s1,&s2);
+        if(s2.dist(target) >= s1.dist(target))
+            s1 = s2;
+        s1 = s1 + (s1 - agentPos).norm()*(finalPos.dist(ballPos))*1.5;
+        finalPos = s1;
+    }
 
     gpa->init(finalPos,finalDir);
     gpa->setNoavoid(false);
-
-    if(wm->ball->vel.length() > 0.3)
-        gpa->setBallobstacleradius(0);
-    else
-        gpa->setBallobstacleradius(0);
-    if(((fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60) && (agentPos.dist(ballPos) < 1) && (wm->ball->vel.length() > 0.2)) || (agentPos.dist(ballPos) < 0.4)) {
-        if(fabs((kickFinalDir - agentDir.th()).degree()) > 30 && dribblerArea.contains(ballPos))
-        {
-            turnForKick();
-        }
-        else
-        {
-            jTurn();
-        }
-        return;
-    }
-
     gpa->setSlowmode(slow);
     gpa->setDivemode(false);
     gpa->setAvoidpenaltyarea(true);
     gpa->execute();
-
 
 }
 
