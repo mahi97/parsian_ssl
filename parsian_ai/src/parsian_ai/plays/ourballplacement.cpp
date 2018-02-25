@@ -99,7 +99,6 @@ void COurBallPlacement::execute_x(){
         state = BallPlacement :: GO_FOR_BALL;
     }
 
-
     //GO_FOR_BALL
     auto *rec = new ReceivepassAction();
     rec->setReceiveradius(1);
