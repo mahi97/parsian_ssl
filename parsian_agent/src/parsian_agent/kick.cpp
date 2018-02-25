@@ -885,53 +885,44 @@ void CSkillKick::findPosToGo()
     Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
     Vector2D dummy;
     Segment2D targetNormalSeg(target + wm->ball->vel.norm().rotate(90),target - wm->ball->vel.norm().rotate(90));
-    drawer->draw(targetNormalSeg,QColor("red"));
-    drawer->draw(target);
+    Vector2D kickerPoint = agentPos + agentDir.norm()*0.08;
+    Vector2D addVec = agentDir.norm()*0.08;
     if(wm->ball->vel.length() > 0.2 )
     {
-//
-//           /* if(Circle2D(agentPos,0.1).intersection(Segment2D(ballPos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy))
-//            {
-//                finalPos = ballPath.nearestPoint(kickerPoint);
-//            }
-//            else
-//            {
-//                bool posFound  = false;
-//                for(double i = 0 ; i < 5 ; i += 0.1)
-//                {
-//
-//                    intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
-//                    QList <int> dummy;
-//                    agentTime = CSkillGotoPointAvoid::timeNeeded(agent,intersectPos + addVec,conf->VelMax,dummy,dummy,false,0,true);
-//
-//
-//                    if(agentTime < (i - (reachBeforeBallTime) ))
-//                    {
-//                        posFound  = true;
-//                        break;
-//                    }
-//                }
-//
-//                if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(intersectPos + addVec))
-//                {
-//                    intersectPos = ballPath.nearestPoint(kickerPoint);
-//                }
-//            }
-//        //        intersectPos = ballPath.nearestPoint(kickerPoint);
-//        drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
-//
-//
-//        if(wm->field->isInOppPenaltyArea(intersectPos) || oppPenaltyAreaWP.contains(waitPos))
-//        {
-//            if(oppPenaltyArea.intersection(ballLine,&sol1,&sol2) != 0)
-//            {
-//                if(sol1.dist(waitPos) > sol2.dist(waitPos))
-//                {
-//                    sol1 = sol2;
-//                }
-//                intersectPos = sol1;
-//            }
-//        }
+        if(Circle2D(agentPos,0.1).intersection(Segment2D(ballPos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy))
+        {
+            finalPos = ballPath.nearestPoint(kickerPoint);
+        }
+        else
+        {
+            bool posFound  = false;
+            for(double i = 0 ; i < 5 ; i += 0.1)
+            {
+                finalPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
+                QList <int> dummy;
+                agentTime = CSkillGotoPointAvoid::timeNeeded(agent,finalPos - addVec,conf->VelMax,dummy,dummy,false,0,true);
+
+
+                if(agentTime < (i - (0.5) ))
+                {
+                    posFound  = true;
+                    break;
+                }
+            }
+
+            if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(intersectPos + addVec))
+            {
+                finalPos = ballPath.nearestPoint(kickerPoint);
+            }
+        }
+        finalPos = finalPos - addVec;
+        //        intersectPos = ballPath.nearestPoint(kickerPoint);
+        drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
+
+
+       //TODO : penalty area
+
+        if((target - finalPos))
 
     }
     else
