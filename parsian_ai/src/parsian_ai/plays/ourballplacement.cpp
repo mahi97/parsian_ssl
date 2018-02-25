@@ -81,13 +81,13 @@ void COurBallPlacement::execute_x(){
     }
     ROS_INFO("Executaion 1.5");
 
-    Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
-    Circle2D validcir{pos , 1 - 0.1};
-    Circle2D invalidcir{pos, 0.2};
+    Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.15;
+    Circle2D validcir{pos , 0.2};
+    Circle2D invalidcir{pos, 1 - 0.1};
     Vector2D sol1, sol2;
     drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
 
-    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
+    if(state == BallPlacement :: GO_FOR_BALL && agents[minIndexPos]->pos().dist(pos) < 0.1 && agents[minIndex]->pos().dist(behindBall) < 0.1){
         state = BallPlacement :: PASS;
         passballpos = ballpos;
     }
@@ -95,14 +95,16 @@ void COurBallPlacement::execute_x(){
     (invalidcir.contains(ballpos) || invalidcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
         state = BallPlacement :: GO_FOR_VALID_PASS;
     }
-    if(state == BallPlacement :: GO_FOR_VALID_PASS && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
+    ROS_INFO_STREAM("ED: " << agents[minIndexPos]->pos().dist(pos) << " -- " << agents[minIndex]->pos().dist(behindBall));
+    if(state == BallPlacement :: GO_FOR_VALID_PASS && agents[minIndexPos]->pos().dist(pos) < 0.1 && agents[minIndex]->pos().dist(behindBall) < 0.1){
         state = BallPlacement  :: VALID_PASS;
     }
     if(state == BallPlacement :: VALID_PASS &&
-    (invalidcir.contains(ballpos) || invalidcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+    (validcir.contains(ballpos) || validcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
         state = BallPlacement :: RECIVE_AND_POS;
     }
-    if(state == BallPlacement :: RECIVE_AND_POS && invalidcir.contains(ballpos) && !validcir.contains(ballpos)){
+    if(state == BallPlacement :: RECIVE_AND_POS && invalidcir.contains(ballpos) && !validcir.contains(ballpos) &&
+    validcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) == 0){
         state = BallPlacement :: GO_FOR_VALID_PASS;
     }
     if(state == BallPlacement :: RECIVE_AND_POS && !invalidcir.contains(ballpos) && !validcir.contains(ballpos)){
@@ -126,7 +128,7 @@ void COurBallPlacement::execute_x(){
     auto *gpa = new GotopointavoidAction;
     gpa->setTargetpos(behindBall);
     gpa->setSlowmode(true);
-    gpa->setBallobstacleradius(0.5);
+    gpa->setBallobstacleradius(0.18);
     gpa->setLookat(pos);
 
     //PASS
@@ -148,7 +150,7 @@ void COurBallPlacement::execute_x(){
 
     //RECIVE_AND_POS
     auto *recSpin = new ReceivepassAction();
-    recSpin->setReceiveradius(agents[minIndexPos]->pos().dist(passballpos));
+    recSpin->setReceiveradius(0.2);
     recSpin->setTarget(pos);
     recSpin->setSlow(true);
     //spin
@@ -165,37 +167,37 @@ void COurBallPlacement::execute_x(){
             //:)
             break;
         case BallPlacement :: GO_FOR_BALL://noghtash doroste vali mikhore be top:-?
-            ROS_INFO_STREAM("GO_FOR_BALL");
+            ROS_INFO_STREAM("ED: " << "GO_FOR_BALL");
             agents[minIndexPos]->action = rec;
             agents[minIndex]->action = gpa;
             break;
         case BallPlacement :: PASS:
-            ROS_INFO_STREAM("PASS");
+            ROS_INFO_STREAM("ED: " << "PASS");
             agents[minIndexPos]->action = rec;
             agents[minIndex]->action = pass;
             break;
         case BallPlacement :: GO_FOR_VALID_PASS:
-            ROS_INFO_STREAM("GO_FOR_VALID_PASS");
+            ROS_INFO_STREAM("ED: " << "GO_FOR_VALID_PASS");
             agents[minIndexPos]->action = vrec;
             agents[minIndex]->action = gpa;
             break;
         case BallPlacement :: VALID_PASS:
-            ROS_INFO_STREAM("VALID_PASS");
+            ROS_INFO_STREAM("ED: " << "VALID_PASS");
             agents[minIndexPos]->action = vrec;
             agents[minIndex]->action = pass;
             break;
         case BallPlacement :: RECIVE_AND_POS:
-            ROS_INFO_STREAM("RECIVE_AND_POS");
+            ROS_INFO_STREAM("ED: " << "RECIVE_AND_POS");
             agents[minIndexPos]->action = recSpin;
             agents[minIndex]->action = nothing;
             break;
         case BallPlacement :: FINAL_POS:
-            ROS_INFO_STREAM("FINAL_POS");
+            ROS_INFO_STREAM("ED: " << "FINAL_POS");
             agents[minIndexPos]->action = gpas;
             agents[minIndex]->action = nothing;
             break;
         case BallPlacement :: DONE:
-            ROS_INFO_STREAM("DONE");
+            ROS_INFO_STREAM("ED: " << "DONE");
             agents[minIndexPos]->action = nothing;
             agents[minIndex]->action = nothing;
             break;
