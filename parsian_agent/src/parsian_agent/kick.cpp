@@ -651,7 +651,7 @@ void CSkillKick::jTurn()
 
     if(wm->ball->vel.length() < 0.2)
         posPid->kp = 0;
-    speedPid->kp = 4;
+    speedPid->kp = 6;
 
 
     if(!jTurnFromBack)
@@ -881,22 +881,23 @@ void CSkillKick::findPosToGo()
     Circle2D dribblerArea(agentPos+agentDir.norm()*0.1,0.25);
     Circle2D robotArea(agentPos,1);
     gpa->setAddvel(Vector2D(0,0));
-    kickerArea.assign(agentPos + agent->dir().norm()*0.09 , 0.05);
+    kickerArea.assign(agentPos + agent->dir().norm()*0.09 , 0.1);
     Segment2D kickerSeg(agentPos+agent->dir().norm()*0.08+agent->dir().rotate(90).norm()*0.02 ,agentPos+agent->dir().norm()*0.08-agent->dir().rotate(90).norm()*0.02 );
     Vector2D dummy;
     Segment2D targetNormalSeg(target + wm->ball->vel.norm().rotate(90),target - wm->ball->vel.norm().rotate(90));
     Vector2D kickerPoint = agentPos + agentDir.norm()*0.08;
     Vector2D addVec = agentDir.norm()*0.08;
-    if(wm->ball->vel.length() > 0.2 )
+    if(wm->ball->vel.length() > 0.5 )
     {
         if(Circle2D(agentPos,0.1).intersection(Segment2D(ballPos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy))
         {
             finalPos = ballPath.nearestPoint(kickerPoint);
+
         }
         else
         {
             bool posFound  = false;
-            for(double i = 0 ; i < 5 ; i += 0.1)
+            for(double i = 0.5 ; i < 5 ; i += 0.1)
             {
                 finalPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
                 QList <int> dummy;
@@ -910,7 +911,7 @@ void CSkillKick::findPosToGo()
                 }
             }
 
-            if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(intersectPos + addVec))
+            if(posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(finalPos + addVec))
             {
                 finalPos = ballPath.nearestPoint(kickerPoint);
             }
@@ -918,24 +919,34 @@ void CSkillKick::findPosToGo()
         }
         finalPos = finalPos - addVec;
 
-        if(fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60) {
+            if(Circle2D(agentPos,0.1).intersection(Segment2D(ballPos,wm->ball->getPosInFuture(0.5)),&dummy,&dummy)) {
+                if(fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60)
+                    {
+                        finalDir = Vector2D::unitVector(
+                                oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target,
+                                              conf->Landa,
+                                              conf->Gamma));
+                    }
+                    else {
+                        finalDir = ballPos - finalPos;
+                    }
 
-            Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel,
-                                                                      agentPos - ballPos, target,conf->Landa, conf->Gamma));
-            finalDir = oneTouchDir;
-        }
-        else {
-            finalDir = finalPos - ballPos;
-        }
+            }
+            else {
+                    finalDir = ballPos - finalPos;
+            }
+
 
         drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
 
 
-       //TODO : penalty area
-        if(ballPath.intersection(targetNormalSeg) && agentPos.dist(ballPos) < 1 && )
+        //TODO : penalty area
+        if((ballPath.intersection(targetNormalSeg).isValid()) && (agentPos.dist(ballPos) < 1) && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60))
         {
-
+            jTurn();
+            return;
         }
+
     }
     else
     {
@@ -961,6 +972,7 @@ void CSkillKick::findPosToGo()
     Segment2D directPath(agentPos,finalPos);
     drawer->draw(directPath);
     finalPosArea.assign(ballPos ,0.145);
+
     if(finalPosArea.intersection(directPath,&s1,&s2))
     {
         finalPosArea.assign(ballPos ,0.245);
@@ -970,9 +982,10 @@ void CSkillKick::findPosToGo()
         s1 = s1 + (s1 - agentPos).norm()*(finalPos.dist(ballPos))*1.5;
         finalPos = s1;
     }
+    drawer->draw(finalPos);
 
     gpa->init(finalPos,finalDir);
-    gpa->setNoavoid(false);
+    gpa->setNoavoid(true);
     gpa->setSlowmode(slow);
     gpa->setDivemode(false);
     gpa->setAvoidpenaltyarea(true);
