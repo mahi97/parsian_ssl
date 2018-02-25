@@ -82,7 +82,8 @@ void COurBallPlacement::execute_x(){
     ROS_INFO("Executaion 1.5");
 
     Vector2D behindBall = ballpos - Vector2D(pos - ballpos).norm() * 0.5;
-    Circle2D cir{pos , 1 - 0.1};
+    Circle2D validcir{pos , 1 - 0.1};
+    Circle2D invalidcir{pos, 0.2};
     Vector2D sol1, sol2;
     drawer->draw(Segment2D(ballpos , ballpos + wm->ball->vel.norm() * 1.5) , QColor(Qt ::blue));
 
@@ -91,11 +92,29 @@ void COurBallPlacement::execute_x(){
         passballpos = ballpos;
     }
     if(state == BallPlacement :: PASS &&
-    (cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+    (invalidcir.contains(ballpos) || invalidcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+        state = BallPlacement :: GO_FOR_VALID_PASS;
+    }
+    if(state == BallPlacement :: GO_FOR_VALID_PASS && agents[minIndexPos]->pos().dist(pos) < 0.2 && agents[minIndex]->pos().dist(behindBall) < 0.2){
+        state = BallPlacement  :: VALID_PASS;
+    }
+    if(state == BallPlacement :: VALID_PASS &&
+    (invalidcir.contains(ballpos) || invalidcir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
         state = BallPlacement :: RECIVE_AND_POS;
     }
-    if(state == BallPlacement :: RECIVE_AND_POS &&
-    !(cir.contains(ballpos) || cir.intersection(Segment2D(ballpos, ballpos + wm->ball->vel.norm() * 2),&sol1,&sol2) > 0)){
+    if(state == BallPlacement :: RECIVE_AND_POS && invalidcir.contains(ballpos) && !validcir.contains(ballpos)){
+        state = BallPlacement :: GO_FOR_VALID_PASS;
+    }
+    if(state == BallPlacement :: RECIVE_AND_POS && !invalidcir.contains(ballpos) && !validcir.contains(ballpos)){
+        state = BallPlacement :: GO_FOR_BALL;
+    }
+    if(state == BallPlacement :: VALID_PASS && agents[minIndex]->pos().dist(ballpos) > 0.3){
+        state = BallPlacement :: GO_FOR_VALID_PASS;
+    }
+    if(state == BallPlacement :: GO_FOR_VALID_PASS && !invalidcir.contains(ballpos) && !validcir.contains(ballpos)){
+        state = BallPlacement :: GO_FOR_BALL;
+    }
+    if(state == BallPlacement :: PASS && agents[minIndex]->pos().dist(ballpos) > 2){
         state = BallPlacement :: GO_FOR_BALL;
     }
 
