@@ -21,7 +21,7 @@ void Drawer::draw(const Rect2D& _rect, const QColor &_color, bool _filled)
 
     drawRect.filled = _filled;
 
-   // draws.rects.push_back(drawRect);
+    draws.rects.push_back(drawRect);
 
 }
 
@@ -33,7 +33,7 @@ void Drawer::draw(const QString& _text, const Vector2D& _pos, const QColor& _col
     drawText.size = _size;
     drawText.color = toColorRGBA(_color);
 
-   // draws.texts.push_back(drawText);
+    draws.texts.push_back(drawText);
 
 
 }
@@ -53,7 +53,7 @@ void Drawer::draw(const Circle2D& _circle, int _startAng, int _endAng, const QCo
     drawCircle.startAng = _startAng;
     drawCircle.endAng   = _endAng;
 
-    //draws.circles.push_back(drawCircle);
+    draws.circles.push_back(drawCircle);
 
 
 }
@@ -74,7 +74,7 @@ void Drawer::draw(const Circle2D& _circle, const QColor& _color, bool _filled) {
     drawCircle.startAng = 0;
     drawCircle.endAng   = 360;
 
-    //draws.circles.push_back(drawCircle);
+    draws.circles.push_back(drawCircle);
 
 }
 
@@ -111,7 +111,7 @@ void Drawer::draw(const Vector2D& _point, const QColor& _color) {
     drawVector.vector = toParsianVec(_point);
     drawVector.color  = toColorRGBA(_color);
 
-    //draws.vectors.push_back(drawVector);
+    draws.vectors.push_back(drawVector);
 }
 
 std_msgs::ColorRGBA Drawer::toColorRGBA(const QColor &_color) {
