@@ -914,16 +914,28 @@ void CSkillKick::findPosToGo()
             {
                 finalPos = ballPath.nearestPoint(kickerPoint);
             }
+
         }
         finalPos = finalPos - addVec;
-        //        intersectPos = ballPath.nearestPoint(kickerPoint);
+
+        if(fabs(((target-agentPos).th().degree() - (ballPos-agentPos).th().degree() )) < 60) {
+
+            Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel,
+                                                                      agentPos - ballPos, target,conf->Landa, conf->Gamma));
+            finalDir = oneTouchDir;
+        }
+        else {
+            finalDir = finalPos - ballPos;
+        }
+
         drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
 
 
        //TODO : penalty area
+        if(ballPath.intersection(targetNormalSeg) && agentPos.dist(ballPos) < 1 && )
+        {
 
-        if((target - finalPos))
-
+        }
     }
     else
     {
