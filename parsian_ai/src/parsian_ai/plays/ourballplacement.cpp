@@ -35,7 +35,7 @@ void COurBallPlacement::execute_x(){
 
     ROS_INFO("Executaion X");
     ROS_INFO_STREAM(flag);
-    if(agents.size() <= 0)
+    if(agents.size() <= 1)
         return;
 
     if (first) {
