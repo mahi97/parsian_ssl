@@ -224,15 +224,33 @@ class Handler(FileSystemEventHandler):
         # get a sublist from final_list based on player_num, game_mode and ball_pos
         sublist = []
         rad = 0.9
-        # normal checking:
+
+        master_list = []
+        active_list = []
+
+        print("\nHI\n")
         for plan in self.__final_dict:
+            if plan["isMaster"]:
+                master_list.append(plan)
+        if len(master_list) > 0:
+            active_list = master_list
+        else:
+            for plan in self.__final_dict:
+                if plan["isActive"]:
+                    active_list.append(plan)
+
+        if len(active_list) == 0:
+            print ("There's No Active Plan!!!")
+            return
+
+        for plan in active_list:
             if self.check_plan(plan, ball_x, ball_y, rad, player_num, plan_mode):
                 sublist.append(plan)
 
         if len(sublist) > 0:
             i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
-            print ("\n"+sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
+            print ("\n"+sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"])+" master: "+str(plan["isMaster"])+" active: "+str(plan["isActive"]))
             return self.ai_message_generator(sublist[i])
 
         else:
@@ -269,20 +287,22 @@ class Handler(FileSystemEventHandler):
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            print ("\n"+sublist[0]["filename"].split("plans/")[1]+"  "+str(sublist[0]["planMode"]))
+            print ("\n"+sublist[0]["filename"].split("plans/")[1]+"  "+str(sublist[0]["planMode"])+" master: "+str(plan["isMaster"])+" active: "+str(plan["isActive"]))
             # print (self.ai_message_generator(sublist[0]))
             return self.ai_message_generator(sublist[0])
         else:
             print ("\nNO PLAN MATCHED!\n")
             return None
 
-    def circle_contains(self, x, y, r, point_x, point_y):
+    @staticmethod
+    def circle_contains(x, y, r, point_x, point_y):
         if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
             return False
         else:
             return True
 
-    def ball_dist(self, plan, x1, y1, x2, y2):
+    @staticmethod
+    def ball_dist(plan, x1, y1, x2, y2):
         a = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)
         b = (x1-x2)*(x1-x2) + (y1+y2)*(y1+y2)
         if a < b:
@@ -305,6 +325,8 @@ class Handler(FileSystemEventHandler):
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
 
+        for plan in self.__final_dict:
+            print(plan["filename"]+": "+"master: "+str(plan["isMaster"])+" , "+"active: "+str(plan["isActive"]))
         return self.get_all_plans_gui_msgs()
 
     def plans_to_dict(self):
