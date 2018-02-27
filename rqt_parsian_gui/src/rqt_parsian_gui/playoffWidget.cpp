@@ -185,6 +185,8 @@ void PlayOffWidget::slt_updatePlans() {
         ROS_INFO("ERROR req to plan server");
         return;
     }
+    theplans->request.newPlans.clear();
+    theplans->request.index.clear();
     updateModel();
 }
 
