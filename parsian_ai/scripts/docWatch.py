@@ -188,8 +188,7 @@ class Handler(FileSystemEventHandler):
             if pattern != '':
                 try:
                     for f in new_file_list:
-                        if re.search(pattern, str(f).split("/plans")[1]) and re.search(pattern, str(f).split("/plans")[
-                            1]).start() == 0:
+                        if re.search(pattern, str(f).split("/plans")[1]) and re.search(pattern, str(f).split("/plans")[1]).start() == 0:
                             new_file_list2.append(f)
                 except:
                     print("Invalid Expression: " + pattern)
@@ -224,16 +223,32 @@ class Handler(FileSystemEventHandler):
         # get a sublist from final_list based on player_num, game_mode and ball_pos
         sublist = []
         rad = 0.9
-        # normal checking:
+        master_list = []
+        active_list = []
+
         for plan in self.__final_dict:
             if self.check_plan(plan, ball_x, ball_y, rad, player_num, plan_mode):
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            i = self.__shuffleCount % len(sublist)
+            for plan in sublist:
+                if plan["isMaster"]:
+                    master_list.append(plan)
+            if len(master_list) > 0:
+                active_list = master_list
+            else:
+                for plan in sublist:
+                    if plan["isActive"]:
+                        active_list.append(plan)
+
+            if len(active_list) == 0:
+                print ("There's No Active Plan!!!")
+                return
+
+            i = self.__shuffleCount % len(active_list)
             self.__shuffleCount += 1
-            print ("\n"+sublist[i]["filename"].split("plans/")[1]+"  "+str(sublist[i]["planMode"]))
-            return self.ai_message_generator(sublist[i])
+            print ("\n"+active_list[i]["filename"].split("plans/")[1]+"  "+str(active_list[i]["planMode"]))
+            return self.ai_message_generator(active_list[i])
 
         else:
             print ("of invalid plans")
@@ -244,14 +259,14 @@ class Handler(FileSystemEventHandler):
         INDIRECT = 2
         KICKOFF = 3
         if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-            print("Ball Pos Matched")
+            # print("Ball Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT)):
                 plan["symmetry"] = False
                 return True
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
-            print("Ball Symm Pos Matched")
+            # print("Ball Symm Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and plan["planMode"] == plan_mode:
@@ -263,26 +278,44 @@ class Handler(FileSystemEventHandler):
         new_list = sorted(self.__final_dict, key=lambda x: self.ball_dist(x, x["ballInitPos"]["x"], x["ballInitPos"]["y"],
                                                                           ball_x, ball_y))
         sublist = []
+        master_list = []
+        active_list = []
+
         for plan in new_list:
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0:
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            print ("\n"+sublist[0]["filename"].split("plans/")[1]+"  "+str(sublist[0]["planMode"]))
-            # print (self.ai_message_generator(sublist[0]))
-            return self.ai_message_generator(sublist[0])
+            for plan in sublist:
+                if plan["isMaster"]:
+                    master_list.append(plan)
+            if len(master_list) > 0:
+                active_list = master_list
+            else:
+                for plan in sublist:
+                    if plan["isActive"]:
+                        active_list.append(plan)
+
+            if len(active_list) == 0:
+                print ("There's No Active Plan!!!")
+                return
+
+            print ("\n" + active_list[0]["filename"].split("plans/")[1] + " : " + str(active_list[0]["planMode"]))
+            return self.ai_message_generator(active_list[0])
         else:
             print ("\nNO PLAN MATCHED!\n")
             return None
 
-    def circle_contains(self, x, y, r, point_x, point_y):
+    @staticmethod
+    def circle_contains(x, y, r, point_x, point_y):
         if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
             return False
         else:
             return True
 
-    def ball_dist(self, plan, x1, y1, x2, y2):
+    @staticmethod
+    def ball_dist(plan, x1, y1, x2, y2):
         a = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)
         b = (x1-x2)*(x1-x2) + (y1+y2)*(y1+y2)
         if a < b:
@@ -305,6 +338,8 @@ class Handler(FileSystemEventHandler):
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
 
+        for plan in self.__final_dict:
+            print(plan["filename"]+": "+"master: "+str(plan["isMaster"])+" , "+"active: "+str(plan["isActive"]))
         return self.get_all_plans_gui_msgs()
 
     def plans_to_dict(self):
