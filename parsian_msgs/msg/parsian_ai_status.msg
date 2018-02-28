@@ -1,20 +1,7 @@
-int32 status
-uint8 id
-uint8 battery
-uint8 capCharge
-uint8 dataLoss
-bool spinCatchBall
-bool shootSensor
-bool halt
-bool shootBoardFault
-bool kickFault
-bool chipFault
-bool m1Fault
-bool m2Fault
-bool m3Fault
-bool m4Fault
-bool En1Fault
-bool En2Fault
-bool En3Fault
-bool En4Fault
-uint8 boardId
+Header header
+parsian_msgs/parsian_role_enum[] roles
+uint8[] role_id
+string behavior
+float64 success_rate
+bool finished
+
