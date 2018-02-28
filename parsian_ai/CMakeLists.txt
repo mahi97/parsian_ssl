@@ -286,6 +286,7 @@ install(FILES
 		)
 
 catkin_install_python(PROGRAMS scripts/planserver_node.py
+						       scripts/behavior_server_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
