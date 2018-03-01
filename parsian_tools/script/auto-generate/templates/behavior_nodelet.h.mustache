@@ -8,7 +8,7 @@
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_team_config.h>
-#include <parsian_ai/behaviors/behavior{{behavior}}.h>
+#include <parsian_ai/behaviors/{{behavior}}.h>
 
 #include <dynamic_reconfigure/server.h>
 #include "parsian_ai/{{behavior}}Config.h"
@@ -19,7 +19,7 @@ namespace parsian_ai {
     class {{Tbehavior}}Nodelet : public nodelet::Nodelet {
 
     private:
-        boost::shared_ptr<Behavior{{behavior}}> {{behavior}};
+        boost::shared_ptr<Behavior{{Tbehavior}}> {{behavior}};
         ros::Subscriber worldModelSub;
         ros::Subscriber refereeSub;
         ros::Subscriber teamConfSub;
