@@ -1,6 +1,7 @@
 #ifndef BEHAVIOR_H
 #define BEHAVIOR_H
 
+#include<parsian_msgs/parsian_world_model.h>
 
 class Behavior
 {
@@ -12,8 +13,11 @@ public:
 	double eval() = 0;
 	std::string getName() const { return name; }
 	std::string getDescription() const { return description; }
-	double probability() { return prob; } const
+	double probability() const { return prob; }
+	void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) { /*TODO FIX*/ }
+	void updateWM(const parsian_msgs::parsian_world_modelConstPtr& _wm) { wm = _wm; }
 protected:
+	parsian_msgs::parsian_world_modelPtr wm;
 	double prob;
 	const std::string name;
 	const std::string description;
