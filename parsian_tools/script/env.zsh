@@ -80,6 +80,30 @@ function parsian() {
 			catkin clean "${@:2}"
 			catkin build "${@:2}"
 			;;
+		behavior)
+			case $2 in
+			remove) # TODO : This feature is kinda tricky
+			;;
+			add)
+				roscd parsian_tools
+				cd script/auto-generate
+				./behavior.py ${@:3}
+			;;
+			list)
+			roscd parsian_ai
+			if [  -d ./src/parsian_ai/behaviors ];then
+				for i in `ls`;do
+					j=${i%.cpp}
+					echo ${j#behavior}
+				done
+			else
+				echo "Behavior Directory Doesn't Exists."
+			fi
+			;;
+			help|-h|--help|*)
+			;;
+			esac
+			;;
 		help|-h|--help)
 			cat <<EOS
 Usage: parsian [command] [arg=optinal]
@@ -88,14 +112,16 @@ Commands:
   run-grsim		Run enough node to run a game in grsim  (arg=--ai run ai along with)
   run-real		Run enough node to run a game in realworld (arg=--ai run ai along with)
   rebuild		clean and then build the specified packages, if nothing mentioned rebuild all packages
+  behavior		Behavior Commands
   [catkin]		If command is not valid for parsian, catkin will be run instead of parsian
 EOS
 			;;
 		*)
 			if [ $# -eq 0 ];then
+				cd $TEMP_DIR
 				echo "Unrecognised parsian command!"
 				echo "Try: parsian help"
-				break
+				return
 			fi
 			catkin "$@"
 esac
