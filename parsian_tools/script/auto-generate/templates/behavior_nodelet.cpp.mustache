@@ -39,16 +39,25 @@ void {{Tbehavior}}Nodelet::timerCb(const ros::TimerEvent& event) {
 
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
+
+    drawer->draws.texts.clear();
+    drawer->draws.circles.clear();
+    drawer->draws.segments.clear();
+    drawer->draws.vectors.clear();
+    drawer->draws.polygon.clear();
+    drawer->draws.rects.clear();
+
+    debugger->debugs.clear();
+
 }
 
 void {{Tbehavior}}Nodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-
-
+    {{behavior}}->updateWM(_wm);
 }
 
 void {{Tbehavior}}Nodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
 
-    ai->updateReferee(_ref);
+    {{behavior}}->updateReferee(_ref);
 }
 
 void {{Tbehavior}}Nodelet::ConfigServerCallBack(const ai_config::{{behavior}}Config &config, uint32_t level) {
