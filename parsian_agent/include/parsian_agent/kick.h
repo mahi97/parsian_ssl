@@ -42,7 +42,7 @@ private:
     Circle2D kickerArea;
     double jturnThr;
     double onetouchThr;
-
+    double distThr;
     QQueue <Vector2D> dirQueue;
     double kkDist;
     double kkBallDist;
