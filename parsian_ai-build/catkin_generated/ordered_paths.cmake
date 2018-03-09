@@ -1,1 +1,0 @@
-set(ORDERED_PATHS "/home/hamid/Desktop/parsian_ws/devel/.private/parsian_util/lib;/opt/ros/kinetic/lib")

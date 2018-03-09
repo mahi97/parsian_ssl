@@ -1,4 +1,0 @@
-# Hashes of file build rules.
-ea16235e678889062a0102555c86460a CMakeFiles/clean_test_results
-64a1b6f0b4b2399803e664c5be87129b CMakeFiles/parsian_ai_gencfg
-c4b5b6f0841fd7bb04c60bfb92648c56 devel/include/parsian_ai/aiConfig.h
