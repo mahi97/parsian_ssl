@@ -136,7 +136,7 @@ void COurBallPlacement::execute_x(){
     //PASS
     auto *pass = new KickAction();
     pass->setTarget(pos);
-    int power = 50 * pos.dist(ballpos);
+    int power = (int)(50 * pos.dist(ballpos));
     ROS_INFO_STREAM(power);
     pass->setKickspeed(power);
     pass->setSpin(5);
@@ -162,7 +162,7 @@ void COurBallPlacement::execute_x(){
     gpas->setTargetpos(pos);
     gpas->setLookat(ballpos);
     gpas->setSlowmode(true);
-    gpas->setRoller(7);
+    gpas->setRoller(4);
 
     switch(state){
         case BallPlacement :: NoState:
