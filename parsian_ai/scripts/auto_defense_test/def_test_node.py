@@ -2,10 +2,8 @@ from enum import Enum
 import rospy
 from parsian_msgs.msg import parsian_world_model
 from parsian_msgs.msg import parsian_robot_task
-from plans.pass_shoot_plan import *
 from point import Point
 
-## kian bia ye GUI barash benevisim
 
 
 ##------------------------------States------------------------------------##

@@ -285,8 +285,10 @@ install(FILES
 		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 		)
 
-catkin_install_python(PROGRAMS scripts/plan_server/planserver_node.py
-						       scripts/behavior_server/behavior_server_node.py
+catkin_install_python(PROGRAMS
+scripts/plan_server/planserver_node.py
+scripts/behavior_server/behavior_server_node.py
+scripts/auto_defense_test/def_test_node.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############
