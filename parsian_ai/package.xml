@@ -58,6 +58,8 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
+    <nodelet plugin="${prefix}/mahi.xml"/>
+    <nodelet plugin="${prefix}/behavior.xml"/>
     <nodelet plugin="${prefix}/nodelet.xml"/>
 
   </export>
