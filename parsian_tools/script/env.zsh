@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Save the directory this script is located in
 SCRIPTS_DIR=$(builtin cd -q "`dirname "$0"`" > /dev/null && pwd)
@@ -15,9 +15,8 @@ done
 INSTALLPATH="/parsian"
 
 # Set up enviroment variable for catkin and ROS
-source "$PARSIAN_ROOT/devel/setup.zsh"
+source $PARSIAN_ROOT/devel/setup.zsh
 export ROSCONSOLE_FORMAT='[${severity}][${node}->${function}:${line}]: ${message}'
-
 
 
 function pullgit() {
@@ -91,7 +90,7 @@ function parsian() {
 			;;
 			list)
 			roscd parsian_ai
-			if [  -d ./src/parsian_ai/behaviors ];then
+			if [  -d ./src/parsian_ai/behavior ];then
 				for i in `ls`;do
 					j=${i%.cpp}
 					echo ${j#behavior}
@@ -101,6 +100,14 @@ function parsian() {
 			fi
 			;;
 			help|-h|--help|*)
+				cat <<EOS
+Usage parsian behavior [command] [arg=optinal]
+Commands:
+  add			Add a new behavior if it doesn't exist in parsian_ai
+  remove		Remove a current behavior from parsian_ai
+  list			Show the list of behaviors inside parsian_ai
+  help			Display this help message
+EOS
 			;;
 			esac
 			;;
