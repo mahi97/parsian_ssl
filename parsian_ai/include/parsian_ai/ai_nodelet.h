@@ -16,6 +16,7 @@
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_team_config.h>
+#include <parsian_msgs/parsian_behavior.h>
 #include <parsian_ai/ai.h>
 
 #include <dynamic_reconfigure/server.h>
@@ -28,10 +29,7 @@ namespace parsian_ai {
 
     private:
         boost::shared_ptr<AI> ai;
-        ros::Subscriber worldModelSub;
-        ros::Subscriber robotStatusSub;
-        ros::Subscriber refereeSub;
-        ros::Subscriber teamConfSub;
+        ros::Subscriber worldModelSub, robotStatusSub, refereeSub, teamConfSub, behaviorSub;
         ros::Publisher drawPub;
         ros::Publisher debugPub;
 
@@ -51,6 +49,7 @@ namespace parsian_ai {
         void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
         void robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs);
         void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
+        void behaviorCb(const parsian_msgs::parsian_behaviorConstPtr& _behavior);
         void timerCb(const ros::TimerEvent &event);
     };
 }
