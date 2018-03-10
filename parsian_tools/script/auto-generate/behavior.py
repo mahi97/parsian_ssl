@@ -50,12 +50,14 @@ def render_and_write(directory, renderer, behav, template):
                 os.mkdir(dir_name)
         
         p = dir_name + os.sep + template.replace('behavior', behav['behavior'])[:-len('.mustache')]
-        if os.path.exists(p):
+        if os.path.exists(p) and extention not in  ['xml', 'txt']:
             print('Nothing Happend, File is Exists => ', p)
+            return
 
         with open(p, "w") as f:
             f.write(renderer.render_path('templates' + os.sep + template, behav))
         lines = []
+
         if extention == 'xml':
             with open ('../../../parsian_ai/package.xml', 'r') as fd:
                 for line in fd.readlines():
@@ -65,6 +67,16 @@ def render_and_write(directory, renderer, behav, template):
             with open ('../../../parsian_ai/package.xml', 'w') as fd:
                 for line in lines:
                     fd.write(line)
+        if extention == 'txt':
+            with open ('../../../parsian_ai/CMakeLists.txt', 'r') as fd:
+                for line in fd.readlines():
+                    lines.append(line)
+                    if 'catkin_python_setup' in line:
+                        lines.append('include(./'+ behav['behavior']+ '_CMakeLists.txt)')
+            with open ('../../../parsian_ai/CMakeLists.txt', 'w') as fd:
+                for line in lines:
+                    fd.write(line)
+
 def clean_folder(name):
     path = os.path.join(os.getcwd(), name)
     if os.path.isdir(path):
