@@ -8,7 +8,7 @@ class BestSelector:
     def update_data(self, new_action):
         # type:( parsian_behavior )
         if new_action.name not in self.data.keys():
-            self.data[new_action.name] = NQueue(30)
+            self.data[new_action.name] = NQueue(50)
 
         self.data[new_action.name].update(new_action)
 
