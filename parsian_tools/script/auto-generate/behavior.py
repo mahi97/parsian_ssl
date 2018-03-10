@@ -4,6 +4,7 @@ import datetime
 import os
 import re
 import argparse
+import xmltodict
 
 rend = pystache.Renderer()
 
@@ -35,9 +36,16 @@ def render_and_write(directory, renderer, behav, template):
             sub_dir = 'include/behavior'
         elif extention in ['cfg']:
             sub_dir = 'cfg'
+        elif extention in ['xml', 'txt']:
+            sub_dir = '.'
         else:
             sub_dir = 'auto_generated/behavior'
-        dir_name = directory + os.sep + sub_dir + os.sep + behav['behavior']
+
+
+        if sub_dir in ['.', 'cfg']:
+            dir_name = directory + os.sep + sub_dir
+        else:
+            dir_name = directory + os.sep + sub_dir + os.sep + behav['behavior']
         if not os.path.isdir(dir_name):
                 os.mkdir(dir_name)
         
@@ -47,7 +55,16 @@ def render_and_write(directory, renderer, behav, template):
 
         with open(p, "w") as f:
             f.write(renderer.render_path('templates' + os.sep + template, behav))
-
+        lines = []
+        if extention == 'xml':
+            with open ('../../../parsian_ai/package.xml', 'r') as fd:
+                for line in fd.readlines():
+                    lines.append(line)
+                    if '<export>' in line:
+                        lines.append('    <nodelet plugin="${prefix}/' + 'mahi' + '.xml"/>\n')
+            with open ('../../../parsian_ai/package.xml', 'w') as fd:
+                for line in lines:
+                    fd.write(line)
 def clean_folder(name):
     path = os.path.join(os.getcwd(), name)
     if os.path.isdir(path):

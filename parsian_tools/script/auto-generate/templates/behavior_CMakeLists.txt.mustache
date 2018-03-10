@@ -1,0 +1,59 @@
+generate_dynamic_reconfigure_options(
+	cfg/{{behavior}}.cfg
+)
+
+add_library({{behavior}}
+	src/behavior/{{behavior}}.cpp
+
+)
+
+add_library({{behavior}}_nodelet
+        src/behavior/{{behavior}}_nodelet.cpp
+
+)
+
+add_executable({{behavior}}_node
+        src/behavior/{{behavior}}_node.cpp
+
+)
+
+target_link_libraries({{behavior}}_node
+        ${catkin_LIBRARIES}
+        {{behavior}}_nodelet
+        )
+
+target_link_libraries({{behavior}}_nodelet
+	${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+	${{{behavior}}}
+	
+	)
+
+target_link_libraries({{behavior}}
+	${catkin_LIBRARIES}
+        ${QT_LIBRARIES}
+	)
+
+add_dependencies({{behavior}
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+	${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies({{behavior}_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+	${PROJECT_NAME}_gencfg
+        )
+
+add_dependencies(${PROJECT_NAME}_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+	${PROJECT_NAME}_gencfg
+        )
+
+install(TARGETS {{behavior}} {{behavior}}_nodelet {{behavior}}_node
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
