@@ -28,7 +28,7 @@ class BehaviorServer:
         self.selected_pub.publish(best)
 
     def correctProbillty(self, msg):
-        pass
+        self.selector.update_success_rate(msg)
 if __name__ == '__main__':
     bs = BehaviorServer()
     rospy.spin()
