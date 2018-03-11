@@ -1,19 +1,28 @@
-from enum import Enum
+#!/usr/bin/env python
+# license removed for brevity
+
 import rospy
-from parsian_msgs.msg import parsian_world_model
+import point
+import math
+import rospkg
+from enum import Enum
 from parsian_msgs.msg import parsian_robot_task
-from point import Point
+from parsian_msgs.msg import vector2D
+from parsian_msgs.msg import parsian_robot_command
+from parsian_msgs.msg import parsian_skill_gotoPointAvoid
+from parsian_msgs.msg import parsian_skill_no
+from parsian_msgs.msg import parsian_world_model
+from parsian_msgs.msg import parsian_robot
+from parsian_msgs.msg import parsian_skill_receivePass
+from parsian_msgs.msg import parsian_skill_kick
+from Plans.pass_shoot_plan import Pass_Shoot_Plan
 
 
 
 ##------------------------------States------------------------------------##
 class Attack_Plan(Enum):
-    No_Plan = 0,
-    Pass_Shoot_Plan = 1  
+    Pass_Shoot_Plan = 0
 
-
-class Pass_Shoot_State(Enum):
-	A = 1
 
 
 
@@ -25,28 +34,32 @@ class AutoDefenseTest():
     def __init__(self):
 
         self.wm = parsian_world_model
-        rospy.init_node('def_test', anonymous=True)
-	self.wm_sub = rospy.Subscriber('/world_model', parsian_world_model, self.wm_cb, queue_size=1, buff_size=2 ** 24)
-        self.attack_state = Attack_Plan.No_Attack
-        self.srv = Server(def_testConfig, self.cfg_callback)
+        self.wm_sub = rospy.Subscriber('/world_model', parsian_world_model, self.wm_cb, queue_size=1, buff_size=2 ** 24)
+        self.ready_to_run = True ##should br false and assign true in cfg
+        self.plan = Attack_Plan.Pass_Shoot_Plan
+
+        self.pass_shoot_plan = Pass_Shoot_Plan()
+
 
     def wm_cb(self, wm):
+        self.wm = wm
 
-	self.wm = wm
-
-        if (self.attack_state == Attack_Plan.No_Plan):
-            #halt
-            pass
+        if self.ready_to_run:
 
 
-        if (self.attack_state == Attack_Plan.Pass_Shoot_plan):
-            if (pass_shoot_plan(self.wm)):
-                self.STATE = STATE.Get_User_Plan
+            if (self.plan == Attack_Plan.Pass_Shoot_Plan):
+                if (self.pass_shoot_plan.execute(self.wm)):
+                    self.ready_to_run = False
 
 
-    #-------------------------Plan Functions------------------------------------##
-        
-    def Pass_Shoot_Plan():
+
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('def_test', anonymous=True)
+        rospy.loginfo("def_test_node is running")
+        def_test = AutoDefenseTest()
+        rospy.spin()
+    except rospy.ROSInterruptException:
         pass
-
 
