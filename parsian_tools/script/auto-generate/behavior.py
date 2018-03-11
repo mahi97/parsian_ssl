@@ -52,7 +52,7 @@ def render_and_write(directory, renderer, behav, template):
         p = dir_name + os.sep + template.replace('behavior', behav['behavior'])[:-len('.mustache')]
         if os.path.exists(p) and extention not in  ['xml', 'txt']:
             print('Nothing Happend, File is Exists => ', p)
-            return
+#            return
 
         with open(p, "w") as f:
             f.write(renderer.render_path('templates' + os.sep + template, behav))
@@ -72,7 +72,7 @@ def render_and_write(directory, renderer, behav, template):
                 for line in fd.readlines():
                     lines.append(line)
                     if 'catkin_python_setup' in line:
-                        lines.append('include(./'+ behav['behavior']+ '_CMakeLists.txt)')
+                        lines.append('include(./'+ behav['behavior']+ '_CMakeLists.txt)\n')
             with open ('../../../parsian_ai/CMakeLists.txt', 'w') as fd:
                 for line in lines:
                     fd.write(line)

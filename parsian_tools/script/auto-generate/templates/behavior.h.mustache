@@ -8,8 +8,8 @@ class Behavior{{Tbehavior}}: public Behavior {
 public:
     Behavior{{Tbehavior}}();
     virtual ~Behavior{{Tbehavior}}();
-    virtual int execute();
-    virtual double eval();
+    virtual int execute() = 0;
+    virtual double eval() = 0;
 };
 
 #endif // BEHAVIOR{{UCbehavior}}_H
