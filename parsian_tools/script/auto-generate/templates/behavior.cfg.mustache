@@ -18,4 +18,4 @@ generator = ParameterGenerator()
 # conf.add("conf2", int_t   , 0, "conf2 discrib.", 0, 0, 11) #default, min, max
 # conf.add("conf3", double_t, 0, "conf4 discrib.", 0, 0, 11) #default, min, max
 
-exit(generator.generate(PACKAGE, "ai_config", {{behavior}}))
+exit(generator.generate(PACKAGE, "ai_config", "{{behavior}}"))
