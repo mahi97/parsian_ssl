@@ -9,6 +9,7 @@
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
+#include <parsian_msgs/parsian_robots_status.h>
 #include <behavior/{{behavior}}/{{behavior}}.h>
 
 #include <dynamic_reconfigure/server.h>
@@ -24,6 +25,7 @@ namespace parsian_ai {
         ros::Subscriber worldModelSub;
         ros::Subscriber refereeSub;
         ros::Subscriber teamConfSub;
+	ros::Subscriber robotStatusSub;
         ros::Publisher drawPub;
         ros::Publisher debugPub;
 
@@ -34,7 +36,7 @@ namespace parsian_ai {
         void ConfigServerCallBack(const ai_config::{{behavior}}Config &config, uint32_t level) ;
 
         void onInit() override;
-
+	void robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs);
         void worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm);
         void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
         void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);

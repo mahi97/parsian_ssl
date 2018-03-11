@@ -8,7 +8,7 @@ void {{Tbehavior}}Nodelet::onInit() {
 
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
-    {{behavior}}.reset(new Behavior{{Tbehavior}}("describe me"));
+    {{behavior}}.reset(new Behavior{{Tbehavior}}());
 
     drawer = new Drawer();
     debugger = new Debugger();
@@ -38,16 +38,15 @@ void {{Tbehavior}}Nodelet::teamConfCb(const parsian_msgs::parsian_team_configCon
 void {{Tbehavior}}Nodelet::timerCb(const ros::TimerEvent& event) {
 
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
-    if (debugger != nullptr) debugPub.publish(debugger->debugs);
+//    if (debugger != nullptr) debugPub.publish(debugger->debugs);
 
     drawer->draws.texts.clear();
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.vectors.clear();
-    drawer->draws.polygon.clear();
     drawer->draws.rects.clear();
 
-    debugger->debugs.clear();
+//    debugger->debugs.clear();
 
 }
 
@@ -61,5 +60,4 @@ void {{Tbehavior}}Nodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrappe
 }
 
 void {{Tbehavior}}Nodelet::ConfigServerCallBack(const ai_config::{{behavior}}Config &config, uint32_t level) {
-    conf = config;
 }
