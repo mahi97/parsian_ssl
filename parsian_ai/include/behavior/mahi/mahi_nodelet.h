@@ -7,7 +7,6 @@
 
 #include <parsian_msgs/parsian_debugs.h>
 #include <parsian_msgs/parsian_draw.h>
-#include <parsian_msgs/parsian_team_config.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_msgs/parsian_robots_status.h>
 #include <behavior/mahi/mahi.h>
@@ -36,10 +35,9 @@ namespace parsian_ai {
         void ConfigServerCallBack(const ai_config::mahiConfig &config, uint32_t level) ;
 
         void onInit() override;
-	void robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs);
+	    void robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs);
         void worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm);
         void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
-        void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
         void timerCb(const ros::TimerEvent &event);
     };
 }

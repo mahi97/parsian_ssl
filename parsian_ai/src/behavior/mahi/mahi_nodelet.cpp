@@ -17,7 +17,6 @@ void MahiNodelet::onInit() {
     robotStatusSub = nh.subscribe("/robot_status", 1000, &MahiNodelet::robotStatusCallBack, this);
 
     refereeSub = nh.subscribe("/referee", 1000,  &MahiNodelet::refereeCallBack, this);
-    teamConfSub = nh.subscribe("/team_config", 100, &MahiNodelet::teamConfCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -29,10 +28,6 @@ void MahiNodelet::onInit() {
     f = boost::bind(&MahiNodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
 
-}
-
-void MahiNodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf) {
-    teamConfig = *_conf;
 }
 
 void MahiNodelet::timerCb(const ros::TimerEvent& event) {
@@ -60,4 +55,8 @@ void MahiNodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr
 }
 
 void MahiNodelet::ConfigServerCallBack(const ai_config::mahiConfig &config, uint32_t level) {
+}
+
+void MahiNodelet::robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs) {
+
 }
