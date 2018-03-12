@@ -21,12 +21,10 @@ find_package(catkin REQUIRED COMPONENTS
 file(GLOB_RECURSE LibFiles "include/*.h")
 add_custom_target(headers SOURCES ${LibFiles})
 
-
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${QT_DEFINITIONS})
-
 
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
@@ -36,12 +34,10 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 
 find_package(QJSON REQUIRED)
 
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 catkin_python_setup()
-
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -58,6 +54,7 @@ catkin_python_setup()
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
+		cfg/mahi.cfg
 		cfg/ai.cfg
 )
 
@@ -136,7 +133,6 @@ add_library(${PROJECT_NAME}_util
 		#		src/parsian_ai/util/loadplayoffjson.cpp
 		src/parsian_ai/util/agent.cpp)
 
-
 add_library(${PROJECT_NAME}_nodelet
 		src/parsian_ai/ai_nodelet.cpp
 		)
@@ -144,7 +140,6 @@ add_library(${PROJECT_NAME}_nodelet
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-
 
 add_executable(${PROJECT_NAME}_node
 		src/parsian_ai/ai_node.cpp
@@ -223,7 +218,6 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_util
 		)
 
-
 target_link_libraries(${PROJECT_NAME}_plays
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
@@ -248,7 +242,8 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${QJSON_LIBRARIES}
 		)
 
-
+### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./mahi_CMakeLists.txt)
 
 #############
 ## Install ##
@@ -266,7 +261,7 @@ install(PROGRAMS
 		)
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node mahi_node
 		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -1,0 +1,15 @@
+#ifndef BEHAVIOR{{UCbehavior}}_H
+#define BEHAVIOR{{UCbehavior}}_H
+
+#include<parsian_ai/util/behavior.h>
+
+class Behavior{{Tbehavior}}: public Behavior {
+
+public:
+    Behavior{{Tbehavior}}();
+    virtual ~Behavior{{Tbehavior}}();
+    virtual int execute();
+    virtual double eval();
+};
+
+#endif // BEHAVIOR{{UCbehavior}}_H
