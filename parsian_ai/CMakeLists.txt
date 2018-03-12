@@ -21,12 +21,10 @@ find_package(catkin REQUIRED COMPONENTS
 file(GLOB_RECURSE LibFiles "include/*.h")
 add_custom_target(headers SOURCES ${LibFiles})
 
-
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_definitions(${QT_DEFINITIONS})
-
 
 file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.hpp)
 
@@ -35,7 +33,6 @@ qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
 find_package(QJSON REQUIRED)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -137,7 +134,6 @@ add_library(${PROJECT_NAME}_util
 		#		src/parsian_ai/util/loadplayoffjson.cpp
 		src/parsian_ai/util/agent.cpp)
 
-
 add_library(${PROJECT_NAME}_nodelet
 		src/parsian_ai/ai_nodelet.cpp
 		)
@@ -145,7 +141,6 @@ add_library(${PROJECT_NAME}_nodelet
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-
 
 add_executable(${PROJECT_NAME}_node
 		src/parsian_ai/ai_node.cpp
@@ -224,7 +219,6 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_util
 		)
 
-
 target_link_libraries(${PROJECT_NAME}_plays
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
@@ -248,8 +242,6 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${catkin_LIBRARIES}
 		${QJSON_LIBRARIES}
 		)
-
-
 
 #############
 ## Install ##
