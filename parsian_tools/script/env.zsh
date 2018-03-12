@@ -84,9 +84,11 @@ function parsian() {
 			remove) # TODO : This feature is kinda tricky
 			;;
 			add)
-				roscd parsian_tools
+				temp=`pwd`
+				cd $PARSIAN_ROOT/src/parsian_ssl/parsian_tools
 				cd script/auto-generate
 				./behavior.py ${@:3}
+				cd $temp
 			;;
 			list)
 			roscd parsian_ai
