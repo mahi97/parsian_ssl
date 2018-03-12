@@ -38,7 +38,6 @@ find_package(QJSON REQUIRED)
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 catkin_python_setup()
-include(./mahi_CMakeLists.txt)
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
@@ -242,6 +241,9 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${catkin_LIBRARIES}
 		${QJSON_LIBRARIES}
 		)
+
+### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./mahi_CMakeLists.txt)
 
 #############
 ## Install ##
