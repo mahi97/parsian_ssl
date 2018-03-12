@@ -90,11 +90,15 @@ function parsian() {
 			;;
 			list)
 			roscd parsian_ai
-			if [  -d ./src/parsian_ai/behavior ];then
+			if [  -d ./src/behavior ];then
+				echo "###Behaviors:"
+				cd ./src/behavior
 				for i in `ls`;do
 					j=${i%.cpp}
 					echo ${j#behavior}
 				done
+				echo "###End of Behaviors"
+				cd ..
 			else
 				echo "Behavior Directory Doesn't Exists."
 			fi

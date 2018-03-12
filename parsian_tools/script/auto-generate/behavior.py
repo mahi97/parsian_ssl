@@ -4,7 +4,6 @@ import datetime
 import os
 import re
 import argparse
-import xmltodict
 
 rend = pystache.Renderer()
 
