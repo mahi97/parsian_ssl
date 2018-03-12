@@ -60,6 +60,8 @@ def render_and_write(directory, renderer, behav, template):
         if extention == 'xml':
             with open ('../../../parsian_ai/package.xml', 'r') as fd:
                 for line in fd.readlines():
+                    if len(lines) > 0 and line == lines[-1]:
+                        continue
                     lines.append(line)
                     if '<export>' in line:
                         lines.append('    <nodelet plugin="${prefix}/' + 'mahi' + '.xml"/>\n')
@@ -69,6 +71,8 @@ def render_and_write(directory, renderer, behav, template):
         if extention == 'txt':
             with open ('../../../parsian_ai/CMakeLists.txt', 'r') as fd:
                 for line in fd.readlines():
+                    if len(lines) > 0 and line == lines[-1]:
+                        continue
                     lines.append(line)
                     if 'catkin_python_setup' in line:
                         lines.append('include(./'+ behav['behavior']+ '_CMakeLists.txt)\n')
