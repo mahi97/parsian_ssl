@@ -825,7 +825,6 @@ void CCoach::decideAttack()
 
     switch (gameState->getState()) { // GAMESTATE
 
-<<<<<<< ed56530840a8517df72ef03d210e43668daf7758
     case States::Halt:
         decideHalt(ourPlayers);
         return;
@@ -882,65 +881,6 @@ void CCoach::decideAttack()
         decideNull(ourPlayers);
         return;
         break;
-=======
-        case States::Halt:
-            decideHalt(ourPlayers);
-            return;
-            break;
-        case States::PlayOff:
-            selectedPlay->reset();
-            decideStop(ourPlayers);
-            return;
-            break;
-
-        case States::OurKickOff:
-            decideOurKickOff(ourPlayers);
-            break;
-
-        case States::TheirKickOff:
-            decideTheirKickOff(ourPlayers);
-            break;
-
-        case States::OurDirectKick:
-            decideOurDirect(ourPlayers);
-            break;
-
-        case States::TheirDirectKick:
-            decideTheirDirect(ourPlayers);
-            break;
-
-        case States::OurIndirectKick:
-            decideOurIndirect(ourPlayers);
-            break;
-
-        case States::TheirIndirectKick:
-            decideTheirIndirect(ourPlayers);
-            break;
-
-        case States::OurPenaltyKick:
-            decideOurPenalty(ourPlayers);
-            break;
-
-        case States::TheirPenaltyKick:
-            decideTheirPenalty(ourPlayers);
-            break;
-        case States::PlayOn:
-            decideStart(ourPlayers);
-            break;
-        case States::OurBallPlacement:
-            decideOurBallPlacement(ourPlayers);
-            break;
-        case States::TheirBallPlacement:
-            decideStop(ourPlayers);
-            break;
-        case States::HalfTime:
-            decideHalfTimeLineUp(ourPlayers);
-            break;
-        default:
-            decideNull(ourPlayers);
-            return;
-            break;
->>>>>>> mahi commit all Lhum's code
     }
     QList<Agent*> ourAgents;
     for(auto& ourPlayer : ourPlayers) {

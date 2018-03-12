@@ -82,6 +82,7 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
     wm->updateRef(_ref);
 
+
 }
 
 CSoccer* AI::getSoccer() {
