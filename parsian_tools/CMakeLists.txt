@@ -137,7 +137,8 @@ install(FILES
 
 
 catkin_install_python(PROGRAMS script/latency.py
-        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+				script/blackboardconsole.py
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #############
 ## Testing ##
 #############
