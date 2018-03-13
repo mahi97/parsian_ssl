@@ -71,6 +71,9 @@ CCoach::CCoach(Agent**_agents)
     selectedPlay = stopPlay;
     for (int &i : faultDetectionCounter) i = 0;
     firstTime = true;
+
+    selectedBehavior = nullptr;
+    behaviorMahi = new BehaviorMahi();
 }
 
 CCoach::~CCoach()

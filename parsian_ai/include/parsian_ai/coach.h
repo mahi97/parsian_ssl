@@ -20,7 +20,7 @@
 #include <parsian_ai/plans/plans.h>
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
-
+#include <behavior/mahi/mahi.h>
 #include <parsian_msgs/plan_service.h>
 
 enum class BallPossesion {
@@ -94,6 +94,9 @@ private:
     CDynamicAttack       *dynamicAttack;
 
     CStopPlay            *stopPlay;
+
+    Behavior* selectedBehavior;
+    BehaviorMahi* behaviorMahi;
 
 public:
     CRoleStop *stopRoles[_MAX_NUM_PLAYERS];
