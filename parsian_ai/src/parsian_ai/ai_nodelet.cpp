@@ -24,6 +24,8 @@ void AINodelet::onInit() {
     refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
     teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
 
+    behaviorSub = nh.subscribe("/behavior", 100, &AINodelet::behaviorCb, this);
+
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
 //    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
@@ -93,3 +95,9 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
 void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
     conf = config;
 }
+
+void AINodelet::behaviorCb(const parsian_msgs::parsian_behaviorConstPtr &_behavior) {
+ ROS_INFO_STREAM("behavior "<<_behavior->name << " received !");
+}
+
+
