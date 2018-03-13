@@ -4,6 +4,8 @@
 #include<parsian_msgs/parsian_world_model.h>
 #include<parsian_msgs/ssl_refree_wrapper.h>
 #include<parsian_ai/util/worldmodel.h>
+#include<parsian_msgs/parsian_behavior.h>
+
 class Behavior
 {
 public:
@@ -11,7 +13,7 @@ public:
 
 	}
 	virtual int execute() = 0;
-	virtual double eval() = 0;
+	virtual double eval(parsian_msgs::parsian_behaviorPtr _behav) = 0;
 	std::string getName() const { return name; }
 	std::string getDescription() const { return description; }
 	double probability() const { return prob; }

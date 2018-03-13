@@ -13,6 +13,7 @@ int BehaviorMahi::execute() {
     return 0;
 }
 
-double BehaviorMahi::eval() {
+double BehaviorMahi::eval(parsian_msgs::parsian_behaviorPtr _behav) {
+    _behav = nullptr;
     return 0.0;
 }
