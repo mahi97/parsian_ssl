@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# license removed for brevity
-
+# created by kian and hamid in parsian ai
 
 import rospy
 import random
@@ -18,6 +17,7 @@ from point import Point
 import math
 import point
 from parsian_msgs.msg import parsian_robot
+from time import time
 
 
 
@@ -29,31 +29,36 @@ class States(Enum):
 class Pass_Shoot_Plan():
 
     def __init__(self):
-        self.wm = parsian_world_model
+        self.wm = parsian_world_model()
         self.state = States.SET_ROLES
 
         self.kicker = parsian_robot
         self.receiver = parsian_robot
         self.random_ids = []
+        self.timer = time()
+        self.setkickerNreceiver = False
+        self.ispassed = False
 
 
 
-    def execute(self, _wm):
+
+    def execute(self, _wm, isforcestart):
         self.wm = _wm
-
+        rospy.loginfo(self.state)
         if self.state == States.SET_ROLES:
             if self.set_roles():
                 self.state = States.PASS_TO_KICK
 
+        if isforcestart:
+            if self.state == States.PASS_TO_KICK:
+                if self.pass_to_kicker():
+                    self.state = States.KICK
 
-        if self.state == States.PASS_TO_KICK:
-            if self.pass_to_kicker():
-                self.state = States.KICK
 
-
-        if self.state == States.KICK:
-            if self.kick():
-                return True
+            if self.state == States.KICK:
+                if self.kick():
+                    self.state = States.SET_ROLES
+                    return True
 
         if self.ball_out_of_field():
             return True
@@ -66,34 +71,37 @@ class Pass_Shoot_Plan():
 
     def set_roles(self):
 
-        ## get nearest to ball
-        nearerid = self.findnearesttoballID()
-        for robot in self.wm.our:
-            if robot.id == nearerid:
-                self.kicker = robot
-        kickertarget = self.generateSMWbehindP1inrelP2(point.Point(self.wm.ball.pos.x, self.wm.ball.pos.y), point.Point(6, 0))
+        kickertarget = point.Point(0, 0)
+        if not self.setkickerNreceiver:
+            ## get nearest to ball
+            nearerid = self.findnearesttoballID()
+            for robot in self.wm.our:
+                if robot.id == nearerid:
+                    self.kicker = robot
 
-        ## choose receiver
-        for robot in self.wm.our:
-            if robot.id != self.kicker.id:
-                self.receiver = robot
-                break
+            ## choose receiver
+            for robot in self.wm.our:
+                if robot.id != self.kicker.id:
+                    self.receiver = robot
+                    self.gotopoint(self.receiver.id, point.Point(random.uniform(0, 4.5), random.uniform(-3, 3)))
+                    break
+            self.setkickerNreceiver = True
+        kickertarget = self.generateSMWbehindP1inrelP2(point.Point(self.wm.ball.pos.x, self.wm.ball.pos.y),
+                                                       point.Point(self.receiver.pos.x, self.receiver.pos.y))
 
         ## generenate random positions
         for robot in self.wm.our:
             if robot.id != self.kicker.id and robot.id != self.receiver.id:
-                tar = point.Point(random.uniform(0, 6), random.uniform(-4, 4))
+                tar = point.Point(random.uniform(0, 4.5), random.uniform(-3, 3))
                 self.gotopoint(robot.id, tar)
 
         ## if kicker and receiver arrive -> send force_start
-        if self.gotopoint(self.kicker.id, kickertarget):
-            rospy.loginfo("finish")
+        if self.gotopoint(self.kicker.id, kickertarget, point.Point(self.receiver.pos.x, self.receiver.pos.y)):
+            self.timer = time()
             return True
         return False
 
     def pass_to_kicker(self):
-        pass
-
         ## assign pass and receive skills
         task_pub1 = rospy.Publisher('agent_' + str(self.receiver.id) + str('/task'), parsian_robot_task,
                                          queue_size=1,
@@ -106,22 +114,22 @@ class Pass_Shoot_Plan():
         task1.target.y = self.receiver.pos.y
         current_task1.receivePassTask = task1
         task_pub1.publish(current_task1)
-
         task_pub2 = rospy.Publisher('agent_' + str(self.kicker.id) + str('/task'), parsian_robot_task,
-                                         queue_size=1,
-                                         latch=True)
-        current_task2 = parsian_robot_task()
-        current_task2.select = parsian_robot_task.KICK
-        task2 = parsian_skill_kick()
-        task2.chip = random.randint(0,2)
-        task2.spin = random.randint(0,6)
-        # task2.iskickchargetime = True
-        # task2.kickchargetime = self.current_speed
-        task2.kickSpeed = 400 ##
-        task2.target.x = self.receiver.pos.x
-        task2.target.y = self.receiver.pos.y
-        current_task2.kickTask = task2
-        task_pub2.publish(current_task2)
+                                    queue_size=1,
+                                    latch=True)
+        if not self.ispassed:
+            current_task2 = parsian_robot_task()
+            current_task2.select = parsian_robot_task.KICK
+            task2 = parsian_skill_kick()
+            task2.chip = random.randint(0,2)
+            task2.spin = random.randint(0,6)
+            # task2.iskickchargetime = True
+            # task2.kickchargetime = self.current_speed
+            task2.kickSpeed = 300 ##
+            task2.target.x = self.receiver.pos.x
+            task2.target.y = self.receiver.pos.y
+            current_task2.kickTask = task2
+            task_pub2.publish(current_task2)
         ## set gotopoint skills in the for random points in their regions
 
         ## finished if ball enters the receivers region
@@ -131,24 +139,53 @@ class Pass_Shoot_Plan():
             task3 = parsian_skill_no()
             current_task3.noTask = task3
             task_pub2.publish(current_task3)
+            self.ispassed = True
+        if math.hypot(self.wm.ball.vel.x, self.wm.ball.vel.y) < 0.2 and self.ispassed: # and math.hypot(self.wm.ball.pos.x - self.receiver.pos.x, self.wm.ball.pos.y - self.receiver.pos.y) < 0.8
+            self.timer = time()
             return True
         return False
 
     def kick(self):
-        pass
-
         ## assign kikck skill
+        task_pub2 = rospy.Publisher('agent_' + str(self.receiver.id) + str('/task'), parsian_robot_task,
+                                    queue_size=1,
+                                    latch=True)
+        current_task2 = parsian_robot_task()
+        current_task2.select = parsian_robot_task.KICK
+        task2 = parsian_skill_kick()
+        task2.chip = False
+        task2.spin = random.randint(0, 6)
+        # task2.iskickchargetime = True
+        # task2.kickchargetime = self.current_speed
+        task2.kickSpeed = 700  ##
+        task2.target.x = 6
+        task2.target.y = 0
+        current_task2.kickTask = task2
+        task_pub2.publish(current_task2)
+        ## set gotopoint skills in the for random points in their regions
+
+        ## finished if ball enters the receivers region
+        if math.hypot(self.wm.ball.vel.x, self.wm.ball.vel.y) > 0.2 and math.hypot(self.wm.ball.pos.x - self.receiver.pos.x, self.wm.ball.pos.y - self.receiver.pos.y) > 0.8:
+            current_task3 = parsian_robot_task()
+            current_task3.select = parsian_robot_task.NOTASK
+            task3 = parsian_skill_no()
+            current_task3.noTask = task3
+            task_pub2.publish(current_task3)
+            self.timer = time()
+            return True
 
         ## maybe give random positions and gotopoint skills
 
-        ## finished if 1)ball speed increases very much and ball far from kicker
+        return False
 
 
     def ball_out_of_field(self):
-        pass
+        return self.wm.ball.pos.x > 6 or self.wm.ball.pos.x < -6 or self.wm.ball.pos.y > 4.5 or self.wm.ball.pos.y < -4.5
 
     def out_of_time(self):
-        pass
+        if time() - self.timer > 200:
+            return True
+
 
     def dist(self, firstV2, secondV2):
         # type:(vector2D, vector2D) ->float
@@ -213,3 +250,22 @@ class Pass_Shoot_Plan():
         target.x = p1.x + r.x
         target.y = p1.y + r.y
         return target
+
+    def resetplan(self):
+        self.kicker = parsian_robot
+        self.receiver = parsian_robot
+        self.random_ids = []
+        self.timer = time()
+        self.setkickerNreceiver = False
+        self.ispassed = False
+        self.state = States.SET_ROLES
+
+        for robot in self.wm.our:
+            task_pub2 = rospy.Publisher('agent_' + str(robot.id) + str('/task'), parsian_robot_task,
+                                        queue_size=1,
+                                        latch=True)
+            current_task3 = parsian_robot_task()
+            current_task3.select = parsian_robot_task.NOTASK
+            task3 = parsian_skill_no()
+            current_task3.noTask = task3
+            task_pub2.publish(current_task3)
