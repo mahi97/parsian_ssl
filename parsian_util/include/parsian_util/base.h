@@ -129,26 +129,16 @@ struct GameStatePacket
 #define _BANG_BANG_NONLINEAR_SWITCH 0.300
 
 
-
-#define _STADIUM_WIDTH   10.90
-#define _STADIUM_HEIGHT  7.70
-
-
-/* COM Port Constants */
-#define _SIM_COM_PORT   "/dev/ttyS6"
-#define _REAL_COM_PORT  "/dev/ttyUSB0"
-
-
 /* Skills */
 #define _DEFENCE_DIST       0.110
 
 #define Property(type,name,local) \
-    public: inline type& get##name() {return local;} \
+    public: inline const type& get##name() const {return local;} \
     public: inline void set##name(type val) {local = val;} \
     protected: type local
 
 #define PropertyGet(type,name,local) \
-    public: inline type& get##name() {return local;} \
+    public: inline type& get##name() const {return local;} \
     protected: type local
 
 #define InitVal(val) val = _##val

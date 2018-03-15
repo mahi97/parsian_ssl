@@ -195,7 +195,6 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             agentsCount--;
         }
     }
-    preferedGoalieID = findGoalieID();
 
     // handle stop
     if (gameState->isStop()) {
@@ -701,29 +700,13 @@ void CCoach::updateAttackState()
     lastASWasCritical = (ourAttackState == CRITICAL);
 
 }
-void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
+void CCoach::choosePlaymakeAndSupporter()
 {
+    playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
-    if( ourPlayers.contains(preferedGoalieID) != nullptr) {
+    if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
     }
-
-    //    if(defenseFirst){
-    //        for (auto defenseAgent : defenseAgents) {
-    //            if ( ourPlayers.contains(defenseAgent->id()) ) {
-    //                ourPlayers.removeOne(defenseAgent->id());
-    //            } else {
-    //                debugger->debug("[coach] Bad Defense assigning", D_ERROR);
-    //            }
-    //        }
-    //    } else {
-    //        if (ourPlayers.size() - preferedDefenseCounts <= 0) {
-    //            playmakeId = -1;
-    //            lastPlayMake = -1;
-
-    //            return;
-    //        }
-    //    }
 
     if (ourPlayers.empty()) {
         playmakeId = -1;
@@ -740,7 +723,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
     {
         double maxD = -1000.1;
         for (int ourPlayer : ourPlayers) {
-            double o = -1 * agents[ourPlayer]->pos().dist(ballPos) ;
+            double o = -1 * agents[ourPlayer]->pos().dist(ballPos);
             if(ourPlayer == lastPlayMake)
                 o += playMakeTh;
             if(o > maxD)
@@ -757,7 +740,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
         if(playMakeIntention.elapsed() < playMakeIntentionInterval)
         {
             playmakeId = lastPlayMake;
-            debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
+            debugger->debug(QString("play make is : %1").arg(playmakeId), D_PARSA);
             return;
         }
         playMakeIntention.restart();
@@ -776,10 +759,10 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
             }
         }
         for (int ourPlayer : ourPlayers)
-            debugger->debug(QString("timeneeded of %1 is : %2 \n").arg(ourPlayer).arg(nearest[ourPlayer]), D_PARSA);
+            debugger->debug(QString("time needed of %1 is : %2 \n").arg(ourPlayer).arg(nearest[ourPlayer]), D_PARSA);
         lastPlayMake = playmakeId;
     }
-    debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
+    debugger->debug(QString("play make is : %1").arg(playmakeId), D_PARSA);
 }
 
 void CCoach::decideAttack()
@@ -1202,19 +1185,17 @@ void CCoach::checkTransitionToForceStart(){
 
 void CCoach::execute()
 {
-    ROS_INFO("I DID IT!");
-    return;
     findGoalieID();
-    double critAreaRadius = 1.6;
-    Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
-    playmakeId = -1;
-    choosePlaymakeAndSupporter(!((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")));
+    choosePlaymakeAndSupporter();
+    findDefneders(conf.maxNumberOfDefenses);
     sendBehaviorStatus();
+    ROS_INFO("MAHI IS THE BEST");
+//    decidePreferredDefenseAgentsCountAndGoalieAgent();
+//    decideDefense();
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();
     virtualTheirPlayOffState();
-    decidePreferredDefenseAgentsCountAndGoalieAgent();
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
@@ -1680,12 +1661,49 @@ void CCoach::sendBehaviorStatus() {
     parsian_msgs::parsian_ai_statusPtr status{new parsian_msgs::parsian_ai_status};
     status->GK = preferedGoalieID;
     status->playmake_id = playmakeId;
-    Q_FOREACH(Agent* def, defenseAgents) {
-            status->defenses.push_back(def->id());
-        }
+    for (int i = 1; i <= conf.maxNumberOfDefenses; i++) {
+        for (int j = 0; j < i; j++) status->defenses.push_back(static_cast<unsigned char &&>(std::move(defenseMatched[0][i][j])));
+        delete defenseMatched[0][i];
+        if (conf.evalGoalie) delete defenseMatched[1][i];
+    }
+    delete[] defenseMatched[0];
+    if (conf.evalGoalie) delete[] defenseMatched[1];
     status->supporter_id = status->INVALID_ID;
-    status->behavior = selectedBehavior->getName();
-    status->finished = (selectedBehavior->process() == 1.0);
+    if (selectedBehavior != nullptr) {
+        status->behavior = selectedBehavior->getName();
+        status->finished = (selectedBehavior->process() == 1.0);
+    } else {
+        status->behavior = "";
+        status->finished = false;
+    }
     ai_status_pub->publish(status);
+
+}
+
+void CCoach::findDefneders(const int& max_number) {
+    defenseMatched[0] = new int* [max_number + 1];
+    for (int i = 1; i <= max_number; i++) defenseMatched[0][i] = new int[i];
+
+    for (int i = 1; i <= max_number; i++) {
+        assignDefenseAgents(i);
+        assignGoalieAgent(preferedGoalieID);
+        selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
+        selectedPlay->defensePlan.initDefense(defenseAgents);
+        selectedPlay->defensePlan.execute();
+        for (int j = 0; j < defenseAgents.size(); j++ ) defenseMatched[0][i][j] = defenseAgents[j]->id();
+    }
+    if (conf.evalGoalie) {
+        defenseMatched[1] = new int* [max_number + 1];
+        for (int i = 1; i <= max_number; i++) defenseMatched[1][i] = new int[i];
+
+        for (int i = 1; i <= max_number; i++) {
+            assignDefenseAgents(i);
+            assignGoalieAgent(-1);
+            selectedPlay->defensePlan.initGoalKeeper(nullptr);
+            selectedPlay->defensePlan.initDefense(defenseAgents);
+            selectedPlay->defensePlan.execute();
+            for (int j = 0; j < defenseAgents.size(); j++ ) defenseMatched[1][i][j] = defenseAgents[j]->id();
+        }
+    }
 
 }
