@@ -60,6 +60,7 @@ catkin_python_setup()
 generate_dynamic_reconfigure_options(
 		cfg/mahi.cfg
 		cfg/ai.cfg
+		cfg/behavior_server.cfg
 )
 
 ###################################
