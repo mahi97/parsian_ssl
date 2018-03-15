@@ -7,6 +7,7 @@
 
 CCoach::CCoach(Agent**_agents)
 {
+
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -1201,12 +1202,13 @@ void CCoach::checkTransitionToForceStart(){
 
 void CCoach::execute()
 {
+    ROS_INFO("I DID IT!");
+    return;
     findGoalieID();
     double critAreaRadius = 1.6;
     Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
     playmakeId = -1;
     choosePlaymakeAndSupporter(!((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")));
-    decideDefense();
     sendBehaviorStatus();
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function

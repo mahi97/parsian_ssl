@@ -76,7 +76,7 @@ function parsian() {
 			fi
 			;;
 		rebuild)
-			catkin clean "${@:2}"
+			catkin clean -y
 			catkin build "${@:2}"
 			;;
 		behavior)

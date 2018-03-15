@@ -145,6 +145,8 @@ add_executable(${PROJECT_NAME}_node
 		src/parsian_ai/ai_node.cpp
 		)
 
+### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./mahi_CMakeLists.txt)
 
 
 ## Rename C++ executable without prefix
@@ -248,8 +250,6 @@ target_link_libraries(${PROJECT_NAME}_roles
 		)
 
 
-### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
-include(./mahi_CMakeLists.txt)
 
 
 #############
