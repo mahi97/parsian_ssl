@@ -22,6 +22,7 @@
 #include <parsian_ai/roles/stop.h>
 #include <behavior/mahi/mahi.h>
 #include <parsian_msgs/plan_service.h>
+#include <parsian_msgs/parsian_ai_status.h>
 
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
@@ -48,11 +49,13 @@ public:
     parsian_msgs::plan_serviceRequest planRequest;
     parsian_msgs::plan_serviceResponse receivedPlan;
 
+    ros::Publisher* ai_status_pub;
     ros::ServiceClient plan_client;
-    void setPlanClient(ros::ServiceClient _plan_client);
-
+    void setPlanClient(const ros::ServiceClient& _plan_client);
+    void setBehaviorPublisher(ros::Publisher& _behaver_publisher);
+    int findGoalieID();
     parsian_msgs::plan_serviceResponse getLastPlan();
-
+    void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
 private:
     /////////////////////transition to force start
@@ -71,7 +74,7 @@ private:
     double exeptionPlayMakeThr;
     QList<Agent*> defenseAgents;
     int preferedDefenseCounts ,lastPreferredDefenseCounts;
-    int preferedGoalieAgent;
+    int preferedGoalieID;
     Vector2D defenseTargets[_MAX_NUM_PLAYERS];
     QTime intentionTimePossession;
     QTime playMakeIntention;
@@ -83,19 +86,17 @@ private:
 
     CPlayOff             *ourPlayOff;
     COurPenalty          *ourPenalty;
-//    COurBallPlacement    *ourBallPlacement;
-
+    COurBallPlacement    *ourBallPlacement;
     CTheirDirect         *theirDirect;
     CTheirPenalty        *theirPenalty;
     CTheirKickOff        *theirKickOff;
     CTheirIndirect       *theirIndirect;
     CTheirBallPlacement  *theirBallPlacement;
-
     CDynamicAttack       *dynamicAttack;
-
     CStopPlay            *stopPlay;
 
     Behavior* selectedBehavior;
+
     BehaviorMahi* behaviorMahi;
 
 public:
@@ -210,5 +211,6 @@ private:
     int desiredDefCount;
     QString stateForMark;
     POffSkills strToEnum(const std::string& _str);
+    void sendBehaviorStatus();
 };
 #endif //PARSIAN_AI_COACH_H

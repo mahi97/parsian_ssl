@@ -19,6 +19,7 @@ public:
 	double probability() const { return prob; }
 	void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) { /*TODO FIX*/ }
 	void updateWM(const parsian_msgs::parsian_world_modelConstPtr& _wm) { wm->update( _wm); }
+    virtual double process() { return 0.0; } //// From 0 to 1 ~> 1 is Finished
 protected:
 	double prob;
 	const std::string name;

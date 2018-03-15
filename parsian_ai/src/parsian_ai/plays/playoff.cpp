@@ -240,7 +240,7 @@ void CPlayOff::staticExecute() {
             posExecute();
             checkEndState();
             DBUG(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
-            ROS_INFO(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber).toStdString().c_str());
+            ROS_INFO_STREAM("IDD : " << 1 << ", ST : " << positionAgent[1].stateNumber);
 
             if(masterPlan->common.currentSize > 1 && havePassInPlan) {
                 passManager();
@@ -1169,7 +1169,7 @@ bool CPlayOff::isTimeOver() {
 
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
-        ROS_INFO(QString("MAHIS: Time That Left: %1").arg(ros::Time::now().sec - tempStart).toStdString().c_str());
+        ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
         if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;

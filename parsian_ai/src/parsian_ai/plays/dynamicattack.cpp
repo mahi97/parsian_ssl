@@ -85,7 +85,7 @@ void CDynamicAttack::reset(){
 
 void CDynamicAttack::execute_x() {
     DBUG(QString("Dynamic Attack : %1").arg(agents.size()),D_MAHI);
-    ROS_INFO(QString("Dynamic Attack : %1").arg(agents.size()).toStdString().c_str());
+    ROS_INFO_STREAM("Dynamic Attack : " << agents.size());
     globalExecute(agents.size());
 }
 
@@ -271,7 +271,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     assignTasks();
 
     DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
-    ROS_INFO(QString("MODE : %1").arg(getString(currentPlan.mode)).toStdString().c_str());
+    ROS_INFO_STREAM("MODE : " << getString(currentPlan.mode).toStdString());
     DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
     for(size_t i = 0;i < agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {

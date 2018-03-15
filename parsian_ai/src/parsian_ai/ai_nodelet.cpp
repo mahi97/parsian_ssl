@@ -32,8 +32,10 @@ void AINodelet::onInit() {
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
-    ai->getSoccer()->getCoach()->setPlanClient(plan_client);
+    behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 1000);
 
+    ai->getSoccer()->getCoach()->setPlanClient(plan_client);
+    ai->getSoccer()->getCoach()->setBehaviorPublisher(behaviorPub);
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
@@ -52,6 +54,16 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
 
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
+
+    drawer->draws.circles.clear();
+    drawer->draws.vectors.clear();
+    drawer->draws.texts.clear();
+    drawer->draws.segments.clear();
+    drawer->draws.rects.clear();
+    drawer->draws.polygons.clear();
+
+    debugger->debugs.debugs.clear();
+
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
@@ -63,23 +75,24 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
-    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
-    ROS_INFO_STREAM("last plan name: "<<lastPlan.the_plan.planFile);
-    /// handle plan request
-//    if(ai->getSoccer()->getCoach()->requestForPlan){
-//        parsian_msgs::plan_service req;
-//        req.request = ai->getSoccer()->getCoach()->getPlanRequest();
-//        if(plan_client.call(req)){
-//            ai->getSoccer()->getCoach()->setPlanResponse(req.response);
-//            ai->getSoccer()->getCoach()->requestForPlan = false;
-//            ROS_INFO("ai requesting for plan...");
-//
-//        } else {
-//            ROS_INFO("ERROR! in ai plan request");
-//        }
-//    } else {
-//        ROS_INFO("No plan requested");
-//    }
+
+////    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+////    ROS_INFO_STREAM("last plan name: "<<lastPlan.the_plan.planFile);
+////    /// handle plan request
+////    if(ai->getSoccer()->getCoach()->requestForPlan){
+////        parsian_msgs::plan_service req;
+////        req.request = ai->getSoccer()->getCoach()->getPlanRequest();
+////        if(plan_client.call(req)){
+////            ai->getSoccer()->getCoach()->setPlanResponse(req.response);
+////            ai->getSoccer()->getCoach()->requestForPlan = false;
+////            ROS_INFO("ai requesting for plan...");
+////
+////        } else {
+////            ROS_INFO("ERROR! in ai plan request");
+////        }
+////    } else {
+////        ROS_INFO("No plan requested");
+////    }
 
 }
 
@@ -97,7 +110,7 @@ void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t
 }
 
 void AINodelet::behaviorCb(const parsian_msgs::parsian_behaviorConstPtr &_behavior) {
- ROS_INFO_STREAM("behavior "<<_behavior->name << " received !");
+    soccer->coach->updateBehavior(_behavior);
 }
 
 

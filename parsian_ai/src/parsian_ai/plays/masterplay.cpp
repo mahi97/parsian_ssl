@@ -3,7 +3,7 @@
 
 //PositioningPlan CMasterPlay::positioningPlan;
 //CMarkPlan CMasterPlay::markPlan;
-//DefensePlan CMasterPlay::defensePlan;
+DefensePlan CMasterPlay::defensePlan;
 //CRolePlayMake CMasterPlay::playMakeRole{nullptr};
 //CRoleBlock CMasterPlay::blockRole{nullptr};
 

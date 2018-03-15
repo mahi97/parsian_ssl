@@ -46,9 +46,9 @@ public:
     //////////////////////////////////////
     bool noPlanException;
 
-    /*static*/ PositioningPlan positioningPlan;
-    /*static*/ CMarkPlan markPlan;
-    /*static*/ DefensePlan defensePlan;
+    static PositioningPlan positioningPlan;
+    static CMarkPlan markPlan;
+    static DefensePlan defensePlan;
 
 private:
     void execPlay();

@@ -73,7 +73,7 @@ CCoach::CCoach(Agent**_agents)
     firstTime = true;
 
     selectedBehavior = nullptr;
-    behaviorMahi = new BehaviorMahi();
+//    behaviorMahi = new BehaviorMahi();
 }
 
 CCoach::~CCoach()
@@ -91,26 +91,26 @@ CCoach::~CCoach()
 //    {
 //        if(goalieTimer.elapsed() <200)
 //        {
-//            knowledge->getAgent(preferedGoalieAgent)->setRobotAbsVel(2,0,0);
+//            knowledge->getAgent(preferedGoalieID)->setRobotAbsVel(2,0,0);
 //        }
 //        else if(goalieTimer.elapsed() <300)
 //        {
-//            knowledge->getAgent(preferedGoalieAgent)->setRobotAbsVel(-2,0,0);
+//            knowledge->getAgent(preferedGoalieID)->setRobotAbsVel(-2,0,0);
 //
 //        }
 //        else if(goalieTimer.elapsed() < 400)
 //        {
-//            knowledge->getAgent(preferedGoalieAgent)->setRobotAbsVel(0,2,0);
+//            knowledge->getAgent(preferedGoalieID)->setRobotAbsVel(0,2,0);
 //
 //        }
 //        else if(goalieTimer.elapsed() < 500)
 //        {
-//            knowledge->getAgent(preferedGoalieAgent)->setRobotAbsVel(0,-2,0);
+//            knowledge->getAgent(preferedGoalieID)->setRobotAbsVel(0,-2,0);
 //
 //        }
 //        else
 //        {
-//            knowledge->getAgent(preferedGoalieAgent)->setRobotAbsVel(1,1,5);
+//            knowledge->getAgent(preferedGoalieID)->setRobotAbsVel(1,1,5);
 //
 //        }
 //    }
@@ -194,12 +194,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             agentsCount--;
         }
     }
-    if (conf.GoalieFromGUI) {
-        preferedGoalieAgent = conf.Goalie;
-    }
-    else {
-        preferedGoalieAgent = wm->our.data->goalieID;
-    }
+    preferedGoalieID = findGoalieID();
 
     // handle stop
     if (gameState->isStop()) {
@@ -269,17 +264,14 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     }
 
     if(gameState->halfTimeLineUp()){
-        preferedGoalieAgent = -1;
+        preferedGoalieID = -1;
         preferedDefenseCounts = 0;
     }
 
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    if(conf.StrictFormation){
-        preferedDefenseCounts = conf.Defense;
-    }
-    ROS_INFO(QString("prefered defense: %1").arg(preferedDefenseCounts).toStdString().c_str());
+    ROS_INFO_STREAM("prefered defense: " << preferedDefenseCounts);
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -359,6 +351,7 @@ void CCoach::assignGoalieAgent( int goalieID ){
         goalieAgent = agents[goalieID];
     }
 }
+
 BallPossesion CCoach::isBallOurs()
 {
     int oppNearestToBall = -1, ourNearestToBall = -1;
@@ -495,12 +488,12 @@ BallPossesion CCoach::isBallOurs()
     }
 
     if (wm->field->isInOurPenaltyArea(wm->ball->pos)
-            &&  wm->ball->vel.length() < 0.1) {
+        &&  wm->ball->vel.length() < 0.1) {
         decidePState = BallPossesion::SOSOTHEIR;
     }
 
     if (wm->field->isInOppPenaltyArea(wm->ball->pos)
-            && wm->ball->vel.length() < 0.1) {
+        && wm->ball->vel.length() < 0.1) {
         decidePState = BallPossesion::SOSOOUR;
     }
 
@@ -601,7 +594,7 @@ void CCoach::virtualTheirPlayOffState()
 }
 
 void CCoach::decideDefense(){
-    assignGoalieAgent(preferedGoalieAgent);
+    assignGoalieAgent(preferedGoalieID);
     assignDefenseAgents(preferedDefenseCounts);
     ROS_INFO_STREAM("SD: " << preferedDefenseCounts << " : " << defenseAgents.size());
     if( gameState->theirPenaltyKick() ){
@@ -710,8 +703,8 @@ void CCoach::updateAttackState()
 void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
 {
     QList<int> ourPlayers = wm->our.data->activeAgents;
-    if( ourPlayers.contains(preferedGoalieAgent) != nullptr) {
-        ourPlayers.removeOne(preferedGoalieAgent);
+    if( ourPlayers.contains(preferedGoalieID) != nullptr) {
+        ourPlayers.removeOne(preferedGoalieID);
     }
 
     //    if(defenseFirst){
@@ -814,62 +807,62 @@ void CCoach::decideAttack()
 
     switch (gameState->getState()) { // GAMESTATE
 
-    case States::Halt:
-        decideHalt(ourPlayers);
-        return;
-        break;
-    case States::Stop:
-        decideStop(ourPlayers);
-        return;
-        break;
+        case States::Halt:
+            decideHalt(ourPlayers);
+            return;
+            break;
+        case States::Stop:
+            decideStop(ourPlayers);
+            return;
+            break;
 
-    case States::OurKickOff:
-        decideOurKickOff(ourPlayers);
-        break;
+        case States::OurKickOff:
+            decideOurKickOff(ourPlayers);
+            break;
 
-    case States::TheirKickOff:
-        decideTheirKickOff(ourPlayers);
-        break;
+        case States::TheirKickOff:
+            decideTheirKickOff(ourPlayers);
+            break;
 
-    case States::OurDirectKick:
-        decideOurDirect(ourPlayers);
-        break;
+        case States::OurDirectKick:
+            decideOurDirect(ourPlayers);
+            break;
 
-    case States::TheirDirectKick:
-        decideTheirDirect(ourPlayers);
-        break;
+        case States::TheirDirectKick:
+            decideTheirDirect(ourPlayers);
+            break;
 
-    case States::OurIndirectKick:
-        decideOurIndirect(ourPlayers);
-        break;
+        case States::OurIndirectKick:
+            decideOurIndirect(ourPlayers);
+            break;
 
-    case States::TheirIndirectKick:
-        decideTheirIndirect(ourPlayers);
-        break;
+        case States::TheirIndirectKick:
+            decideTheirIndirect(ourPlayers);
+            break;
 
-    case States::OurPenaltyKick:
-        decideOurPenalty(ourPlayers);
-        break;
+        case States::OurPenaltyKick:
+            decideOurPenalty(ourPlayers);
+            break;
 
-    case States::TheirPenaltyKick:
-        decideTheirPenalty(ourPlayers);
-        break;
-    case States::Start:
-        decideStart(ourPlayers);
-        break;
-    case States::OurBallPlacement:
-        decideOurBallPlacement(ourPlayers);
-        break;
-    case States::TheirBallPlacement:
-        decideStop(ourPlayers);
-        break;
-    case States::HalfTime:
-        decideHalfTimeLineUp(ourPlayers);
-        break;
-    default:
-        decideNull(ourPlayers);
-        return;
-        break;
+        case States::TheirPenaltyKick:
+            decideTheirPenalty(ourPlayers);
+            break;
+        case States::Start:
+            decideStart(ourPlayers);
+            break;
+        case States::OurBallPlacement:
+            decideOurBallPlacement(ourPlayers);
+            break;
+        case States::TheirBallPlacement:
+            decideStop(ourPlayers);
+            break;
+        case States::HalfTime:
+            decideHalfTimeLineUp(ourPlayers);
+            break;
+        default:
+            decideNull(ourPlayers);
+            return;
+            break;
     }
     QList<Agent*> ourAgents;
     for(auto& ourPlayer : ourPlayers) {
@@ -962,25 +955,25 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     overdef = checkOverdef();
     int MarkNum = 0;
     switch (ballPState) {
-    case BallPossesion::WEHAVETHEBALL:
-        MarkNum = 2;
-        break;
-    case BallPossesion::WEDONTHAVETHEBALL:
-        MarkNum = (overdef) ? 4 : 3;
-        break;
-    case BallPossesion::SOSOOUR:
-        MarkNum = 3;
-        break;
-    case BallPossesion::SOSOTHEIR:
-        MarkNum = 3;
-        break;
+        case BallPossesion::WEHAVETHEBALL:
+            MarkNum = 2;
+            break;
+        case BallPossesion::WEDONTHAVETHEBALL:
+            MarkNum = (overdef) ? 4 : 3;
+            break;
+        case BallPossesion::SOSOOUR:
+            MarkNum = 3;
+            break;
+        case BallPossesion::SOSOTHEIR:
+            MarkNum = 3;
+            break;
     }
 
     MarkNum = std::min(MarkNum, ourPlayers.count());
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
-            && selectedPlay->lockAgents
-            && lastPlayers.count() == ourPlayers.count()) {
+       && selectedPlay->lockAgents
+       && lastPlayers.count() == ourPlayers.count()) {
         ourPlayers.clear();
         ourPlayers = lastPlayers;
 
@@ -1027,44 +1020,44 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
                              const POMODE _gameMode,
                              const QList<int>& _ourplayers) {
     switch(_mode) {
-    case NGameOff::StaticPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
-        initStaticPlay(_gameMode, _ourplayers);
-        break;
-    case NGameOff::DynamicPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initDynamicPlay");
-        initDynamicPlay(_ourplayers);
-        break;
-    case NGameOff::FastPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initFastPlay");
-        initFastPlay(_ourplayers);
-        break;
-    case NGameOff::FirstPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initFirstPlay");
-        initFirstPlay(_ourplayers);
-        break;
-    default:
-        ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
-        initStaticPlay(_gameMode, _ourplayers);
+        case NGameOff::StaticPlay:
+            ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
+            initStaticPlay(_gameMode, _ourplayers);
+            break;
+        case NGameOff::DynamicPlay:
+            ROS_INFO("HSHM: initPlayOffMode: initDynamicPlay");
+            initDynamicPlay(_ourplayers);
+            break;
+        case NGameOff::FastPlay:
+            ROS_INFO("HSHM: initPlayOffMode: initFastPlay");
+            initFastPlay(_ourplayers);
+            break;
+        case NGameOff::FirstPlay:
+            ROS_INFO("HSHM: initPlayOffMode: initFirstPlay");
+            initFirstPlay(_ourplayers);
+            break;
+        default:
+            ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
+            initStaticPlay(_gameMode, _ourplayers);
     }
 }
 
 void CCoach::setPlayOff(NGameOff::EMode _mode) {
     switch(_mode) {
-    case NGameOff::StaticPlay:
-        setStaticPlay();
-        break;
-    case NGameOff::DynamicPlay:
-        setDynamicPlay();
-        break;
-    case NGameOff::FastPlay:
-        setFastPlay();
-        break;
-    case NGameOff::FirstPlay:
-        setFirstPlay();
-        break;
-    default:
-        setStaticPlay();
+        case NGameOff::StaticPlay:
+            setStaticPlay();
+            break;
+        case NGameOff::DynamicPlay:
+            setDynamicPlay();
+            break;
+        case NGameOff::FastPlay:
+            setFastPlay();
+            break;
+        case NGameOff::FirstPlay:
+            setFirstPlay();
+            break;
+        default:
+            setStaticPlay();
     }
 }
 
@@ -1208,27 +1201,18 @@ void CCoach::checkTransitionToForceStart(){
 
 void CCoach::execute()
 {
-
+    findGoalieID();
+    double critAreaRadius = 1.6;
+    Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
+    playmakeId = -1;
+    choosePlaymakeAndSupporter(!((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")));
+    decideDefense();
+    sendBehaviorStatus();
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();
     virtualTheirPlayOffState();
     decidePreferredDefenseAgentsCountAndGoalieAgent();
-    /////////////////////////////////////// choose play maker
-    double critAreaRadius = 1.6;
-    Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
-    playmakeId = -1;
-    if((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")) {
-        decideDefense();
-        choosePlaymakeAndSupporter(true);
-    } else {
-        choosePlaymakeAndSupporter(false);
-        decideDefense();
-    }
-    ROS_INFO_STREAM("M : " << preferedDefenseCounts);
-    ROS_INFO_STREAM("PM :" << playmakeId);
-    ROS_INFO_STREAM("GAMESTATEEE : " << static_cast<int>(gameState->getState()));
-    ////////////////////////////////////////////
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
@@ -1266,9 +1250,9 @@ void CCoach::checkRoleAssignments()
     //    knowledge->roleAssignments.clear();
 
     for_visible_agents(agents, i)
-    {
-        //        knowledge->roleAssignments[agents[i]->skillName].append(agents[i]);
-    }
+        {
+            //        knowledge->roleAssignments[agents[i]->skillName].append(agents[i]);
+        }
 
     //////////////// Matching for marker agents to mark better! /////////////////
     //    CRoleMarkInfo *markInfo = (CRoleMarkInfo*) CSkills::getInfo("mark");
@@ -1417,7 +1401,7 @@ bool CCoach::isFastPlay() {
 bool CCoach::checkOverdef(){
     if((Vector2D::angleOf(wm->ball->pos,wm->field->ourGoal(),wm->field->ourCornerL()).abs() < 20 + overDefThr
         ||Vector2D::angleOf(wm->ball->pos,wm->field->ourGoal(),wm->field->ourCornerR()).abs() < 20 + overDefThr)
-            && !Circle2D((wm->field->ourGoal() - Vector2D(0.2,0)),1.60).contains(wm->ball->pos)) {
+       && !Circle2D((wm->field->ourGoal() - Vector2D(0.2,0)),1.60).contains(wm->ball->pos)) {
         overDefThr = 5;
         return true;
     }
@@ -1432,7 +1416,7 @@ void CCoach::checkSensorShootFault() {
         if (ourPlayers.contains(i) != nullptr) {
             Agent* tempAgent = agents[i];
             if (tempAgent->shootSensor
-                    &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm()*0.08) > 0.2) {
+                &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm()*0.08) > 0.2) {
                 faultDetectionCounter[i]++;
 
             } else {
@@ -1465,15 +1449,15 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
     ROS_INFO("initStaticPlay: request");
 
     switch (_mode) {
-    case POMODE::INDIRECT:
-        planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
-        break;
-    case POMODE::DIRECT:
-        planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
-        break;
-    case POMODE::KICKOFF:
-        planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
-        break;
+        case POMODE::INDIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
+            break;
+        case POMODE::DIRECT:
+            planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
+            break;
+        case POMODE::KICKOFF:
+            planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
+            break;
     }
 
     //    planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF; // test
@@ -1530,7 +1514,7 @@ void CCoach::checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers) 
     }
 
     if (conf.IDBaseOneToucher
-            && _ourplayers.contains(conf.OneToucherID)) {
+        && _ourplayers.contains(conf.OneToucherID)) {
         int temp = _plan -> matching.common -> matchedID.value(1);
         _plan -> matching.common -> matchedID[1] = conf.OneToucherID;
         for (int i = 2;i < _plan->matching.common->matchedID.size(); i++) {
@@ -1577,11 +1561,11 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
     }
 
     QList< QList<playOffRobot> > agpln;
-    for (int i = 0; i < planMsg.the_plan.agentSize; i++) {
+    for (unsigned int i = 0; i < planMsg.the_plan.agentSize; i++) {
         ROS_INFO_STREAM("agent "<<i<<" pos "<<planMsg.the_plan.agents.at(i).posSize);
         QList<playOffRobot>  ag;
         ag.clear();
-        for (int j = 0; j < planMsg.the_plan.agents.at(i).posSize; j++) {
+        for (unsigned int j = 0; j < planMsg.the_plan.agents.at(i).posSize; j++) {
 
             ROS_INFO_STREAM("agent "<<i<<" pos "<<planMsg.the_plan.agents.at(i).posSize<<"-> "<<j);
             playOffRobot* po = new playOffRobot();
@@ -1595,7 +1579,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
 
             QList<playOffSkill> sk;
             sk.clear();
-            for (int k = 0; k < planMsg.the_plan.agents.at(i).positions.at(j).skillSize; k++) {
+            for (unsigned int k = 0; k < planMsg.the_plan.agents.at(i).positions.at(j).skillSize; k++) {
                 playOffSkill *p = new playOffSkill();
                 p->data[0] = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).primary;
                 p->data[1] = planMsg.the_plan.agents.at(i).positions.at(j).skills.at(k).secondry;
@@ -1656,14 +1640,50 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         _plan->common.matchedID.insert(i, _ourplayers.at(matchedID));
 
     }
-    qDebug() << "[Coach] mathched by" << _plan->common.matchedID;
+    qDebug() << "[Coach] matched by" << _plan->common.matchedID;
 }
 
 
-void CCoach::setPlanClient(ros::ServiceClient _plan_client) {
+void CCoach::setPlanClient(const ros::ServiceClient& _plan_client) {
     plan_client = _plan_client;
+}
+
+void CCoach::setBehaviorPublisher(ros::Publisher& _behavior_publisher) {
+    ai_status_pub = &_behavior_publisher;
 }
 
 parsian_msgs::plan_serviceResponse CCoach::getLastPlan() {
     return receivedPlan;
+}
+
+void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav) {
+    if (_behav->name == "mahi") {
+        selectedBehavior = behaviorMahi;
+    } else {
+        selectedBehavior = nullptr;
+    }
+}
+
+int CCoach::findGoalieID() {
+    if (conf.GoalieFromGUI) {
+        preferedGoalieID = conf.Goalie;
+    }
+    else {
+        preferedGoalieID = wm->our.data->goalieID;
+    }
+    return preferedGoalieID;
+}
+
+void CCoach::sendBehaviorStatus() {
+    parsian_msgs::parsian_ai_statusPtr status{new parsian_msgs::parsian_ai_status};
+    status->GK = preferedGoalieID;
+    status->playmake_id = playmakeId;
+    Q_FOREACH(Agent* def, defenseAgents) {
+            status->defenses.push_back(def->id());
+        }
+    status->supporter_id = status->INVALID_ID;
+    status->behavior = selectedBehavior->getName();
+    status->finished = (selectedBehavior->process() == 1.0);
+    ai_status_pub->publish(status);
+
 }
