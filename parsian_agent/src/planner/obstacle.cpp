@@ -99,9 +99,9 @@ void CObstacles::add_rectangle(double cx,double cy,double w,double h)
     temp.rad.assign(w/2 , h/2);
     Rect2D testRect(cx- (w/2),cy-(h/2),h,w);// = Rect2D::from_center(cx,cy,w,h);
     if(!testRect.contains(targetPosition)) {
-        drawer->draw(testRect,QColor(Qt::red));
+//        drawer->draw(testRect,QColor(Qt::red));
 
-        //obs.append(temp);
+        obs.append(temp);
     }
 
 }
@@ -117,7 +117,7 @@ void CObstacles::add_circle(double x,double y,double radius,
     Circle2D testCircle(Vector2D(x,y),radius);
 
     if(!testCircle.contains(targetPosition) && !testCircle.contains(agentPos)) {
-        drawer->draw(testCircle,QColor(Qt::red));
+//        drawer->draw(testCircle,QColor(Qt::red));
 
         obs.append(temp);
     }

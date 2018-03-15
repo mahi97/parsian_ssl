@@ -231,7 +231,7 @@ void CPlanner::runPlanner(){
                 middleNode = Rnodes.allNodes[j];
                 nearestToGoal = nodes.allNodes[i];
                 if( obst.check(middleNode->pos , nearestToGoal->pos) && \
-                    ((result.size() && middleNode->dist + nearestToGoal->dist < mn) || (result.size() == 0 && middleNode->dist + nearestToGoal->dist + middleNode->pos.dist(nearestToGoal->pos) < mn)) ){
+                        ((result.size() && middleNode->dist + nearestToGoal->dist < mn) || (result.size() == 0 && middleNode->dist + nearestToGoal->dist + middleNode->pos.dist(nearestToGoal->pos) < mn)) ){
                     if( result.size() )
                         mn = (middleNode->dist + nearestToGoal->dist);
                     else
@@ -342,9 +342,9 @@ void CPlanner::runPlanner(){
     if (conf->Draw_Path) {
         for (int j = 1; j < resultModified.size(); j++) {
             drawer->draw(Segment2D(resultModified[j - 1], resultModified[j]), QColor(
-                    static_cast<int>(255 / (resultModified.size() / (double) j)),
-                    static_cast<int>(255 / (resultModified.size() / (double) j)),
-                    static_cast<int>(255 / (resultModified.size() / (double) j))));
+                        static_cast<int>(255 / (resultModified.size() / (double) j)),
+                        static_cast<int>(255 / (resultModified.size() / (double) j)),
+                        static_cast<int>(255 / (resultModified.size() / (double) j))));
             drawer->draw(result[j]);
         }
         Draw();
@@ -594,18 +594,12 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         obs.add_circle(wm->ball->pos.x,wm->ball->pos.y,ballObstacleRadius,wm->ball->vel.x , wm->ball->vel.y);
 
     if( avoidPenaltyArea ){
-        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
-        obs.add_circle(-1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-        obs.add_rectangle(-1*(field._FIELD_WIDTH / 2)+0.5,0,1,0.5);
+
     }
+    /////////////// Penalty area obstacle //////////////////////////////////////
+    obs.add_rectangle(-1*(field._FIELD_WIDTH/2) , 0 , wm->field->_PENALTY_DEPTH * 2 , wm->field->_PENALTY_WIDTH);
 
-    ////////////////////test opPenalty
-    obs.add_circle(1*(field._FIELD_WIDTH / 2) , 0.25,1,0,0);
-    obs.add_circle(1*(field._FIELD_WIDTH / 2) , -0.25,1,0,0);
-    obs.add_rectangle(1*(field._FIELD_WIDTH / 2) - 0.5,0,1,0.5);
-
-
-    obs.add_rectangle(0,0,0.5,0.5);
+    //obs.add_rectangle(0,0,0.5,0.5);
     if (avoidCenterCircle)
     {
         obs.add_circle(0 , 0 , field._CENTER_CIRCLE_RAD , 0 , 0);

@@ -23,7 +23,7 @@ Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit){
     Vector2D sol[2];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = wm->ball->pos;
+    Vector2D ballPosition = ballPrediction(false);
     int numberOfDefenseAgents = 1;
     wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit),0).intersection(
                 getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
@@ -36,7 +36,7 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
     Vector2D sol[4];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = wm->ball->pos;
+    Vector2D ballPosition = ballPrediction(false);
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
     Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
     int numberOfDefenseAgents = 2;
@@ -54,7 +54,7 @@ QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upL
     Vector2D sol[8];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = wm->ball->pos;
+    Vector2D ballPosition = ballPrediction(false);
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
     Vector2D downIntersection;
     Vector2D upIntesection;
@@ -86,10 +86,10 @@ QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upL
                         ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
             upIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y >= ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
                         ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
-            ROS_INFO(QString("down: %1").arg(downIntersection.y).toStdString().c_str());
-            ROS_INFO(QString("up: %1").arg(upIntesection.y).toStdString().c_str());
-            ROS_INFO(QString("sol2: %1").arg(sol[2].y).toStdString().c_str());
-            ROS_INFO(QString("sol3: %1").arg(sol[3].y).toStdString().c_str());
+//            ROS_INFO(QString("down: %1").arg(downIntersection.y).toStdString().c_str());
+//            ROS_INFO(QString("up: %1").arg(upIntesection.y).toStdString().c_str());
+//            ROS_INFO(QString("sol2: %1").arg(sol[2].y).toStdString().c_str());
+//            ROS_INFO(QString("sol3: %1").arg(sol[3].y).toStdString().c_str());
             if(upIntesection.isValid()){
                 wm->field->ourBigPenaltyArea(1,findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit),0).intersection(
                             getBisectorSegment(ourGoalLeft , ballPosition , upIntesection) , &sol[4] , &sol[5]);
@@ -119,7 +119,7 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
     QList<Vector2D> defensePosiotion;
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = wm->ball->pos;
+    Vector2D ballPosition = ballPrediction(false);
     defensePosiotion.clear();
     ROS_INFO(QString("allOfDefenseAgents: %1").arg(allOfDefenseAgents).toStdString().c_str());
     double temp = findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit);
@@ -165,7 +165,7 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents,int allOfD
 
 QList<Segment2D> DefensePlan::getLinesOfBallTriangle(){
     QList<Segment2D> linesOfBallTriangle;
-    Vector2D ballPos = wm->ball->pos;
+    Vector2D ballPos = ballPrediction(false);
     Vector2D ourGoalL = wm->field->ourGoalL();
     Vector2D ourGoalR = wm->field->ourGoalR();
     linesOfBallTriangle.append(Segment2D(ballPos , ourGoalL));
@@ -257,7 +257,7 @@ Segment2D DefensePlan::getBestSegmentWithTalles(int defenseCount , Vector2D firs
 
 double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , double downLimit , double upLimit){
     double bestOffsetForPenaltyArea = 0;
-    Vector2D ballPos = wm->ball->pos;
+    Vector2D ballPos = ballPrediction(false);
     Vector2D ourGoalR = wm->field->ourGoalR();
     Vector2D ourGoalL = wm->field->ourGoalL();
     Segment2D biggerFrontageOfTriangle;
@@ -308,6 +308,9 @@ double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , dou
     if(bestOffsetForPenaltyArea <= 0){
         bestOffsetForPenaltyArea = 0.2;
     }
+    if(wm->field->ourBigPenaltyArea(1,0,0).contains(wm->ball->pos)){
+        bestOffsetForPenaltyArea = 0.2;
+    }
     return bestOffsetForPenaltyArea;
 }
 
@@ -315,7 +318,7 @@ int DefensePlan::findNeededDefense(){
     int neededDefense = 0;
     int numOfDefenses = 0;
     double robotDiameter = 2 * Robot::robot_radius_new;
-    Vector2D ballPos = wm->ball->pos;
+    Vector2D ballPos = ballPrediction(false);
     Vector2D ourGoalL = wm->field->ourGoalL();
     Vector2D ourGoalR = wm->field->ourGoalR();
     Segment2D aimLessLine;
@@ -340,7 +343,7 @@ int DefensePlan::findNeededDefense(){
     }
     else{
         for(numOfDefenses = 2 ; numOfDefenses < 4 ; numOfDefenses++){
-            if(getBestSegmentWithTalles(numOfDefenses , ourGoalL , ballPos , ourGoalR).length() <= (numOfDefenses) * (robotDiameter)){
+            if(getBestSegmentWithTalles(numOfDefenses , ourGoalL , ballPos , ourGoalR).length() <= (numOfDefenses + 1) * (robotDiameter)){
                 neededDefense = numOfDefenses;
                 break;
             }
@@ -1610,7 +1613,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     for(int i = 0 ; i < AHZDefPoints.size() ; i++){
         drawer->draw(tempDefPos.pos[i],QColor(Qt::blue));
         matchPoints.append(AHZDefPoints.at(i));
-        ROS_INFO(QString("pos: %1 %2").arg(AHZDefPoints.at(i).x).arg(AHZDefPoints.at(i).y).toStdString().c_str());
+//        ROS_INFO(QString("pos: %1 %2").arg(AHZDefPoints.at(i).x).arg(AHZDefPoints.at(i).y).toStdString().c_str());
     }
     findOppAgentsToMark();
     findPos(decideNumOfMarks());
@@ -1666,20 +1669,10 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             }
         }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
-        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
-            matchPoints[matchResult[i]] = checkDefensePoint(ourAgents[i], matchPoints[matchResult[i]]);
-        }
+        //        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
+        //            matchPoints[matchResult[i]] = checkDefensePoint(ourAgents[i], matchPoints[matchResult[i]]);
+        //        }
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
-        gpa[ourAgents[i]->id()]->setNoavoid(true);
-        gpa[ourAgents[i]->id()]->setSlowmode(false);
-        gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
-        gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
-        if(gameState->theirIndirectKick()){
-            gpa[ourAgents[i]->id()]->setNoavoid(false);
-            gpa[ourAgents[i]->id()]->setSlowmode(false);
-            gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
-            gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
-        }
         if(gameState->theirIndirectKick()){
             gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
@@ -1690,6 +1683,14 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(true);
             gpa[ourAgents[i]->id()]->setDivemode(false);
+            gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
+            gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
+        }
+        else{
+            gpa[ourAgents[i]->id()]->setNoavoid(false);
+            gpa[ourAgents[i]->id()]->setSlowmode(false);
+            gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
+            gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
         }
         //////////// Go To Point Avoid for defense agents //////////////////
         if(i < _defenseNum){
@@ -1783,6 +1784,7 @@ void DefensePlan::execute(){
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     AHZDefPoints = defenseFormation(defenseNumber() , realDefSize , 1.4 ,2.5);
                     ROS_INFO(QString("newDefSize: %1").arg(AHZDefPoints.size()).toStdString().c_str());
+                    ROS_INFO(QString("realDefSize: %1").arg(realDefSize).toStdString().c_str());
                     matchingDefPos(realDefSize);
                 }
             }
@@ -2200,6 +2202,26 @@ void DefensePlan::executeGoalKeeper(){
     stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
+    if(!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch /*&& defenseCount != 1*/){
+        tempSol = wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperTarget));
+        if(tempSol.size()){
+            if(tempSol.size() == 1){
+                goalKeeperTarget = tempSol.at(0);
+            }
+            else if(tempSol.size() == 2){
+                goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
+            }
+        }
+    }
+    if(!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch /*&& defenseCount != 1*/){
+        tempSol.append(wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperAgent->pos())));
+        if(tempSol.size() == 1){
+            goalKeeperTarget = tempSol.at(0);
+        }
+        else if(tempSol.size() == 2){
+            goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
+        }
+    }
     if(goalKeeperAgent != nullptr){
         DBUG(QString("goalKeeper clear mode : %1").arg(know->variables["goalKeeperClearMode"].toBool()) , D_AHZ);
         DBUG(QString("goalKeeper oneTouch mode : %1").arg(know->variables["goalKeeperOneTouchMode"].toBool()) , D_AHZ);
@@ -2210,6 +2232,7 @@ void DefensePlan::executeGoalKeeper(){
             DBUG("Their Indirect" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
             gpa[goalKeeperAgent->id()]->setSlowmode(false);
+            gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
             kickSkill->setKickspeed(0);
             gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
@@ -2244,6 +2267,7 @@ void DefensePlan::executeGoalKeeper(){
             DBUG("Stop Mode" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
             gpa[goalKeeperAgent->id()]->setSlowmode(true);
+            gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
             kickSkill->setKickspeed(0);
             gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
@@ -2256,6 +2280,7 @@ void DefensePlan::executeGoalKeeper(){
             DBUG("Ball is out of field" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
             gpa[goalKeeperAgent->id()]->setSlowmode(true);
+            gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
             kickSkill->setKickspeed(0);
             gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
@@ -2268,6 +2293,7 @@ void DefensePlan::executeGoalKeeper(){
             DBUG("Ball is beside the poles" , D_AHZ);
             gpa[goalKeeperAgent->id()]->setDivemode(false);
             gpa[goalKeeperAgent->id()]->setSlowmode(true);
+            gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
             kickSkill->setKickspeed(0);
             gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
@@ -2281,6 +2307,7 @@ void DefensePlan::executeGoalKeeper(){
                 DBUG("Clear slow ball" , D_AHZ);
                 gpa[goalKeeperAgent->id()]->setDivemode(false);
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
+                gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
                 kickSkill->setKickspeed(0);
                 goalKeeperTarget = Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm()*100).nearestPoint(goalKeeperAgent->pos());
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
@@ -2362,8 +2389,7 @@ void DefensePlan::executeGoalKeeper(){
                 know->variables["goalKeeperOneTouchMode"] = false;
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
-                gpa[goalKeeperAgent->id()]->setDivemode(false);
-                DBUG("No Danger" , D_AHZ);
+                gpa[goalKeeperAgent->id()]->setDivemode(false);                
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
                 gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
@@ -2371,27 +2397,7 @@ void DefensePlan::executeGoalKeeper(){
             }
             drawer->draw(Circle2D(goalKeeperTarget , 0.05) , 0 , 360 , "black" , true);
         }
-        DBUG(QString("beside flag : %1").arg(ballIsBesidePoles) , D_AHZ);
-        if(!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch && defenseCount != 1){
-            tempSol = wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperTarget));
-            if(tempSol.size()){
-                if(tempSol.size() == 1){
-                    goalKeeperTarget = tempSol.at(0);
-                }
-                else if(tempSol.size() == 2){
-                    goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
-                }
-            }
-        }
-        if(!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch && defenseCount != 1){
-            tempSol.append(wm->AHZOurPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperAgent->pos()), "goalKeeper"));
-            if(tempSol.size() == 1){
-                goalKeeperTarget = tempSol.at(0);
-            }
-            else if(tempSol.size() == 2){
-                goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
-            }
-        }
+        DBUG(QString("beside flag : %1").arg(ballIsBesidePoles) , D_AHZ);        
     }
 }
 
@@ -3078,10 +3084,10 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie){
     //// consider the intersection point for the locaiton of the ball.
 
     Vector2D BallPos = wm->ball->pos;
-    Vector2D BallVel = wm->ball->vel * 0.5;
-    Segment2D ballPosVel(BallPos,BallPos+(BallVel * 0.5));
+    Vector2D BallVel = wm->ball->vel  * 1;
+    Segment2D ballPosVel(BallPos,BallPos+(BallVel));
     Vector2D predictedBall;
-    Vector2D solu[2];
+    Vector2D solu[4];
     Rect2D fieldRect(Vector2D(- wm->field->_FIELD_WIDTH/2.0 , - wm->field->_FIELD_HEIGHT/2.0)+Vector2D(-0.005,-0.005),Vector2D(wm->field->_FIELD_WIDTH/2.0 , wm->field->_FIELD_HEIGHT/2.0)+Vector2D(+0.005,+0.005));
     double dist2Ball = 1000;
     if(BallVel.x > 0 && BallPos.x > 0){
@@ -3127,6 +3133,11 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie){
     else{
         predictedBall = BallPos;
         drawer->draw(QString("Def follow"), Vector2D(0,2),"red");
+    }
+
+    if(!_isGoalie && wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos)){
+        wm->field->ourBigPenaltyArea(1,1,0).intersection(Line2D(wm->field->ourGoal() , wm->ball->pos) , &solu[2] , &solu[3]);
+        predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2]:solu[3];
     }
     drawer->draw(predictedBall);
     return predictedBall;
