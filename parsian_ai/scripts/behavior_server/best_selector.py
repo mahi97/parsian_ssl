@@ -1,7 +1,7 @@
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
 threshold_amount = .3
-
+queue_amount = 10
 class BestSelector:
     def __init__(self):
         self.data = {}
@@ -9,7 +9,7 @@ class BestSelector:
     def update_data(self, new_action):
         # type:( parsian_behavior )
         if new_action.name not in self.data.keys():
-            self.data[new_action.name] = NQueue(50)
+            self.data[new_action.name] = NQueue(queue_amount)
 
         self.data[new_action.name].update(new_action)
 
@@ -39,6 +39,8 @@ class NQueue:
         self.queue.insert(0, action)
 
     def get_average(self):
+        if len(self.queue) is 0:
+            return 0
         return (sum([action.probability for action in self.queue]) / len(self.queue)) + self.threshold
 
     def update_success_rate(self, success_rate):
