@@ -54,3 +54,4 @@ class NQueue:
 
     def Geometric_mean(self, first, f_coef, second, s_coef):
         return (first ** f_coef * second ** s_coef) ** (1 / (f_coef + s_coef))
+
