@@ -2,6 +2,7 @@ from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
 threshold_amount = .3
 queue_amount = 10
+
 class BestSelector:
     def __init__(self):
         self.data = {}
