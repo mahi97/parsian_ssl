@@ -14,6 +14,8 @@ class BestSelector:
         self.data[new_action.name].update(new_action)
 
     def get_best(self):
+        if len(self.data) is 0:
+            return -1
         best = self.data[max(self.data, key=lambda x: self.data[x].get_average())]
         if self.last_best is not None:
             self.last_best.threshold = 0

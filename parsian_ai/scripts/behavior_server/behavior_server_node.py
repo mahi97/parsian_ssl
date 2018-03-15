@@ -21,7 +21,7 @@ class BehaviorServer:
         self.ai_status_sub = rospy.Subscriber('/ai_status', parsian_ai_status, self.correctProbillty, queue_size=1,
                                               buff_size=2 ** 24)
         self.selected_pub = rospy.Publisher('/behavior', parsian_behavior, queue_size=1, latch=True)
-        self.timer = rospy.Timer(rospy.Duration(10), self.publisherCallBack, oneshot=False)
+        self.timer = rospy.Timer(rospy.Duration(1), self.publisherCallBack, oneshot=False)
         rospy.loginfo('behavior server inited')
         rospy.spin()
 
@@ -30,7 +30,9 @@ class BehaviorServer:
         rospy.loginfo("running")
 
     def publisherCallBack(self, event):
-        self.selected_pub.publish(self.selector.get_best())
+        best = self.selector.get_best()
+        if best is not -1:
+            self.selected_pub.publish(best)
 
     def correctProbillty(self, msg):
         self.selector.update_success_rate(msg)
