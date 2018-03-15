@@ -1,12 +1,11 @@
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
-import rospy
-
+threshold_amount = .3
 
 class BestSelector:
     def __init__(self):
         self.data = {}
-
+        self.last_best = None
     def update_data(self, new_action):
         # type:( parsian_behavior )
         if new_action.name not in self.data.keys():
@@ -15,10 +14,15 @@ class BestSelector:
         self.data[new_action.name].update(new_action)
 
     def get_best(self):
-        return self.data[max(self.data, key=lambda x: self.data[x].get_average())].queue[0]
+        best = self.data[max(self.data, key=lambda x: self.data[x].get_average())]
+        if self.last_best is not None:
+            self.last_best.threshold = 0
+        best.threshold = threshold_amount
+        self.last_best = best
+        return best.queue[0]
 
-    def update_success_rate(self, ai_status):
-        #type:(parsian_ai_status)
+    def update_success_rate(self,ai_status):
+        #type:(parsian_ai_status) -> null
         self.data[ai_status.behavior].update_success_rate(ai_status.success_rate)
 
 
@@ -27,6 +31,7 @@ class NQueue:
         self.queue = []
         self.success_rate = -1
         self.max_len = length
+        self.threshold = 0
 
     def update(self, action):
         if len(self.queue) >= self.max_len:
@@ -34,7 +39,7 @@ class NQueue:
         self.queue.insert(0, action)
 
     def get_average(self):
-        return sum([action.probability for action in self.queue]) / len(self.queue)
+        return (sum([action.probability for action in self.queue]) / len(self.queue)) + self.threshold
 
     def update_success_rate(self, success_rate):
         self.success_rate = success_rate
