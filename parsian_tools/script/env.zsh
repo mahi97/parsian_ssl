@@ -138,7 +138,6 @@ EOS
 			fi
 			catkin "$@"
 esac
-
 cd $TEMP_DIR
 
 }
