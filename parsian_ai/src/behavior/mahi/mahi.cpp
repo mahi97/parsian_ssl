@@ -1,7 +1,7 @@
 #include <behavior/mahi/mahi.h>
 
 BehaviorMahi::BehaviorMahi()
-: Behavior("Mahi", "describe me") {
+    : Behavior("Mahi", "describe me") {
 
 }
 
