@@ -273,6 +273,7 @@ private:
     int desiredDefCount;
     QString stateForMark;
     int** defenseMatched[2];
+    parsian_msgs::parsian_behaviorConstPtr m_behavior;
 
     POffSkills strToEnum(const std::string &_str);
 

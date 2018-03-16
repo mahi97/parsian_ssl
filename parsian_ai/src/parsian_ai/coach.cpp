@@ -74,7 +74,7 @@ CCoach::CCoach(Agent**_agents)
     firstTime = true;
 
     selectedBehavior = nullptr;
-//    behaviorMahi = new BehaviorMahi();
+    behaviorMahi = new BehaviorMahi();
 }
 
 CCoach::~CCoach()
@@ -861,6 +861,9 @@ void CCoach::decideAttack()
     }
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
+//    if (selectedBehavior != nullptr) {
+//        selectedBehavior->execute();
+//    }
     lastPlayers.clear();
     lastPlayers.append(ourPlayers);
 }
@@ -1187,11 +1190,11 @@ void CCoach::execute()
 {
     findGoalieID();
     choosePlaymakeAndSupporter();
-    findDefneders(conf.maxNumberOfDefenses);
-    sendBehaviorStatus();
-    ROS_INFO("MAHI IS THE BEST");
-//    decidePreferredDefenseAgentsCountAndGoalieAgent();
-//    decideDefense();
+//    findDefneders(conf.maxNumberOfDefenses);
+//    sendBehaviorStatus();
+//    ROS_INFO("MAHI IS THE BEST");
+    decidePreferredDefenseAgentsCountAndGoalieAgent();
+    decideDefense();
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
     CRoleStop::info()->reset();
@@ -1640,11 +1643,12 @@ parsian_msgs::plan_serviceResponse CCoach::getLastPlan() {
 }
 
 void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav) {
-    if (_behav->name == "mahi") {
-        selectedBehavior = behaviorMahi;
-    } else {
-        selectedBehavior = nullptr;
-    }
+    m_behavior = _behav;
+//    if (_behav->name == "mahi") {
+//        selectedBehavior = behaviorMahi;
+//    } else {
+//        selectedBehavior = nullptr;
+//    }
 }
 
 int CCoach::findGoalieID() {

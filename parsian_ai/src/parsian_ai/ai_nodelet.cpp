@@ -9,7 +9,7 @@ void AINodelet::onInit() {
     ros::NodeHandle& nh = getNodeHandle();
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
     ai.reset(new AI());
-    ROS_INFO("init");
+    ROS_INFO("init2");
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
         std::string topic(QString("/agent_%1/task").arg(i).toStdString());
