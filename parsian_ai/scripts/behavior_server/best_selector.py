@@ -1,5 +1,6 @@
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
+from threading import Timer
 
 threshold_amount = .1
 queue_size = 10
@@ -8,6 +9,10 @@ class BestSelector:
     def __init__(self):
         self.data = {}
         self.last_best = None
+        self.upper_bound = 0.9
+        self.lower_bound = 0.1
+        self.timer = Timer(3, self.timer_cb)
+        self.hasTimePassed = True
 
     def update_data(self, new_action):
         # type:( parsian_behavior ) -> None
@@ -19,16 +24,10 @@ class BestSelector:
         if len(self.data) is 0:
             return -1
 
-        # checks if a specific time has passed since the execution of last plan
-        if self.check_intention():
-            if self.last_best is not None:
-                return self.last_best
-            else:
-                return -1
-
+        # gets the best plan and checks if it is beyond boundries
         best = self.data[max(self.data, key=lambda x: self.data[x].get_average())]
         best = self.check_bounds(best)
-        
+
         if self.last_best is not None:
             self.last_best.has_threshold = 0
         best.has_threshold = 1
@@ -43,21 +42,20 @@ class BestSelector:
         global queue_size, threshold_amount
         queue_size = q_size
         threshold_amount = th_amount
-
-    def check_intention(self):
-        pass
-
+        
     def check_bounds(self, action):
-
-        if action.probability < 0.1:
+        if action.probability < self.lower_bound:
             if self.last_best is not None:
                 return self.last_best
             else:
                 return -1
-        elif self.last_best.probabilty > 0.9:
+        elif self.last_best.probabilty > self.upper_bound:
             return self.last_best
         else:
             return action
+
+    def timer_cb(self):
+        self.hasTimePassed = True
 
 class NQueue:
     def __init__(self, length):

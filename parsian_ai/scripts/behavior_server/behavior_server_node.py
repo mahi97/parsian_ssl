@@ -27,7 +27,10 @@ class BehaviorServer:
     def publisherCallBack(self, event):
         best = self.selector.get_best()
         if best is not -1:
-            self.selected_pub.publish(best)
+            if self.selector.hasTimePassed:
+                self.selector.timer.start()
+                self.selected_pub.publish(best)
+                self.selector.hasTimePassed = False
 
     def correctProbillty(self, msg):
         self.selector.update_success_rate(msg)
