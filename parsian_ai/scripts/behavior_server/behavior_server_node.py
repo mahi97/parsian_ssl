@@ -36,6 +36,7 @@ class BehaviorServer:
         self.selector.update_config(config["queue_size"], config["threshold_amount"])
         return config
 
+
 if __name__ == '__main__':
     bs = BehaviorServer()
     rospy.spin()

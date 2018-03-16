@@ -8,31 +8,56 @@ class BestSelector:
     def __init__(self):
         self.data = {}
         self.last_best = None
+
     def update_data(self, new_action):
-        # type:( parsian_behavior )
+        # type:( parsian_behavior ) -> None
         if new_action.name not in self.data.keys():
             self.data[new_action.name] = NQueue(queue_size)
-
         self.data[new_action.name].update(new_action)
 
     def get_best(self):
         if len(self.data) is 0:
             return -1
+
+        # checks if a specific time has passed since the execution of last plan
+        if self.check_intention():
+            if self.last_best is not None:
+                return self.last_best
+            else:
+                return -1
+
         best = self.data[max(self.data, key=lambda x: self.data[x].get_average())]
+        best = self.check_bounds(best)
+        
         if self.last_best is not None:
             self.last_best.has_threshold = 0
         best.has_threshold = 1
         self.last_best = best
         return best.queue[0]
 
-    def update_success_rate(self,ai_status):
-        #type:(parsian_ai_status) -> null
+    def update_success_rate(self, ai_status):
+        # type:(parsian_ai_status) -> None
         self.data[ai_status.behavior].update_success_rate(ai_status.success_rate)
 
     def update_config(self, q_size, th_amount):
-        global queue_size,threshold_amount
+        global queue_size, threshold_amount
         queue_size = q_size
         threshold_amount = th_amount
+
+    def check_intention(self):
+        pass
+
+    def check_bounds(self, action):
+
+        if action.probability < 0.1:
+            if self.last_best is not None:
+                return self.last_best
+            else:
+                return -1
+        elif self.last_best.probabilty > 0.9:
+            return self.last_best
+        else:
+            return action
 
 class NQueue:
     def __init__(self, length):
