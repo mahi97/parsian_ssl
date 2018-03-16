@@ -21,7 +21,9 @@ double CSkill::successRate() {
 }
 
 bool CSkill::done() {
-    if (agent == NULL) return true;
+    if (agent == NULL) {
+        return true;
+    }
     return progress() >= 1.0;
 }
 
@@ -82,15 +84,17 @@ bool CSkills::registerSkill(const char *name, CSkill* Skill) {
 
 CSkill* CSkills::initSkill(const char *name, Agent* _agent) {
     for (auto &Skill : *Skills)
-        if (strcmp(Skill.name, name) == 0)
+        if (strcmp(Skill.name, name) == 0) {
             return Skill.Skill->allocate(_agent);
+        }
     return nullptr;
 }
 
 void* CSkills::getInfo(const char *name) {
     for (auto &Skill : *Skills)
-        if (strcmp(Skill.name, name) == 0)
+        if (strcmp(Skill.name, name) == 0) {
             return Skill.Info;
+        }
     return nullptr;
 }
 

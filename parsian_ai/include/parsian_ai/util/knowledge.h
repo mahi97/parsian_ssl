@@ -36,8 +36,9 @@ struct NewFastestToBall {
         oppF.clear();
     }
     int ourFastest() {
-        if (ourF.size())
+        if (ourF.size()) {
             return ourF.first().second;
+        }
         return -1;
     }
     double ourFastestTime() {
@@ -47,13 +48,15 @@ struct NewFastestToBall {
         return -1;
     }
     int oppFastest() {
-        if (oppF.size())
+        if (oppF.size()) {
             return oppF.first().second;
+        }
         return -1;
     }
     double oppFastestTime() {
-        if (oppF.size())
+        if (oppF.size()) {
             return oppF.first().first;
+        }
         return -1;
     }
 };

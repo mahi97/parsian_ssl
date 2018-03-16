@@ -23,12 +23,13 @@ public:
     double PID_OUT() {
         _P = kp * error;
 
-        if (fabs(error) < I_clear_error)
+        if (fabs(error) < I_clear_error) {
             _I = 0;
-        else if (_I <= I_saturate || I_saturate == 0)
+        } else if (_I <= I_saturate || I_saturate == 0) {
             _I += error;
-        else
+        } else {
             _I = I_saturate;
+        }
 
         _D = error - pError;
 //        debug(QString("sag :%1").arg(pError),D_MHMMD);

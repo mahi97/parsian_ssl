@@ -36,8 +36,9 @@ void CRolePosition::execute() {
     bool stop = false;
     stop = knowledge->getGameMode() == CKnowledge::Stop && knowledge->getGameState() == CKnowledge::Stop;
 
-    for (int i = 0; i < _MAX_NUM_PLAYERS; i++)
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
         halfworld->positioningPoints[i] = targets[i];
+    }
 
     QString configFileName = "";
     int count = 2;
@@ -45,11 +46,11 @@ void CRolePosition::execute() {
         count = 1;
     } else if (configFileName == "2attacker") {
         count = 2;
-    } else if (configFileName == "3attacker")
+    } else if (configFileName == "3attacker") {
         count = 3;
-    else if (configFileName == "large5")
+    } else if (configFileName == "large5") {
         count = 5;
-    else if (configFileName == "TI6") {
+    } else if (configFileName == "TI6") {
         count = 6;
     }
 
@@ -60,9 +61,13 @@ void CRolePosition::execute() {
 
 
 
-    if (kickOff) count = 2;
+    if (kickOff) {
+        count = 2;
+    }
 
-    if (!editData.contains(configFileName)) configFileName = "";
+    if (!editData.contains(configFileName)) {
+        configFileName = "";
+    }
 
     Vector2D p[5];
     if (kickOff) {
@@ -148,19 +153,22 @@ void CRolePosition::execute() {
 
     if (knowledge->getGameMode() == CKnowledge::Stop) {
         gotopoint->setBallObstacleRadius(0.5);
-    } else
+    } else {
         gotopoint->setBallObstacleRadius(0.0);
+    }
 
     info()->matchPositions();
 
 
-    if (info()->oneToucher.isEmpty())
+    if (info()->oneToucher.isEmpty()) {
         info()->oneToucherDist2Ball = 100;
+    }
 
     bool playmakerIsFar = true;
     if (knowledge->getPlayMaker() != NULL)
-        if (knowledge->getPlayMaker()->pos().dist(agent->pos()) < 0.45)
+        if (knowledge->getPlayMaker()->pos().dist(agent->pos()) < 0.45) {
             playmakerIsFar = false;
+        }
 
 //    if(agent->pos().dist(wm->ballCatchTarget(agent->self())) < info()->oneToucherDist2Ball
 //      &&  (agent->canOneTouch() && coming > 0.3 && ang<policy()->PlayMaker_OneTouchAngleThreshold() )
@@ -178,10 +186,11 @@ void CRolePosition::execute() {
 //  }
 
 
-    if (knowledge->getGameState() == CKnowledge::OurKickOff)
+    if (knowledge->getGameState() == CKnowledge::OurKickOff) {
         gotopoint->setAvoidCenterCircle(true);
-    else
+    } else {
         gotopoint->setAvoidCenterCircle(false);
+    }
 
     gotopoint->setNoAvoid(false);
     gotopoint->setAvoidPenaltyArea(true);
@@ -222,9 +231,11 @@ void CRolePositionInfo::reset() {
 }
 
 void CRolePositionInfo::matchPositions() {
-    if (lastFrameCalculated != knowledge->frameCount)
+    if (lastFrameCalculated != knowledge->frameCount) {
         lastFrameCalculated = knowledge->frameCount;
-    else return;
+    } else {
+        return;
+    }
     int tmpIndices[_MAX_NUM_PLAYERS];
     bool flags[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
@@ -236,20 +247,24 @@ void CRolePositionInfo::matchPositions() {
     int c = count();
     posAgents.clear();
     for (int i = 0; i < c; i++) {
-        if (static_cast<CRolePosition*>(robot(i)->skill)->getDefaultPositioning())
+        if (static_cast<CRolePosition*>(robot(i)->skill)->getDefaultPositioning()) {
             posAgents.append(i);
+        }
     }
 
     QList<int> qq;
     //positioningPointsCount > count() should be true
-    for (int i = 0; i < knowledge->positioningPointsCount; i++) qq << i;
+    for (int i = 0; i < knowledge->positioningPointsCount; i++) {
+        qq << i;
+    }
     QList<QList<int> > q = generateSubsets(qq, posAgents.count());
     double minDist = 100;
     QList<int> best;
     //for (int i=0;i<)
 
-    for (int i = 0; i < knowledge->positioningPointsCount; i++)
+    for (int i = 0; i < knowledge->positioningPointsCount; i++) {
         draw(knowledge->positioningPoints[i], 1, "blue");
+    }
 
     for (int i = 0; i < q.count(); i++) {
         QList<QList<int> > p = generateCombinations(q[i]);
@@ -281,7 +296,9 @@ void CRolePositionInfo::matchPositions() {
                 break;
             }
         }
-    } else agentsChanged = true;
+    } else {
+        agentsChanged = true;
+    }
 
     lastAgents.clear();
     for (int i = 0; i < c; i++) {
@@ -289,8 +306,9 @@ void CRolePositionInfo::matchPositions() {
     }
 
     if (fabs(lastError - sumDist) > 0.25 || agentsChanged) {
-        for (int i = 0; i < _MAX_NUM_PLAYERS; i++)
+        for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
             indices[i] = tmpIndices[i];
+        }
         //indices[i] = tmpIndices[i];
         lastError = sumDist;
     }
@@ -311,7 +329,8 @@ CRolePositionInfo::CRolePositionInfo(QString _roleName) : CRoleInfo(_roleName) {
 int CRolePositionInfo::findPlayMaker() {
     playMakerID = -1;
     for (int i = 0; i < knowledge->agentCount(); i++)
-        if (knowledge->getAgent(i) != NULL && knowledge->getAgent(i)->skillName == CRolePlayMake::Name)
+        if (knowledge->getAgent(i) != NULL && knowledge->getAgent(i)->skillName == CRolePlayMake::Name) {
             playMakerID = knowledge->getAgent(i)->id();
+        }
     return playMakerID;
 }

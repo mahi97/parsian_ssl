@@ -32,8 +32,12 @@ const double kalman_threshold = 0.01;
 const double kalman_threshold_2 = 0.0005;
 
 double boundto(double x, double a, double b) {
-    if (x > b) return b;
-    if (x < a) return a;
+    if (x > b) {
+        return b;
+    }
+    if (x < a) {
+        return a;
+    }
     return x;
 }
 
@@ -65,8 +69,9 @@ RobotTracker::rcommand RobotTracker::get_command(double time) {
     uint i;
 
     for (i = 1; i < cs.size(); i++) {
-        if (cs[i].timestamp > time)
+        if (cs[i].timestamp > time) {
             break;
+        }
     }
 
     return cs[i - 1];
@@ -75,11 +80,13 @@ RobotTracker::rcommand RobotTracker::get_command(double time) {
 void RobotTracker::command(double timestamp, Vector2D v, double w) {
     rcommand c = { timestamp + latency - (getFramePeriod() / 2.0), v, w };
 
-    while (cs.size() > 1 && cs[0].timestamp < time - stepsize)
+    while (cs.size() > 1 && cs[0].timestamp < time - stepsize) {
         cs.pop_front();
+    }
 
-    while (!cs.empty() && cs.back().timestamp == c.timestamp)
+    while (!cs.empty() && cs.back().timestamp == c.timestamp) {
         cs.pop_back();
+    }
 
     cs.push_back(c);
 }
@@ -94,8 +101,9 @@ void RobotTracker::observeNew(vraw obs, double _acc_x_sign, double _acc_y_sign) 
 
 void RobotTracker::observe(vraw obs, double timestamp) {
     if (reset_on_obs) {
-        if (obs.conf <= 0.0)
+        if (obs.conf <= 0.0) {
             return;
+        }
 
         static Matrix x(8, 1), P(8);
 
@@ -428,8 +436,12 @@ Matrix& RobotTracker::V(const Matrix &x) {
 }
 
 double RobotTracker::boundTo(double x, double low, double high) {
-    if (x < low) x = low;
-    if (x > high) x = high;
+    if (x < low) {
+        x = low;
+    }
+    if (x > high) {
+        x = high;
+    }
     return (x);
 }
 

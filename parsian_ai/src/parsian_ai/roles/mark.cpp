@@ -19,16 +19,19 @@ int CRoleMark::chooseOppToMark() {
 
     QList <CRobot*> markedByDef;
     for (int i = 0 ; i < knowledge->toBeMopps.size() ; i++)
-        if (knowledge->toBeMopps[i]->markedByDefense == true)
+        if (knowledge->toBeMopps[i]->markedByDefense == true) {
             markedByDef.append(knowledge->toBeMopps[i]);
+        }
 
     QList <CRobot*> freeOpps;
     for (int i = 0 ; i < knowledge->toBeMopps.size() ; i++)
-        if (knowledge->toBeMopps[i]->markedByDefense == false)
+        if (knowledge->toBeMopps[i]->markedByDefense == false) {
             freeOpps.append(knowledge->toBeMopps[i]);
+        }
 
-    for (int i = 0 ; i < freeOpps.count() ; i++)
+    for (int i = 0 ; i < freeOpps.count() ; i++) {
         draw(freeOpps[i]->pos);
+    }
 
     int res = -1;
     double minDist = 100000;
@@ -65,12 +68,14 @@ void CRoleMark::execute() {
     double w, ang, coming;
     Vector2D target = knowledge->onetouchablity(agent->id(), w, ang, coming);
     info()->oneToucher.removeAll(agent->self()->id);
-    if (info()->oneToucher.isEmpty())
+    if (info()->oneToucher.isEmpty()) {
         info()->oneToucherDist2Ball = 100;
+    }
     bool playmakerIsFar = true;
     if (knowledge->getPlayMaker() != NULL)
-        if (knowledge->getPlayMaker()->pos().dist(agent->pos()) < 0.45)
+        if (knowledge->getPlayMaker()->pos().dist(agent->pos()) < 0.45) {
             playmakerIsFar = false;
+        }
     if (agent->pos().dist(wm->ballCatchTarget(agent->self())) < info()->oneToucherDist2Ball
             && (agent->canOneTouch() && coming > 0.3 && ang < policy()->PlayMaker_OneTouchAngleThreshold())
             && playmakerIsFar) {
@@ -232,7 +237,9 @@ Agent* CRoleMarkInfo::blocker(int i) {
     int z = 0;
     for (int k = 0; k < knowledge->agentCount(); k++) {
         if (knowledge->getAgent(k)->skillName == "block") {
-            if (z == i) return knowledge->getAgent(k);
+            if (z == i) {
+                return knowledge->getAgent(k);
+            }
             z++;
         }
     }
@@ -246,23 +253,27 @@ void CRoleMarkInfo::matching() {
 
     oppOffenders.clear();
     for (int i = 0 ; i < knowledge->toBeMopps.size() ; i++)
-        if (knowledge->toBeMopps[i]->markedByDefense == false)
+        if (knowledge->toBeMopps[i]->markedByDefense == false) {
             oppOffenders.append(knowledge->toBeMopps[i]->id);
+        }
 
     ourOffendersAgents.clear();
     ourOffenders.clear();
     ourOffendersAgents.append(knowledge->roleAssignments["mark"]);
-    for (int i = 0 ; i < ourOffendersAgents.size() ; i++)
+    for (int i = 0 ; i < ourOffendersAgents.size() ; i++) {
         ourOffenders.append(ourOffendersAgents[i]->id());
+    }
 
     if (oppOffenders.size() == 0 || ourOffenders.size() > oppOffenders.size()) {
         for (int i = 0 ; i < knowledge->toBeMopps.size() && oppOffenders.size() < ourOffenders.size() ; i++)
-            if (knowledge->toBeMopps[i]->markedByDefense == true)
+            if (knowledge->toBeMopps[i]->markedByDefense == true) {
                 oppOffenders.append(knowledge->toBeMopps[i]->id);
+            }
     }
 
-    if (ourOffenders.size() == 0 || oppOffenders.size() == 0)
+    if (ourOffenders.size() == 0 || oppOffenders.size() == 0) {
         return;
+    }
 
     const double Dist_Mark = 3;
     const double Ang_Mark = 90;
@@ -274,8 +285,9 @@ void CRoleMarkInfo::matching() {
             weightSum[i].second = i;
             for (int j = 0; j < oppOffenders.count(); j++) {
                 double inertia = 0;
-                if (lastMatched[ourOffenders[i]] == oppOffenders[j])
+                if (lastMatched[ourOffenders[i]] == oppOffenders[j]) {
                     inertia = 10;
+                }
                 double d = (wm->our[ourOffenders[i]]->pos - wm->opp[oppOffenders[j]]->pos).length();
 
                 double ang = AngleDeg::normalize_angle((wm->opp[oppOffenders[j]]->pos - wm->field->ourGoal()).th().degree() -
@@ -310,8 +322,9 @@ void CRoleMarkInfo::matching() {
             for (int i = 0; i < ourOffenders.count(); i++)
                 for (int j = 0; j < oppOffenders.count(); j++) {
                     double inertia = 0;
-                    if (lastMatched[ourOffenders[i]] == oppOffenders[j])
+                    if (lastMatched[ourOffenders[i]] == oppOffenders[j]) {
                         inertia = 10;
+                    }
                     double d = (wm->our[ourOffenders[i]]->pos - wm->opp[oppOffenders[j]]->pos).length();
 //          double score = 1000*wm->opp[oppOffenders[j]]->danger*exp(-d*d/(Dist_Mark*Dist_Mark)) + inertia;
 
@@ -329,14 +342,16 @@ void CRoleMarkInfo::matching() {
                     draw(QString("%1").arg(score) , (seg.a() + seg.b()) / 2);
                 }
 
-            for (int i = 0; i < _MAX_NUM_PLAYERS; i++)
+            for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
                 lastMatched[i] = -1;
+            }
             mwbm.findMatching();
             for (int i = 0; i < ourOffenders.count(); i++) {
                 if (mwbm.getMatch(i) >= 0) {
                     lastMatched[ourOffenders[i]] = oppOffenders[mwbm.getMatch(i)];
-                } else
+                } else {
                     lastMatched[ourOffenders[i]] = -1;
+                }
             }
             flag = false;
             for (int i = 0 ; i < ourOffendersBak.size() ; i++)
@@ -351,8 +366,9 @@ void CRoleMarkInfo::matching() {
         for (int i = 0; i < ourOffenders.count(); i++)
             for (int j = 0; j < oppOffenders.count(); j++) {
                 double inertia = 0;
-                if (lastMatched[ourOffenders[i]] == oppOffenders[j])
+                if (lastMatched[ourOffenders[i]] == oppOffenders[j]) {
                     inertia = 10;
+                }
                 double d = (wm->our[ourOffenders[i]]->pos - wm->opp[oppOffenders[j]]->pos).length();
                 //double score = 1000*wm->opp[oppOffenders[j]]->danger*exp(-d*d/(Dist_Mark*Dist_Mark)) + inertia;
 
@@ -370,14 +386,16 @@ void CRoleMarkInfo::matching() {
                 draw(QString("%1").arg(score) , (seg.a() + seg.b()) / 2);
             }
 
-        for (int i = 0; i < _MAX_NUM_PLAYERS; i++)
+        for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
             lastMatched[i] = -1;
+        }
         mwbm.findMatching();
         for (int i = 0; i < ourOffenders.count(); i++) {
             if (mwbm.getMatch(i) >= 0) {
                 lastMatched[ourOffenders[i]] = oppOffenders[mwbm.getMatch(i)];
-            } else
+            } else {
                 lastMatched[ourOffenders[i]] = -1;
+            }
         }
     }
 }
@@ -387,9 +405,9 @@ void CRoleMark::parse(QStringList params) {
     kickOffMode = false;
     toBeMarkedRole.clear();
     for (int i = 0; i < params.length(); i++) {
-        if (params[i].toLower() == "kickoffmode")
+        if (params[i].toLower() == "kickoffmode") {
             kickOffMode = true;
-        else {
+        } else {
             toBeMarkedRole.append(params[i].toLower());
         }
     }

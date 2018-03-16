@@ -19,16 +19,24 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     float ourTeamSide = (isOurSideLeft == parsian_msgs::parsian_team_config::LEFT) ? -1.0f : 1.0f;
 
     if (!m_config.camera_one_active) {
-        if (packet->camera_id == 0) return;
+        if (packet->camera_id == 0) {
+            return;
+        }
     }
     if (!m_config.camera_two_active) {
-        if (packet->camera_id == 1) return;
+        if (packet->camera_id == 1) {
+            return;
+        }
     }
     if (!m_config.camera_three_active) {
-        if (packet->camera_id == 2) return;
+        if (packet->camera_id == 2) {
+            return;
+        }
     }
     if (!m_config.camera_four_active) {
-        if (packet->camera_id == 3) return;
+        if (packet->camera_id == 3) {
+            return;
+        }
     }
 
 
@@ -62,7 +70,9 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
     v[id].lastUpdateTime = vcTimer->elapsed();
     double t = packet->t_capture;
     double dt =  t - v[id].ltcapture;
-    if (dt < 0.0) dt = 0.05;
+    if (dt < 0.0) {
+        dt = 0.05;
+    }
     v[id].time = t;
     v[id].timeStep = dt;
     v[id].ltcapture = t;
@@ -82,8 +92,9 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
             v[id].ball.append(raw);
         }
     }
-    if (! packet->balls.empty())
+    if (! packet->balls.empty()) {
         v[id].outofsight_ball = 0;
+    }
 
     bool our_insight[_MAX_NUM_PLAYERS];
     bool opp_insight[_MAX_NUM_PLAYERS];
@@ -93,7 +104,9 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
 
     for (const auto &u : packet->us) {
         int rob_id = u.robot_id;
-        if (v[id].ourTeam[rob_id].count() >= MAX_OBJECT) continue;
+        if (v[id].ourTeam[rob_id].count() >= MAX_OBJECT) {
+            continue;
+        }
         CRawObject raw = CRawObject(frameCnt, Vector2D(u.pos.x * ourTeamSide, u.pos.y * ourTeamSide),
                                     u.orientation * 180.0f / M_PI + (1.0 - ourTeamSide) * 90.0
                                     , rob_id , u.confidence, nullptr, id);
@@ -109,7 +122,9 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
 
     for (const auto &i : packet->them) {
         int rob_id = i.robot_id;
-        if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) continue;
+        if (v[id].oppTeam[rob_id].count() >= MAX_OBJECT) {
+            continue;
+        }
         CRawObject raw = CRawObject(frameCnt, Vector2D(i.pos.x * ourTeamSide, i.pos.y * ourTeamSide),
                                     i.orientation * 180.0f / M_PI + (1.0 - ourTeamSide) * 90.0
                                     , rob_id , i.confidence, nullptr, id);
@@ -135,7 +150,9 @@ void CVisionClient::parse(const parsian_msgs::ssl_vision_detectionConstPtr& pack
 }
 
 inline float inSightReduce(float v, int n) {
-    if (n > 0) return v / ((float) n * n);
+    if (n > 0) {
+        return v / ((float) n * n);
+    }
     return v;
 }
 
@@ -219,13 +236,16 @@ void CVisionClient::merge(int camera_count) {
             }
         }
     }
-    for (int k = 0; k < res.ball.count(); k++)
+    for (int k = 0; k < res.ball.count(); k++) {
         res.ball[k].pos /= (float)(res.ball[k].mergeCount + 1);
+    }
     for (int t = 0; t < _MAX_NUM_PLAYERS; t++) {
-        for (int k = 0; k < res.ourTeam[t].count(); k++)
+        for (int k = 0; k < res.ourTeam[t].count(); k++) {
             res.ourTeam[t][k].pos /= (float)(res.ourTeam[t][k].mergeCount + 1);
-        for (int k = 0; k < res.oppTeam[t].count(); k++)
+        }
+        for (int k = 0; k < res.oppTeam[t].count(); k++) {
             res.oppTeam[t][k].pos /= (float)(res.oppTeam[t][k].mergeCount + 1);
+        }
     }
 
     res.time /= camera_count;

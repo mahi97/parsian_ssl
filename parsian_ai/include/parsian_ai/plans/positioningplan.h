@@ -47,10 +47,11 @@ public:
 class Comparar {
 public:
     bool operator()(QPair< edgeMode , double >& s1, QPair< edgeMode , double >& s2) {
-        if (s1.second < s2.second)
+        if (s1.second < s2.second) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 };
 

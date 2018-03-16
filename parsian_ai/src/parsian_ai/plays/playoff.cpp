@@ -10,7 +10,9 @@ CPlayOff::CPlayOff() : CMasterPlay() {
 
     decidePlan = true;
     agentSize = 1;
-    for (auto &i : positionAgent) i.stateNumber = 0;
+    for (auto &i : positionAgent) {
+        i.stateNumber = 0;
+    }
     for (int i = 0; i < _NUM_PLAYERS; i++) {
         roleAgent[i] = new CRolePlayOff();
         newRoleAgent[i] = new CRolePlayOff();
@@ -60,8 +62,9 @@ CPlayOff::~CPlayOff() {
 }
 
 bool CPlayOff:: isBlockDisturbing() {
-    if (blockerState == 7)
+    if (blockerState == 7) {
         return true;
+    }
     return conf.UseForcedBlock;
 
 }
@@ -162,8 +165,9 @@ bool CPlayOff::BlockerExecute(int agentID) {
         newRoleAgent[0]->setTargetDir(wm->field->ourGoal());
         if (newRoleAgent[0]->getTargetDir().angleWith(newRoleAgent[0]->getAgent()->dir()).degree() < 5) {
             blockerStopStates = BlockStop ;
-        } else
+        } else {
             newRoleAgent[0]->execute();
+        }
 
         break;
     case TurnAndKick:
@@ -205,10 +209,11 @@ bool CPlayOff::BlockerExecute(int agentID) {
         newRoleAgent[ID]->setTarget(pos1);
         newRoleAgent[ID]->setTargetDir(wm->ball->pos - pos1);
 
-        if (newRoleAgent[ID]->getTarget().dist(newRoleAgent[ID]->getAgent()->pos()) > 0.15)
+        if (newRoleAgent[ID]->getTarget().dist(newRoleAgent[ID]->getAgent()->pos()) > 0.15) {
             newRoleAgent[ID]->execute();
-        else
+        } else {
             blockerStopStates = TurnAndKick;
+        }
 
         //        debug(QString("The ID is:%1").arg(newRoleAgent[4]->getAgent()->id()),D_NADIA);
 
@@ -701,15 +706,17 @@ void CPlayOff::thirdDegree() {
     for (int i : blockersCentralRegion) {
         DBUG(QString("central:%1").arg(blockersCentralRegion.at(i)), D_NADIA);
         //        if(blockersRoundRegion.contains(blockersCentralRegion.at(i)) && i==blockerID)
-        if (i == blockerID)
+        if (i == blockerID) {
             blockerState += centralRegionBlock;
+        }
     }
 
 
     for (int i : blockersRoundRegion) {
         DBUG(QString("Rounds:%1").arg(blockersRoundRegion.at(i)), D_NADIA);
-        if (i == blockerID)
+        if (i == blockerID) {
             blockerState += RoundRegionBlock;
+        }
     }
 
 
@@ -733,12 +740,13 @@ void CPlayOff::stayPoistioning() {
 
     double x = wm->ball->pos.x;
     int m;
-    if (x > wm->field->_FIELD_WIDTH / 3)
+    if (x > wm->field->_FIELD_WIDTH / 3) {
         m = 0;
-    else if (x > wm->field->_FIELD_WIDTH / 6)
+    } else if (x > wm->field->_FIELD_WIDTH / 6) {
         m = 1;
-    else
+    } else {
         m = -1;
+    }
 
     newRoleAgent[1]->setTarget(Vector2D(1, .5));
     newRoleAgent[1]->setTargetDir(wm->field->oppGoal());
@@ -826,9 +834,13 @@ void CPlayOff::firstExecute() {
     int passBlocked = 0;
     Vector2D sol1, sol2;
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-        if (wm->opp.active(i)->id == wm->opp.data->goalieID) continue;
+        if (wm->opp.active(i)->id == wm->opp.data->goalieID) {
+            continue;
+        }
         for (auto &j : newRoleAgent) {
-            if (j->getAgent() == nullptr) continue;
+            if (j->getAgent() == nullptr) {
+                continue;
+            }
             if (Circle2D(wm->opp.active(i)->pos, 0.25).intersection(Segment2D(j->getAgent()->pos(), wm->field->oppGoal()), &sol1, &sol2)) {
                 shotBlocked++;
             }
@@ -836,9 +848,13 @@ void CPlayOff::firstExecute() {
     }
 
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-        if (wm->opp.active(i)->id == wm->opp.data->goalieID) continue;
+        if (wm->opp.active(i)->id == wm->opp.data->goalieID) {
+            continue;
+        }
         for (auto &j : newRoleAgent) {
-            if (j->getAgent() == nullptr) continue;
+            if (j->getAgent() == nullptr) {
+                continue;
+            }
             if (Circle2D(wm->opp.active(i)->pos, 0.25).intersection(Segment2D(j->getAgent()->pos(), wm->ball->pos), &sol1, &sol2)) {
                 passBlocked++;
             }
@@ -973,19 +989,25 @@ void CPlayOff::firstPlayForOppCorner(int _agentSize) {
             finisher++;
         }
     }
-    if (!conf.UseBlockBlocker)
+    if (!conf.UseBlockBlocker) {
         blockerStep = S3;
+    }
 
     if (finisher == _agentSize - 1) {
-        if (firstStepEnums == Stay && blockerStep == S3)
+        if (firstStepEnums == Stay && blockerStep == S3) {
             firstStepEnums = Done;
-        else
+        } else {
             firstStepEnums = Done;
+        }
     } else if (newRoleAgent[0]->getTarget().dist(newRoleAgent[0]->getAgent()->pos()) < 0.1
                && newRoleAgent[0]->getTargetDir().angleWith(newRoleAgent[0]->getAgent()->dir()).degree() < 5) {
-        if (blockerStep == S0) blockerStep = S1;
-        else if (blockerStep == S1) blockerStep = S2;
-        else if (blockerStep == S2) blockerStep = S3;
+        if (blockerStep == S0) {
+            blockerStep = S1;
+        } else if (blockerStep == S1) {
+            blockerStep = S2;
+        } else if (blockerStep == S2) {
+            blockerStep = S3;
+        }
     }
 
 
@@ -1168,7 +1190,9 @@ bool CPlayOff::isTimeOver() {
 
 bool CPlayOff::isBallDirChanged() {
 
-    if (masterPlan->execution.passCount != 1) return false;
+    if (masterPlan->execution.passCount != 1) {
+        return false;
+    }
 
     // USE PASSER FORM INITIAL LEVEL
     const int& passer = masterPlan->execution.passer.id;
@@ -1181,7 +1205,9 @@ bool CPlayOff::isBallDirChanged() {
         drawer->draw(s, QColor(Qt::blue));
         drawer->draw(c, QColor(Qt::red));
         Vector2D v1, v2;
-        if (!c.intersection(s, &v1, &v2)) return true;
+        if (!c.intersection(s, &v1, &v2)) {
+            return true;
+        }
     } else {
         return false;
     }
@@ -1194,7 +1220,9 @@ bool CPlayOff::isFinalShotDone() {
     const int& tLastState = masterPlan->execution.theLastState;
 
     // Plan hasn't a final shoot
-    if (tLastState == -1 || tLastAgent == -1) return false;
+    if (tLastState == -1 || tLastAgent == -1) {
+        return false;
+    }
 
     Agent* tAgent = soccer->agents[masterPlan -> common.matchedID[tLastAgent]];
 
@@ -1230,8 +1258,9 @@ Vector2D CPlayOff::getEmptyTarget(Vector2D _position, double _radius) {
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
             ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3))
+            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
                 continue;
+            }
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
                 if (Circle2D(wm->opp.active(i)->pos, 0.07).contains(tempTarget)) {
                     oppCnt = 1;
@@ -1316,7 +1345,9 @@ void CPlayOff::posExecute() {
 void CPlayOff::checkEndState() {
 
     for (int i = 0; i < masterPlan->common.currentSize; i++) {
-        if (roleAgent[i]->getAgent() == nullptr) continue;
+        if (roleAgent[i]->getAgent() == nullptr) {
+            continue;
+        }
         if (isTaskDone(roleAgent[i])) {
 
             roleAgent[i]->setRoleUpdate(false);
@@ -1589,7 +1620,9 @@ Vector2D CPlayOff::getMoveTarget(int agentID,
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-                if (Circle2D(wm->opp.active(i)->pos, 0.02).contains(tempTarget)) oppCnt++;
+                if (Circle2D(wm->opp.active(i)->pos, 0.02).contains(tempTarget)) {
+                    oppCnt++;
+                }
             }
             if (!oppCnt) {
                 finalTarget = tempTarget;
@@ -1597,7 +1630,9 @@ Vector2D CPlayOff::getMoveTarget(int agentID,
                 break;
             }
         }
-        if (posFound) break;
+        if (posFound) {
+            break;
+        }
     }
 
     return finalTarget;
@@ -1614,8 +1649,11 @@ double CPlayOff::getMaxVel(int agentID,
     tAgentPos = soccer->agents[kkAgentsID[agentID]]->pos();
     tDist = tAgentPos.dist(positionAgent[agentID].positionArg.at(positionAgent[agentID].stateNumber).staticPos);
     tempVel = tDist / positionAgent[agentID].positionArg.at(positionAgent[agentID].stateNumber).leftData;
-    if (tempVel >= 4) tempVel = 4;
-    else if (tempVel <= 1.5) tempVel = 1.5;
+    if (tempVel >= 4) {
+        tempVel = 4;
+    } else if (tempVel <= 1.5) {
+        tempVel = 1.5;
+    }
     return tempVel;
 }
 
@@ -1628,10 +1666,11 @@ double CPlayOff::getMaxVel(const CRolePlayOff* _roleAgent,
     tDist = tAgentPos.dist(_posArg.staticPos);
     tempVel = tDist / _posArg.leftData;
 
-    if (tempVel >= 4)
+    if (tempVel >= 4) {
         tempVel = 4;
-    else if (tempVel <= 1.5)
+    } else if (tempVel <= 1.5) {
         tempVel = 1.5;
+    }
 
     return tempVel;
 }
@@ -1641,8 +1680,12 @@ Vector2D CPlayOff::getGoalTarget(int shoterID, int shoterState) {
     Vector2D tempPos;
     double tempYPos = (double)(positionAgent[shoterID].positionArg.at(shoterState).rightData) / 1000 + wm->field->oppGoalR().y;
     drawer->draw(QString("%1").arg(tempYPos), Vector2D(-2, -2));
-    if (tempYPos < wm->field->oppGoalR().y) tempYPos = wm->field->oppGoalR().y;
-    if (tempYPos > wm->field->oppGoalL().y) tempYPos = wm->field->oppGoalL().y;
+    if (tempYPos < wm->field->oppGoalR().y) {
+        tempYPos = wm->field->oppGoalR().y;
+    }
+    if (tempYPos > wm->field->oppGoalL().y) {
+        tempYPos = wm->field->oppGoalL().y;
+    }
     tempPos.assign(wm->field->oppGoal().x, tempYPos);
     return tempPos;
 }
@@ -1651,20 +1694,26 @@ Vector2D CPlayOff::getGoalTarget(const long& _y) {
     Vector2D tempPos;
     double tempYPos = (double)(_y) / 1000 + wm->field->oppGoalR().y;
     drawer->draw(QString("%1").arg(tempYPos), Vector2D(-2, -2));
-    if (tempYPos < wm->field->oppGoalR().y) tempYPos = wm->field->oppGoalR().y;
-    if (tempYPos > wm->field->oppGoalL().y) tempYPos = wm->field->oppGoalL().y;
+    if (tempYPos < wm->field->oppGoalR().y) {
+        tempYPos = wm->field->oppGoalR().y;
+    }
+    if (tempYPos > wm->field->oppGoalL().y) {
+        tempYPos = wm->field->oppGoalL().y;
+    }
     tempPos.assign(wm->field->oppGoal().x, tempYPos);
     return tempPos;
 }
 
 bool CPlayOff::chipOrNot(int passerID, int ReceiverID, int ReceiverState) {
 
-    if (positionAgent[passerID].positionArg.at(positionAgent[passerID].stateNumber).leftData < 0) return true;
-    else if (positionAgent[passerID].positionArg.at(positionAgent[passerID].stateNumber).rightData < 0) return false;
-    else return !isPathClear(wm->ball->pos,
-                                 positionAgent[ReceiverID].positionArg.at(ReceiverState).staticPos,
-                                 0.5,
-                                 0.1);
+    if (positionAgent[passerID].positionArg.at(positionAgent[passerID].stateNumber).leftData < 0) {
+        return true;
+    } else if (positionAgent[passerID].positionArg.at(positionAgent[passerID].stateNumber).rightData < 0) {
+        return false;
+    } else return !isPathClear(wm->ball->pos,
+                                   positionAgent[ReceiverID].positionArg.at(ReceiverState).staticPos,
+                                   0.5,
+                                   0.1);
 }
 
 bool CPlayOff::chipOrNot(const SPositioningArg& _posArg) {
@@ -1708,7 +1757,9 @@ bool CPlayOff::isPathClear(Vector2D _pos1,
     drawer->draw(_poly, "red");
 
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-        if (_poly.contains(wm->opp.active(i)->pos)) return false;
+        if (_poly.contains(wm->opp.active(i)->pos)) {
+            return false;
+        }
     }
     return true;
 }
@@ -1789,17 +1840,22 @@ int CPlayOff::kkGetIndex(kkValue &value, int cIndex) {
     int cnt = 0;
     for (int i = 0; i < value.agentSize; i++) {
         if (value.IDs[i] == -1) {
-            if (cnt == cIndex)
+            if (cnt == cIndex) {
                 return i;
+            }
             cnt++;
         }
     }
 }
 
 POMODE CPlayOff::getPlayOffMode() {
-    if (gameState->ourKickoff()) return KICKOFF;
-    else if (gameState->ourIndirectKick()) return INDIRECT;
-    else if (gameState->ourDirectKick()) return DIRECT;
+    if (gameState->ourKickoff()) {
+        return KICKOFF;
+    } else if (gameState->ourIndirectKick()) {
+        return INDIRECT;
+    } else if (gameState->ourDirectKick()) {
+        return DIRECT;
+    }
 }
 
 void CPlayOff::reset() {
@@ -1915,8 +1971,9 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
 
 bool CPlayOff::isReceiveDone(const CRolePlayOff * _roleAgent) {
     if (Circle2D(_roleAgent->getAgent()->pos(), 0.3).contains(wm->ball->pos)) {
-        if (wm->ball->vel.length() < 0.5)
+        if (wm->ball->vel.length() < 0.5) {
             return true;
+        }
     }
     return false;
 }
@@ -1957,12 +2014,13 @@ bool CPlayOff::isMoveDone(const CRolePlayOff * _roleAgent) {
 QDebug operator<< (QDebug d, NGameOff::SPlan _plan) {
 
     QString mode;
-    if (_plan.common.planMode == KICKOFF)
+    if (_plan.common.planMode == KICKOFF) {
         mode = "KickOff";
-    else if (_plan.common.planMode == DIRECT)
+    } else if (_plan.common.planMode == DIRECT) {
         mode = "Direct";
-    else if (_plan.common.planMode == INDIRECT)
+    } else if (_plan.common.planMode == INDIRECT) {
         mode = "InDirect";
+    }
 
 
     d << "------------------->>>";

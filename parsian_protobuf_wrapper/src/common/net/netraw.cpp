@@ -20,7 +20,9 @@ bool Address::setHost(const char *hostname, int port) {
     // printf("%s %d\n",hostname,port);
     addrinfo *res = NULL;
     getaddrinfo(hostname, NULL, NULL, &res);
-    if (!res) return (false);
+    if (!res) {
+        return (false);
+    }
 
     mzero(addr);
     addr_len = res->ai_addrlen;
@@ -78,12 +80,16 @@ bool UDP::open(int port, bool share_port_for_multicasting, bool multicast_includ
     const int TTL = 32;
 
     // open the socket
-    if (fd >= 0) ::close(fd);
+    if (fd >= 0) {
+        ::close(fd);
+    }
     fd = socket(PF_INET, SOCK_DGRAM, 0);
 
     // set socket as non-blocking
     int flags = fcntl(fd, F_GETFL, 0);
-    if (flags < 0) flags = 0;
+    if (flags < 0) {
+        flags = 0;
+    }
     fcntl(fd, F_SETFL, flags | (blocking ? 0 : O_NONBLOCK));
 
     if (share_port_for_multicasting) {
@@ -148,20 +154,27 @@ bool UDP::addMulticast(const Address &multiaddr, const Address &interface) {
 
     int ret = setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                          &imreq, sizeof(imreq));
-    if (debug) printf("ret=%d\n", ret);
-    if (ret != 0)
+    if (debug) {
+        printf("ret=%d\n", ret);
+    }
+    if (ret != 0) {
         return false;
+    }
 
     //set multicast output interface
     ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF,
                      &imreq.imr_interface.s_addr, sizeof(imreq.imr_interface.s_addr));
-    if (debug) printf("ret=%d\n", ret);
+    if (debug) {
+        printf("ret=%d\n", ret);
+    }
 
     return (ret == 0);
 }
 
 void UDP::close() {
-    if (fd >= 0) ::close(fd);
+    if (fd >= 0) {
+        ::close(fd);
+    }
     fd = -1;
 
     sent_packets = 0;
@@ -232,7 +245,9 @@ void EchoServer() {
                 printf("[");
                 addr.print();
                 printf("]: %s", msg);
-                if (msg[l - 1] != '\n') printf("\n");
+                if (msg[l - 1] != '\n') {
+                    printf("\n");
+                }
 
                 net.send(msg, l, addr);
             }
@@ -283,7 +298,9 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (server == client) exit(1);
+    if (server == client) {
+        exit(1);
+    }
 
     if (server) {
         EchoServer();

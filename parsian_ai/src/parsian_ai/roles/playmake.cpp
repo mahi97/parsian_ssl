@@ -72,8 +72,9 @@ void CRolePlayMake::stopBehindBall(bool penalty) {
 
     } else {
         Vector2D shadowPoint = wm->ball->pos + Vector2D(wm->ball->pos - wm->field->oppGoal()).norm() * 0.3;
-        if (kickoffmode || kickoffWing)
+        if (kickoffmode || kickoffWing) {
             shadowPoint = wm->ball->pos + Vector2D(wm->field->oppGoal() - wm->ball->pos).norm() * 0.3;
+        }
         gotopoint->setSlowmode(true);
         gotopoint->setNoavoid(false);
         gotopoint->setAvoidpenaltyarea(true);
@@ -96,8 +97,9 @@ void CRolePlayMake::executeOurKickOff() {
         return;
     }
 
-    if (kickMode == FixedShoot)
+    if (kickMode == FixedShoot) {
         chipToOppGoal = true;
+    }
     if (gameState->isStop()) {
         stopBehindBall(false);
     } else {
@@ -147,8 +149,9 @@ bool CRolePlayMake::ShootPenalty() {
 
     }
     debugger->debug(QString("goalie index :%1").arg(wm->opp.data->goalieID), D_NADIA);
-    if (wm->opp[wm->opp.data->goalieID] == nullptr)
+    if (wm->opp[wm->opp.data->goalieID] == nullptr) {
         return false;
+    }
     return Segment2D(agent->pos(), penaltyTarget).dist(wm->opp[wm->opp.data->goalieID]->pos)
            > fabs(agent->pos().x - wm->opp[wm->opp.data->goalieID]->pos.x) / 4;
 }
@@ -164,7 +167,9 @@ int CRolePlayMake::getPenaltychipSpeed() {
 
         // TODO : FIX THIS
         return 2;//(knowledge->getProfile(agent->id(),(oppGoaliPos-agent->pos()).length(),false)+knowledge->getProfile(agent->id()+1,lastBounce(),false))/2;
-    } else return -1;
+    } else {
+        return -1;
+    }
 }
 
 void CRolePlayMake::firstKickInShootout(bool isChip) {
@@ -180,16 +185,18 @@ void CRolePlayMake::firstKickInShootout(bool isChip) {
     if (isChip) { //chip first
         kick->setKickspeed(1.0);
         kick->setChip(true);
-        if (wm->ball->vel.length() > 0.4)
+        if (wm->ball->vel.length() > 0.4) {
             firstKick = false;
+        }
 
     } else { //kick first
 
 
         kick->setChip(false);
         kick->setKickspeed(1.0);
-        if (wm->ball->vel.length() > 0.1)
+        if (wm->ball->vel.length() > 0.1) {
             firstKick = false;
+        }
     }
 }
 
@@ -206,8 +213,9 @@ void CRolePlayMake::kickInitialShootout() {
 
 void CRolePlayMake::ShootoutSwitching(bool isChip) {
 
-    if (wm->ball->vel.length() < 0.2)
+    if (wm->ball->vel.length() < 0.2) {
         firstKick = true;
+    }
 
 
 
@@ -265,9 +273,13 @@ void CRolePlayMake::ShootoutSwitching(bool isChip) {
 }
 
 int CRolePlayMake::choosePenaltyStrategy() {
-    if (ShootPenalty()) return pshootDirect;
-    else if (getPenaltychipSpeed() != -1) return pchipShoot;
-    else return pgoaheadShoot;
+    if (ShootPenalty()) {
+        return pshootDirect;
+    } else if (getPenaltychipSpeed() != -1) {
+        return pchipShoot;
+    } else {
+        return pgoaheadShoot;
+    }
 }
 
 void CRolePlayMake::executeOurPenaltyShootout() {
@@ -275,8 +287,9 @@ void CRolePlayMake::executeOurPenaltyShootout() {
     bool chipchip = false;
 
     debugger->debug("penalty Shootout : ", D_NADIA);
-    if (abs(wm->ball->pos.x) > 4.4)//penalty finished
+    if (abs(wm->ball->pos.x) > 4.4) { //penalty finished
         firstKick = true;
+    }
 
 
     if (gameState->isStop()/*knowledge->getGameMode()==CKnowledge::Stop*/) {
@@ -290,8 +303,9 @@ void CRolePlayMake::executeOurPenaltyShootout() {
         //initial kick skill:
         kickInitialShootout();
 
-        if (ShootPenalty())
+        if (ShootPenalty()) {
             firstKick = false;
+        }
 
         if (firstKick) {
             firstKickInShootout(chipchip);
@@ -406,8 +420,9 @@ void CRolePlayMake::kickPass(double kickSpeed) {
             gotopoint->setAvoidcentercircle(false);
             gotopoint->setBallobstacleradius(0);
             agent->action = gotopoint;
-        } else
+        } else {
             kickPassCyclesWait++;
+        }
     }
 }
 
@@ -457,8 +472,9 @@ void CRolePlayMake::execute() {
         return;
     }
 
-    if (noKick)
+    if (noKick) {
         return;
+    }
 
     if (kickMode == FixedPass) {
         debugger->debug("HERE" , D_MASOOD);
@@ -523,30 +539,53 @@ void CRolePlayMake::parse(QStringList params) {
     for (int i = 0; i < params.length(); i++) {
         bool ok = false;
         int p = params[i].toInt(&ok);
-        if (params[i].toLower() == "slow") setSlow(true);
-        else if (params[i].toLower() == "chip") setChip(true);
-        else if (params[i].toLower() == "indirectkhafan") setIndirectKhafan(true);
-        else if (params[i].toLower() == "nostop") setNoStop(true);
-        else if (params[i].toLower() == "wing") setKickoffWing(true);
-        else if (params[i].toLower() == "indirectgoogooli") setIndirectGoogooli(true);
-        else if (params[i].toLower() == "chipindirect") setChipIndirect(true);
-        else if (params[i].toLower() == "through") setThrough(true);
-        else if (params[i].toLower() == "nokick") setNoKick(true);
-        else if (params[i].toLower() == "allowonetouch") setAllowOneTouch(true);
-        else if (params[i].toLower() == "allowonepass") setAllowOnePass(true);
-        else if (params[i].toLower() == "followsequence") setFollowSequence(true);
-        else if (params[i].toLower() == "kickoff") setKickoffmode(true);
-        else if (params[i].toLower() == "indirecttiny") setIndirectTiny(true);
-        else if (params[i].toLower() == "chipinpenalty") setChipInPenaltyArea(true);
-        else if (params[i].toLower() == "shadowpass") setShadowPass(true);
-        else if (params[i].toLower() == "khers") setKhers(true);
-        else if (params[i].toLower() == "kicktotheirdefense") setKickToTheirDefense(true);
-        else if (params[i].toLower() == "justturn") setJustTurn(true);
-        else if (params[i].toLower() == "longchip") setLongChip(true);
-        else if (params[i].toLower() == "chiptogoal") setChipToOppGoal(true);
-        else if (params[i].toLower() == "shadowypoint") setShadowyPoint(true);
-        else if (params[i].toLower() == "safe") setSafeIndirect(true);
-        else if (params[i].startsWith("@")) {
+        if (params[i].toLower() == "slow") {
+            setSlow(true);
+        } else if (params[i].toLower() == "chip") {
+            setChip(true);
+        } else if (params[i].toLower() == "indirectkhafan") {
+            setIndirectKhafan(true);
+        } else if (params[i].toLower() == "nostop") {
+            setNoStop(true);
+        } else if (params[i].toLower() == "wing") {
+            setKickoffWing(true);
+        } else if (params[i].toLower() == "indirectgoogooli") {
+            setIndirectGoogooli(true);
+        } else if (params[i].toLower() == "chipindirect") {
+            setChipIndirect(true);
+        } else if (params[i].toLower() == "through") {
+            setThrough(true);
+        } else if (params[i].toLower() == "nokick") {
+            setNoKick(true);
+        } else if (params[i].toLower() == "allowonetouch") {
+            setAllowOneTouch(true);
+        } else if (params[i].toLower() == "allowonepass") {
+            setAllowOnePass(true);
+        } else if (params[i].toLower() == "followsequence") {
+            setFollowSequence(true);
+        } else if (params[i].toLower() == "kickoff") {
+            setKickoffmode(true);
+        } else if (params[i].toLower() == "indirecttiny") {
+            setIndirectTiny(true);
+        } else if (params[i].toLower() == "chipinpenalty") {
+            setChipInPenaltyArea(true);
+        } else if (params[i].toLower() == "shadowpass") {
+            setShadowPass(true);
+        } else if (params[i].toLower() == "khers") {
+            setKhers(true);
+        } else if (params[i].toLower() == "kicktotheirdefense") {
+            setKickToTheirDefense(true);
+        } else if (params[i].toLower() == "justturn") {
+            setJustTurn(true);
+        } else if (params[i].toLower() == "longchip") {
+            setLongChip(true);
+        } else if (params[i].toLower() == "chiptogoal") {
+            setChipToOppGoal(true);
+        } else if (params[i].toLower() == "shadowypoint") {
+            setShadowyPoint(true);
+        } else if (params[i].toLower() == "safe") {
+            setSafeIndirect(true);
+        } else if (params[i].startsWith("@")) {
             localAgentPassTarget = params[i].right(params[i].length() - 1);
         } else if (params[i].toLower() == "%") {
             setManualPassReceive(true);

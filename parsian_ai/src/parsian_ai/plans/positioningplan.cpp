@@ -50,8 +50,9 @@ void PositioningPlan::init(const QList<Agent*> & _agents , QString playMode) {
         posCount--;
     }
 
-    for (int i = 0 ; i < agents.size() ; i++)
+    for (int i = 0 ; i < agents.size() ; i++) {
         dynamicPositioners.append(i);
+    }
 }
 
 void PositioningPlan::staticExec() {
@@ -63,11 +64,13 @@ void PositioningPlan::staticInit(QList< holdingPoints > &_staticPoints) {
 }
 
 bool PositioningPlan::isDifferentSequence(QList<Vector2D> first, QList<Vector2D> second) {
-    if (first.size() != second.size())
+    if (first.size() != second.size()) {
         return true;
+    }
     for (int i = 0 ; i < first.size() ; i++) {
-        if (first.at(i).dist(second.at(i)) > 1e-2)
+        if (first.at(i).dist(second.at(i)) > 1e-2) {
             return true;
+        }
     }
     return false;
 }
@@ -108,8 +111,9 @@ void PositioningPlan::execute() {
             for (int k = 0 ; k < staticPositioners.count() ; k++) {
                 scores[i][j] += (int)(rolesPositions[i].dist(lastStaticPositioningTargets[k]) * 100.0);
             }
-            if (last_match[j] == i)
+            if (last_match[j] == i) {
                 scores[i][j] += 1;
+            }
         }
     }
 
@@ -165,10 +169,11 @@ void PositioningPlan::execute() {
             } else {
                 gpa[dynamicPositioners.at(i)]->setAvoidcentercircle(false);
             }
-            if (gameState->isStop())
+            if (gameState->isStop()) {
                 gpa[dynamicPositioners.at(i)]->setBallobstacleradius(.1);
-            else
+            } else {
                 gpa[dynamicPositioners.at(i)]->setBallobstacleradius(0);
+            }
         }
     }
 
@@ -216,10 +221,11 @@ void PositioningPlan::execute() {
             } else {
                 gpa[curID]->setAvoidcentercircle(false);
             }
-            if (gameState->isStop())
+            if (gameState->isStop()) {
                 gpa[curID]->setBallobstacleradius(.1);
-            else
+            } else {
                 gpa[curID]->setBallobstacleradius(0);
+            }
         }
     }
 }
@@ -242,29 +248,35 @@ void PositioningPlan::reset() {
 bool PositioningPlan::isValidPoint(Vector2D target , bool callFromStaticPositioner) {
     if ((
                 gameState->ourKickoff()) &&
-            (target.x > -Robot::robot_radius_new || target.length() < 0.6))
+            (target.x > -Robot::robot_radius_new || target.length() < 0.6)) {
         return false;
+    }
 
-    if (target.absX() > wm->field->_FIELD_WIDTH * 0.5 - Robot::robot_radius_new)
+    if (target.absX() > wm->field->_FIELD_WIDTH * 0.5 - Robot::robot_radius_new) {
         return false;
+    }
 
-    if (target.absY() > wm->field->_FIELD_WIDTH * 0.5 - Robot::robot_radius_new)
+    if (target.absY() > wm->field->_FIELD_WIDTH * 0.5 - Robot::robot_radius_new) {
         return false;
+    }
 
     Vector2D closerTarget = target + (wm->field->ourGoal() - target).norm() * 0.2;
-    if (wm->field->isInOurPenaltyArea(target) || wm->field->isInOurPenaltyArea(closerTarget))
+    if (wm->field->isInOurPenaltyArea(target) || wm->field->isInOurPenaltyArea(closerTarget)) {
         return false;
+    }
 
     if ((gameState->theirDirectKick() ||
             gameState->theirIndirectKick()) &&
-            (target.dist(wm->ball->pos) < 0.6))
+            (target.dist(wm->ball->pos) < 0.6)) {
         return false;
+    }
 
     closerTarget = target + (wm->field->oppGoal() - target).norm() * 0.3;
     if ((gameState->ourDirectKick() ||
             gameState->ourIndirectKick()) &&
-            (wm->field->isInOppPenaltyArea(target) || wm->field->isInOppPenaltyArea(closerTarget)))
+            (wm->field->isInOppPenaltyArea(target) || wm->field->isInOppPenaltyArea(closerTarget))) {
         return false;
+    }
 
     if (!callFromStaticPositioner) {
         for (int i = 0 ; i < staticPositioners.count() ; i++) {
@@ -283,8 +295,9 @@ bool PositioningPlan::isValidPoint(Vector2D target , bool callFromStaticPosition
     double topPost = (wm->field->oppGoalL() - wm->ball->pos).th().degree();
     double downPost = (wm->field->oppGoalR() - wm->ball->pos).th().degree();
 
-    if (lowerbound > downPost && lowerbound < topPost)
+    if (lowerbound > downPost && lowerbound < topPost) {
         return false;
+    }
 
     return !(upperbound > downPost && upperbound < topPost);
 
@@ -304,8 +317,9 @@ bool PositioningPlan::dfs(int vertex_off , int max_count_off_mrk , int adj[_MAX_
 
     for (i_marker = 0 ; i_marker < max_count_off_mrk ; i_marker++)
         if (adj[vertex_off][i_marker])
-            if (t[i_marker] = 1 , match[i_marker] == -1 || (!mark[match[i_marker]] && dfs(match[i_marker] , max_count_off_mrk , adj , mark , s , t)))
+            if (t[i_marker] = 1 , match[i_marker] == -1 || (!mark[match[i_marker]] && dfs(match[i_marker] , max_count_off_mrk , adj , mark , s , t))) {
                 return match[i_marker] = vertex_off , true;
+            }
 
     return false;
 
@@ -316,18 +330,21 @@ bool PositioningPlan::dfs(int vertex_off , int max_count_off_mrk , int adj[_MAX_
 bool PositioningPlan::matching(int max_count_off_mrk , int adj[_MAX_NUM_PLAYERS][_MAX_NUM_PLAYERS] , int s[] , int t[] , int matching_checker[]) {
     int i_vertex_off;
     int mark[_MAX_NUM_PLAYERS];
-    for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i ++)
+    for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i ++) {
         mark[i] = 0 ;
+    }
     for (i_vertex_off = 0 ; i_vertex_off < max_count_off_mrk ; i_vertex_off++)
         if (!matching_checker[i_vertex_off] && !mark[i_vertex_off] && dfs(i_vertex_off , max_count_off_mrk , adj , mark , s , t)) {
-            for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i ++)
+            for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i ++) {
                 mark[i] = 0 ;
+            }
             matching_checker[i_vertex_off] = 1;
         }
 
     for (i_vertex_off = 0 ; i_vertex_off < max_count_off_mrk ; i_vertex_off++)
-        if (!matching_checker[i_vertex_off])
+        if (!matching_checker[i_vertex_off]) {
             return false;
+        }
 
     return true;
 }
@@ -344,8 +361,9 @@ void PositioningPlan::getBipartiteGraph(int count_target , int count_positioner 
     for (int i1 = 0 ; i1 < _MAX_NUM_PLAYERS ; i1 ++) {
         matching_checker[i1] = 0 ;
         match[i1] = -1 ;
-        for (int j1 = 0 ; j1 < _MAX_NUM_PLAYERS ; j1 ++)
+        for (int j1 = 0 ; j1 < _MAX_NUM_PLAYERS ; j1 ++) {
             adj[i1][j1] = 0 ;
+        }
     }
     /*!*****************************************************************************************************************/
 
@@ -357,8 +375,9 @@ void PositioningPlan::getBipartiteGraph(int count_target , int count_positioner 
         int index = 0;
         //!saving number of best weighted positioner for i'th target
         for (j = 1; j < max_count_off_mrk; j++)
-            if (weight[i][index] <= weight[i][j])
+            if (weight[i][index] <= weight[i][j]) {
                 index = j;
+            }
         //!END
         cover[1][i] = 0;
         cover[0][i] = weight[i][index];//!storing maximum weight of edges that between i & index
@@ -378,24 +397,28 @@ void PositioningPlan::getBipartiteGraph(int count_target , int count_positioner 
         for (i = 0; i < max_count_off_mrk; i++)
             for (j = 0; j < max_count_off_mrk; j++)
                 if (s[i] && !t[j] && !adj[i][j])
-                    if (cover[0][i] + cover[1][j] - weight[i][j] < min)
+                    if (cover[0][i] + cover[1][j] - weight[i][j] < min) {
                         min = cover[0][i] + cover[1][j] - weight[i][j];
+                    }
 
         for (i = 0; i < max_count_off_mrk; i++)
-            if (s[i])
+            if (s[i]) {
                 cover[0][i] -= min;
+            }
 
         for (i = 0; i < max_count_off_mrk; i++)
-            if (t[i])
+            if (t[i]) {
                 cover[1][i] += min;
+            }
 
         for (i = 0; i < max_count_off_mrk; i++)
             for (j = 0; j < max_count_off_mrk; j++)
                 if ((s[i] && !t[j]) || (!s[i] && t[j]))
-                    if ((cover[0][i] + cover[1][j] - weight[i][j]) == 0)
+                    if ((cover[0][i] + cover[1][j] - weight[i][j]) == 0) {
                         adj[i][j] = 1;
-                    else
+                    } else {
                         adj[i][j] = 0;
+                    }
     }
 }
 
@@ -450,8 +473,9 @@ double PositioningPlan::PositioningObject::target_opp_mean_dist() {
         }
     }
 
-    if (count)
+    if (count) {
         return sum / count;
+    }
 
     return 1.0;
 }
@@ -480,14 +504,17 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
             double lowerbound = obsDeg - obsAng;
             double upperbound = obsDeg + obsAng;
 
-            if (lowerbound > most || upperbound < least)
+            if (lowerbound > most || upperbound < least) {
                 continue;
+            }
 
-            if (upperbound > most)
+            if (upperbound > most) {
                 upperbound = most;
+            }
 
-            if (lowerbound < least)
+            if (lowerbound < least) {
                 lowerbound = least;
+            }
 
             blockedLines.push(qMakePair(edgeMode::TOP, upperbound));
             blockedLines.push(qMakePair(edgeMode::BOT, lowerbound));
@@ -501,14 +528,17 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
             double lowerbound = obsDeg - obsAng;
             double upperbound = obsDeg + obsAng;
 
-            if (lowerbound > most || upperbound < least)
+            if (lowerbound > most || upperbound < least) {
                 continue;
+            }
 
-            if (upperbound > most)
+            if (upperbound > most) {
                 upperbound = most;
+            }
 
-            if (lowerbound < least)
+            if (lowerbound < least) {
                 lowerbound = least;
+            }
 
             blockedLines.push(qMakePair(edgeMode::TOP, upperbound));
             blockedLines.push(qMakePair(edgeMode::BOT, lowerbound));
@@ -519,22 +549,27 @@ double PositioningPlan::PositioningObject::getOpenness(Vector2D from, Vector2D p
 }
 
 double PositioningPlan::PositioningObject::coveredArea(std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles) {
-    if (obstacles.size() <= 1)
+    if (obstacles.size() <= 1) {
         return 0.0;
+    }
 
     QPair< edgeMode , double > lastest = obstacles.top();
     obstacles.pop();
     QPair< edgeMode , double > second_lastest = obstacles.top();
 
-    if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP)
+    if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else if (lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT)
+    else if (lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT)
+    else if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else
+    else {
         return coveredArea(obstacles);
+    }
 }

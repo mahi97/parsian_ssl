@@ -97,9 +97,13 @@ void CLoadPlayOffJson::fillCommon(NGameOff::SCommon& _common, const QVariantMap&
     _common.planRepeat = 0;
 
     QString planMode = _plan.value("planMode").toString();
-    if (planMode == "KICKOFF") _common.planMode = KICKOFF;
-    else if (planMode == "DIRECT") _common.planMode = DIRECT;
-    else if (planMode == "INDIRECT") _common.planMode = INDIRECT;
+    if (planMode == "KICKOFF") {
+        _common.planMode = KICKOFF;
+    } else if (planMode == "DIRECT") {
+        _common.planMode = DIRECT;
+    } else if (planMode == "INDIRECT") {
+        _common.planMode = INDIRECT;
+    }
 }
 
 void CLoadPlayOffJson::fillMatching(NGameOff::SMatching& _matching, const QVariantMap& _plan, bool&& _parsedOk) {
@@ -199,20 +203,35 @@ Vector2D CLoadPlayOffJson::findShotPos(NGameOff::SPlan *&_plan) {
 }
 
 POffSkills CLoadPlayOffJson::strToEnum(const QString& _str) {
-    if (_str == "NoSkill") return NoSkill;
-    else if (_str == "Mark") return Mark;
-    else if (_str == "Goalie") return Goalie;
-    else if (_str == "Support") return Support;
-    else if (_str == "Defense") return Defense;
-    else if (_str == "Position") return Position;
-    else if (_str == "MoveSkill") return MoveSkill;
-    else if (_str == "PassSkill") return PassSkill;
-    else if (_str == "OneTouchSkill") return OneTouchSkill;
-    else if (_str == "ChipToGoalSkill") return ChipToGoalSkill;
-    else if (_str == "ShotToGoalSkill") return ShotToGoalSkill;
-    else if (_str == "ReceivePassSkill") return ReceivePassSkill;
-    else if (_str == "ReceivePassIASkill") return ReceivePassIASkill;
-    else                                    return NoSkill;
+    if (_str == "NoSkill") {
+        return NoSkill;
+    } else if (_str == "Mark") {
+        return Mark;
+    } else if (_str == "Goalie") {
+        return Goalie;
+    } else if (_str == "Support") {
+        return Support;
+    } else if (_str == "Defense") {
+        return Defense;
+    } else if (_str == "Position") {
+        return Position;
+    } else if (_str == "MoveSkill") {
+        return MoveSkill;
+    } else if (_str == "PassSkill") {
+        return PassSkill;
+    } else if (_str == "OneTouchSkill") {
+        return OneTouchSkill;
+    } else if (_str == "ChipToGoalSkill") {
+        return ChipToGoalSkill;
+    } else if (_str == "ShotToGoalSkill") {
+        return ShotToGoalSkill;
+    } else if (_str == "ReceivePassSkill") {
+        return ReceivePassSkill;
+    } else if (_str == "ReceivePassIASkill") {
+        return ReceivePassIASkill;
+    } else {
+        return NoSkill;
+    }
 }
 
 QString CLoadPlayOffJson::getModeStr(POMODE _mode) {
@@ -234,5 +253,7 @@ void CLoadPlayOffJson::slt_fileChanged(const QString &_file) {
     if (autoUpdate) {
         load(_file);
         emit plansUpdated();
-    } else qDebug() << "File Changed But not Updated";
+    } else {
+        qDebug() << "File Changed But not Updated";
+    }
 }

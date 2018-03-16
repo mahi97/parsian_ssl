@@ -159,7 +159,9 @@ void WorldModel::merge(int frame) {
 
 // This Function Run in a Loop
 void WorldModel::run() {
-    if (vc == nullptr) return;
+    if (vc == nullptr) {
+        return;
+    }
     vc->parse(detection);
 
 }

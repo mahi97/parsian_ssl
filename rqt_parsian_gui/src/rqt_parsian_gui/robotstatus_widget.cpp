@@ -200,10 +200,11 @@ void RobotStatusWidget::setMessage(const parsian_msgs::parsian_robot_status msg)
 void RobotStatusWidget::setVel(const parsian_msgs::parsian_robot_command msg) {
     vel->setText("vel: " + QString::number(std::hypot(msg.vel_F, msg.vel_N)));
     vel_ang->setText("vel ang: " + QString::number(msg.vel_w));
-    if (msg.vel_F == 0 && msg.vel_N == 0)
+    if (msg.vel_F == 0 && msg.vel_N == 0) {
         draw_dir(0);
-    else
+    } else {
         draw_dir(std::atan2(msg.vel_F, msg.vel_N));
+    }
 
 }
 void RobotStatusWidget::draw_dir(double ang) {

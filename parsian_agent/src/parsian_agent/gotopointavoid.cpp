@@ -35,12 +35,16 @@ CSkillGotoPointAvoid* CSkillGotoPointAvoid::noRelax() {
 }
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::ourRelax(int element) {
-    if (!ourRelaxList.contains(element)) ourRelaxList.append(element);
+    if (!ourRelaxList.contains(element)) {
+        ourRelaxList.append(element);
+    }
     return this;
 }
 
 CSkillGotoPointAvoid* CSkillGotoPointAvoid::oppRelax(int element) {
-    if (!oppRelaxList.contains(element)) oppRelaxList.append(element);
+    if (!oppRelaxList.contains(element)) {
+        oppRelaxList.append(element);
+    }
     return this;
 }
 
@@ -49,8 +53,9 @@ void CSkillGotoPointAvoid::execute()
 {
 
     //drawer->draw(Circle2D(Vector2D(1,0),0.1),QColor(Qt::red),true);
-    if (agent == nullptr)
+    if (agent == nullptr) {
         return;
+    }
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx, dVy, dW;
@@ -70,8 +75,9 @@ void CSkillGotoPointAvoid::execute()
         return;
     }
 
-    if (!targetVel.valid())
+    if (!targetVel.valid()) {
         targetVel.assign(0, 0);
+    }
 
     if (drawPath) {
         if (agentVel.length() < 0.1) {
@@ -88,10 +94,18 @@ void CSkillGotoPointAvoid::execute()
 
 
     /////////////////
-    if (targetPos.x < wm->field->ourCornerL().x - 0.2) targetPos.x = wm->field->ourCornerL().x;
-    if (targetPos.x > wm->field->oppCornerL().x + 0.2) targetPos.x = wm->field->oppCornerL().x;
-    if (targetPos.y < wm->field->ourCornerR().y - 0.2) targetPos.y = wm->field->ourCornerR().y;
-    if (targetPos.y > wm->field->ourCornerL().y + 0.2) targetPos.y = wm->field->ourCornerL().y;
+    if (targetPos.x < wm->field->ourCornerL().x - 0.2) {
+        targetPos.x = wm->field->ourCornerL().x;
+    }
+    if (targetPos.x > wm->field->oppCornerL().x + 0.2) {
+        targetPos.x = wm->field->oppCornerL().x;
+    }
+    if (targetPos.y < wm->field->ourCornerR().y - 0.2) {
+        targetPos.y = wm->field->ourCornerR().y;
+    }
+    if (targetPos.y > wm->field->ourCornerL().y + 0.2) {
+        targetPos.y = wm->field->ourCornerL().y;
+    }
 
 
     if (lookAt.valid()) {
@@ -147,8 +161,9 @@ void CSkillGotoPointAvoid::execute()
     bool flag = false;
     Vector2D dir(0, 0);
 
-    if (result.size() > 1)
+    if (result.size() > 1) {
         dir = (result[1] - result[0]).norm();
+    }
 
     double D = 0 , alpha = 0 , d = 0 , vf = 0;
     Vector2D lllll ;
@@ -213,7 +228,9 @@ void CSkillGotoPointAvoid::execute()
 
     bangBang->setSmooth(true);// = false;
     bangBang->bangBangSpeed(agentPos, agentVel, agent->dir(), lllll, targetDir, vf, 0.016, dVx, dVy, dW);
-    if (!addVel.isValid()) addVel = Vector2D(0, 0);
+    if (!addVel.isValid()) {
+        addVel = Vector2D(0, 0);
+    }
     agent->setRobotAbsVel(dVx + addVel.x, dVy + addVel.y, dW);
     agent->accelerationLimiter(vf, oneTouchMode);
     // ROS_INFO_STREAM("vx: "<<dVx<<"vy: "<<dVy<<"w: "<< dW);

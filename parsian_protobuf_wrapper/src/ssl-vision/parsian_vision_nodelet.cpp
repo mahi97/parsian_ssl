@@ -37,8 +37,11 @@ void VisionNodelet::onInit() {
 void VisionNodelet::reconnect() {
     delete vision;
     vision = new RoboCupSSLClient(visionConfig.vision_multicast_port, visionConfig.vision_multicast_ip);
-    if (!vision->open(false)) NODELET_WARN("Connection Failed.");
-    else NODELET_INFO("Connected!");
+    if (!vision->open(false)) {
+        NODELET_WARN("Connection Failed.");
+    } else {
+        NODELET_INFO("Connected!");
+    }
 
 }
 

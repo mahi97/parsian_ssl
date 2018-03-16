@@ -139,8 +139,9 @@ void Kalman::update(const Matrix &z) {
             if (prediction_time > 0.0) {
                 Matrix m_error = x - prediction_x;
 
-                for (int i = 0; i < m_error.nrows(); i++)
+                for (int i = 0; i < m_error.nrows(); i++) {
                     errors.e(i, 0) += fabs(m_error.e(i, 0));
+                }
                 errors_n++;
             }
 
@@ -149,8 +150,9 @@ void Kalman::update(const Matrix &z) {
         }
     } else {
 
-        for (int i = 0; i < error.nrows(); i++)
+        for (int i = 0; i < error.nrows(); i++) {
             errors.e(i, 0) += error.e(i, 0);
+        }
         errors_n++;
     }
 
@@ -168,7 +170,9 @@ void Kalman::update(const Matrix &z) {
 void Kalman::tick(double dt) {
     auto nsteps = static_cast<uint>(rint(dt / stepsize));
 
-    while (xs.size() - 1 < nsteps) propagate();
+    while (xs.size() - 1 < nsteps) {
+        propagate();
+    }
 
     xs.erase(xs.begin(), xs.begin() + nsteps);
     Ps.erase(Ps.begin(), Ps.begin() + nsteps);
@@ -180,7 +184,9 @@ void Kalman::tick(double dt) {
 Matrix Kalman::predict(double dt) {
     auto nsteps = static_cast<uint>(rint(dt / stepsize));
 
-    while (xs.size() - 1 < nsteps) propagate();
+    while (xs.size() - 1 < nsteps) {
+        propagate();
+    }
 
     return xs[nsteps];
 }
@@ -188,7 +194,9 @@ Matrix Kalman::predict(double dt) {
 Matrix Kalman::predict_cov(double dt) {
     auto nsteps = static_cast<uint>(rint(dt / stepsize));
 
-    while (xs.size() - 1 < nsteps) propagate();
+    while (xs.size() - 1 < nsteps) {
+        propagate();
+    }
 
     return Ps[nsteps];
 }
@@ -196,7 +204,9 @@ Matrix Kalman::predict_cov(double dt) {
 Matrix Kalman::predict_info(double dt) {
     auto nsteps = static_cast<uint>(rint(dt / stepsize));
 
-    while (xs.size() - 1 < nsteps) propagate();
+    while (xs.size() - 1 < nsteps) {
+        propagate();
+    }
 
     return Is[nsteps];
 }
@@ -205,7 +215,9 @@ Matrix Kalman::predict_fast(double dt) {
     auto nsteps = static_cast<uint>(rint(dt / stepsize));
     double orig_stepsize = stepsize;
 
-    if (xs.size() - 1 >= nsteps) return xs[nsteps];
+    if (xs.size() - 1 >= nsteps) {
+        return xs[nsteps];
+    }
 
     stepsize = dt - (stepped_time - time);
     propagate();
@@ -233,8 +245,9 @@ double Kalman::obs_likelihood(double dt, Matrix &z) {
 
     double likelihood = 1.0;
 
-    for (int i = 0; i < D.nrows(); i++)
+    for (int i = 0; i < D.nrows(); i++) {
         likelihood *= exp(- (D.e(i, 0) * D.e(i, 0)) / (2 * C.e(i, i)));
+    }
 
     return likelihood;
 }

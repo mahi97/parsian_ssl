@@ -18,10 +18,13 @@ CPlanLoader::CPlanLoader(const QString &_folderDirectory, QObject *parent) : QOb
     QDirIterator it(m_mainDirectory, QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString temp = it.next();
-        if (temp.contains("ignore")) continue;
+        if (temp.contains("ignore")) {
+            continue;
+        }
         if (temp.endsWith(".json")) {
-            if (it.fileInfo().isSymLink())
+            if (it.fileInfo().isSymLink()) {
                 temp = it.fileInfo().symLinkTarget();
+            }
             m_dirList << temp;
         }
     }
@@ -44,7 +47,9 @@ CPlanLoader::CPlanLoader(const QString &_folderDirectory, QObject *parent) : QOb
 
 void CPlanLoader::slt_fileChanged(const QString &_file) {
     qDebug() << _file << "Changed.";
-    if (autoUpdate) qDebug() << "Updated automaticly";
+    if (autoUpdate) {
+        qDebug() << "Updated automaticly";
+    }
 }
 
 void CPlanLoader::updateDirectory() {
@@ -58,10 +63,13 @@ void CPlanLoader::updateDirectory() {
     QDirIterator it(m_mainDirectory, QDirIterator::FollowSymlinks | QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString temp = it.next();
-        if (temp.contains("ignore")) continue;
+        if (temp.contains("ignore")) {
+            continue;
+        }
         if (temp.endsWith(".json")) {
-            if (it.fileInfo().isSymLink())
+            if (it.fileInfo().isSymLink()) {
                 temp = it.fileInfo().symLinkTarget();
+            }
             m_dirList << temp;
         }
     }

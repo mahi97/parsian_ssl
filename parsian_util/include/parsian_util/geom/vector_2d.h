@@ -321,10 +321,11 @@ public:
     */
     double &operator [](int i) {
         i %= 2;
-        if (i == 0)
+        if (i == 0) {
             return x;
-        else
+        } else {
             return y;
+        }
     }
 
     /*!
@@ -460,7 +461,9 @@ public:
 
     AngleDeg angleWith(const Vector2D & v) const {
         double d = (length() * v.length());
-        if (d == 0.0) return 0;
+        if (d == 0.0) {
+            return 0;
+        }
         return AngleDeg(acos((this->x * v.x + this->y * v.y) / d) * 180.0 / M_PI);
     }
     inline

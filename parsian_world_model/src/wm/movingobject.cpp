@@ -22,14 +22,18 @@ MovingObject::MovingObject(bool resetToZero)
     modelSampleTime = 0.02;
     if (!resetToZero) {
         pos.invalidate();
-    } else pos.assign(0, 0);
+    } else {
+        pos.assign(0, 0);
+    }
 
     observation = new CRawObject();
 
 }
 
 void MovingObject::update(MovingObject* obj) {
-    if (obj == nullptr) return;
+    if (obj == nullptr) {
+        return;
+    }
     cam_id = obj->cam_id;
     pos = obj->pos;
     vel = obj->vel;
@@ -63,15 +67,21 @@ void MovingObject::init() {
 }
 
 void MovingObject::findModel(double dt) {
-    if (hist.count() > 100)
+    if (hist.count() > 100) {
         delete hist.dequeue();
+    }
     hist.append(new CRawObject(0, pos, dir.th().degree(), -1, 1.0));
 
     double aa = 1 ; // TODO : => FIX THIS BallFriction() * Gravity; // acc.length();
     double vv = vel.length() * vel.length();
-    if (aa < 0.3) aa = 0.3;
-    if (acc * vel.norm() > 0.3) ballStopPos.invalidate();
-    else ballStopPos = pos + vel.norm() * (vv / (2.0 * aa));
+    if (aa < 0.3) {
+        aa = 0.3;
+    }
+    if (acc * vel.norm() > 0.3) {
+        ballStopPos.invalidate();
+    } else {
+        ballStopPos = pos + vel.norm() * (vv / (2.0 * aa));
+    }
     modelFrameCnt ++;
     modelSampleTime = dt;
 }
@@ -100,11 +110,13 @@ void MovingObject::kalmanFilter() {
 //            resetKalman();
         }
     }
-    if (lastSpeeds.length() > 50)
+    if (lastSpeeds.length() > 50) {
         lastSpeeds.pop_back();
+    }
 
-    if (lastAngularSpeeds.length() > 50)
+    if (lastAngularSpeeds.length() > 50) {
         lastAngularSpeeds.pop_back();
+    }
 
     lastSpeeds.push_front(vel);
     lastAngularSpeeds.push_front(angularVel);
@@ -161,8 +173,9 @@ void MovingObject::kalmanFilter() {
 
 Vector2D MovingObject::predict(double time) {
     //must be checked if it works precisely or not
-    if (time < 0.001)
+    if (time < 0.001) {
         return pos;
+    }
 
     if (acc.length() < 0.01 || vel.length() < 0.1) {
         return pos;
@@ -170,7 +183,9 @@ Vector2D MovingObject::predict(double time) {
 
     if (acc.valid() && (acc * vel < 0)) {
         double vf = (vel.length() - acc.length() * time);
-        if (vf < 0) return pos + vel * vel.length() / (2.0 * acc.length());
+        if (vf < 0) {
+            return pos + vel * vel.length() / (2.0 * acc.length());
+        }
         return pos - 0.5 * acc.length() * vel.norm() * time * time + vel * time;
     }
     return pos + vel * time;
@@ -180,7 +195,9 @@ Vector2D MovingObject::predict(double time) {
 Vector2D MovingObject::predictV(double time) {
     if (acc.valid() && (acc * vel < 0)) {
         double vf = vel.length() - (acc.length() * time);
-        if (vf < 0.0) vf = 0.0;
+        if (vf < 0.0) {
+            vf = 0.0;
+        }
         return vel.norm() * vf;
     }
     return vel;
@@ -198,8 +215,9 @@ double MovingObject::whenIsAtVel(double L) {
     double C = vel.x * vel.x + vel.y * vel.y - L * L;
 
     double delta = B * B - 4 * A * C;
-    if (delta < 0)
+    if (delta < 0) {
         return -1;
+    }
     double T1 = (-B  + sqrt(delta)) / (2 * A);
     double T2 = (-B  - sqrt(delta)) / (2 * A);
 

@@ -19,8 +19,9 @@ void CMasterPlay::initMaster() {
     blockAgent = nullptr;
     playMakeAgent = nullptr;
     positionAgents.clear();
-    if (gameState->isStart())
+    if (gameState->isStart()) {
         markAgents.clear();
+    }
     stopAgents.clear();
     masterStaticPoints.clear();
     staticInited = false;
@@ -34,8 +35,9 @@ bool CMasterPlay::canScore() {
     QList<int> ourRelaxed, theirRelaxed;
     theirRelaxed.clear();
     ourRelaxed.clear();
-    for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++)
+    for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
         ourRelaxed.append(wm->our.activeAgentID(i));
+    }
     return  getOpenness(wm->ball->pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxed, theirRelaxed) > .2;
 }
 
@@ -172,8 +174,9 @@ bool CMasterPlay::canOneTouch(QList<Agent *> posAgents, Agent *playMake) {
         int positioner = posAgent->id();
         ourRelaxIDS.push_back(positioner);
         Vector2D pos = posAgent->pos() + posAgent->dir().setLengthVector(Robot::center_from_kicker_new);
-        if (getOpenness(pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS) > 0.8)
+        if (getOpenness(pos, wm->field->oppGoalL(), wm->field->oppGoalR(), ourRelaxIDS, oppRelaxIDS) > 0.8) {
             return true;
+        }
     }
     return false;
 }
@@ -194,14 +197,17 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
             double lowerbound = obsDeg - obsAng;
             double upperbound = obsDeg + obsAng;
 
-            if (lowerbound > most || upperbound < least)
+            if (lowerbound > most || upperbound < least) {
                 continue;
+            }
 
-            if (upperbound > most)
+            if (upperbound > most) {
                 upperbound = most;
+            }
 
-            if (lowerbound < least)
+            if (lowerbound < least) {
                 lowerbound = least;
+            }
 
             blockedLines.push(qMakePair(edgeMode::TOP, upperbound));
             blockedLines.push(qMakePair(edgeMode::BOT, lowerbound));
@@ -215,14 +221,17 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
             double lowerbound = obsDeg - obsAng;
             double upperbound = obsDeg + obsAng;
 
-            if (lowerbound > most || upperbound < least)
+            if (lowerbound > most || upperbound < least) {
                 continue;
+            }
 
-            if (upperbound > most)
+            if (upperbound > most) {
                 upperbound = most;
+            }
 
-            if (lowerbound < least)
+            if (lowerbound < least) {
                 lowerbound = least;
+            }
 
             blockedLines.push(qMakePair(edgeMode::TOP, upperbound));
             blockedLines.push(qMakePair(edgeMode::BOT, lowerbound));
@@ -233,24 +242,29 @@ double CMasterPlay::getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<i
 }
 
 double CMasterPlay::coveredArea(std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles) {
-    if (obstacles.size() <= 1)
+    if (obstacles.size() <= 1) {
         return 0.0;
+    }
 
     QPair< edgeMode , double > lastest = obstacles.top();
     obstacles.pop();
     QPair< edgeMode , double > second_lastest = obstacles.top();
 
-    if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP)
+    if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::TOP) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else if (lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT)
+    else if (lastest.first == edgeMode::BOT && second_lastest.first == edgeMode::BOT) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT)
+    else if (lastest.first == edgeMode::TOP && second_lastest.first == edgeMode::BOT) {
         return (lastest.second - second_lastest.second) + coveredArea(obstacles);
+    }
 
-    else
+    else {
         return coveredArea(obstacles);
+    }
 }
 
 void CMasterPlay::execute() {

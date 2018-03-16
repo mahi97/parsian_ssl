@@ -145,7 +145,9 @@ void CBaseCommunicator::connectSerial(const char* port) {
 }
 
 void CBaseCommunicator::closeSerial() {
-    if (p->serial_port == nullptr) return;
+    if (p->serial_port == nullptr) {
+        return;
+    }
     p->serial_port->close();
     delete p->serial_port;
     p->serial_port = nullptr;

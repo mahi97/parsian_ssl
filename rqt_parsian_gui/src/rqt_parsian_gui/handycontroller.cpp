@@ -329,8 +329,9 @@ bool HandyController::eventFilter(QObject* target, QEvent* event) {
         if (event->type() == QEvent::KeyRelease) {
             QKeyEvent* e = static_cast<QKeyEvent*>(event);
 
-            if (e->isAutoRepeat())
+            if (e->isAutoRepeat()) {
                 return false;
+            }
 
 
             if (e->key() == Qt::Key_K || e->key() == Qt::Key_C || e->key() == Qt::Key_R) {

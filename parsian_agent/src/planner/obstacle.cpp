@@ -2,8 +2,12 @@
 
 //global functions
 double boundTo(double x, double low, double high) {
-    if (x < low) x = low;
-    if (x > high) x = high;
+    if (x < low) {
+        x = low;
+    }
+    if (x > high) {
+        x = high;
+    }
     return (x);
 }
 
@@ -36,7 +40,9 @@ bool obstacle::check(state s , double obsMargin) {
     if (type == OBS_CIRCLE || type == OBS_RECTANGLE) {
         dx = fabs(s.pos.x - pos.x);
         dy = fabs(s.pos.y - pos.y);
-        if (dx > rad.x + obsMargin || dy > rad.y + obsMargin) return (true);
+        if (dx > rad.x + obsMargin || dy > rad.y + obsMargin) {
+            return (true);
+        }
     }
 
     return (margin(s , obsMargin) > 0.0);
@@ -49,7 +55,9 @@ bool obstacle::check(state s0, state s1 , double obsMargin) {
     double d;
 
     d = s0.pos.dist(s1.pos);
-    if (d < EPSILON) return (check(s0 , obsMargin));
+    if (d < EPSILON) {
+        return (check(s0 , obsMargin));
+    }
 
     switch (type) {
     case OBS_CIRCLE:
@@ -64,7 +72,9 @@ bool obstacle::check(state s0, state s1 , double obsMargin) {
         c[3].assign(pos.x - rad.x, pos.y + rad.y);
         for (i = 0; i < 4; i++) {
             d = Segment2D(s0.pos, s1.pos).dist(Segment2D(c[i], c[(i + 1) % 4]));
-            if (d < obsMargin) return (false);
+            if (d < obsMargin) {
+                return (false);
+            }
         }
 
         return (check(s0 , obsMargin));
@@ -153,8 +163,9 @@ bool CObstacles::check(state s, QList<int> &id) {
 
 bool CObstacles::check(state s0, state s1) {
     for (int i = 0 ; i < obs.count() ; i++)
-        if (obs[i].check(s0 , s1 , obsMargin) == false)
+        if (obs[i].check(s0 , s1 , obsMargin) == false) {
             return false;
+        }
     return true;
 }
 
@@ -183,9 +194,9 @@ bool CObstacles::check(Vector2D p1 , Vector2D p2) {
 
 void CObstacles::draw() {
     for (int i = 0; i < obs.count(); i++) {
-        if (obs[i].type == OBS_CIRCLE)
+        if (obs[i].type == OBS_CIRCLE) {
             drawer->draw(Circle2D(obs[i].pos, obs[i].rad.x), 0, 360, QColor("red"));
-        else if (obs[i].type == OBS_RECTANGLE)
+        } else if (obs[i].type == OBS_RECTANGLE)
             drawer->draw(Rect2D(
                              Vector2D(obs[i].pos.x - obs[i].rad.x, obs[i].pos.y + obs[i].rad.y),
                              obs[i].rad.x * 2.0, obs[i].rad.y * 2.0), QColor("red"));

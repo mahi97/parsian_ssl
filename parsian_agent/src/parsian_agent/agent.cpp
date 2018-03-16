@@ -25,8 +25,9 @@ double Agent::getVar(const double *data) {
 
 Matrix tansig(const Matrix &n) {
     for (int i = 0 ; i < n.nrows() ; i++)
-        for (int j = 0 ; j < n.ncols() ; j++)
+        for (int j = 0 ; j < n.ncols() ; j++) {
             n.e(i , j) = 2.0 / (1.0 + exp(-2.0 * n.e(i , j))) - 1.0;
+        }
     return n;
 }
 
@@ -158,8 +159,9 @@ Agent::Agent(int _ID) {
 void Agent::loadProfiles() {
     //Set shotProfile From File
     {
-        for (auto &i : shotProfile)
+        for (auto &i : shotProfile) {
             i[0] = i[1] = -1.0;
+        }
         QFile file(QString("profiles/robot%1.shot").arg(selfID));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             //            qDebug()<<(QString("Parsing profiles/robot%1.shot").arg(selfID));
@@ -185,8 +187,9 @@ void Agent::loadProfiles() {
 
     //Set chipProfile From File
     {
-        for (auto &i : chipProfile)
+        for (auto &i : chipProfile) {
             i[0] = i[1] = -1.0;
+        }
         QFile file(QString("profiles/robot%1.chip").arg(selfID));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             //            qDebug()<<(QString("Parsing profiles/robot%1.chip").arg(selfID));
@@ -329,8 +332,9 @@ bool Agent::trajectory(double& vf, double& vn, double& va, double w1, double w2,
         lastVelx[0] = (cos(-angle) * wm->our[new_com_test_robot_id]->vel.x) - (sin(-angle) * wm->our[new_com_test_robot_id]->vel.y);
         lastVely[0] = (sin(-angle) * wm->our[new_com_test_robot_id]->vel.x) + (cos(-angle) * wm->our[new_com_test_robot_id]->vel.y);
         lastOmega[0] = wm->our[new_com_test_robot_id]->angularVel;
-        if (counter < errlen + 10)
+        if (counter < errlen + 10) {
             counter++;
+        }
     }
     return false;
 }
@@ -368,8 +372,9 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     double tempVf = vforward , tempVn = vnormal;
     double decCoef = 1.5;
 
-    if (vf == 0)
+    if (vf == 0) {
         decCoef = 2.5;
+    }
     ///////////////////////first Stage Acc with true angle
 
     double accCoef = 1, realAcc = 4;
@@ -676,34 +681,44 @@ double Agent::getKickValue(bool chip, bool spin, double v) {
 
     switch (selfID) {
     case 3:
-        if (chip && spin)
+        if (chip && spin) {
             return 0.001 * x2 + 1.8639 * x + 58.865;
-        if (chip)
+        }
+        if (chip) {
             return 3E-05 * x2 + 2.8236 * x + 13.833;
+        }
         return 0.0386 * x4 - 1.262 * x3 + 20.143 * x2 - 6.1246 * x + 37.614;
     case 4:
-        if (chip && spin)
+        if (chip && spin) {
             return 0.0015 * x2 + 2.9201 * x - 45.104;
-        if (chip)
+        }
+        if (chip) {
             return y = 0.0009 * x2 + 2.2283 * x + 16.247;
+        }
         return -0.7326 * x4 + 14.181 * x3 - 83.857 * x2 + 272.69 * x - 205.66;
     case 5:
-        if (chip && spin)
+        if (chip && spin) {
             return -0.0009 * x2 + 3.422 * x + 38.807;
-        if (chip)
+        }
+        if (chip) {
             return 0.0015 * x2 + 2.8468 * x - 74.866;
+        }
         return 0.0474 * x6 - 1.4049 * x5 + 15.668 * x4 - 80.694 * x3 + 198.6 * x2 - 155.04 * x + 75.944;
     case 2:
-        if (chip && spin)
+        if (chip && spin) {
             return 0.0004 * x2 + 2.0255 * x + 4.1774;
-        if (chip)
+        }
+        if (chip) {
             return 0.0032 * x2 + 1.1196 * x + 50.543;
+        }
         return 0.0198 * x6 - 0.5191 * x5 + 4.9436 * x4 - 20.368 * x3 + 39.014 * x2 + 27.566 * x + 21.604;
     case 9:
-        if (chip && spin)
+        if (chip && spin) {
             return -0.0032 * x2 + 3.8923 * x + 6.5453;
-        if (chip)
+        }
+        if (chip) {
             return 0.0027 * x2 + 2.1671 * x + 54.724;
+        }
         return -9E-14 * x6 + 2E-10 * x5 - 1E-07 * x4 + 4E-05 * x3 - 0.007 * x2 + 1.9532 * x - 1.6872;
     case 7:
         if (chip) {
@@ -714,16 +729,20 @@ double Agent::getKickValue(bool chip, bool spin, double v) {
         }
         return -0.0171 * x6 + 0.5062 * x5 - 5.7639 * x4 + 32.104 * x3 - 84.666 * x2 + 159.48 * x - 39.783;
     case 1:
-        if (chip && spin)
+        if (chip && spin) {
             return 0.0036 * x2 + 0.8745 * x + 88.982;
-        if (chip)
+        }
+        if (chip) {
             return 0.0031 * x2 + 2.2316 * x - 0.4071;
+        }
         return 0.3568 * x4 - 6.2606 * x3 + 36.989 * x2 + 29.483 * x + 19.816;
     case 6:
-        if (chip && spin)
+        if (chip && spin) {
             return -0.001 * x2 + 3.8301 * x - 9.4641;
-        if (chip)
+        }
+        if (chip) {
             return -0.001 * x2 + 3.8301 * x - 9.4641;
+        }
         return -0.0321 * x6 + 0.9598 * x5 - 11.038 * x4 + 61.438 * x3 - 163.39 * x2 + 254.1 * x - 71.466;
     default:
         myId = selfID;
@@ -744,8 +763,9 @@ int Agent::kickValueForDistance(double dist, double finalVel) {
     double a = 0.66;//BallFriction()*Gravity;
     double temp, vel;
     temp = finalVel * finalVel + 2 * a * dist;
-    if (temp < 0)
+    if (temp < 0) {
         temp = 0;
+    }
     vel = sqrt(temp);
     //  qDebug() << "vel=" << vel;
     return static_cast<int>(kickSpeedValue(vel, false));
@@ -770,7 +790,9 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
         DBUG("case", D_ERROR);
         if (q.valid() && (q - positioningPos).length() < 1.0) {
             DBUG("case2", D_ERROR);
-            if ((wm->ball->pos - pos()).length() < 1.0) oneTouchKick = true;
+            if ((wm->ball->pos - pos()).length() < 1.0) {
+                oneTouchKick = true;
+            }
             q -= (self()->centerFromKicker() + CBall::radius) * oneTouchDir;
         }
     }
@@ -793,8 +815,9 @@ bool Agent::canOneTouch() {
     drawer->draw(Segment2D(Vector2D(0, 0) , (pos() - wm->ball->pos).norm()), "blue");
     drawer->draw(Segment2D(Vector2D(0, 0) , wm->ball->vel.norm()), "red");
     if (1/*self()->ballComingSpeed()*/ > 0.9) {
-        if (fabs(Vector2D::angleBetween(wm->ball->vel.norm(), (pos() - wm->ball->pos).norm()).degree()) < 21)
+        if (fabs(Vector2D::angleBetween(wm->ball->vel.norm(), (pos() - wm->ball->pos).norm()).degree()) < 21) {
             return true;
+        }
     }
     return false;
 }
@@ -876,8 +899,9 @@ parsian_msgs::parsian_robot_commandPtr Agent::getCommand() {
 
     if (chip) {
         command->kickspeedz = static_cast<float>(kickSpeed);
-    } else
+    } else {
         command->kickspeedz = 0;
+    }
     command->spinner = static_cast<unsigned char>(false);
     command->header.stamp = ros::Time::now();
     return command;

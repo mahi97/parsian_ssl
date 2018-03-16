@@ -44,7 +44,8 @@
 #include <cstring>
 #include <algorithm>
 
-extern "C" {
+extern "C"
+{
 
     void triangulate(char *, struct triangulateio *,
                      struct triangulateio *, struct triangulateio *);

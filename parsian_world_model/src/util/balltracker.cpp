@@ -174,7 +174,9 @@ void BallTracker::observeNew(vraw obs, double _acc_x_sign, double _acc_y_sign) {
 
 void BallTracker::observe(vraw obs, double timestamp) {
     // mhb: Need this?
-    if (isnan(xs[0].e(0, 0))) _reset = true;
+    if (isnan(xs[0].e(0, 0))) {
+        _reset = true;
+    }
 
     if (_reset && obs.timestamp >= timestamp) {
         Matrix x(6, 1), P(6);
@@ -276,7 +278,9 @@ void BallTracker::reset(double timestamp, float state[6], float variances[16],
 }
 
 Vector2D BallTracker::position(double time) {
-    if (occluded == Occluded) return occluded_position(time);
+    if (occluded == Occluded) {
+        return occluded_position(time);
+    }
 
 //  qDebug()<<"Ball Prediction";
     Matrix x = predict(time);
@@ -284,7 +288,9 @@ Vector2D BallTracker::position(double time) {
 }
 
 Vector2D BallTracker::velocity(double time) {
-    if (occluded == Occluded) return occluded_velocity(time);
+    if (occluded == Occluded) {
+        return occluded_velocity(time);
+    }
 
 //  qDebug()<<"Ball Prediction";
     Matrix x = predict(time);
@@ -306,7 +312,9 @@ Matrix BallTracker::covariances(double time) {
 bool BallTracker::collision(double time, int &team, int &robot) {
     Matrix I = predict_info(time);
 
-    if (I.nrows() <= 1) return false;
+    if (I.nrows() <= 1) {
+        return false;
+    }
 
     team = (int) rint(I.e(0, 0));
     robot = (int) rint(I.e(1, 0));

@@ -16,10 +16,11 @@ void CRoleStopInfo::findPositions() {
     const double radius = 1.8 + 2.0 * Robot::robot_radius_new;
 
     TA = wm->field->ourGoal();
-    if ((wm->ball->pos - wm->field->ourGoal()).length() < radius)
+    if ((wm->ball->pos - wm->field->ourGoal()).length() < radius) {
         TA = wm->field->oppGoal();
-    else
+    } else {
         TA = wm->field->ourGoal();
+    }
 
     Vector2D baseDirVec;
     baseDirVec = (TA - c).norm();
@@ -109,7 +110,9 @@ void CRoleStop::execute() {
 void CRoleStop::parse(QStringList params) {
     switchAgent = false;
     for (int i = 0; i < params.length(); i++) {
-        if (params[i].toLower() == "switch") switchAgent = true;
+        if (params[i].toLower() == "switch") {
+            switchAgent = true;
+        }
     }
 }
 

@@ -20,20 +20,22 @@ struct state {
         parent = _parent;
         if (parent) {
             depth = parent->depth + 1;
-            if (depth < res.size())
+            if (depth < res.size()) {
                 dist = parent->dist + pos.dist(res[depth]);
-            else if (res.size())
+            } else if (res.size()) {
                 dist = parent->dist + pos.dist(res[res.size() - 1]);
-            else
+            } else {
                 dist = parent->dist + pos.dist(parent->pos);
+            }
         } else {
             depth = 0;
-            if (depth < res.size())
+            if (depth < res.size()) {
                 dist = pos.dist(res[depth]);
-            else if (res.size())
+            } else if (res.size()) {
                 dist = pos.dist(res[res.size() - 1]);
-            else
+            } else {
                 dist = 0;
+            }
         }
 
         left = right = next = NULL;

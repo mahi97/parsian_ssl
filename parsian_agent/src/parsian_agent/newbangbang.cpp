@@ -45,8 +45,9 @@ void CNewBangBang::trajectoryPlanner() {
     //    }
     ///////////////////////////////////////////// th pid
     thPid->error = (agentMovementTh - agentVel.norm().th()).radian();
-    if (agentVel.length() < 0.3)
+    if (agentVel.length() < 0.3) {
         thPid->error = 0;
+    }
 
     double veltan = (cos(agentMovementTh.radian())) * cos(agentDir.th().radian()) + (sin(agentMovementTh.radian())) * sin(agentDir.th().radian());
     double velnorm = -1 * (cos(agentMovementTh.radian())) * sin(agentDir.th().radian()) + (sin(agentMovementTh.radian())) * cos(agentDir.th().radian());
@@ -74,10 +75,11 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     agentDir = _agentDir;
     movementTh = pos2 - agentPos;
     if (angPath) {
-        if (angKp)
+        if (angKp) {
             angPid->kp = angKp;
-        else
+        } else {
             angPid->kp = 1;
+        }
     } else {
         angPid->kp = 4;
     }
@@ -134,10 +136,11 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
         vDes = velMax;
         break;
     case _bangBangDec:
-        if (Vel2 == 0)
+        if (Vel2 == 0) {
             vDes = sqrt(vp * vp + 2 * dmax * agentPos.dist(pos2) * moreDec) - decOffset;
-        else
+        } else {
             vDes = sqrt(Vel2 * Vel2 + 2 * dmax * agentPos.dist(pos2) * moreDec) - decOffset ;
+        }
         break;
     case _bangBangAcc:
 

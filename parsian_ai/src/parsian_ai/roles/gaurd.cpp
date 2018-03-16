@@ -26,7 +26,9 @@ double CRoleGaurd::progress() {
 void CRoleGaurd::parse(QStringList params) {
     setOpposite(false);
     for (int i = 0; i < params.length(); i++) {
-        if (params[i].toLower() == "opposite") setOpposite(true);
+        if (params[i].toLower() == "opposite") {
+            setOpposite(true);
+        }
     }
 }
 

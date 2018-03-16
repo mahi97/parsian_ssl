@@ -39,13 +39,16 @@ void CHalfWorld::update(QList<CBall *>& ball, CVisionBelief* v) {
         }
     } else {
         QList<bool> flag;
-        for (int i = 0; i < ball.count(); i++)
+        for (int i = 0; i < ball.count(); i++) {
             flag.append(false);
+        }
         for (int i = 0; i < v->ball.count(); i++) {
             double min_d = 1e5;
             int k = -1;
             for (int j = 0; j < ball.count(); j++) {
-                if (flag[j]) continue;
+                if (flag[j]) {
+                    continue;
+                }
                 double d = (ball[j]->pos + ball[j]->vel * getFramePeriod() - v->ball[i].pos).length();
                 if (d < min_d) {
                     min_d = d;
@@ -113,9 +116,9 @@ void CHalfWorld::update(CVisionBelief *v) {
         if (oppTeam[j].count() == 0) {
             oppTeam[j].append(new Robot(j, false, false));
         } else {
-            if (v->oppTeam[j].count() > 0)
+            if (v->oppTeam[j].count() > 0) {
                 oppTeam[j][0]->update(v->oppTeam[j][0]);
-            else if (oppTeam[j][0]->inSight > 0) {
+            } else if (oppTeam[j][0]->inSight > 0) {
                 oppTeam[j][0]->update(CRawObject(0, oppTeam[j][0]->pos, oppTeam[j][0]->dir.th().degree(), -1, 0.0,
                                                  nullptr, v->cam_id, v->time));
             }
@@ -124,14 +127,18 @@ void CHalfWorld::update(CVisionBelief *v) {
 }
 
 void CHalfWorld::update(CHalfWorld *w) {
-    for (int k = 0; k < ball.count(); k++) delete ball[k];
+    for (int k = 0; k < ball.count(); k++) {
+        delete ball[k];
+    }
     ball.clear();
     for (int k = 0; k < w->ball.count(); k++) {
         ball.append(new CBall(true));
         ball.back()->update(w->ball[k]);
     }
     for (int j = 0; j < _MAX_NUM_PLAYERS; j++) {
-        for (int k = 0; k < ourTeam[j].count(); k++) delete ourTeam[j][k];
+        for (int k = 0; k < ourTeam[j].count(); k++) {
+            delete ourTeam[j][k];
+        }
         ourTeam[j].clear();
         for (int k = 0; k < w->ourTeam[j].count(); k++) {
             ourTeam[j].append(new Robot(j, true, true));
@@ -139,7 +146,9 @@ void CHalfWorld::update(CHalfWorld *w) {
         }
     }
     for (int j = 0; j < _MAX_NUM_PLAYERS; j++) {
-        for (int k = 0; k < oppTeam[j].count(); k++) delete oppTeam[j][k];
+        for (int k = 0; k < oppTeam[j].count(); k++) {
+            delete oppTeam[j][k];
+        }
         oppTeam[j].clear();
         for (int k = 0; k < w->oppTeam[j].count(); k++) {
             oppTeam[j].append(new Robot(j, false, true));

@@ -29,7 +29,9 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
         DBUG("case", D_ERROR);
         if (q.valid() && (q - positioningPos).length() < 1.0) {
             DBUG("case2", D_ERROR);
-            if ((wm->ball->pos - pos()).length() < 1.0) oneTouchKick = true;
+            if ((wm->ball->pos - pos()).length() < 1.0) {
+                oneTouchKick = true;
+            }
             q -= (self.centerFromKicker() + CBall::radius) * oneTouchDir;
         }
     }

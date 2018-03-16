@@ -132,10 +132,15 @@ QList<Vector2D> CField::ourPAreaIntersect(Line2D line) const {
     b.invalidate();
     int c = fOurPenaltyRect.intersection(line, &a, &b);
     QList<Vector2D> results;
-    if (c == 2) results << a << b;
+    if (c == 2) {
+        results << a << b;
+    }
     if (c == 1) {
-        if (a.isValid()) results << a;
-        else results << b;
+        if (a.isValid()) {
+            results << a;
+        } else {
+            results << b;
+        }
     }
     return results;
 }
@@ -232,19 +237,27 @@ Rect2D CField::ourBigPenaltyArea(double scale , double tolerance , bool doChange
 
 QList<Vector2D> CField::ourPAreaIntersect(Segment2D segment) const {
     Vector2D v[2];
-    for (auto& vec : v) vec.invalidate();
+    for (auto& vec : v) {
+        vec.invalidate();
+    }
     fOurPenaltyRect.intersection(segment, &v[0], &v[1]);
     QList<Vector2D> results;
-    for (const auto& vec : v) results.append(vec);
+    for (const auto& vec : v) {
+        results.append(vec);
+    }
     return results;
 }
 
 QList<Vector2D> CField::ourPAreaIntersect(Circle2D circle) const {
     Vector2D v[4];
-    for (auto& vec : v) vec.invalidate();
+    for (auto& vec : v) {
+        vec.invalidate();
+    }
     fOurPenaltyRect.intersection(circle, &v[0], &v[1], &v[2], &v[3]);
     QList<Vector2D> results;
-    for (const auto& vec : v) results.append(vec);
+    for (const auto& vec : v) {
+        results.append(vec);
+    }
     return results;
 }
 
@@ -254,10 +267,14 @@ bool CField::isInOurPenaltyArea(Vector2D point) const {
 
 QList<Vector2D> CField::oppPAreaIntersect(Line2D line) const {
     Vector2D v[2];
-    for (auto& vec : v) vec.invalidate();
+    for (auto& vec : v) {
+        vec.invalidate();
+    }
     fOppPenaltyRect.intersection(line, &v[0], &v[1]);
     QList<Vector2D> results;
-    for (const auto& vec : v) results.append(vec);
+    for (const auto& vec : v) {
+        results.append(vec);
+    }
     return results;
 }
 
@@ -265,19 +282,27 @@ QList<Vector2D> CField::oppPAreaIntersect(Line2D line) const {
 
 QList<Vector2D> CField::oppPAreaIntersect(Segment2D segment) const {
     Vector2D v[2];
-    for (auto& vec : v) vec.invalidate();
+    for (auto& vec : v) {
+        vec.invalidate();
+    }
     fOppPenaltyRect.intersection(segment, &v[0], &v[1]);
     QList<Vector2D> results;
-    for (const auto& vec : v) results.append(vec);
+    for (const auto& vec : v) {
+        results.append(vec);
+    }
     return results;
 }
 
 QList<Vector2D> CField::oppPAreaIntersect(Circle2D circle) const {
     Vector2D v[4];
-    for (auto& vec : v) vec.invalidate();
+    for (auto& vec : v) {
+        vec.invalidate();
+    }
     fOurPenaltyRect.intersection(circle, &v[0], &v[1], &v[2], &v[3]);
     QList<Vector2D> results;
-    for (const auto& vec : v) results.append(vec);
+    for (const auto& vec : v) {
+        results.append(vec);
+    }
     return results;
 }
 
@@ -552,14 +577,15 @@ Rect2D  CField::getCircleRegion(int n, int i) const {
 
     //TOF for technical challenge iranopen2012
 
-    if (i == 0)
+    if (i == 0) {
         s.assign(0.5, 1.4);
-    else if (i == 1)
+    } else if (i == 1) {
         s.assign(2.4, 1.4);
-    else if (i == 2)
+    } else if (i == 2) {
         s.assign(2.4, -1.4);
-    else if (i == 3)
+    } else if (i == 3) {
         s.assign(0.5, -1.4);
+    }
 
 
     return Rect2D{Vector2D(s - diam), Vector2D(s + diam)};
@@ -567,100 +593,193 @@ Rect2D  CField::getCircleRegion(int n, int i) const {
 
 Rect2D  CField::getRegion(QString name, double k) const {
     Region r = Region::OppField;
-    if (name == "ourcornertop")              r = Region::OurCornerTop;
-    else if (name == "ourcornerbottom")           r = Region::OurCornerBottom;
-    else if (name == "oppcornertop")              r = Region::OppCornerTop;
-    else if (name == "oppcornerbottom")           r = Region::OppCornerBottom;
-    else if (name == "midfieldtop")               r = Region::MidFieldTop;
-    else if (name == "midfieldbottom")            r = Region::MidFieldBottom;
-    else if (name == "frontgoalopp")              r = Region::FrontGoalOpp;
-    else if (name == "frontgoalour")              r = Region::FrontGoalOur;
-    else if (name == "center")                    r = Region::Center;
-    else if (name == "bigcenter")                 r = Region::BigCenter;
-    else if (name == "ourpenalty")                r = Region::OurPenalty;
-    else if (name == "opppenalty")                r = Region::OppPenalty;
-    else if (name == "ourfield")                  r = Region::OurField;
-    else if (name == "oppfield")                  r = Region::OppField;
-    else if (name == "oppcornertopright")         r = Region::OppCornerTopRight;
-    else if (name == "oppcornertopleft")          r = Region::OppCornerTopLeft;
-    else if (name == "oppcornerbottomright")      r = Region::OppCornerBottomRight;
-    else if (name == "oppcornerbottomleft")       r = Region::OppCornerBottomLeft;
-    else if (name == "ourcornertopright")         r = Region::OurCornerTopRight;
-    else if (name == "ourcornertopleft")          r = Region::OurCornerTopLeft;
-    else if (name == "ourcornerbottomright")      r = Region::OurCornerBottomRight;
-    else if (name == "ourcornerbottomleft")       r = Region::OurCornerBottomLeft;
-    else if (name == "ourmidfieldtop")            r = Region::OurMidFieldTop;
-    else if (name == "ourmidfieldbottom")         r = Region::OurMidFieldBottom ;
-    else if (name == "oppmidfieldtop")            r = Region::OppMidFieldTop;
-    else if (name == "oppmidfieldbottom")         r = Region::OppMidFieldBottom;
-    else if (name == "oppfieldtop")               r = Region::OppFieldTop;
-    else if (name == "oppfieldbottom")            r = Region::OppFieldBottom;
-    else if (name == "ourfieldtop")               r = Region::OurFieldTop;
-    else if (name == "ourfieldbottom")            r = Region::OurFieldBottom;
-    else if (name == "ourmidfieldtopmost")        r = Region::OurMidFieldTopMost;
-    else if (name == "ourmidfieldbottommost")     r = Region::OurMidFieldBottomMost;
-    else if (name == "field1stquarter")           r = Region::Field1stQuarter;
-    else if (name == "field2ndquarter")           r = Region::Field2ndQuarter;
-    else if (name == "field3rdquarter")           r = Region::Field3rdQuarter;
-    else if (name == "field4thquarter")           r = Region::Field4thQuarter;
-    else if (name == "ourmidfieldtopwing")        r = Region::OurMidFieldTopWing;
-    else if (name == "ourmidfieldbottomwing")     r = Region::OurMidFieldBottomWing;
-    else if (name == "ourattackonethird")         r = Region::OurAttackOneThird;
-    else if (name == "ourdeffenseonethird")       r = Region::OurDeffenseOneThird;
-    else if (name == "ourmidonethird")            r = Region::OurMidOneThird;
-    else if (name == "oppmidfield")               r = Region::OppMidField;
-    else if (name == "oppcornerlinetop")          r = Region::OppCornerLineTop;
-    else if (name == "oppcornerlinebottom")       r = Region::OppCornerLineBottom;
-    else if (name == "fieldgrid1top")             r = Region::FieldGrid1Top;
-    else if (name == "fieldgrid1center")          r = Region::FieldGrid1Center;
-    else if (name == "fieldgrid1bottom")          r = Region::FieldGrid1Bottom;
-    else if (name == "fieldgrid2top")             r = Region::FieldGrid2Top;
-    else if (name == "fieldgrid2center")          r = Region::FieldGrid2Center;
-    else if (name == "fieldgrid2bottom")          r = Region::FieldGrid2Bottom;
-    else if (name == "fieldgrid3top")             r = Region:: FieldGrid3Top;
-    else if (name == "fieldgrid3center")          r = Region:: FieldGrid3Center;
-    else if (name == "fieldgrid3bottom")          r = Region:: FieldGrid3Bottom;
-    else if (name == "fieldgrid4top")             r = Region:: FieldGrid4Top;
-    else if (name == "fieldgrid4center")          r = Region:: FieldGrid4Center;
-    else if (name == "fieldgrid4bottom")          r = Region:: FieldGrid4Bottom;
-    else if (name == "fieldgrid5top")             r = Region:: FieldGrid5Top;
-    else if (name == "fieldgrid5center")          r = Region:: FieldGrid5Center;
-    else if (name == "fieldgrid5bottom")          r = Region:: FieldGrid5Bottom;
-    else if (name == "oppcornerpointtop")         r = Region:: OppCornerPointTop;
-    else if (name == "oppcornerpointbottom")      r = Region:: OppCornerPointBottom;
-    else if (name == "theirpenaltytop")           r = Region:: TheirPenaltyTop;
-    else if (name == "theirpenaltybottom")        r = Region:: TheirPenaltyBottom;
-    else if (name == "attreccornertopb")          r = Region::AttackRecCornerTopB;
-    else if (name == "attreccornertopp1")         r = Region::AttackRecCornerTopP1;
-    else if (name == "attreccornertopp2")         r = Region::AttackRecCornerTopP2;
-    else if (name == "attreccornerbottomb")       r = Region::AttackRecCornerBottomB;
-    else if (name == "attreccornerbottomp1")      r = Region::AttackRecCornerBottomP1;
-    else if (name == "attreccornerbottomp2")      r = Region::AttackRecCornerBottomp2;
-    else if (name == "attrecmidtopb")             r = Region::AttackRecMidTopB;
-    else if (name == "attrecmidtopp1")            r = Region::AttackRecMidTopP1;
-    else if (name == "attrecmidtopp2")            r = Region::AttackRecMidTopP2;
-    else if (name == "attrecmidbottomb")          r = Region::AttackRecMidBottomB;
-    else if (name == "attrecmidbottomp1")         r = Region::AttackRecMidBottomP1;
-    else if (name == "attrecmidbottomp2")         r = Region::AttackRecMidBottomp2;
-    else if (name == "tc2012top1")                r = Region::TC2012Top1;
-    else if (name == "tc2012top2")                r = Region::TC2012Top2;
-    else if (name == "tc2012top3")                r = Region::TC2012Top3;
-    else if (name == "tc2012top4")                r = Region::TC2012Top4;
-    else if (name == "tc2012bottom1")             r = Region::TC2012Bottom1;
-    else if (name == "tc2012bottom2")             r = Region::TC2012Bottom2;
-    else if (name == "tc2012bottom3")             r = Region::TC2012Bottom3;
-    else if (name == "tc2012bottom4")             r = Region::TC2012Bottom4;
-    else if (name == "tc2012rect1")               r = Region::TC2012Rect1;
-    else if (name == "tc2012rect2")               r = Region::TC2012Rect2;
-    else if (name == "tc2012rect3")               r = Region::TC2012Rect3;
-    else if (name == "tc2012rect4")               r = Region::TC2012Rect4;
-    else if (name == "ourcornerpointtop")         r = Region::OurCornerPointTop;
-    else if (name == "ourcornerpointbottom")      r = Region::OurCornerPointBottom;
-    else if (name == "largeoppcornertopright")    r = Region::LargeOppCornerTopRight;
-    else if (name == "largeoppcornertopleft")     r = Region::LargeOppCornerTopLeft;
-    else if (name == "largeoppcornerbottomright") r = Region::LargeOppCornerBottomRight;
-    else if (name == "largeoppcornerbottomleft")  r = Region::LargeOppCornerBottomLeft;
-    else if (name.startsWith("circle")) {
+    if (name == "ourcornertop") {
+        r = Region::OurCornerTop;
+    } else if (name == "ourcornerbottom") {
+        r = Region::OurCornerBottom;
+    } else if (name == "oppcornertop") {
+        r = Region::OppCornerTop;
+    } else if (name == "oppcornerbottom") {
+        r = Region::OppCornerBottom;
+    } else if (name == "midfieldtop") {
+        r = Region::MidFieldTop;
+    } else if (name == "midfieldbottom") {
+        r = Region::MidFieldBottom;
+    } else if (name == "frontgoalopp") {
+        r = Region::FrontGoalOpp;
+    } else if (name == "frontgoalour") {
+        r = Region::FrontGoalOur;
+    } else if (name == "center") {
+        r = Region::Center;
+    } else if (name == "bigcenter") {
+        r = Region::BigCenter;
+    } else if (name == "ourpenalty") {
+        r = Region::OurPenalty;
+    } else if (name == "opppenalty") {
+        r = Region::OppPenalty;
+    } else if (name == "ourfield") {
+        r = Region::OurField;
+    } else if (name == "oppfield") {
+        r = Region::OppField;
+    } else if (name == "oppcornertopright") {
+        r = Region::OppCornerTopRight;
+    } else if (name == "oppcornertopleft") {
+        r = Region::OppCornerTopLeft;
+    } else if (name == "oppcornerbottomright") {
+        r = Region::OppCornerBottomRight;
+    } else if (name == "oppcornerbottomleft") {
+        r = Region::OppCornerBottomLeft;
+    } else if (name == "ourcornertopright") {
+        r = Region::OurCornerTopRight;
+    } else if (name == "ourcornertopleft") {
+        r = Region::OurCornerTopLeft;
+    } else if (name == "ourcornerbottomright") {
+        r = Region::OurCornerBottomRight;
+    } else if (name == "ourcornerbottomleft") {
+        r = Region::OurCornerBottomLeft;
+    } else if (name == "ourmidfieldtop") {
+        r = Region::OurMidFieldTop;
+    } else if (name == "ourmidfieldbottom") {
+        r = Region::OurMidFieldBottom ;
+    } else if (name == "oppmidfieldtop") {
+        r = Region::OppMidFieldTop;
+    } else if (name == "oppmidfieldbottom") {
+        r = Region::OppMidFieldBottom;
+    } else if (name == "oppfieldtop") {
+        r = Region::OppFieldTop;
+    } else if (name == "oppfieldbottom") {
+        r = Region::OppFieldBottom;
+    } else if (name == "ourfieldtop") {
+        r = Region::OurFieldTop;
+    } else if (name == "ourfieldbottom") {
+        r = Region::OurFieldBottom;
+    } else if (name == "ourmidfieldtopmost") {
+        r = Region::OurMidFieldTopMost;
+    } else if (name == "ourmidfieldbottommost") {
+        r = Region::OurMidFieldBottomMost;
+    } else if (name == "field1stquarter") {
+        r = Region::Field1stQuarter;
+    } else if (name == "field2ndquarter") {
+        r = Region::Field2ndQuarter;
+    } else if (name == "field3rdquarter") {
+        r = Region::Field3rdQuarter;
+    } else if (name == "field4thquarter") {
+        r = Region::Field4thQuarter;
+    } else if (name == "ourmidfieldtopwing") {
+        r = Region::OurMidFieldTopWing;
+    } else if (name == "ourmidfieldbottomwing") {
+        r = Region::OurMidFieldBottomWing;
+    } else if (name == "ourattackonethird") {
+        r = Region::OurAttackOneThird;
+    } else if (name == "ourdeffenseonethird") {
+        r = Region::OurDeffenseOneThird;
+    } else if (name == "ourmidonethird") {
+        r = Region::OurMidOneThird;
+    } else if (name == "oppmidfield") {
+        r = Region::OppMidField;
+    } else if (name == "oppcornerlinetop") {
+        r = Region::OppCornerLineTop;
+    } else if (name == "oppcornerlinebottom") {
+        r = Region::OppCornerLineBottom;
+    } else if (name == "fieldgrid1top") {
+        r = Region::FieldGrid1Top;
+    } else if (name == "fieldgrid1center") {
+        r = Region::FieldGrid1Center;
+    } else if (name == "fieldgrid1bottom") {
+        r = Region::FieldGrid1Bottom;
+    } else if (name == "fieldgrid2top") {
+        r = Region::FieldGrid2Top;
+    } else if (name == "fieldgrid2center") {
+        r = Region::FieldGrid2Center;
+    } else if (name == "fieldgrid2bottom") {
+        r = Region::FieldGrid2Bottom;
+    } else if (name == "fieldgrid3top") {
+        r = Region:: FieldGrid3Top;
+    } else if (name == "fieldgrid3center") {
+        r = Region:: FieldGrid3Center;
+    } else if (name == "fieldgrid3bottom") {
+        r = Region:: FieldGrid3Bottom;
+    } else if (name == "fieldgrid4top") {
+        r = Region:: FieldGrid4Top;
+    } else if (name == "fieldgrid4center") {
+        r = Region:: FieldGrid4Center;
+    } else if (name == "fieldgrid4bottom") {
+        r = Region:: FieldGrid4Bottom;
+    } else if (name == "fieldgrid5top") {
+        r = Region:: FieldGrid5Top;
+    } else if (name == "fieldgrid5center") {
+        r = Region:: FieldGrid5Center;
+    } else if (name == "fieldgrid5bottom") {
+        r = Region:: FieldGrid5Bottom;
+    } else if (name == "oppcornerpointtop") {
+        r = Region:: OppCornerPointTop;
+    } else if (name == "oppcornerpointbottom") {
+        r = Region:: OppCornerPointBottom;
+    } else if (name == "theirpenaltytop") {
+        r = Region:: TheirPenaltyTop;
+    } else if (name == "theirpenaltybottom") {
+        r = Region:: TheirPenaltyBottom;
+    } else if (name == "attreccornertopb") {
+        r = Region::AttackRecCornerTopB;
+    } else if (name == "attreccornertopp1") {
+        r = Region::AttackRecCornerTopP1;
+    } else if (name == "attreccornertopp2") {
+        r = Region::AttackRecCornerTopP2;
+    } else if (name == "attreccornerbottomb") {
+        r = Region::AttackRecCornerBottomB;
+    } else if (name == "attreccornerbottomp1") {
+        r = Region::AttackRecCornerBottomP1;
+    } else if (name == "attreccornerbottomp2") {
+        r = Region::AttackRecCornerBottomp2;
+    } else if (name == "attrecmidtopb") {
+        r = Region::AttackRecMidTopB;
+    } else if (name == "attrecmidtopp1") {
+        r = Region::AttackRecMidTopP1;
+    } else if (name == "attrecmidtopp2") {
+        r = Region::AttackRecMidTopP2;
+    } else if (name == "attrecmidbottomb") {
+        r = Region::AttackRecMidBottomB;
+    } else if (name == "attrecmidbottomp1") {
+        r = Region::AttackRecMidBottomP1;
+    } else if (name == "attrecmidbottomp2") {
+        r = Region::AttackRecMidBottomp2;
+    } else if (name == "tc2012top1") {
+        r = Region::TC2012Top1;
+    } else if (name == "tc2012top2") {
+        r = Region::TC2012Top2;
+    } else if (name == "tc2012top3") {
+        r = Region::TC2012Top3;
+    } else if (name == "tc2012top4") {
+        r = Region::TC2012Top4;
+    } else if (name == "tc2012bottom1") {
+        r = Region::TC2012Bottom1;
+    } else if (name == "tc2012bottom2") {
+        r = Region::TC2012Bottom2;
+    } else if (name == "tc2012bottom3") {
+        r = Region::TC2012Bottom3;
+    } else if (name == "tc2012bottom4") {
+        r = Region::TC2012Bottom4;
+    } else if (name == "tc2012rect1") {
+        r = Region::TC2012Rect1;
+    } else if (name == "tc2012rect2") {
+        r = Region::TC2012Rect2;
+    } else if (name == "tc2012rect3") {
+        r = Region::TC2012Rect3;
+    } else if (name == "tc2012rect4") {
+        r = Region::TC2012Rect4;
+    } else if (name == "ourcornerpointtop") {
+        r = Region::OurCornerPointTop;
+    } else if (name == "ourcornerpointbottom") {
+        r = Region::OurCornerPointBottom;
+    } else if (name == "largeoppcornertopright") {
+        r = Region::LargeOppCornerTopRight;
+    } else if (name == "largeoppcornertopleft") {
+        r = Region::LargeOppCornerTopLeft;
+    } else if (name == "largeoppcornerbottomright") {
+        r = Region::LargeOppCornerBottomRight;
+    } else if (name == "largeoppcornerbottomleft") {
+        r = Region::LargeOppCornerBottomLeft;
+    } else if (name.startsWith("circle")) {
         QStringList q = name.right(name.length() - 6).split("_");
         if (q.length() == 2) {
             bool ok;
@@ -776,8 +895,12 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
 double CField::ourPAreaPos(double angle) const {
     Vector2D p, n;
     n = ourPAreaPerpendicularVector(angle, p);
-    if (angle > 90) return _GOAL_WIDTH / 4 + fabs(Vector2D::angleBetween(n, Vector2D(0.0, 0.0)).radian()) * 0.50;
-    if (angle < -90) return -_GOAL_WIDTH / 4 - fabs(Vector2D::angleBetween(n, Vector2D(0.0, 0.0)).radian()) * 0.50;
+    if (angle > 90) {
+        return _GOAL_WIDTH / 4 + fabs(Vector2D::angleBetween(n, Vector2D(0.0, 0.0)).radian()) * 0.50;
+    }
+    if (angle < -90) {
+        return -_GOAL_WIDTH / 4 - fabs(Vector2D::angleBetween(n, Vector2D(0.0, 0.0)).radian()) * 0.50;
+    }
     if (p.y <= -_GOAL_WIDTH / 4) {
         return -_GOAL_WIDTH / 4 - fabs(Vector2D::angleBetween(n, Vector2D(0.0, 0.0)).radian()) * 0.50;
     }

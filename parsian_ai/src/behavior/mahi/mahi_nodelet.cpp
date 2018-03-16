@@ -32,7 +32,9 @@ void MahiNodelet::onInit() {
 
 void MahiNodelet::timerCb(const ros::TimerEvent& event) {
 
-    if (drawer != nullptr)   drawPub.publish(drawer->draws);
+    if (drawer != nullptr) {
+        drawPub.publish(drawer->draws);
+    }
 //    if (debugger != nullptr) debugPub.publish(debugger->debugs);
 
     drawer->draws.texts.clear();

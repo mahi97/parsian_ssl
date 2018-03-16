@@ -58,8 +58,11 @@ void CBall::setReplace(Vector2D newPos, Vector2D newVel) {
 }
 
 int CBall::replacementPacket(char* buf) {
-    if (repl) buf[0] = 100;
-    else buf[0] = 10;
+    if (repl) {
+        buf[0] = 100;
+    } else {
+        buf[0] = 10;
+    }
     float x;
     x = static_cast<float>(replPos.x);
     buf[1] = *((char*)(& (x)));
@@ -86,7 +89,9 @@ int CBall::replacementPacket(char* buf) {
 }
 
 double CBall::getVel() {
-    if (modelObjStopped) return vel.length();
+    if (modelObjStopped) {
+        return vel.length();
+    }
     return fabs(modelC1 / modelSampleTime);
 }
 Vector2D CBall::getPosInFuture(double _t) {
@@ -106,13 +111,15 @@ double CBall::modelWhenIsObjAt(double dToObj) {
         double r1 = modelSampleTime * (-modelC1 - delta) / (2.0 * modelC2);
         double r2 = modelSampleTime * (-modelC1 + delta) / (2.0 * modelC2);
         if (r1 < r2) {
-            if (r1 > 0)
+            if (r1 > 0) {
                 return r1;
+            }
             return r2;
         }
 
-        if (r2 > 0)
+        if (r2 > 0) {
             return r2;
+        }
         return r1;
 
     } else {
@@ -159,8 +166,9 @@ bool CBall::isPassed() {
 
 void CBall::filter(int vanished) {
     auto * ballLast = new CRawObject;
-    if (hist.size() > 100)
+    if (hist.size() > 100) {
         hist.pop_front();
+    }
     ballLast->pos = pos;
     ballLast->dir = dir;
     hist.push_back(ballLast);
@@ -265,7 +273,9 @@ double CBall::whenBallReachToPoint(double dist) {
 }
 
 Vector2D CBall::whereBallSpeedIs(double speed) {
-    if (vel.length() < speed) return pos;
+    if (vel.length() < speed) {
+        return pos;
+    }
     return pos + vel.norm() * (vel.r2() - speed * speed) / (2.0 * acc.length());
 }
 

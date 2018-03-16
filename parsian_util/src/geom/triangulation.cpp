@@ -44,7 +44,8 @@
 #include <cstdlib>
 #include <cstring>
 
-extern "C" {
+extern "C"
+{
 
     void triangulate(char *,
                      struct triangulateio *,
@@ -248,9 +249,15 @@ Triangulation::compute() {
     // e: edges output
     char opt[32];
     std::strcpy(opt, "zBNPQ");
-    if (constraints_size > 0) std::strcat(opt, "pc");
-    if (! M_use_triangles) std::strcat(opt, "E");
-    if (M_use_edges) std::strcat(opt, "e");
+    if (constraints_size > 0) {
+        std::strcat(opt, "pc");
+    }
+    if (! M_use_triangles) {
+        std::strcat(opt, "E");
+    }
+    if (M_use_edges) {
+        std::strcat(opt, "e");
+    }
 
     triangulate(opt, &in, &out, NULL);
 

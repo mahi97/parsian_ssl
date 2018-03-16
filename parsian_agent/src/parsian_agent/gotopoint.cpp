@@ -58,10 +58,11 @@ gpMode CSkillGotoPoint::decideMode() {
         agentX3 = fabs(((posPidDist * posPid->kp) * (posPidDist * posPid->kp) - (agentVc * agentVc)) / (2 * maxDeceleration)) + 0.05 * agentVc;
 
         if (agentDist <= agentX3 + decThr) {
-            if (agentVc < 0.5)
+            if (agentVc < 0.5) {
                 decThr = 0;
-            else
+            } else {
                 decThr = 0.5;
+            }
             return GPDEC1;
         } else if (agentVc >= maxVelocity) {
             decThr = 0;
@@ -109,8 +110,9 @@ void CSkillGotoPoint::trajectoryPlanner() {
     if ((fabs(thPid->error) > 1)
             || agentVc < 0.5
             || agentDist > 3
-            || fabs((agentMovementTh - agent->dir().th()).degree()) > 80 && fabs((agentMovementTh - agent->dir().th()).degree()) < 100)
+            || fabs((agentMovementTh - agent->dir().th()).degree()) > 80 && fabs((agentMovementTh - agent->dir().th()).degree()) < 100) {
         thPid->error = 0;
+    }
 
     appliedTh = agentMovementTh.radian() + thPid->PID_OUT();
 
@@ -144,12 +146,14 @@ void CSkillGotoPoint::execute() {
         posPid->kd = 0;
     } else if (startingPoint.dist(agentPos) < 0.3) {
         posPid->kp = 0.37 / agentDist;
-        if (posPid->kp > 3)
+        if (posPid->kp > 3) {
             posPid->kp = 3;
+        }
 
         posPid->kd = 10;
-    } else
+    } else {
         posPid->kp = 1.9;
+    }
 
 
     if (slowMode || penaltyKick) {
@@ -158,8 +162,9 @@ void CSkillGotoPoint::execute() {
     if (diveMode) {
         posPid->kp = 1.8 / agentDist;
         posPid->kd = 10;
-        if (posPid->kp > 4)
+        if (posPid->kp > 4) {
             posPid->kp = 4;
+        }
         posPidDist = 1;
     } else {
         posPidDist = 0.5;
@@ -178,8 +183,9 @@ void CSkillGotoPoint::execute() {
     double vp = (posPidDist * posPid->kp);
     double moreDec = 0.65;
     double decOffset = 0.8;
-    if (agentVc < 0.2)
+    if (agentVc < 0.2) {
         startingPoint = agentPos;
+    }
 
 
     ////////////////////////////
@@ -249,11 +255,21 @@ void CSkillGotoPoint::execute() {
 }
 
 double CSkillGotoPoint::progress() {
-    if (agent == nullptr) return 0;
+    if (agent == nullptr) {
+        return 0;
+    }
     double d = (agentPos - targetPos).length();
-    if (d < 0.04) return 1.0;
-    if (d < 0.05) return 0.8;
-    if (d < 0.10) return 0.7;
-    if (d < 0.20) return 0.6;
+    if (d < 0.04) {
+        return 1.0;
+    }
+    if (d < 0.05) {
+        return 0.8;
+    }
+    if (d < 0.10) {
+        return 0.7;
+    }
+    if (d < 0.20) {
+        return 0.6;
+    }
     return 0;
 }

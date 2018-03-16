@@ -5,7 +5,9 @@
 
 CTeam::CTeam(const bool& isYellow, const bool& isLeft) {
     data = new CTeamData;
-    for (int i = 0; i < _MAX_NUM_PLAYERS; i++)data->teamMembers[i] = new CRobot(i);
+    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
+        data->teamMembers[i] = new CRobot(i);
+    }
     setColor(isYellow);
     setSide(isLeft);
 
@@ -17,8 +19,9 @@ CTeam::CTeam(const  bool& isYellow, const bool& isLeft, const std::vector<parsia
 }
 
 CTeam::~CTeam() {
-    for (auto &teamMember : data->teamMembers)
+    for (auto &teamMember : data->teamMembers) {
         delete teamMember;
+    }
     delete data;
 }
 
@@ -57,13 +60,16 @@ int CTeam::activeAgentID(int i) {
     }
     debugger->debug(QString("request for id %1 that does not exist in team").arg(i), D_ERROR);
     debugger->debug("Active Agents:", D_DEBUG);
-    for (int activeAgent : data->activeAgents)
+    for (int activeAgent : data->activeAgents) {
         DEBUG(activeAgent , D_DEBUG);
+    }
     return -1;
 
 }
 CRobot* CTeam::operator [](const int& i) const {
-    if (i >= 0 && i < _MAX_NUM_PLAYERS) return data->teamMembers[i];
+    if (i >= 0 && i < _MAX_NUM_PLAYERS) {
+        return data->teamMembers[i];
+    }
     PDEBUG("id out of range", i, D_ERROR);
     return nullptr;
 }
@@ -74,8 +80,9 @@ CRobot* CTeam::active(const int& i) const {
     }
     debugger->debug(QString("request for id %1 that does not exist in team").arg(i), D_ERROR);
     debugger->debug("Active Agents:", D_DEBUG);
-    for (int activeAgent : data->activeAgents)
+    for (int activeAgent : data->activeAgents) {
         DEBUG(activeAgent , D_DEBUG);
+    }
     return nullptr;
 
 }

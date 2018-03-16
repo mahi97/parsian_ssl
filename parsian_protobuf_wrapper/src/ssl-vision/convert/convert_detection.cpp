@@ -31,15 +31,21 @@ parsian_msgs::ssl_vision_detection convert_detection_frame(SSL_DetectionFrame pr
     for (int i = 0; i < protoFrame.robots_yellow().size(); ++i) {
         SSL_DetectionRobot protoBot = protoFrame.robots_yellow().Get(i);
         parsian_msgs::ssl_vision_detection_robot rosBot = convert_detection_robot(protoBot);
-        if (isYellow) rosFrame.us.push_back(rosBot);
-        else rosFrame.them.push_back(rosBot);
+        if (isYellow) {
+            rosFrame.us.push_back(rosBot);
+        } else {
+            rosFrame.them.push_back(rosBot);
+        }
     }
 
     for (int i = 0; i < protoFrame.robots_blue().size(); ++i) {
         SSL_DetectionRobot protoBot = protoFrame.robots_blue().Get(i);
         parsian_msgs::ssl_vision_detection_robot rosBot = convert_detection_robot(protoBot);
-        if (isYellow) rosFrame.them.push_back(rosBot);
-        else rosFrame.us.push_back(rosBot);
+        if (isYellow) {
+            rosFrame.them.push_back(rosBot);
+        } else {
+            rosFrame.us.push_back(rosBot);
+        }
     }
 
     return rosFrame;

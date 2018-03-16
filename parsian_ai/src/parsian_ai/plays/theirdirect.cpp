@@ -23,8 +23,12 @@ void CTheirDirect::init(const QList<Agent*>& _agents) {
 }
 
 void CTheirDirect::execute_x() {
-    if (agents.empty()) return;
+    if (agents.empty()) {
+        return;
+    }
     executedCycles++;
     chooseBlocker();
-    if (agents.size() > 1) appendRemainingsAgents(markAgents);
+    if (agents.size() > 1) {
+        appendRemainingsAgents(markAgents);
+    }
 }
