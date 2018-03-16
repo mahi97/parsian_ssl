@@ -16,7 +16,6 @@
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_util/core/worldmodel.h>
-#include <rospack/rospack.h>
 #include <ros/package.h>
 
 
