@@ -163,6 +163,7 @@ void Matrix::str_init(char* const init_string)
 
   if(!tcount) {
 	mat = 0;
+	free(str1);
 	return;
   }
 
