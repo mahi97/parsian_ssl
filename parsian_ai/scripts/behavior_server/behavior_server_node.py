@@ -36,7 +36,7 @@ class BehaviorServer:
         self.selector.update_success_rate(msg)
 
     def cfg_callback(self, config, level):
-        self.selector.update_config(config["queue_size"], config["threshold_amount"])
+        self.selector.update_config(config["queue_size"], config["threshold_amount"], config["upper_boundary"], config["lower_boundary"])
         return config
 
 

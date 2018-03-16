@@ -38,11 +38,13 @@ class BestSelector:
         # type:(parsian_ai_status) -> None
         self.data[ai_status.behavior].update_success_rate(ai_status.success_rate)
 
-    def update_config(self, q_size, th_amount):
+    def update_config(self, q_size, th_amount, upper_b, lower_b):
         global queue_size, threshold_amount
         queue_size = q_size
         threshold_amount = th_amount
-        
+        self.upper_bound = upper_b
+        self.lower_bound = lower_b
+
     def check_bounds(self, action):
         if action.probability < self.lower_bound:
             if self.last_best is not None:
