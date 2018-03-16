@@ -194,7 +194,7 @@ void CCommunicator::packetCallBack(const parsian_msgs::parsian_packetsConstPtr &
 
         sendString(tempStr, static_cast<int>(robotPacket.packets.size()));
 
-        delete tempStr;
+        delete[] tempStr;
     }
 }
 

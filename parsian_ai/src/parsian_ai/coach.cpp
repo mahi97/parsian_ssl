@@ -647,9 +647,9 @@ void CCoach::updateAttackState()
     double    critAng   = 30  ;
     CRobot    *oppNearest;
     if(wm->opp.activeAgentsCount() > 0) {
-        //        int id = CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos);
-        //        ROS_INFO_STREAM(id);
-        //        oppNearest = wm->opp[id];
+//	int id = CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos);
+//        ROS_INFO_STREAM(id);
+//        oppNearest = wm->opp[id];
         ourAttackState = SAFE;
         return;
 
@@ -659,7 +659,7 @@ void CCoach::updateAttackState()
         ourAttackState = SAFE;
         return;
     }
-    QList<int> ids;
+/*    QList<int> ids;
     Segment2D oppNearestPath(oppNearest->pos,oppNearest->pos + oppNearest->vel);
     ids = wm->our.data->activeAgents;
     //    ourNearestAgent = knowledge->getAgent(knowledge->getNearestAgentToPoint(wm->ball->pos,&ids));
@@ -702,7 +702,7 @@ void CCoach::updateAttackState()
     }
 
     lastASWasCritical = (ourAttackState == CRITICAL);
-
+*/
 }
 void CCoach::choosePlaymakeAndSupporter(bool defenseFirst)
 {
