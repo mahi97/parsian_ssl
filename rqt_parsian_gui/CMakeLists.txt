@@ -31,7 +31,7 @@ endif()
 catkin_python_setup()
 
 roslint_cpp()
-
+roslint_python()
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -145,8 +145,7 @@ set(${PROJECT_NAME}_HDRS
   include/${PROJECT_NAME}/handycontroller.h
   include/${PROJECT_NAME}/playoffWidget.h
   include/${PROJECT_NAME}/playoff.h
-
-)
+        )
 
 set(${PROJECT_NAME}_UIS
   resource/handycontroller.ui

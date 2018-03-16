@@ -34,73 +34,72 @@
 
 
 
-namespace rqt_parsian_gui
-{
-    class MonitorWidget
-            :public QOpenGLWidget {
-        Q_OBJECT
-    public:
-        MonitorWidget();
-        ~MonitorWidget();
-        void drawField();
-        CguiDrawer *drawerBuffer;
-        ros::NodeHandle n;
-        ros::Publisher monitor_pub;
-        parsian_msgs::vector2DPtr mousePos;
-        //TODO: get these values from util CRobot
-        const double robot_radius_new = 0.0890;
-        const double robot_radius_old = 0.0900;
-        int getViewportWidth();
+namespace rqt_parsian_gui {
+class MonitorWidget
+    : public QOpenGLWidget {
+    Q_OBJECT
+public:
+    MonitorWidget();
+    ~MonitorWidget();
+    void drawField();
+    CguiDrawer *drawerBuffer;
+    ros::NodeHandle n;
+    ros::Publisher monitor_pub;
+    parsian_msgs::vector2DPtr mousePos;
+    //TODO: get these values from util CRobot
+    const double robot_radius_new = 0.0890;
+    const double robot_radius_old = 0.0900;
+    int getViewportWidth();
 
 
-    protected:
+protected:
 
 
-        void initializeGL();
+    void initializeGL();
 
-        void paintGL();
-        double cameraX,cameraY;
+    void paintGL();
+    double cameraX, cameraY;
 
-        double scaleFactor;
-        void resizeGL(int width, int height);
-        QPainter painter;
-        void mousePressEvent(QMouseEvent *event);
-        void wheelEvent(QWheelEvent *event);
-
-
-    private:
-        QSizeF viewportSize;
-        QSizeF stadiumSize;
-        QRectF field;
-        QRectF fieldCenter;
-        QRectF leftPenalty;
-        QRectF rightPenalty;
-        GLuint list;
-        QColor stadiumGreen;
-        QColor fieldGreen;
-        double viewportWidth;
-        double WH_RATIO;
-        double coeff;
-        Vector2D centralPoint;
+    double scaleFactor;
+    void resizeGL(int width, int height);
+    QPainter painter;
+    void mousePressEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 
-        void qglClearColor(QColor clearColor);
-        void setViewportWidth(int width);
+private:
+    QSizeF viewportSize;
+    QSizeF stadiumSize;
+    QRectF field;
+    QRectF fieldCenter;
+    QRectF leftPenalty;
+    QRectF rightPenalty;
+    GLuint list;
+    QColor stadiumGreen;
+    QColor fieldGreen;
+    double viewportWidth;
+    double WH_RATIO;
+    double coeff;
+    Vector2D centralPoint;
 
-        GLuint drawArc(double centerX, double centerY, double radius, int start, int end, QColor color = QColor(255, 255, 255),
-                       bool fill = false, bool fullFill = false);
 
-        GLuint drawRect(double topLeftX, double topLeftY, double buttomRightX, double buttomRightY,
-                        QColor color = QColor(255, 255, 255), bool fill = false);
+    void qglClearColor(QColor clearColor);
+    void setViewportWidth(int width);
 
-        GLuint drawLine(double x1, double y1, double x2, double y2, QColor color = QColor(255, 255, 255));
+    GLuint drawArc(double centerX, double centerY, double radius, int start, int end, QColor color = QColor(255, 255, 255),
+                   bool fill = false, bool fullFill = false);
 
-        GLuint drawPoint(double x, double y, QColor color = QColor(0, 0, 0));
+    GLuint drawRect(double topLeftX, double topLeftY, double buttomRightX, double buttomRightY,
+                    QColor color = QColor(255, 255, 255), bool fill = false);
 
-        void drawText(double x, double y, QString text, QColor color, int size);
+    GLuint drawLine(double x1, double y1, double x2, double y2, QColor color = QColor(255, 255, 255));
 
-        void drawRobot(double x, double y, double ang, int ID, int comID, QColor color,QString str="", bool newRobots=false);
-    };
+    GLuint drawPoint(double x, double y, QColor color = QColor(0, 0, 0));
+
+    void drawText(double x, double y, QString text, QColor color, int size);
+
+    void drawRobot(double x, double y, double ang, int ID, int comID, QColor color, QString str = "", bool newRobots = false);
+};
 
 
 

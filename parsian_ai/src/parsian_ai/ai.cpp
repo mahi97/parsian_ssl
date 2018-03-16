@@ -73,7 +73,7 @@ void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
     wm->update(_wm);
-    for(int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
+    for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
         soccer->agents[i]->self = *wm->our[i];
     }
 }
@@ -81,20 +81,20 @@ void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
 void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     gameState->setRefree(_ref);
 
-    ROS_INFO_STREAM("refff count : "<< _ref->command_counter);
+    ROS_INFO_STREAM("refff count : " << _ref->command_counter);
 
-    if(gameState->isPlayOff()) {
-        ROS_INFO_STREAM("ref play off");
+    if (gameState->isStop()) {
+        ROS_INFO_STREAM("ref stop");
     }
-    if(gameState->isPlayOn()) {
-        ROS_INFO_STREAM("ref play on");
+    if (gameState->isStart()) {
+        ROS_INFO_STREAM("ref start");
     }
-    if(gameState->ourDirectKick()) {
+    if (gameState->ourDirectKick()) {
         ROS_INFO_STREAM("ref our Direct");
     }
 
-    if(gameState->canMove()) {
-        ROS_INFO_STREAM("ref !halt");
+    if (!gameState->canMove()) {
+        ROS_INFO_STREAM("ref halt");
     }
 
 
