@@ -10,6 +10,7 @@ project(parsian_msgs)
 find_package(catkin REQUIRED COMPONENTS
 		message_generation
 		std_msgs
+		roslint
 		)
 
 ## System dependencies are found with CMake's conventions
@@ -119,7 +120,7 @@ catkin_package(
 		CATKIN_DEPENDS message_runtime std_msgs
 		#  DEPENDS system_lib
 )
-
+roslint_cpp()
 ###########
 ## Build ##
 ###########

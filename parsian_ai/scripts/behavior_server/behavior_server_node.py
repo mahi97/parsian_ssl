@@ -6,10 +6,13 @@ import best_selector
 
 import rospy
 
+
 class TempMsg:
     def __init__(self):
         self.name = ""
         self.point = 0
+
+
 class BehaviorServer:
     def __init__(self):
         rospy.init_node('behavior_server')

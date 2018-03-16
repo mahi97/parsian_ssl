@@ -25,7 +25,7 @@ void MahiNodelet::onInit() {
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::mahiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::mahiConfig>::CallbackType f;
-    f = boost::bind(&MahiNodelet::ConfigServerCallBack,this, _1, _2);
+    f = boost::bind(&MahiNodelet::ConfigServerCallBack, this, _1, _2);
     server->setCallback(f);
 
 }
