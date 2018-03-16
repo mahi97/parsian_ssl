@@ -39,6 +39,10 @@ private:
 
     Vector2D agentPos;
     Vector2D agentDir;
+    Circle2D kickerArea;
+    double jturnThr;
+    double onetouchThr;
+    double distThr;
     QQueue <Vector2D> dirQueue;
     double kkDist;
     double kkBallDist;
