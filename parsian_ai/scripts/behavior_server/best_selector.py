@@ -1,6 +1,8 @@
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
 import rospy
+
+
 class BestSelector:
     def __init__(self):
         self.data = {}
@@ -15,9 +17,10 @@ class BestSelector:
     def get_best(self):
         return self.data[max(self.data, key=lambda x: self.data[x].get_average())].queue[0]
 
-    def update_success_rate(self,ai_status):
+    def update_success_rate(self, ai_status):
         #type:(parsian_ai_status)
         self.data[ai_status.behavior].update_success_rate(ai_status.success_rate)
+
 
 class NQueue:
     def __init__(self, length):
@@ -40,4 +43,4 @@ class NQueue:
         pass
 
     def Geometric_mean(self, first, f_coef, second, s_coef):
-        return ( first**f_coef * second**s_coef ) ** (1/(f_coef+s_coef))
+        return (first ** f_coef * second ** s_coef) ** (1 / (f_coef + s_coef))

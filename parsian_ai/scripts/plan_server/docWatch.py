@@ -27,7 +27,6 @@ class Watcher:
         self.__observer = Observer()
         # DIRECTORY_TO_WATCH = DIRECTORY_TO_WATCH + self.__p
         self.__event_handler = Handler(self.path)
-
         # l=[]
         # l.append("/home/fateme/Workspace/parsian_ws/src/parsian_ssl/parsian_ai/plans/2Pass/pass.json")
         # self.__event_handler.update_master_active(l, True, True)
@@ -43,7 +42,6 @@ class Watcher:
             # print("Error")
             self.__observer.join()
             sys.exit(0)
-
 
     def get_all_plans(self):
         return self.__event_handler.get_all_plans_gui_msgs()
@@ -82,7 +80,7 @@ class Handler(FileSystemEventHandler):
         # self.choose_plan(4, 3)
         # print (self.message_generator(self.__final_dict[0]))
 
-    # @staticmethod
+        # @staticmethod
     def on_any_event(self, event):
         if event.is_directory:
             return None
@@ -100,7 +98,6 @@ class Handler(FileSystemEventHandler):
         elif event.event_type == 'created':
             self.refresh()
             # print("Received created event - %s." % event.src_path)
-
 
     def list_valid_plans(self, path):
         file_list = []
@@ -141,7 +138,6 @@ class Handler(FileSystemEventHandler):
                     print("not json: " + str(f) + " --> removed!")
 
         file_list2 = [f for f in file_list if f not in bad_files]
-
         # printfile_list2
 
         self.__final_list = self.ignore_plans(file_list2, ignore_lst)
@@ -247,7 +243,7 @@ class Handler(FileSystemEventHandler):
 
             i = self.__shuffleCount % len(active_list)
             self.__shuffleCount += 1
-            print ("\n"+active_list[i]["filename"].split("plans/")[1]+"  "+str(active_list[i]["planMode"]))
+            print ("\n" + active_list[i]["filename"].split("plans/")[1] + "  " + str(active_list[i]["planMode"]))
             return self.ai_message_generator(active_list[i])
 
         else:
@@ -309,15 +305,15 @@ class Handler(FileSystemEventHandler):
 
     @staticmethod
     def circle_contains(x, y, r, point_x, point_y):
-        if (x-point_x)*(x-point_x) + (y-point_y)*(y-point_y) > r*r:
+        if (x - point_x) * (x - point_x) + (y - point_y) * (y - point_y) > r * r:
             return False
         else:
             return True
 
     @staticmethod
     def ball_dist(plan, x1, y1, x2, y2):
-        a = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)
-        b = (x1-x2)*(x1-x2) + (y1+y2)*(y1+y2)
+        a = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+        b = (x1 - x2) * (x1 - x2) + (y1 + y2) * (y1 + y2)
         if a < b:
             plan["symmetry"] = False
             return math.sqrt(a)
@@ -339,7 +335,7 @@ class Handler(FileSystemEventHandler):
                     plan["isActive"] = is_active
 
         for plan in self.__final_dict:
-            print(plan["filename"]+": "+"master: "+str(plan["isMaster"])+" , "+"active: "+str(plan["isActive"]))
+            print(plan["filename"] + ": " + "master: " + str(plan["isMaster"]) + " , " + "active: " + str(plan["isActive"]))
         return self.get_all_plans_gui_msgs()
 
     def plans_to_dict(self):

@@ -1,7 +1,7 @@
 #include <plan_server/util/planloader.h>
 
 
-CPlanLoader::CPlanLoader(QObject* parent) : QObject(parent){
+CPlanLoader::CPlanLoader(QObject* parent) : QObject(parent) {
     watcher = new FileWatcher(this);
     connect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(slt_fileChanged(QString)));
 }
@@ -26,12 +26,11 @@ CPlanLoader::CPlanLoader(const QString &_folderDirectory, QObject *parent) : QOb
         }
     }
     //Add Files to FileWatcher and remove Files that can't be added.
-    Q_FOREACH(QString file, m_dirList) {
+    Q_FOREACH (QString file, m_dirList) {
         if (file.endsWith(".json")) {
             if (watcher->addFile(file)) {
                 qDebug() << file << "Added Succecfully and is be watching";
-            }
-            else {
+            } else {
                 qDebug() << file << "founded but can't be wathced :( so it's removed !";
                 m_dirList.removeOne(file);
             }
@@ -67,12 +66,11 @@ void CPlanLoader::updateDirectory() {
         }
     }
     //Add Files to FileWatcher and remove Files that can't be added.
-    Q_FOREACH(QString file, m_dirList) {
+    Q_FOREACH (QString file, m_dirList) {
         if (file.endsWith(".json")) {
             if (watcher->addFile(file)) {
                 qDebug() << file << "Added Succecfully and is be watching";
-            }
-            else {
+            } else {
                 qDebug() << file << "founded but can't be wathced :( so it's removed !";
                 m_dirList.removeOne(file);
             }

@@ -3,8 +3,7 @@
 
 #include <parsian_util/core/worldmodel.h>
 
-class WorldModel : public CWorldModel
-{
+class WorldModel : public CWorldModel {
 public:
 
     WorldModel();
@@ -13,7 +12,7 @@ public:
     ~WorldModel();
 
     bool AHZIsInOurPenaltyArea(Vector2D point);
-    QList<Vector2D> AHZOurPAreaIntersect(Segment2D segment,QString role);
+    QList<Vector2D> AHZOurPAreaIntersect(Segment2D segment, QString role);
 
 
 

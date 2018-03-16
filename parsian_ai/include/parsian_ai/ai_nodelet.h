@@ -25,32 +25,32 @@
 
 
 namespace parsian_ai {
-    class AINodelet : public nodelet::Nodelet {
+class AINodelet : public nodelet::Nodelet {
 
-    private:
-        boost::shared_ptr<AI> ai;
-        ros::Subscriber worldModelSub, robotStatusSub, refereeSub, teamConfSub, behaviorSub;
-        ros::Publisher drawPub;
-        ros::Publisher debugPub;
+private:
+    boost::shared_ptr<AI> ai;
+    ros::Subscriber worldModelSub, robotStatusSub, refereeSub, teamConfSub, behaviorSub;
+    ros::Publisher drawPub;
+    ros::Publisher debugPub;
 
-        ros::Publisher *robTask;
+    ros::Publisher *robTask;
 
-        ros::Timer timer_;
+    ros::Timer timer_;
 
-        ros::ServiceClient plan_client;
+    ros::ServiceClient plan_client;
 
-        //config server setup
-        boost::shared_ptr<dynamic_reconfigure::Server<ai_config::aiConfig>> server;
-        void ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) ;
+    //config server setup
+    boost::shared_ptr<dynamic_reconfigure::Server<ai_config::aiConfig>> server;
+    void ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) ;
 
-        void onInit() override;
+    void onInit() override;
 
-        void worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm);
-        void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
-        void robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs);
-        void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
-        void behaviorCb(const parsian_msgs::parsian_behaviorConstPtr& _behavior);
-        void timerCb(const ros::TimerEvent &event);
-    };
+    void worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm);
+    void refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref);
+    void robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & _rs);
+    void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
+    void behaviorCb(const parsian_msgs::parsian_behaviorConstPtr& _behavior);
+    void timerCb(const ros::TimerEvent &event);
+};
 }
 #endif //AINODELET_H

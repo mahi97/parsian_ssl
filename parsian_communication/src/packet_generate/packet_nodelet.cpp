@@ -19,11 +19,11 @@ void PacketNodelet::onInit() {
     drawer = new Drawer();
     debugger = new Debugger();
 
-    drawPub    = n.advertise<parsian_msgs::parsian_draw>("draws",1000);
-    debugPub   = n.advertise<parsian_msgs::parsian_debugs>("debugs",1000);
-    packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets",1000);
+    drawPub    = n.advertise<parsian_msgs::parsian_draw>("draws", 1000);
+    debugPub   = n.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
+    packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets", 1000);
 
-    for ( int i = 0 ; i < _MAX_ROBOT_NUM; i++) {
+    for (int i = 0 ; i < _MAX_ROBOT_NUM; i++) {
         robotPacketSub[i]   = n.subscribe(QString("/agent_%1/command").arg(i).toStdString(), 10, &PacketNodelet::callBack, this);
     }
 
@@ -36,7 +36,7 @@ void PacketNodelet::onInit() {
             j = 255;
         }
     }
-    visionCounter= 0;
+    visionCounter = 0;
 
 }
 
@@ -83,8 +83,7 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
 
     outputBuffer[7] = static_cast<unsigned char>(vangularAbs & 0x7F);
 
-    if (_packet->release)
-    {
+    if (_packet->release) {
         outputBuffer[8] |= 0x01;
     }
 
@@ -99,8 +98,7 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     outputBuffer[12] = 0;
     outputBuffer[13] = 0;
 
-    for(int k = 0 ; k < _ROBOT_PACKET_SIZE ; k++)
-    {
+    for (int k = 0 ; k < _ROBOT_PACKET_SIZE ; k++) {
 
         robotPackets[robotId][k] = outputBuffer[k];
     }
@@ -109,12 +107,9 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
 
 void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_packet) {
 
-    if(visionCounter < 8 )
-    {
+    if (visionCounter < 8) {
         visionCounter ++;
-    }
-    else
-    {
+    } else {
         visionCounter = 0;
     }
 
@@ -124,16 +119,13 @@ void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_p
     for (auto &robotPacket : robotPackets) {
         temp.packets.clear();
         validPack = false;
-        for (int i = 0 ; i < _ROBOT_PACKET_SIZE ; i ++)
-        {
-            if(robotPacket[i] != 255)
-            {
+        for (int i = 0 ; i < _ROBOT_PACKET_SIZE ; i ++) {
+            if (robotPacket[i] != 255) {
                 temp.packets.push_back(robotPacket[i]);
                 validPack = true;
             }
         }
-        if(validPack)
-        {
+        if (validPack) {
             robotPacks.value.push_back(temp);
         }
     }
@@ -142,9 +134,9 @@ void PacketNodelet::syncData(const parsian_msgs::parsian_world_modelConstPtr &_p
 }
 
 void PacketNodelet::timerCb(const ros::TimerEvent &event) {
-    if (drawer != nullptr){
+    if (drawer != nullptr) {
         drawPub.publish(drawer->draws);
-        ROS_INFO_STREAM("packet draw "<<drawer);
+        ROS_INFO_STREAM("packet draw " << drawer);
     }
     if (debugger != nullptr)
         debugPub.publish(debugger->debugs);

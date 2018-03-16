@@ -13,8 +13,7 @@
 #include <QTime>
 
 
-struct kalmParam
-{
+struct kalmParam {
     double vx;
     double vy;
     double vw;
@@ -22,8 +21,7 @@ struct kalmParam
 
 
 
-class Robot : public MovingObject
-{
+class Robot : public MovingObject {
 private:
     double ANGULAR_DIRECTION;
     long double ADD_TO_ANGULAR_DIRECTION;
@@ -53,7 +51,7 @@ public:
     double kickerWidth();
     double centerFromKicker();
     double wheelRadius();
-    Robot(int _id, bool isOurTeam, bool noKalman=false);
+    Robot(int _id, bool isOurTeam, bool noKalman = false);
     ~Robot();
     virtual void init();
     virtual void filter(int vanished);
@@ -82,8 +80,8 @@ public:
     Property(Vector2D, ReplPos, replPos);
     Property(float, ReplDir, replDir);
     /////////////////new kalman
-    qint64 kalmanLastTime,kalmanFutureLastTime;
-    typedef KalmanFilter<6,3> kalman;
+    qint64 kalmanLastTime, kalmanFutureLastTime;
+    typedef KalmanFilter<6, 3> kalman;
     kalman *donKalman;
     kalman *donKalmanF;
     void newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand);
@@ -95,7 +93,7 @@ public:
     bool markedByMark;
     bool shootSensor;
     double danger;
-    double vForwardCmd,vNormalCmd,vAngCmd;
+    double vForwardCmd, vNormalCmd, vAngCmd;
     long long test;
 };
 
