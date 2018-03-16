@@ -133,12 +133,12 @@ struct GameStatePacket
 #define _DEFENCE_DIST       0.110
 
 #define Property(type,name,local) \
-    public: inline const type& get##name() const {return local;} \
+    public: inline type& get##name() {return local;} \
     public: inline void set##name(type val) {local = val;} \
     protected: type local
 
 #define PropertyGet(type,name,local) \
-    public: inline type& get##name() const {return local;} \
+    public: inline type& get##name() {return local;} \
     protected: type local
 
 #define InitVal(val) val = _##val
