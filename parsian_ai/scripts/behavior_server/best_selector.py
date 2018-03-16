@@ -13,11 +13,16 @@ class BestSelector:
         self.lower_bound = 0.1
         self.timer = Timer(3, self.timer_cb)
         self.hasTimePassed = True
+        self.rewards_penalties = {}
 
     def update_data(self, new_action):
         # type:( parsian_behavior ) -> None
         if new_action.name not in self.data.keys():
             self.data[new_action.name] = NQueue(queue_size)
+            if new_action.name in self.rewards_penalties:
+                print(new_action.name + " behavior detected!")
+                value = self.rewards_penalties[new_action.name]
+                self.data[new_action.name].update_reward_penalty(value["reward"], value["penalty"])
         self.data[new_action.name].update(new_action)
 
     def get_best(self):
@@ -35,7 +40,7 @@ class BestSelector:
         return best.queue[0]
 
     def update_success_rate(self, ai_status):
-        # type:(parsian_ai_status) -> None
+        # type:( parsian_ai_status ) -> None
         self.data[ai_status.behavior].update_success_rate(ai_status.success_rate)
 
     def update_config(self, q_size, th_amount, upper_b, lower_b):
@@ -59,11 +64,26 @@ class BestSelector:
     def timer_cb(self):
         self.hasTimePassed = True
 
+    def update_rewards_penalties(self, rewards_penalties):
+        self.rewards_penalties = rewards_penalties
+        for name in rewards_penalties:
+            if name in self.data:
+                print(name + " behavior detected!")
+                value = rewards_penalties[name]
+                self.data[name].update_reward_penalty(value["reward"], value["penalty"])
+
+
 class NQueue:
     def __init__(self, length):
         self.queue = []
         self.success_rate = -1
         self.has_threshold = 0
+        self.penalty = .5
+        self.reward = .5
+
+    def update_reward_penalty(self,reward, penalty):
+        self.reward = reward
+        self.penalty = penalty
 
     def update(self, action):
         if len(self.queue) >= queue_size:
@@ -73,7 +93,10 @@ class NQueue:
     def get_average(self):
         if len(self.queue) is 0:
             return 0
-        return (sum([action.probability for action in self.queue]) / len(self.queue)) + self.has_threshold * threshold_amount
+
+        average_probability = (sum([action.probability for action in self.queue]) / len(self.queue))
+        average = average_probability * self.reward - (1 - average_probability) * self.penalty
+        return average + self.has_threshold * threshold_amount
 
     def update_success_rate(self, success_rate):
         self.success_rate = success_rate

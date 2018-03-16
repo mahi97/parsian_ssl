@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # license removed for brevity
+from pprint import pprint
+
 import rospy
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
@@ -22,7 +24,6 @@ class BehaviorServer:
 
     def getEvals(self, msg):
         self.selector.update_data(msg)
-        rospy.loginfo("running")
 
     def publisherCallBack(self, event):
         best = self.selector.get_best()
@@ -36,7 +37,16 @@ class BehaviorServer:
         self.selector.update_success_rate(msg)
 
     def cfg_callback(self, config, level):
-        self.selector.update_config(config["queue_size"], config["threshold_amount"], config["upper_boundary"], config["lower_boundary"])
+        rewards_penalties = {}
+        for group in config["groups"]["groups"]:
+            if group is not "Behavior_Server":
+                name = config["groups"]["groups"][group]["name"]
+                penalty = config["groups"]["groups"][group]["parameters"]["penalty"]
+                reward = config["groups"]["groups"][group]["parameters"]["reward"]
+                rewards_penalties[name] = {"penalty": penalty, "reward": reward}
+        self.selector.update_rewards_penalties(rewards_penalties)
+
+        self.selector.update_config(config["queue_size"], config["threshold_amount"])
         return config
 
 
