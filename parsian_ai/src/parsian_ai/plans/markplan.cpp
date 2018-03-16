@@ -815,8 +815,9 @@ QList<QPair<Vector2D, double> > CMarkPlan::sortdangershoot(double _radius, doubl
     for (int i = 0; i < output.count(); i++) {
 
         for (int j = 0; j < output.count() - 1; j++) {
-            if (output[j].second < output[j + 1].second)
+            if (output[j].second < output[j + 1].second) {
                 output.swap(j, j + 1);
+            }
         }
 
     }
@@ -882,8 +883,9 @@ QList<QPair<Vector2D, double> > CMarkPlan::sortdangerpassplayoff(QList<Vector2D>
         tempsegment.assign(oppposdanger[i], wm->field->ourGoal());
 
         double mintempdis = 0.0;
-        if (wm->our.activeAgentsCount() != 0)
+        if (wm->our.activeAgentsCount() != 0) {
             mintempdis = tempsegment.dist(wm->our.active(0)->pos);
+        }
 
         for (int j = 0; j < wm->our.activeAgentsCount(); j++) {
             if (tempsegment.dist(wm->our.active(j)->pos) < mintempdis) {
@@ -896,8 +898,9 @@ QList<QPair<Vector2D, double> > CMarkPlan::sortdangerpassplayoff(QList<Vector2D>
     ///sorting the Qlist
     for (int i = 0; i < output.count(); i++) {
         for (int j = 0; j < output.count() - 1; j++) {
-            if (output[j].second < output[j + 1].second)
+            if (output[j].second < output[j + 1].second) {
                 output.swap(j, j + 1);
+            }
         }
     }
 
@@ -975,8 +978,9 @@ QList<QPair<Vector2D, double> > CMarkPlan::sortdangerpassplayon(QList<Vector2D> 
     ///sorting the Qlist
     for (int i = 0; i < output.count(); i++) {
         for (int j = 0; j < output.count() - 1; j++) {
-            if (output[j].second < output[j + 1].second)
+            if (output[j].second < output[j + 1].second) {
                 output.swap(j, j + 1);
+            }
         }
     }
     return output;
@@ -994,11 +998,13 @@ bool CMarkPlan::sortBy(const Vector2D &robot1, const Vector2D &robot2) {
     double goalW1 = (dist2GoalW / (robot1.dist(wm->field->ourGoal())));
     double goalW2 = (dist2GoalW / (robot2.dist(wm->field->ourGoal())));
     double theta1 = (robot1 - wm->field->ourGoal()).th().degree();
-    if (fabs(theta1) < thetaMin.degree())
+    if (fabs(theta1) < thetaMin.degree()) {
         theta1 = thetaMin.degree();
+    }
     double theta2 = (robot2 - wm->field->ourGoal()).th().degree();
-    if (fabs(theta2) < thetaMin.degree())
+    if (fabs(theta2) < thetaMin.degree()) {
         theta2 = thetaMin.degree();
+    }
 
 
     return ballW1  + goalW1 + (thetaW / theta1) > ballW2  + goalW2 + (thetaW / theta2);
@@ -1006,10 +1012,11 @@ bool CMarkPlan::sortBy(const Vector2D &robot1, const Vector2D &robot2) {
 }
 
 Vector2D CMarkPlan::posvel(CRobot* opp) {
-    if (opp->vel.length() > 0.5 && opp->vel.x < 0)
+    if (opp->vel.length() > 0.5 && opp->vel.x < 0) {
         return opp->pos + 0.5 * opp->vel;
-    else
+    } else {
         return opp->pos;
+    }
 }
 void CMarkPlan::findOppAgentsToMark() {
     oppAgentsToMark.clear();
@@ -1018,8 +1025,9 @@ void CMarkPlan::findOppAgentsToMark() {
 
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
         oppAgentsToMark.append(wm->opp.active(i));
-        if (wm->field->isInOppPenaltyArea(oppAgentsToMark.last()->pos))
-            oppAgentsToMark.removeOne(oppAgentsToMark.last());   // detection of the goali
+        if (wm->field->isInOppPenaltyArea(oppAgentsToMark.last()->pos)) {
+            oppAgentsToMark.removeOne(oppAgentsToMark.last());    // detection of the goali
+        }
     }
 
     oppAgentsToMarkPos.clear();
@@ -1045,8 +1053,9 @@ void CMarkPlan::findOppAgentsToMark() {
                     drawer->draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
                 }
             }
-            if (nearestToBall != -1)
+            if (nearestToBall != -1) {
                 oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
+            }
         }
     } else if (gameState->theirKickoff()) {
         for (int i = 0; i < oppAgentsToMark.count(); i++) {
@@ -1069,8 +1078,9 @@ void CMarkPlan::findOppAgentsToMark() {
                 drawer->draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
             }
         }
-        if (nearestToBall != -1)
+        if (nearestToBall != -1) {
             oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
+        }
 
     }
 
@@ -1134,18 +1144,20 @@ void CMarkPlan::markPosesRefinePlayon() {
             if (indirect.contains(markPoses[i])) {
                 tempMarkSeg.assign(markPoses[i], wm->field->ourGoal());
                 indirect.intersection(tempMarkSeg, &sol1, &sol2);
-                if (sol1.x < sol2.x)
+                if (sol1.x < sol2.x) {
                     sol = sol1;
-                else
+                } else {
                     sol = sol2;
+                }
 
                 markPoses[i] = sol;
             }
         }
         // not invading the opponent field
         for (int i = 0; i < markPoses.count(); i++) {
-            if (markPoses[i].x > xKickoff)
+            if (markPoses[i].x > xKickoff) {
                 markPoses[i].x = xKickoff;
+            }
         }
     }
 }
@@ -1165,10 +1177,11 @@ QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
         if ((opp + (wm->field->ourGoal() - opp) * ratio).x < 0) {
             if (indirect.contains(opp + (wm->field->ourGoal() - opp) * ratio)) {
                 indirect.intersection(tempMarkSeg, &sol1, &sol2);
-                if (sol1.x < sol2.x)
+                if (sol1.x < sol2.x) {
                     sol = sol1;
-                else
+                } else {
                     sol = sol2;
+                }
 
                 tempQlist.append(sol);
                 tempQlist.append(opp - wm->field->ourGoal());
@@ -1182,10 +1195,11 @@ QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
         else {
             if (indirect.contains(opp + (wm->field->ourGoal() - opp) * ratio)) {
                 indirect.intersection(tempMarkSeg, &sol1, &sol2);
-                if (sol1.x < sol2.x)
+                if (sol1.x < sol2.x) {
                     sol = sol1;
-                else
+                } else {
                     sol = sol2;
+                }
 
                 tempQlist.append(sol);
                 tempQlist.append(opp - wm->field->ourGoal());

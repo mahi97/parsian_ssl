@@ -19,8 +19,9 @@ int GameState::getTheirScore() {
 void GameState::setRefree(ssl_refree_wrapperConstPtr ref_wrapper) {
 
 
-    if (ref_wrapper->command_counter == command_ctr)
+    if (ref_wrapper->command_counter == command_ctr) {
         return;
+    }
     command_ctr = ref_wrapper->command_counter;
     ///////////////////// when we are ready any command means force start
     if (isReady && (state != States::Start) && (ref_wrapper->command.command != ssl_refree_command::HALT)

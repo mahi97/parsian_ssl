@@ -30,8 +30,9 @@ void UDPSend::setport(int _port) {
 void UDPSend::send(std::string buf) {
 
     QByteArray datagram(buf.c_str(), buf.length());
-    if (connect)
+    if (connect) {
         socket->writeDatagram(datagram, host, port);
+    }
 //        ROS_INFO("sending byte: %lld", socket->writeDatagram(datagram, host, port));
 
 }

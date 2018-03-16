@@ -54,8 +54,9 @@ void RobotStatus::initPlugin(qt_gui_cpp::PluginContext &context) {
 
 void RobotStatus::rsCallback(const parsian_msgs::parsian_robots_statusConstPtr msg) {
 
-    for (int i = 0; i < msg->status.size(); i++)
+    for (int i = 0; i < msg->status.size(); i++) {
         statusWidget[i]->setMessage(msg->status[i]);
+    }
 }
 
 void RobotStatus::rcCallback(const parsian_msgs::parsian_robot_commandConstPtr msg) {

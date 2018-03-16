@@ -41,7 +41,9 @@ void PlannerNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) 
 }
 
 void PlannerNodelet::timerCb(const ros::TimerEvent& event) {
-    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+    if (debugger != nullptr) {
+        debug_pub.publish(debugger->debugs);
+    }
     if (drawer   != nullptr) {
         draw_pub.publish(drawer->draws);
         cleanDraws();
@@ -63,7 +65,11 @@ void PlannerNodelet::cleanDraws() const {
 void PlannerNodelet::plannerCb(const parsian_msgs::parsian_get_planConstPtr & _plan) {
     QList<int> ourRL;
     QList<int> oppRL;
-    for (const auto& id : _plan->ourRelaxList) ourRL.append(id);
-    for (const auto& id : _plan->oppRelaxList) oppRL.append(id);
+    for (const auto& id : _plan->ourRelaxList) {
+        ourRL.append(id);
+    }
+    for (const auto& id : _plan->oppRelaxList) {
+        oppRL.append(id);
+    }
     planner->initPathPlanner(Vector2D(_plan->goal), ourRL, oppRL, _plan->avoidPenaltyArea, _plan->avoidCenterCircle, _plan->ballObstacleRadius);
 }

@@ -56,8 +56,11 @@ double CSkillKickOneTouch::oneTouchAngle(Vector2D pos,
     AngleDeg::normalize_angle(th1);
     th  *= _RAD2DEG;
     float ang = 0;
-    if (theta > 0) ang = ang1 + th1;
-    else ang = ang1 - th1;
+    if (theta > 0) {
+        ang = ang1 + th1;
+    } else {
+        ang = ang1 - th1;
+    }
 
     return ang;
 }
@@ -73,8 +76,9 @@ Vector2D CSkillKickOneTouch::findMostPossible() {
     }
 
     for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-        if (wm->our.active(i)->id != agent->id())
+        if (wm->our.active(i)->id != agent->id()) {
             obstacles.append(Circle2D(wm->our.active(i)->pos, 0.1));
+        }
     }
     double prob, angle, biggestAngle;
 
@@ -95,9 +99,12 @@ void CSkillKickOneTouch::execute() {
     gotopointavoid->setOnetouchmode(false);
     gotopointavoid->setNoavoid(false);
 
-    if (shotToEmptySpot)
+    if (shotToEmptySpot) {
         target = findMostPossible();
-    if (!target.valid()) target = wm->field->oppGoal();
+    }
+    if (!target.valid()) {
+        target = wm->field->oppGoal();
+    }
 
 
 
@@ -129,14 +136,16 @@ void CSkillKickOneTouch::execute() {
     drawer->draw(oppPenaltyAreaWP, QColor(Qt::red));
     drawer->draw(oppPenaltyArea, QColor(Qt::red));
 
-    if (ballPos.dist(agentPos) <= onetouchRad)
+    if (ballPos.dist(agentPos) <= onetouchRad) {
         onetouchRad = ballPos.dist(agentPos) - stopParam;
+    }
     oneTouchArea.assign(agentPos, onetouchRad);
 
     if ((wm->ball->vel.length() < 0.4 && agentPos.dist(ballPos) > onetouchKickRad) || ((oneTouchArea.intersection(ballPath, &sol1, &sol2) ==
             0) && wm->ball->vel.length() >= 0.4 && agentPos.dist(ballPos) > onetouchKickRad)) {
-        if (!waitPos.isValid())
+        if (!waitPos.isValid()) {
             waitPos = agentPos;
+        }
         gotopointavoid->init(waitPos, oneTouchDir);
         gotopointavoid->execute();
         agent->setRoller(0);
@@ -200,8 +209,9 @@ void CSkillKickOneTouch::execute() {
         kick->setChip(chip);
         kick->execute();
     } else {
-        if (!waitPos.isValid())
+        if (!waitPos.isValid()) {
             waitPos = agentPos;
+        }
         gotopointavoid->init(waitPos, oneTouchDir);
         gotopointavoid->execute();
     }

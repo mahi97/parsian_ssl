@@ -76,10 +76,12 @@ std::string LatencyInfo<T>::info() {
 
 template<class T>
 void LatencyInfo<T>::updateetMinMax(int value) {
-    if (value < min)
+    if (value < min) {
         min = value;
-    if (value > max)
+    }
+    if (value > max) {
         max = value;
+    }
 }
 
 

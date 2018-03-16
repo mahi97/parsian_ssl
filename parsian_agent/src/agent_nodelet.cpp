@@ -52,7 +52,9 @@ void AgentNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) {
 }
 
 void AgentNodelet::timerCb(const ros::TimerEvent& event) {
-    if (debugger != nullptr) debug_pub.publish(debugger->debugs);
+    if (debugger != nullptr) {
+        debug_pub.publish(debugger->debugs);
+    }
     if (drawer   != nullptr) {
         // ROS_INFO_STREAM("agent drawer"<<drawer);
         draw_pub.publish(drawer->draws);

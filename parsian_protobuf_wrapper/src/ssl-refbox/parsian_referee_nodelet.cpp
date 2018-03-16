@@ -36,8 +36,11 @@ void RefreeNodelet::onInit() {
 void RefreeNodelet::reconnect() {
     delete refBox;
     refBox = new RoboCupSSLClient(networkConfig.port, networkConfig.ip);
-    if (!refBox->open(false)) ROS_WARN("Connection Failed.");
-    else ROS_INFO("Connected!");
+    if (!refBox->open(false)) {
+        ROS_WARN("Connection Failed.");
+    } else {
+        ROS_INFO("Connected!");
+    }
 
 }
 

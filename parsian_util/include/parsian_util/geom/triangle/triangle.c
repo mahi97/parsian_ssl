@@ -3701,23 +3701,23 @@ struct otri *t;
     }
 
     org(*t, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Origin[%d] = NULL\n", (t->orient + 1) % 3 + 3);
-    else
+    } else
         printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n",
                (t->orient + 1) % 3 + 3, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
     dest(*t, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Dest  [%d] = NULL\n", (t->orient + 2) % 3 + 3);
-    else
+    } else
         printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n",
                (t->orient + 2) % 3 + 3, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
     apex(*t, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Apex  [%d] = NULL\n", t->orient + 3);
-    else
+    } else
         printf("    Apex  [%d] = x%lx  (%.12g, %.12g)\n",
                t->orient + 3, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
@@ -3788,16 +3788,16 @@ struct osub *s;
     }
 
     sorg(*s, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Origin[%d] = NULL\n", 2 + s->ssorient);
-    else
+    } else
         printf("    Origin[%d] = x%lx  (%.12g, %.12g)\n",
                2 + s->ssorient, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
     sdest(*s, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Dest  [%d] = NULL\n", 3 - s->ssorient);
-    else
+    } else
         printf("    Dest  [%d] = x%lx  (%.12g, %.12g)\n",
                3 - s->ssorient, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
@@ -3818,16 +3818,16 @@ struct osub *s;
     }
 
     segorg(*s, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Segment origin[%d] = NULL\n", 4 + s->ssorient);
-    else
+    } else
         printf("    Segment origin[%d] = x%lx  (%.12g, %.12g)\n",
                4 + s->ssorient, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);
     segdest(*s, printvertex);
-    if (printvertex == (vertex) NULL)
+    if (printvertex == (vertex) NULL) {
         printf("    Segment dest  [%d] = NULL\n", 5 - s->ssorient);
-    else
+    } else
         printf("    Segment dest  [%d] = x%lx  (%.12g, %.12g)\n",
                5 - s->ssorient, (unsigned long) printvertex,
                printvertex[0], printvertex[1]);

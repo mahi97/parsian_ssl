@@ -34,6 +34,8 @@ void COurPenalty::penaltyKick() {
 }
 
 void COurPenalty::execute_x() {
-    if (agents.empty()) return;
+    if (agents.empty()) {
+        return;
+    }
     penaltyKick();
 }

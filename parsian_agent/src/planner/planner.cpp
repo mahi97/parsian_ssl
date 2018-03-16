@@ -22,9 +22,9 @@ CPlanner::~CPlanner() = default;
 Vector2D CPlanner::chooseTarget(Vector2D &GOAL) {
     double p = drand48();
     unsigned long idx;
-    if (p <= goalProb)
+    if (p <= goalProb) {
         return GOAL;
-    else if (! result.empty() && goalProb < p && p < wayPointProb + goalProb) {
+    } else if (! result.empty() && goalProb < p && p < wayPointProb + goalProb) {
         idx = rand() % result.size();
         return result[idx];
     } else {
@@ -37,9 +37,9 @@ Vector2D CPlanner::chooseTarget(Vector2D &GOAL) {
 
 state *CPlanner::extendTree(state *&NEAREST , Vector2D &GOAL , Vector2D &TARGET , vector<Vector2D> &res) {
     Vector2D temp;
-    if (NEAREST->pos.dist(GOAL) < stepSize)
+    if (NEAREST->pos.dist(GOAL) < stepSize) {
         temp = GOAL;
-    else {
+    } else {
         temp = NEAREST->pos + (TARGET - NEAREST->pos).norm() * stepSize;
     }
 
@@ -75,12 +75,14 @@ void CPlanner::checkAgent() {
     if (!obst.check(goal , obsid)) {
         for (int i = 0; i < obsid.count(); i++) {
             //// except penalty area (((( DOUBLE DEFENDE ))))
-            if (obst.obs[obsid.at(i)].pos.dist(Vector2D(-3.20 , 0)) < 0.1 && fabs(obst.obs[obsid.at(i)].rad.x - 1.1) < 0.2)
+            if (obst.obs[obsid.at(i)].pos.dist(Vector2D(-3.20 , 0)) < 0.1 && fabs(obst.obs[obsid.at(i)].rad.x - 1.1) < 0.2) {
                 continue;
+            }
 
             //// except center circle
-            if (obst.obs[obsid.at(i)].pos.dist(Vector2D(0 , 0)) < 0.1 && fabs(obst.obs[obsid.at(i)].rad.x - 0.5) < 0.1)
+            if (obst.obs[obsid.at(i)].pos.dist(Vector2D(0 , 0)) < 0.1 && fabs(obst.obs[obsid.at(i)].rad.x - 0.5) < 0.1) {
                 continue;
+            }
 
             double lastRad = obst.obs[obsid.at(i)].rad.x;
             double newRad = obst.obs[obsid.at(i)].pos.dist(goal) - 0.07;
@@ -221,10 +223,11 @@ void CPlanner::runPlanner() {
                 nearestToGoal = nodes.allNodes[i];
                 if (obst.check(middleNode->pos , nearestToGoal->pos) && \
                         ((result.size() && middleNode->dist + nearestToGoal->dist < mn) || (result.size() == 0 && middleNode->dist + nearestToGoal->dist + middleNode->pos.dist(nearestToGoal->pos) < mn))) {
-                    if (result.size())
+                    if (result.size()) {
                         mn = (middleNode->dist + nearestToGoal->dist);
-                    else
+                    } else {
                         mn =  middleNode->dist + nearestToGoal->dist + middleNode->pos.dist(nearestToGoal->pos);
+                    }
                     one = middleNode;
                     two = nearestToGoal;
 
@@ -271,10 +274,11 @@ void CPlanner::runPlanner() {
         //draw(Segment2D(result[i],result[i-1]),QColor(Qt::red));
     }
     //////////////////////////////////////////////////path smoothing
-    if (temp.size() > 1)
+    if (temp.size() > 1) {
         resultModified.push_back(std::move(temp.back()));
-    else
+    } else {
         resultModified.push_back(target);
+    }
 
     auto compNodeNum = static_cast<int>(temp.size() - 1);
     for (int i = ((int)(temp.size())) - 1 ; i > 1 ; i--) {
@@ -295,8 +299,9 @@ void CPlanner::runPlanner() {
         }
     }
 
-    if (resultModified.size() == 1)
+    if (resultModified.size() == 1) {
         resultModified.push_back(temp[0]);
+    }
 
     //////////////////////////////////////////////////////
     RresultModified.assign(resultModified.begin() , resultModified.end());
@@ -304,20 +309,22 @@ void CPlanner::runPlanner() {
 
     // miangin vazn dar, az direction harkat
     Vector2D newDir;
-    if (resultModified.size() > 1)
+    if (resultModified.size() > 1) {
         newDir = (resultModified[1] - resultModified[0]).norm();
-    else
+    } else {
         newDir = (goal - Rgoal).norm();
+    }
     int cntcnt = 8;
     int vd = 1;
     if (dirs.count() > cntcnt - 1) {
         averageDir = (averageDir * (cntcnt + (vd - 1)) - dirs.at(0) - (vd - 1) * dirs.last() + vd * newDir) / (cntcnt + (vd - 1));
         dirs.pop_front();
     } else {
-        if (dirs.count())
+        if (dirs.count()) {
             averageDir = (averageDir * (dirs.count() + (vd - 1)) - (vd - 1) * dirs.last() + vd * newDir) / (dirs.count() + vd);
-        else
+        } else {
             averageDir = newDir;
+        }
     }
     dirs.push_back(newDir);
 
@@ -339,12 +346,14 @@ void CPlanner::Draw() {
 
 
     for (int i = 0 ; i < nodes.size() ; i++)
-        if (nodes.allNodes[i]->parent)
+        if (nodes.allNodes[i]->parent) {
             drawer->draw(Segment2D(nodes.allNodes[i]->pos , nodes.allNodes[i]->parent->pos) , "white");
+        }
 
     for (int i = 0 ; i < Rnodes.size() ; i++)
-        if (Rnodes.allNodes[i]->parent)
+        if (Rnodes.allNodes[i]->parent) {
             drawer->draw(Segment2D(Rnodes.allNodes[i]->pos , Rnodes.allNodes[i]->parent->pos) , "gray");
+        }
 
 }
 
@@ -396,8 +405,9 @@ void CPlanner::initPathPlanner(Vector2D _goal, const QList<int>& _ourRelaxList, 
         wm->field->marginedField().intersection(Segment2D(Vector2D(0, 0) , _goal) , sol1 , sol2);
         if (sol1->valid()) {
             _goal = *sol1;
-        } else
+        } else {
             _goal = Vector2D(0, 0);
+        }
     }
 
     resetPlanner(_goal);
@@ -408,8 +418,9 @@ void CPlanner::initPathPlanner(Vector2D _goal, const QList<int>& _ourRelaxList, 
     avoidCenterArea = _avoidCenterArea;
 
     ourRelaxList.clear();
-    for (int i : _ourRelaxList)
+    for (int i : _ourRelaxList) {
         ourRelaxList.append(i);
+    }
     ourRelaxList.append(ID);
 
 
@@ -422,10 +433,11 @@ void CPlanner::initPathPlanner(Vector2D _goal, const QList<int>& _ourRelaxList, 
     stepSize     = conf->Extend_Step;
     threshold    = conf->Target_Distance_Threshold;
     wayPointProb = conf->Waypoint_Catch_Probablity;
-    if (! result.empty())
+    if (! result.empty()) {
         goalProb = conf->Goal_Probablity;
-    else
+    } else {
         goalProb = 0.5;
+    }
 
     robotVel = wm->our[idx]->vel;
 
@@ -554,8 +566,9 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         }
     }
 
-    if (ballObstacleRadius > EPSILON)
+    if (ballObstacleRadius > EPSILON) {
         obs.add_circle(wm->ball->pos.x, wm->ball->pos.y, ballObstacleRadius, wm->ball->vel.x , wm->ball->vel.y);
+    }
 
     if (avoidPenaltyArea) {
 
@@ -568,8 +581,9 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         obs.add_circle(0 , 0 , field._CENTER_CIRCLE_RAD , 0 , 0);
     }
 
-    if (!obs.check(goal))
+    if (!obs.check(goal)) {
         drawer->draw(Vector2D(0, 0));
+    }
 
 
 }

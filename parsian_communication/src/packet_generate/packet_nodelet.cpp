@@ -51,8 +51,9 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
 
     outputBuffer[0] = 0x99;
     outputBuffer[1] = robotId & static_cast<unsigned char>(0x0F);
-    if (_packet->roller_speed != 0)
+    if (_packet->roller_speed != 0) {
         outputBuffer[1] = static_cast<unsigned char>(outputBuffer[1] | ((_packet->roller_speed & 0x07) << 4));
+    }
     outputBuffer[2] = static_cast<unsigned char>(kickNumber & 0x7F);
     outputBuffer[3] = static_cast<unsigned char>((kickNumber >> 7) & 0x07);
 
@@ -60,14 +61,26 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     int vnormalI  = static_cast<int>(floor(_packet->vel_N * 487.0));
     int vangularI  = static_cast<int>((_packet->vel_w) * ((double)256.0 / (double) 360.0));
 
-    if (vforwardI > 2047) vforwardI = 2047;
-    if (vforwardI < -2047) vforwardI = -2047;
+    if (vforwardI > 2047) {
+        vforwardI = 2047;
+    }
+    if (vforwardI < -2047) {
+        vforwardI = -2047;
+    }
 
-    if (vnormalI > 2047) vnormalI = 2047;
-    if (vnormalI < -2047) vnormalI = -2047;
+    if (vnormalI > 2047) {
+        vnormalI = 2047;
+    }
+    if (vnormalI < -2047) {
+        vnormalI = -2047;
+    }
 
-    if (vangularI > 2047) vangularI = 2047;
-    if (vangularI < -2047) vangularI = -2047;
+    if (vangularI > 2047) {
+        vangularI = 2047;
+    }
+    if (vangularI < -2047) {
+        vangularI = -2047;
+    }
 
     int vangularAbs = abs(vangularI);
     int vforwardAbs = abs(vforwardI);
@@ -78,8 +91,12 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
     outputBuffer[4] = static_cast<unsigned char>(vforwardAbs & 0x7F);
     outputBuffer[5] = static_cast<unsigned char>(vnormalAbs & 0x7F);
     outputBuffer[6] = static_cast<unsigned char>((vforwardAbs >> 7) & 0x0F);
-    if (vforwardI < 0) outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x10);
-    if (vnormalI < 0) outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x20);
+    if (vforwardI < 0) {
+        outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x10);
+    }
+    if (vnormalI < 0) {
+        outputBuffer[6] = static_cast<unsigned char>(outputBuffer[6] | 0x20);
+    }
 
     outputBuffer[7] = static_cast<unsigned char>(vangularAbs & 0x7F);
 
@@ -87,10 +104,12 @@ void PacketNodelet::callBack(const parsian_msgs::parsian_robot_commandConstPtr &
         outputBuffer[8] |= 0x01;
     }
 
-    if (_packet->chip)
+    if (_packet->chip) {
         outputBuffer[8] = outputBuffer[8] | 0x02;
-    if (vangularI < 0)
+    }
+    if (vangularI < 0) {
         outputBuffer[8] = outputBuffer[8] | 0x04;
+    }
     outputBuffer[8] = outputBuffer[8] | (((vnormalAbs >> 7) & 0x0F) << 3);
 
 
@@ -138,8 +157,9 @@ void PacketNodelet::timerCb(const ros::TimerEvent &event) {
         drawPub.publish(drawer->draws);
         ROS_INFO_STREAM("packet draw " << drawer);
     }
-    if (debugger != nullptr)
+    if (debugger != nullptr) {
         debugPub.publish(debugger->debugs);
+    }
 
 
 

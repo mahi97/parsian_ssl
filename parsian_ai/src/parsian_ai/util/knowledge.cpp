@@ -80,10 +80,11 @@ inline float len(float x1, float y1, float x2, float y2) {
 }
 
 int factorial(int n) {
-    if (n == 1 | n == 0)
+    if (n == 1 | n == 0) {
         return 1;
-    else
+    } else {
         return n * factorial(n - 1);
+    }
 }
 
 double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
@@ -104,10 +105,11 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
     }
     Vector2D goal_pos;
 
-    if (oppGoal)
+    if (oppGoal) {
         goal_pos = wm->field->oppGoal();
-    else
+    } else {
         goal_pos = wm->field->ourGoal();
+    }
 
     float gx1 = p1.x;
     float gy1 = p1.y;
@@ -131,8 +133,9 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
     d = 0;
     CKnowledge::range r[20];
     bool flag[20];
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 20; i++) {
         flag[i] = false;
+    }
     al = getAngle(x, y, (gx1 + gx2) * 0.5, (gy1 + gy2) * 0.5);
     q1 = getAngle(x, y, gx1, gy1) - al;
     q2 = getAngle(x, y, gx2, gy2) - al;
@@ -155,20 +158,34 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
         }
         a1 = ox * la + oy * lb + lc;
         a2 = x * la + y * lb + lc;
-        if (a1 > 0) a1 = 1;
-        else a1 = -1;
-        if (a2 > 0) a2 = 1;
-        else a2 = -1;
+        if (a1 > 0) {
+            a1 = 1;
+        } else {
+            a1 = -1;
+        }
+        if (a2 > 0) {
+            a2 = 1;
+        } else {
+            a2 = -1;
+        }
         a1 = a1 * a2;
         if (a1 > 0) {
             a = normalang(getAngle(x, y, ox, oy) - al);
             a0 = asin(rad / l);
             a1 = a - a0;
             a2 = a + a0;
-            if (a1 < -M_PI * 0.95 * 0.5) a1 = -M_PI * 0.95 * 0.5;
-            if (a2 < -M_PI * 0.95 * 0.5) a2 = -M_PI * 0.95 * 0.5;
-            if (a1 > +M_PI * 0.95 * 0.5) a1 =  M_PI * 0.95 * 0.5;
-            if (a2 > +M_PI * 0.95 * 0.5) a2 =  M_PI * 0.95 * 0.5;
+            if (a1 < -M_PI * 0.95 * 0.5) {
+                a1 = -M_PI * 0.95 * 0.5;
+            }
+            if (a2 < -M_PI * 0.95 * 0.5) {
+                a2 = -M_PI * 0.95 * 0.5;
+            }
+            if (a1 > +M_PI * 0.95 * 0.5) {
+                a1 =  M_PI * 0.95 * 0.5;
+            }
+            if (a2 > +M_PI * 0.95 * 0.5) {
+                a2 =  M_PI * 0.95 * 0.5;
+            }
             if (normalang(a1 - a2) > 0) {
                 a = a1;
                 a1 = a2;
@@ -176,10 +193,18 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
             }
             a1 = normalang(a1);
             a2 = normalang(a2);
-            if (normalang(a1 - q1) <= 0) a1 = q1;
-            if (normalang(a1 - q2) >= 0) a1 = q2;
-            if (normalang(a2 - q1) <= 0) a2 = q1;
-            if (normalang(a2 - q2) >= 0) a2 = q2;
+            if (normalang(a1 - q1) <= 0) {
+                a1 = q1;
+            }
+            if (normalang(a1 - q2) >= 0) {
+                a1 = q2;
+            }
+            if (normalang(a2 - q1) <= 0) {
+                a2 = q1;
+            }
+            if (normalang(a2 - q2) >= 0) {
+                a2 = q2;
+            }
             if (std::fabs(normalang(a1 - a2)) >= 0.001) {
                 r[count].a = a1;
                 r[count].b = a2;
@@ -292,8 +317,11 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2,
         d /= std::fabs(normalang(q2 - q1));
         d = 1 - d;
         if (!changed || (d < 0.001)) {
-            if (count == 0) biggestAngle = std::fabs(normalang(q2 - q1));
-            else biggestAngle = 0;
+            if (count == 0) {
+                biggestAngle = std::fabs(normalang(q2 - q1));
+            } else {
+                biggestAngle = 0;
+            }
             mostOpenAngle = normalang(normalang(q2 - q1) / 2.0 + q1);
         }
         mostOpenAngle = normalang(mostOpenAngle + al);
@@ -363,10 +391,18 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2, QList<Circ
                 s2.angle = ang1;
                 s1.angle = ang2;
             }
-            if ((s1 >= q1) && (s1 <= q2)) r.append(s1);
-            if ((s2 >= q1) && (s2 <= q2)) r.append(s2);
-            if ((s1 <= q1) && (s2 >= q1)) r[0].begin = true;
-            if ((s2 >= q2) && (s1 <= q2)) r[1].begin = false;
+            if ((s1 >= q1) && (s1 <= q2)) {
+                r.append(s1);
+            }
+            if ((s2 >= q1) && (s2 <= q2)) {
+                r.append(s2);
+            }
+            if ((s1 <= q1) && (s2 >= q1)) {
+                r[0].begin = true;
+            }
+            if ((s2 >= q2) && (s1 <= q2)) {
+                r[1].begin = false;
+            }
             /*            if (!(s1 < q1 || (!(s1 < q2)))) r.append(s1);
             else {
                 if ((s1 < q1) && (!(s2 < q1))) r[0].begin = true;
@@ -380,25 +416,36 @@ double Knowledge::getEmptyAngle(Vector2D p, Vector2D p1, Vector2D p2, QList<Circ
         }
     }
 
-    for (int i = 0; i < r.count(); i++)
+    for (int i = 0; i < r.count(); i++) {
         drawer->draw(Segment2D(p, p + Vector2D::unitVector(r[i].angle)), "red");
+    }
 
     emptyAngles.clear();
     AngleRange rng;
     rng.begin = r[0].angle;
     rng.end = r[0].angle;
-    if (r[0].begin) emptyAngles.append(rng);
+    if (r[0].begin) {
+        emptyAngles.append(rng);
+    }
     rng.begin = r[1].angle;
     rng.end = r[1].angle;
-    if (!r[1].begin) emptyAngles.append(rng);
+    if (!r[1].begin) {
+        emptyAngles.append(rng);
+    }
     qSort(r.begin(), r.end());
     double ang = 0.0;
     biggestAngle = 0.0;
     int par = 0;
     for (int i = 0; i < r.count() - 1; i++) {
-        if (r[i].begin) par ++;
-        if (!r[i].begin) par --;
-        if (par < 0) par = 0;
+        if (r[i].begin) {
+            par ++;
+        }
+        if (!r[i].begin) {
+            par --;
+        }
+        if (par < 0) {
+            par = 0;
+        }
         if (i >= 0) {
             if (!r[i].begin && r[i + 1].begin && (par == 0)) {
                 AngleRange tempRange;
@@ -450,9 +497,13 @@ Vector2D Knowledge::getEmptyPosOnGoal(Vector2D from, double &regionWidth, bool o
     //    if (wOpenness > 0.5)
     //        regionWidth = regionWidth * goalWidth / 30.0;
     //  debug(QString("regionWidth : %1 wOpenness : %2").arg(regionWidth).arg(wOpenness),D_SEPEHR);
-    if (regionWidth > 1.0) regionWidth = 1.0;
+    if (regionWidth > 1.0) {
+        regionWidth = 1.0;
+    }
     Vector2D p = Segment2D(goalL, goalR).intersection(Line2D(from, AngleDeg(angle)));
-    if (p.valid()) return p;
+    if (p.valid()) {
+        return p;
+    }
     return (goalL + goalR) / 2.0;
 }
 
@@ -582,11 +633,13 @@ bool Knowledge::isPointClear(Vector2D point, Vector2D from, double radBig, doubl
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
 
         if ((wm->opp.active(i)->inSight > 0.0)) {
-            if (considerRelaxedIDs && oppRelaxedIDs.contains(wm->opp.activeAgentID(i)))
+            if (considerRelaxedIDs && oppRelaxedIDs.contains(wm->opp.activeAgentID(i))) {
                 continue;
+            }
             double r = radBig;
-            if (oppSmallIDs.contains(wm->opp.activeAgentID(i)))
+            if (oppSmallIDs.contains(wm->opp.activeAgentID(i))) {
                 r = radSmall;
+            }
             Circle2D c(wm->opp.active(i)->pos, r);
             if (c.intersection(l, &posIntersect1, &posIntersect2) != 0) {
                 return false;
@@ -596,11 +649,13 @@ bool Knowledge::isPointClear(Vector2D point, Vector2D from, double radBig, doubl
 
     for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
         if (wm->our.active(i)->inSight > 0.0) {
-            if (considerRelaxedIDs && ourRelaxedIDs.contains(wm->our.activeAgentID(i)))
+            if (considerRelaxedIDs && ourRelaxedIDs.contains(wm->our.activeAgentID(i))) {
                 continue;
+            }
             double r = radBig;
-            if (ourSmallIDs.contains(wm->our.activeAgentID(i)))
+            if (ourSmallIDs.contains(wm->our.activeAgentID(i))) {
                 r = radSmall;
+            }
             Circle2D c(wm->our.active(i)->pos, r);
             if (c.intersection(l, &posIntersect1, &posIntersect2) != 0) {
                 return false;
@@ -618,8 +673,9 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
 
     // reset everything
     NewFastestToBall result;
-    if (!wm->field->fieldRect().contains(wm->ball->pos))
+    if (!wm->field->fieldRect().contains(wm->ball->pos)) {
         return result;
+    }
 
     double t = 0;
     Vector2D ballPredict;
@@ -644,18 +700,20 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
         Vector2D center;
         double radius;
         for (int i = 0; i < ourList.count(); i++) {
-            if (ourCalced[i])
+            if (ourCalced[i]) {
                 continue;
+            }
             center = wm->our[ourList[i]]->pos + wm->our[ourList[i]]->vel * t;
             tToVMax = (robotMaxVel - wm->our[ourList[i]]->vel.length()) / robotMAxAcc;
             radius = 0;
-            if (tToVMax > t)
+            if (tToVMax > t) {
                 radius = 0.5 * robotMAxAcc * t * t + wm->our[ourList[i]]->vel.length() * t;
-            else if (tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel) {
+            } else if (tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel) {
                 radius = 0.5 * robotMAxAcc * tToVMax * tToVMax + wm->our[ourList[i]]->vel.length() * tToVMax;
                 radius += (t - tToVMax) * robotMaxVel;
-            } else
+            } else {
                 radius = t * wm->our[ourList[i]]->vel.length();
+            }
             radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D(center, radius);
             Vector2D s0, s2;
@@ -670,18 +728,20 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             //            draw( cir, 0 , 360, "red");
         }
         for (int i = 0; i < oppList.count(); i++) {
-            if (oppCalced[i])
+            if (oppCalced[i]) {
                 continue;
+            }
             center = wm->opp[oppList[i]]->pos + wm->opp[oppList[i]]->vel * t;
             tToVMax = (robotMaxVel - wm->opp[oppList[i]]->vel.length()) / robotMAxAcc;
             radius = 0;
-            if (tToVMax > t)
+            if (tToVMax > t) {
                 radius = 0.5 * robotMAxAcc * t * t + wm->opp[oppList[i]]->vel.length() * t;
-            else if (tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel) {
+            } else if (tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel) {
                 radius = 0.5 * robotMAxAcc * tToVMax * tToVMax + wm->opp[oppList[i]]->vel.length() * tToVMax;
                 radius += (t - tToVMax) * robotMaxVel;
-            } else
+            } else {
                 radius = t * wm->opp[oppList[i]]->vel.length();
+            }
             radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D(center, radius) ;
             Vector2D s0, s2;
@@ -699,8 +759,9 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
     }
     qSort(result.ourF.begin() , result.ourF.end());
     qSort(result.oppF.begin() , result.oppF.end());
-    if (result.catch_time > 10)
+    if (result.catch_time > 10) {
         result.catch_time = 0;
+    }
     return result;
 }
 
@@ -714,8 +775,9 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
     while (true) {
         Vector2D ballPos = wm->ball->pos;//(min(time, f.catch_time));
         //            draw(ballPos, 1, "red");
-        if (wm->ball->vel.length() < 0.05)
+        if (wm->ball->vel.length() < 0.05) {
             ballPos = wm->ball->pos;
+        }
         double rad = time * 0.6 + 0.2;
         if (f.ourFastest == -1)
             for (int i = 0; i < ourList.count(); i++) {
@@ -723,8 +785,9 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
                 if (playerPos.dist(ballPos) < rad) {
                     f.ourFastest = ourList[i];
                     f.ourFastestTime = time;
-                    if (time < f.catch_time)
+                    if (time < f.catch_time) {
                         f.catch_time = time;
+                    }
                     break;
                 }
             }
@@ -735,8 +798,9 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
                 if (playerPos.dist(ballPos) < rad) {
                     f.oppFastest = oppList[i];
                     f.oppFastestTime = time;
-                    if (time < f.catch_time)
+                    if (time < f.catch_time) {
                         f.catch_time = time;
+                    }
                     break;
                 }
             }
@@ -760,8 +824,9 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
                         }
                     }
                     f.ourFastestTime = time;
-                    if (time < f.catch_time)
+                    if (time < f.catch_time) {
                         f.catch_time = time;
+                    }
                 }
                 if (f.oppFastest == -1 and oppList.count() > 0) {
                     double min = 99999;
@@ -774,8 +839,9 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
                         }
                     }
                     f.oppFastestTime = time;
-                    if (time < f.catch_time)
+                    if (time < f.catch_time) {
                         f.catch_time = time;
+                    }
                 }
             }
             break;
@@ -793,8 +859,9 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
 
     // reset everything
     NewFastestToBall result;
-    if (!wm->field->fieldRect().contains(wm->ball->pos))
+    if (!wm->field->fieldRect().contains(wm->ball->pos)) {
         return result;
+    }
 
     double t = 0;
     Vector2D ballPredict;
@@ -821,18 +888,20 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
         Vector2D center;
         double radius;
         for (int i = 0; i < ourList.count(); i++) {
-            if (ourCalced[i])
+            if (ourCalced[i]) {
                 continue;
+            }
             center = wm->our[ourList[i]]->pos + wm->our[ourList[i]]->vel * t;
             tToVMax = (robotMaxVel - wm->our[ourList[i]]->vel.length()) / robotMAxAcc;
             radius = 0;
-            if (tToVMax > t)
+            if (tToVMax > t) {
                 radius = 0.5 * robotMAxAcc * t * t + wm->our[ourList[i]]->vel.length() * t;
-            else if (tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel) {
+            } else if (tToVMax > 0 && wm->our[ourList[i]]->vel.length() < robotMaxVel) {
                 radius = 0.5 * robotMAxAcc * tToVMax * tToVMax + wm->our[ourList[i]]->vel.length() * tToVMax;
                 radius += (t - tToVMax) * robotMaxVel;
-            } else
+            } else {
                 radius = t * wm->our[ourList[i]]->vel.length();
+            }
             radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D(center, radius);
             Vector2D s0, s2;
@@ -847,18 +916,20 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
             //            draw( cir, 0 , 360, "red");
         }
         for (int i = 0; i < oppList.count(); i++) {
-            if (oppCalced[i])
+            if (oppCalced[i]) {
                 continue;
+            }
             center = wm->opp[oppList[i]]->pos + wm->opp[oppList[i]]->vel * t;
             tToVMax = (robotMaxVel - wm->opp[oppList[i]]->vel.length()) / robotMAxAcc;
             radius = 0;
-            if (tToVMax > t)
+            if (tToVMax > t) {
                 radius = 0.5 * robotMAxAcc * t * t + wm->opp[oppList[i]]->vel.length() * t;
-            else if (tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel) {
+            } else if (tToVMax > 0 && wm->opp[oppList[i]]->vel.length() < robotMaxVel) {
                 radius = 0.5 * robotMAxAcc * tToVMax * tToVMax + wm->opp[oppList[i]]->vel.length() * tToVMax;
                 radius += (t - tToVMax) * robotMaxVel;
-            } else
+            } else {
                 radius = t * wm->opp[oppList[i]]->vel.length();
+            }
             radius += Robot::robot_radius_old;
             Circle2D cir = Circle2D(center, radius) ;
             Vector2D s0, s2;
@@ -876,8 +947,9 @@ NewFastestToBall Knowledge::newFastestToBall(double timeStep, QList<int> ourList
     }
     qSort(result.ourF.begin() , result.ourF.end());
     qSort(result.oppF.begin() , result.oppF.end());
-    if (result.catch_time > 10)
+    if (result.catch_time > 10) {
         result.catch_time = 0;
+    }
     return result;
 }
 
@@ -899,19 +971,22 @@ double Knowledge::chipGoalPropability(bool isOurChip, Vector2D _goaliePos) {
     GoalieDistanseToBall = wm->ball->pos.dist(goaliePos);
     GoalDistanceToGoalie = goaliePos.dist(goal);
     if (goaliePos.dist(wm->ball->pos) < 0.35
-            || wm->ball->pos.dist(goal) < 1)
+            || wm->ball->pos.dist(goal) < 1) {
         return 0;
-    else if (((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2 > 0)
+    } else if (((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2 > 0) {
         return ((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2;
-    else return 0;
+    } else {
+        return 0;
+    }
 }
 
 int Knowledge::getNearestOppToPoint(Vector2D point) {
     double minDist = 1.0e13;
     int nearest = -1;
     for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-        if (wm->opp.active(i)->inSight <= 0)
+        if (wm->opp.active(i)->inSight <= 0) {
             continue;
+        }
         double dist = (wm->opp.active(i)->pos - point).length();
         if (dist < minDist) {
             minDist = dist;
@@ -943,11 +1018,13 @@ double Knowledge::chipGoalPropability(bool isOurChip) {
     GoalieDistanseToBall = wm->ball->pos.dist(goaliePos);
     GoalDistanceToGoalie = goaliePos.dist(goal);
     if (goaliePos.dist(wm->ball->pos) < 0.35
-            || wm->ball->pos.dist(goal) < 1)
+            || wm->ball->pos.dist(goal) < 1) {
         return 0;
-    else if (((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2 > 0)
+    } else if (((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2 > 0) {
         return ((GoalDistanceToBall - GoalieDistanseToBall) / GoalDistanceToGoalie) * 2;
-    else return 0;
+    } else {
+        return 0;
+    }
 
 
 }

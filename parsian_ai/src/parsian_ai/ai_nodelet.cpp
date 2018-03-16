@@ -50,8 +50,12 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
 
     // ai->execute();
 
-    if (drawer != nullptr)   drawPub.publish(drawer->draws);
-    if (debugger != nullptr) debugPub.publish(debugger->debugs);
+    if (drawer != nullptr) {
+        drawPub.publish(drawer->draws);
+    }
+    if (debugger != nullptr) {
+        debugPub.publish(debugger->debugs);
+    }
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {

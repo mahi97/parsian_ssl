@@ -75,8 +75,12 @@ inline num1 bound(num1 x, num2 low, num2 high) MustUseResult;
 
 template <class num1, class num2>
 inline num1 bound(num1 x, num2 low, num2 high) {
-    if (x < low) x = low;
-    if (x > high) x = high;
+    if (x < low) {
+        x = low;
+    }
+    if (x > high) {
+        x = high;
+    }
     return (x);
 }
 
@@ -87,8 +91,12 @@ template <class num1, class num2>
 inline num1 abs_bound(num1 x, num2 range)
 // bound absolute value x in [-range,range]
 {
-    if (x < -range) x = -range;
-    if (x >  range) x =  range;
+    if (x < -range) {
+        x = -range;
+    }
+    if (x >  range) {
+        x =  range;
+    }
     return (x);
 }
 
@@ -150,7 +158,9 @@ template <class data_t>
 inline int max_idx(data_t *arr, int num) {
     int mi = 0;
     for (int i = 1; i < num; i++) {
-        if (arr[i] > arr[mi]) mi = i;
+        if (arr[i] > arr[mi]) {
+            mi = i;
+        }
     }
     return (mi);
 }
@@ -159,16 +169,24 @@ template <class data_t>
 inline int min_idx(data_t *arr, int num) {
     int mi = 0;
     for (int i = 1; i < num; i++) {
-        if (arr[i] < arr[mi]) mi = i;
+        if (arr[i] < arr[mi]) {
+            mi = i;
+        }
     }
     return (mi);
 }
 
 template <class num>
 inline void sort(num &a, num &b, num &c) {
-    if (a > b) swap(a, b);
-    if (b > c) swap(b, c);
-    if (a > b) swap(a, b);
+    if (a > b) {
+        swap(a, b);
+    }
+    if (b > c) {
+        swap(b, c);
+    }
+    if (a > b) {
+        swap(a, b);
+    }
 }
 
 template <class num>
@@ -280,8 +298,12 @@ real ramp(real x, real x0, real x1)
 // linear ramp from f(x0)=0 to f(x1)=1, with output bounded to [0,1]
 // returns f(x)
 {
-    if (x < x0) return (0);
-    if (x > x1) return (1);
+    if (x < x0) {
+        return (0);
+    }
+    if (x > x1) {
+        return (1);
+    }
     return ((x - x0) / (x1 - x0));
 }
 
@@ -290,8 +312,12 @@ real ramp(real x, real x0, real y0, real x1, real y1)
 // linear ramp from f(x0)=y0 to f(x1)=y1, with output bounded to [y0,y1]
 // returns f(x)
 {
-    if (x < x0) return (y0);
-    if (x > x1) return (y1);
+    if (x < x0) {
+        return (y0);
+    }
+    if (x > x1) {
+        return (y1);
+    }
     return (y0 + (y1 - y0) * (x - x0) / (x1 - x0));
 }
 
@@ -376,9 +402,13 @@ template <class real>
 real avg_angle(real left, real right) {
     real result;
 
-    if (left < right) left += 2 * M_PI;
+    if (left < right) {
+        left += 2 * M_PI;
+    }
     result = (left + right) / 2;
-    if (result > M_PI) result -= 2 * M_PI;
+    if (result > M_PI) {
+        result -= 2 * M_PI;
+    }
 
     return (result);
 }
@@ -401,7 +431,9 @@ real abs_bound_angle(real bound_angle, real tolerance, real a) {
 template <class data>
 int find_item(const data *arr, int num, data key) {
     int i = 0;
-    while (i < num && !(arr[i] == key)) i++;
+    while (i < num && !(arr[i] == key)) {
+        i++;
+    }
     return (i);
 }
 
@@ -411,7 +443,9 @@ data *alloc_array(data *arr, num &size, num new_size) MustUseResult;
 template <class data, class num>
 data *alloc_array(data *arr, num &size, num new_size) {
     if ((arr != NULL && new_size == size) ||
-            (arr == NULL && new_size == 0)) return (arr);
+            (arr == NULL && new_size == 0)) {
+        return (arr);
+    }
 
     delete[](arr);
     arr = new data[new_size];
@@ -422,12 +456,16 @@ data *alloc_array(data *arr, num &size, num new_size) {
 template <class data, class num>
 data *resize_array(data *arr, num &size, num new_size, num cur_used) {
     if ((arr != NULL && new_size == size) ||
-            (arr == NULL && new_size == 0)) return (arr);
+            (arr == NULL && new_size == 0)) {
+        return (arr);
+    }
 
     data *narr = new data[new_size];
     if (narr) {
         // copy existing data
-        for (num i = 0; i < cur_used; i++) narr[i] = arr[i];
+        for (num i = 0; i < cur_used; i++) {
+            narr[i] = arr[i];
+        }
         delete[](arr);
         size = new_size;
         return (narr);
@@ -455,7 +493,9 @@ data *alloc_array2(data *arr, num &w, num &h,
     int new_size = new_w * new_h;
 
     if ((arr != NULL && new_size == size) ||
-            (arr == NULL && new_size == 0)) return (arr);
+            (arr == NULL && new_size == 0)) {
+        return (arr);
+    }
 
     delete[](arr);
     arr = new data[new_size];
@@ -472,7 +512,9 @@ data *alloc_array2(data *arr, num &w, num &h,
 template <class data>
 void set_range(data *arr, int start, int num, const data &val) {
     num += start;
-    for (int i = start; i < num; i++) arr[i] = val;
+    for (int i = start; i < num; i++) {
+        arr[i] = val;
+    }
 }
 
 //==== Template-based Memory Operations ==============================//
@@ -481,7 +523,9 @@ template <class data>
 inline int mcopy(data *dest, data *src, int num) {
     int i;
 
-    for (i = 0; i < num; i++) dest[i] = src[i];
+    for (i = 0; i < num; i++) {
+        dest[i] = src[i];
+    }
 
     return (num);
 }
@@ -490,7 +534,9 @@ template <class data>
 inline data mset(data *dest, data val, int num) {
     int i;
 
-    for (i = 0; i < num; i++) dest[i] = val;
+    for (i = 0; i < num; i++) {
+        dest[i] = val;
+    }
 
     return (val);
 }

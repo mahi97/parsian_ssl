@@ -64,8 +64,9 @@ void MonitorWidget::wheelEvent(QWheelEvent *event) {
     centralPoint.y = 400 + cameraY * coeff;
     centralPoint.x = 400 / WH_RATIO + cameraX * coeff;
     if (event->delta() > 0) {
-        if (scaleFactor > 3)
+        if (scaleFactor > 3) {
             return;
+        }
 
 
         scaleFactor += 0.1;
@@ -77,8 +78,9 @@ void MonitorWidget::wheelEvent(QWheelEvent *event) {
 
 
 //
-        if (scaleFactor < 0.5)
+        if (scaleFactor < 0.5) {
             return;
+        }
 
         scaleFactor -= 0.1;
         cameraX = (1 - scaleFactor) * ((double)event->pos().x() - centralPoint.x) / (coeff * scaleFactor);
@@ -155,8 +157,9 @@ void MonitorWidget::paintGL() {
         glColor4f(polygon.color.r, polygon.color.g, polygon.color.b, polygon.color.a);
         if (polygon.filled) {
             glBegin(GL_TRIANGLE_FAN);
-        } else
+        } else {
             glBegin(GL_LINE_LOOP);
+        }
 
 
         for (unsigned int i = 0; i < polygon.points.size(); i++) {
@@ -246,11 +249,13 @@ GLuint MonitorWidget::drawArc(double centerX, double centerY, double radius, int
     } else if (fill) {
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(centerX, centerY);
-    } else
+    } else {
         glBegin(GL_LINE_STRIP);
+    }
 
-    for (int angle = start; angle <= end; angle += 10)
+    for (int angle = start; angle <= end; angle += 10) {
         glVertex2f(centerX + sin(angle * _DEG2RAD) * radius, centerY + cos(angle * _DEG2RAD) * radius);
+    }
     glEnd();
 
     glEndList();
@@ -264,8 +269,9 @@ GLuint MonitorWidget::drawRect(double topLeftX, double topLeftY, double buttomRi
     buttomRightY = -1 * buttomRightY;
     if (fill) {
         glBegin(GL_TRIANGLE_FAN);
-    } else
+    } else {
         glBegin(GL_LINE_LOOP);
+    }
 
     glVertex2f(topLeftX, topLeftY);
     glVertex2f(buttomRightX, topLeftY);

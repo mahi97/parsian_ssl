@@ -193,8 +193,9 @@ double CDefPos::findBestRadius(int _numOfDefs) {
     Segment2D shorterBarSeg = (leftBarSeg.length() > rightBarSeg.length()) ? rightBarSeg : leftBarSeg;
     vatarKazeb = goalSeg.intersection(shorterBarSeg).dist(biggerBarSeg.nearestPoint(goalSeg.intersection(shorterBarSeg)));
     Line2D mainLine(goalSeg.intersection(shorterBarSeg), biggerBarSeg.nearestPoint(goalSeg.intersection(shorterBarSeg)));
-    if (vatarKazeb > (_numOfDefs) * 2 * Robot::robot_radius_new)
+    if (vatarKazeb > (_numOfDefs) * 2 * Robot::robot_radius_new) {
         mainLine = Line2D(Vector2D(BallPos.x - ((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new * ballheight / vatarKazeb), BallPos.y), Vector2D(BallPos.x - ((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new * ballheight / vatarKazeb), BallPos.y - 0.1));
+    }
     if (biggerBarSeg.intersection(mainLine).valid()) {
         return biggerBarSeg.intersection(mainLine).dist(wm->field->ourGoal()) + penaltyAreaOffset;
     }

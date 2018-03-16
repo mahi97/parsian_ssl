@@ -507,8 +507,11 @@ void Robot::setReplace(Vector2D newPos, float newDirection) {
 }
 
 int Robot::replacementPacket(char* buf) {
-    if (repl) buf[0] = 100;
-    else buf[0] = 10;
+    if (repl) {
+        buf[0] = 100;
+    } else {
+        buf[0] = 10;
+    }
     float x;
     x = static_cast<float>(replPos.x);
     buf[1] = *((char*)(& (x)));

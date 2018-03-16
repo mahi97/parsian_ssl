@@ -83,12 +83,15 @@ parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacket(const pa
     auto  sim_handle_packet = *_packet;
     for (auto & robot_packet : sim_handle_packet.value) {
         for (int i = 0; i < 14; i++) {
-            if (i != 11 && i != 0)
+            if (i != 11 && i != 0) {
                 robot_packet.packets[i] = 0;
-            if (i == 8)
+            }
+            if (i == 8) {
                 robot_packet.packets[i] = 0x01;
-            if (i == 1)
+            }
+            if (i == 1) {
                 robot_packet.packets[i] &= 0x0F;
+            }
         }
     }
     parsian_msgs::parsian_packetsPtr packet_{new parsian_msgs::parsian_packets};
@@ -100,10 +103,12 @@ parsian_msgs::parsian_packetsPtr CommunicationNodelet::modeChangePacketZero(cons
     auto  sim_handle_packet = *_packet;
     for (auto & robot_packet : sim_handle_packet.value) {
         for (int i = 0; i < 14; i++) {
-            if (i != 11 && i != 0)
+            if (i != 11 && i != 0) {
                 robot_packet.packets[i] = 0;
-            if (i == 1)
+            }
+            if (i == 1) {
                 robot_packet.packets[i] &= 0x0F;
+            }
         }
     }
     parsian_msgs::parsian_packetsPtr packet_{new parsian_msgs::parsian_packets};
@@ -116,8 +121,9 @@ void CommunicationNodelet::timerCb(const ros::TimerEvent &event) {
         drawPub.publish(drawer->draws);
         drawer->draws.vectors.clear();
     }
-    if (debugger != nullptr)
+    if (debugger != nullptr) {
         debugPub.publish(debugger->debugs);
+    }
 }
 
 

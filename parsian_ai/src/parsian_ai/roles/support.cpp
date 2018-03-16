@@ -34,13 +34,14 @@ void CRoleSupport::execute() {
         kick->execute();
         debug("supporting kick", int(D_SEPEHR));
     }
-    if (!info()->supportPosition.valid() || info()->supportPosition.dist(wm->field->ourGoal()) < 1.8)
+    if (!info()->supportPosition.valid() || info()->supportPosition.dist(wm->field->ourGoal()) < 1.8) {
         info()->supportPosition = (wm->ball->pos - wm->field->ourGoal()).norm() * 1.8 + wm->field->ourGoal();
-    else {
-        if (knowledge->getSupporPlaymaker() == CKnowledge::Back)
+    } else {
+        if (knowledge->getSupporPlaymaker() == CKnowledge::Back) {
             gotopoint->setTargetLook(info()->supportPosition, wm->ball->pos)->execute();
-        else
+        } else {
             gotopoint->setTargetLook(info()->supportPosition, wm->field->oppGoal())->execute();
+        }
     }
 }
 
@@ -63,7 +64,9 @@ CRoleSupportInfo::CRoleSupportInfo(QString _roleName) : CRoleInfo(_roleName) {
 }
 
 void CRoleSupportInfo::findPos() {
-    if (calculated) return;
+    if (calculated) {
+        return;
+    }
     calculated = true;
     Vector2D playmakerPos;
     if (knowledge->getPlayMaker() == NULL) {

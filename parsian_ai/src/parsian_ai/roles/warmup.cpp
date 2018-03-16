@@ -87,10 +87,11 @@ void CRoleWarmupInfo::findPos2() {
         draw(seg, "orange");
         Vector2D s1, s2;
         cir.intersection(seg, &s1, &s2);
-        if (s1.valid())
+        if (s1.valid()) {
             this->Ps.append(s1);
-        else if (s2.valid())
+        } else if (s2.valid()) {
             this->Ps.append(s2);
+        }
     }
 
     distR.clear();
@@ -104,11 +105,13 @@ void CRoleWarmupInfo::findPos2() {
 
     ang += 0.25;
     static int sx = 1;
-    if (fabs(cent.x) > 2.5)
+    if (fabs(cent.x) > 2.5) {
         sx *= -1;
+    }
     static int sy = 1;
-    if (fabs(cent.y) > 1.5)
+    if (fabs(cent.y) > 1.5) {
         sy *= -1;
+    }
     wm->ball->setReplace(cent - Vector2D(sx, sy) * 0.1, Vector2D(0, 0));
     cent.x += (rad + Robot::robot_radius_old) * 0.25 * _DEG2RAD * sx;
     cent.y += (rad + Robot::robot_radius_old) * 0.25 * _DEG2RAD * sy;

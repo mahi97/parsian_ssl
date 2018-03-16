@@ -306,11 +306,17 @@ DelaunayTriangulation::createInitialTriangle() {
     ++vit;
     const VertexCont::iterator vend = M_vertices.end();
     for (; vit != vend; ++vit) {
-        if (vit->pos().x < min_x) min_x = vit->pos().x;
-        else if (max_x < vit->pos().x) max_x = vit->pos().x;
+        if (vit->pos().x < min_x) {
+            min_x = vit->pos().x;
+        } else if (max_x < vit->pos().x) {
+            max_x = vit->pos().x;
+        }
 
-        if (vit->pos().y < min_y) min_y = vit->pos().y;
-        else if (max_y < vit->pos().y) max_y = vit->pos().y;
+        if (vit->pos().y < min_y) {
+            min_y = vit->pos().y;
+        } else if (max_y < vit->pos().y) {
+            max_y = vit->pos().y;
+        }
     }
 
     // std::cout << __FILE__": createInitialTriangle() min="

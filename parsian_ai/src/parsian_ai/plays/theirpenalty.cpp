@@ -25,9 +25,13 @@ void CTheirPenalty::init(const QList<Agent*>& _agents) {
 }
 
 void CTheirPenalty::execute_x() {
-    if (agents.empty()) return;
+    if (agents.empty()) {
+        return;
+    }
     executedCycles++;
-    if (gameState->penaltyShootout()) choosePlayMaker();
+    if (gameState->penaltyShootout()) {
+        choosePlayMaker();
+    }
     appendRemainingsAgents(positionAgents);
     setFormation("TheirP");
 

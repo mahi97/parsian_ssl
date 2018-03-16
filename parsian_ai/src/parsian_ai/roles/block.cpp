@@ -36,8 +36,11 @@ void CRoleBlock::parse(QStringList params) {
     setStop(false);
     setBlockGoal(false);
     for (int i = 0; i < params.count(); i++) {
-        if (params[i].trimmed().toLower() == "stop") setStop(true);
-        else if (params[i].trimmed().toLower() == "goal") setBlockGoal(true);
+        if (params[i].trimmed().toLower() == "stop") {
+            setStop(true);
+        } else if (params[i].trimmed().toLower() == "goal") {
+            setBlockGoal(true);
+        }
     }
 }
 
@@ -68,10 +71,11 @@ void CRoleBlockInfo::findPos(bool blockGoal) {
             pos = (wm->ball->pos - wm->opp[kicker]->pos).norm() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
 
             Rect2D checkRect = Rect2D(wm->field->fieldRect().left() + Robot::robot_radius_old, wm->field->fieldRect().top() - Robot::robot_radius_old , wm->field->_FIELD_WIDTH - 2 * Robot::robot_radius_old, wm->field->_FIELD_HEIGHT - 2 * Robot::robot_radius_old);
-            if (Vector2D::angleBetween((wm->ball->pos - wm->opp[kicker]->pos) , (wm->field->ourGoal() - wm->ball->pos)).abs() < 30 && checkRect.contains(pos))
+            if (Vector2D::angleBetween((wm->ball->pos - wm->opp[kicker]->pos) , (wm->field->ourGoal() - wm->ball->pos)).abs() < 30 && checkRect.contains(pos)) {
                 blockPosition = pos;
-            else
+            } else {
                 blockPosition = goalPos;
+            }
             if (gameState->theirKickoff()) {
                 if (blockPosition.x > -Robot::robot_radius_old) {
                     if (blockPosition.y > 0) {
@@ -83,8 +87,9 @@ void CRoleBlockInfo::findPos(bool blockGoal) {
                     }
                 }
             }
-            if (wm->field->isInOurPenaltyArea(blockPosition) || wm->field->isInOurPenaltyArea(wm->ball->pos))
+            if (wm->field->isInOurPenaltyArea(blockPosition) || wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 blockPosition.x += 1.2;
+            }
         }
     }
 }

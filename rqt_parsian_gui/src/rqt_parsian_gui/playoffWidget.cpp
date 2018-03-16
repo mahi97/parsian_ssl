@@ -113,15 +113,17 @@ void PlayOffWidget::updateModel() {
         if (i != 0) {
             last_path_dir = response_path_dir;
             last_pkg = response_pkg;
-        } else
+        } else {
             last_pkg = "";
+        }
 
         response_path_dir = QString::fromStdString(theplans->response.allPlans[i].planFile).split("plans/")[1].
                             split("/");
 
         response_pkg = "main";
-        for (int path_ctr = 0; path_ctr < response_path_dir.size() - 1; path_ctr++)
+        for (int path_ctr = 0; path_ctr < response_path_dir.size() - 1; path_ctr++) {
             response_pkg += "." + response_path_dir[path_ctr];
+        }
 
         if (response_pkg.compare(last_pkg)) {
             pkgCounter++;
@@ -178,9 +180,9 @@ void PlayOffWidget::updateBtn(bool _debug) {
 
 void PlayOffWidget::slt_updatePlans() {
 
-    if (client.call(*theplans))
+    if (client.call(*theplans)) {
         ROS_INFO("req to plan server......");
-    else {
+    } else {
         ROS_INFO("ERROR req to plan server");
         return;
     }
@@ -308,8 +310,9 @@ void PlayOffWidget::slt_edit(QStandardItem *_item) {
 
 void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++) {
         details[i]->setText("");
+    }
 
 //    chosen = NULL;
     itemSelected = selected;
@@ -337,8 +340,9 @@ void PlayOffWidget::slt_selectionChanged(const QItemSelection &selected, const Q
             details[3]->setText(QString("Chance     : %1").arg(chosen->chance));
             details[4]->setText(QString("Last Dist  : %1").arg(chosen->lastDist));
             auto final_tag = new QString();
-            for (std::string str : chosen->tags)
+            for (std::string str : chosen->tags) {
                 *final_tag += QString::fromStdString(str) + "  ";
+            }
             details[5]->setText(QString("Tags       : %1").arg(*final_tag));
 //                details[6]->setText(QString("ShotPos    : (%1, %2)").arg(chosen->matching.shotPos.x).arg(
 //                        chosen->matching.shotPos.y));

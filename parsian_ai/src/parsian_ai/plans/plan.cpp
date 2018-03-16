@@ -28,7 +28,9 @@ void Plan::assignSkill(int i, Action* _action) {
 
 int Plan::agentById(int id) {
     for (int i = 0; i < count(); i++) {
-        if (agent(i)->id() == id) return i;
+        if (agent(i)->id() == id) {
+            return i;
+        }
     }
     return -1;
 }
@@ -43,7 +45,8 @@ QList<int> Plan::getAgentIdList() {
 
 void Plan::debugAgents(QString text) {
     QString str;
-    for (auto agent : agents)
+    for (auto agent : agents) {
         str += QString(" %1").arg(agent->id());
+    }
     DBUG(QString("%1: Size: %2 --> (%3)").arg(text).arg(agents.size()).arg(str) , D_ERROR);
 }

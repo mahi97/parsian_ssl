@@ -9,10 +9,11 @@ double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 ,
     int g , b;
     Vector2D goal_pos;
 
-    if (oppGoal)
+    if (oppGoal) {
         goal_pos = field.oppGoal();
-    else
+    } else {
         goal_pos = field.ourGoal();
+    }
 
     double gx1 = p1.x;
     double gy1 = p1.y;
@@ -34,8 +35,9 @@ double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 ,
     d = 0;
     range r[20];
     bool flag[20];
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 20; i++) {
         flag[i] = false;
+    }
     al = getangle(x, y, (gx1 + gx2) * 0.5, (gy1 + gy2) * 0.5);
     q1 = getangle(x, y, gx1, gy1) - al;
     q2 = getangle(x, y, gx2, gy2) - al;
@@ -58,20 +60,34 @@ double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 ,
         }
         a1 = ox * la + oy * lb + lc;
         a2 = x * la + y * lb + lc;
-        if (a1 > 0) a1 = 1;
-        else a1 = -1;
-        if (a2 > 0) a2 = 1;
-        else a2 = -1;
+        if (a1 > 0) {
+            a1 = 1;
+        } else {
+            a1 = -1;
+        }
+        if (a2 > 0) {
+            a2 = 1;
+        } else {
+            a2 = -1;
+        }
         a1 = a1 * a2;
         if (a1 > 0) {
             a = normalang(getangle(x, y, ox, oy) - al);
             a0 = asin(rad / l);
             a1 = a - a0;
             a2 = a + a0;
-            if (a1 < -M_PI * 0.95 * 0.5) a1 = -M_PI * 0.95 * 0.5;
-            if (a2 < -M_PI * 0.95 * 0.5) a2 = -M_PI * 0.95 * 0.5;
-            if (a1 > +M_PI * 0.95 * 0.5) a1 =  M_PI * 0.95 * 0.5;
-            if (a2 > +M_PI * 0.95 * 0.5) a2 =  M_PI * 0.95 * 0.5;
+            if (a1 < -M_PI * 0.95 * 0.5) {
+                a1 = -M_PI * 0.95 * 0.5;
+            }
+            if (a2 < -M_PI * 0.95 * 0.5) {
+                a2 = -M_PI * 0.95 * 0.5;
+            }
+            if (a1 > +M_PI * 0.95 * 0.5) {
+                a1 =  M_PI * 0.95 * 0.5;
+            }
+            if (a2 > +M_PI * 0.95 * 0.5) {
+                a2 =  M_PI * 0.95 * 0.5;
+            }
             if (normalang(a1 - a2) > 0) {
                 a = a1;
                 a1 = a2;
@@ -79,10 +95,18 @@ double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 ,
             }
             a1 = normalang(a1);
             a2 = normalang(a2);
-            if (normalang(a1 - q1) <= 0) a1 = q1;
-            if (normalang(a1 - q2) >= 0) a1 = q2;
-            if (normalang(a2 - q1) <= 0) a2 = q1;
-            if (normalang(a2 - q2) >= 0) a2 = q2;
+            if (normalang(a1 - q1) <= 0) {
+                a1 = q1;
+            }
+            if (normalang(a1 - q2) >= 0) {
+                a1 = q2;
+            }
+            if (normalang(a2 - q1) <= 0) {
+                a2 = q1;
+            }
+            if (normalang(a2 - q2) >= 0) {
+                a2 = q2;
+            }
             if (normalangabs(a1 - a2) >= 0.001) {
                 r[count].a = a1;
                 r[count].b = a2;
@@ -195,8 +219,11 @@ double CKnowledge::getEmptyAngle(const CField& field, Vector2D p , Vector2D p1 ,
         d /= normalangabs(q2 - q1);
         d = 1 - d;
         if (!changed || (d < 0.001)) {
-            if (count == 0) biggestAngle = normalangabs(q2 - q1);
-            else biggestAngle = 0;
+            if (count == 0) {
+                biggestAngle = normalangabs(q2 - q1);
+            } else {
+                biggestAngle = 0;
+            }
             mostOpenAngle = normalang(normalang(q2 - q1) / 2.0 + q1);
         }
         mostOpenAngle = normalang(mostOpenAngle + al);
@@ -246,10 +273,11 @@ Vector2D CKnowledge::getReflectPos(const CField& field, Vector2D goal, double di
     dummySeg.assign(field.oppGoal(), (res - field.oppGoal()).norm() * 12);
     //    oppField.intersection(dummySeg,&sol1,&sol2);
     oppCircle.intersection(dummySeg, &sol1, &sol2);
-    if (field.isInField(sol1))
+    if (field.isInField(sol1)) {
         res = sol1;
-    else
+    } else {
         res = sol2;
+    }
 
     return res;
 }
@@ -393,8 +421,11 @@ double CKnowledge::oneTouchAngle(Vector2D pos,
     th1 *= _RAD2DEG;
     AngleDeg::normalize_angle(th1);
     double ang = 0;
-    if (theta > 0) ang = ang1 + th1;
-    else ang = ang1 - th1;
+    if (theta > 0) {
+        ang = ang1 + th1;
+    } else {
+        ang = ang1 - th1;
+    }
 
     return ang;
 }
@@ -438,6 +469,8 @@ inline double CKnowledge::normalangabs(double dir) {
     if (dir > M_PI) {
         dir -= 2.0 * M_PI;
     }
-    if (dir < 0) return -dir;
+    if (dir < 0) {
+        return -dir;
+    }
     return dir;
 }

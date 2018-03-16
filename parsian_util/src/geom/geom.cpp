@@ -357,7 +357,9 @@ Circle2D::intersection(const Line2D & line,
 int Circle2D::tangent(Vector2D p, Vector2D * sol1, Vector2D * sol2) {
     double s = p.dist2(M_center);
     double r = M_radius * M_radius;
-    if (s < r) return 0;
+    if (s < r) {
+        return 0;
+    }
     if (s == r) {
         sol1->assign(p.x, p.y);
         return 1;
@@ -2285,7 +2287,9 @@ Vector2D intersect_ellipse_dir(Vector2D dir, Vector2D center, double a, double b
     Segment2D s = Segment2D(center + Vector2D(0.0, e), center + dir * 2.0 * b + Vector2D(0.0, e));
     Vector2D sol1, sol2;
     int n = Circle2D(center, b).intersection(s, &sol1, &sol2);
-    if (sol1.valid()) sol1.x = (sol1.x - center.x) * a / b + center.x;
+    if (sol1.valid()) {
+        sol1.x = (sol1.x - center.x) * a / b + center.x;
+    }
     return sol1;
 }
 

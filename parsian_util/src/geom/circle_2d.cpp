@@ -107,7 +107,9 @@ const double Circle2D::EPSILOON = 1.0e-5;
 int Circle2D::tangent(Vector2D p, Vector2D * sol1, Vector2D * sol2) {
     double s = p.dist2(M_center);
     double r = M_radius * M_radius;
-    if (s < r) return 0;
+    if (s < r) {
+        return 0;
+    }
     if (s == r) {
         sol1->assign(p.x, p.y);
         return 1;

@@ -69,10 +69,11 @@ void CSkillReceivePass::execute() {
     Vector2D tempVecDamp, tempDampTarget;
     switch (receivePassMode) {
     case RPWAITPOS:
-        if (target.valid())
+        if (target.valid()) {
             gotopointavoid->init(target, oneTouchDir);
-        else
+        } else {
             gotopointavoid->init(agent->pos(), oneTouchDir);
+        }
         agent->setRoller(0);
         gotopointavoid->setSlowmode(false);
         gotopointavoid->execute();
@@ -82,7 +83,9 @@ void CSkillReceivePass::execute() {
     case RPRECEIVE:
         tempVecDamp = (kkAgentPos - ballPos).norm();
         tempDampSpeed = (ballRealVel - agent->vel().length()) * 0.05;
-        if (tempDampSpeed > 0.003) tempDampSpeed = 0.003;
+        if (tempDampSpeed > 0.003) {
+            tempDampSpeed = 0.003;
+        }
         tempDampTarget = ballPos + (kkAgentPos - ballPos).norm() * 0.10 + tempVecDamp * tempDampSpeed;
         gotopointavoid->init(tempDampTarget, oneTouchDir);
         gotopointavoid->execute();

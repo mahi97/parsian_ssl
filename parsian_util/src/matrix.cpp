@@ -42,8 +42,9 @@ Matrix::Matrix(int rows, int columns, const float *m) {
 
     mat = (double*)malloc(r_ * c_ * sizeof(double));
 
-    for (int i = 0; i < rows * columns; i++)
+    for (int i = 0; i < rows * columns; i++) {
         mat[i] = m[i];
+    }
 }
 
 Matrix::Matrix(int identity_size) {
@@ -87,12 +88,15 @@ Matrix::Matrix(const Matrix& other) {
 }
 
 Matrix::~Matrix() {
-    if (mat) free(mat);
+    if (mat) {
+        free(mat);
+    }
 }
 
 void Matrix::CopyData(float *data) {
-    for (double *ptr = mat; ptr < mat + r_ * c_; ptr++)
+    for (double *ptr = mat; ptr < mat + r_ * c_; ptr++) {
         *data++ = (float)(*ptr++);
+    }
 }
 
 void Matrix::CopyData(double *data) {
@@ -100,7 +104,9 @@ void Matrix::CopyData(double *data) {
 }
 
 const Matrix& Matrix::operator= (const Matrix& other) {
-    if (this == &other) return *this;
+    if (this == &other) {
+        return *this;
+    }
 
     //  fprintf(stderr, "\nop=\n");
 
@@ -108,7 +114,9 @@ const Matrix& Matrix::operator= (const Matrix& other) {
 
     //  fprintf(stderr, "mat: 0x%x\n", mat);
 
-    if (mat) free(mat);
+    if (mat) {
+        free(mat);
+    }
     r_ = other.r_;
     c_ = other.c_;
 
@@ -129,7 +137,9 @@ const Matrix& Matrix::operator= (const Matrix& other) {
 }
 
 const Matrix& Matrix::operator= (char* const init_string) {
-    if (mat) free(mat);
+    if (mat) {
+        free(mat);
+    }
     str_init(init_string);
 
     return *this;
@@ -145,14 +155,18 @@ void Matrix::str_init(char* const init_string) {
 
     tcount = 0;
 
-    if (strtok(str1, delim) != nullptr) tcount++;
-    while (strtok(nullptr, delim)) tcount ++;
+    if (strtok(str1, delim) != nullptr) {
+        tcount++;
+    }
+    while (strtok(nullptr, delim)) {
+        tcount ++;
+    }
 
-  if(!tcount) {
-	mat = 0;
-	free(str1);
-	return;
-  }
+    if (!tcount) {
+        mat = 0;
+        free(str1);
+        return;
+    }
 
     mat = (double*)malloc(tcount * sizeof(double));
 
@@ -160,8 +174,12 @@ void Matrix::str_init(char* const init_string) {
 
     r_ = 0;
 
-    if (strtok(str1, ";")) r_++;
-    while (strtok(NULL, ";")) r_ ++;
+    if (strtok(str1, ";")) {
+        r_++;
+    }
+    while (strtok(NULL, ";")) {
+        r_ ++;
+    }
 
     c_ = tcount / r_;
 
@@ -221,8 +239,9 @@ const Matrix operator* (const double a , const Matrix& m) {
 Matrix kron(const Matrix &a , const Matrix &b) {
     Matrix out;
     out.resize(a.r_ * b.r_ , a.c_ * b.c_);
-    for (int i = 0; i < out.r_ * out.c_; i++)
+    for (int i = 0; i < out.r_ * out.c_; i++) {
         out.mat[i] = 0.0;
+    }
 
     for (int i = 0 ; i < a.r_ ; i++) {
         for (int j = 0 ; j < a.c_ ; j++) {
@@ -271,8 +290,9 @@ const Matrix& m_multiply(Matrix& out, const Matrix& a, const Matrix& b) {
 //        a.r_, a.c_, b.r_, b.c_,
 //        out.r_, out.c_);
 
-    for (i = 0; i < out.r_ * out.c_; i++)
+    for (i = 0; i < out.r_ * out.c_; i++) {
         out.mat[i] = 0.0;
+    }
 
     for (i = 0; i < a.r_; i++) {
         for (j = 0; j < b.c_; j++) {
@@ -336,7 +356,9 @@ const Matrix& m_pseudoinverse(Matrix& out, const Matrix& in) {
 }
 
 const Matrix& Matrix::transpose() {
-    if (!mat) return *this;
+    if (!mat) {
+        return *this;
+    }
 
     double* newmat = (double*)malloc(r_ * c_ * sizeof(double));
 
@@ -358,7 +380,9 @@ const Matrix& Matrix::transpose() {
 }
 
 const Matrix& Matrix::identity(int size) {
-    if (mat) free(mat);
+    if (mat) {
+        free(mat);
+    }
     r_ = size;
     c_ = size;
 
@@ -372,10 +396,13 @@ const Matrix& Matrix::identity(int size) {
 }
 
 const Matrix& Matrix::resize(int rows, int columns) {
-    if (rows == r_ && columns == c_)
+    if (rows == r_ && columns == c_) {
         return *this;
+    }
 
-    if (mat) free(mat);
+    if (mat) {
+        free(mat);
+    }
 
     r_ = rows;
     c_ = columns;
@@ -386,8 +413,9 @@ const Matrix& Matrix::resize(int rows, int columns) {
 }
 
 const Matrix& Matrix::resizeS(int rows, int columns) {
-    if (rows == r_ && columns == c_)
+    if (rows == r_ && columns == c_) {
         return *this;
+    }
 
     assert(rows * columns == r_ * c_);
 
@@ -399,7 +427,9 @@ const Matrix& Matrix::resizeS(int rows, int columns) {
 
 
 const Matrix& Matrix::scale(double factor) {
-    if (!mat) return *this;
+    if (!mat) {
+        return *this;
+    }
 
     for (int i = 0; i < r_ * c_; i++) {
         mat[i] *= factor;
@@ -476,8 +506,9 @@ double Matrix::determinant() {
 
     /* This may never be used, but it's necessary for error
      checking */
-    if (r_ == 1)
+    if (r_ == 1) {
         return e(0, 0);
+    }
     return determinant(this, r_);
 }
 
@@ -489,17 +520,19 @@ double Matrix::determinant(Matrix *mx, int n) {
         int i , j;
         for (i = 0 ; i < n && b ; i++)
             for (j = 0 ; j < n && b ; j++)
-                if (mx->e(i, j) != 0)
+                if (mx->e(i, j) != 0) {
                     b = false;
+                }
         i--;
         j--;
         Matrix *m = new Matrix(n - 1, n - 1);
         double scale = 1.0;
         int logarithm = (int)(log10(fabs(mx->e(i, j))));
-        if (logarithm < -3)
+        if (logarithm < -3) {
             scale = pow(10.0, -3 - logarithm);
-        else  if (logarithm > 3)
+        } else  if (logarithm > 3) {
             scale = pow(10.0, 3 - logarithm);
+        }
 
         for (int k = 0 ; k < n ; k++) {
             for (int p = 0 ; p < n ; p++) {
@@ -558,8 +591,11 @@ const Matrix &Matrix::inverse() {
                               G I
             */
             tmp = reduce_matrix(row, col);
-            if ((row + col) % 2 == 0) sign = 1;
-            else sign = -1;
+            if ((row + col) % 2 == 0) {
+                sign = 1;
+            } else {
+                sign = -1;
+            }
             inverse->e(col, row) = sign * tmp->determinant();
             delete tmp;
         }
@@ -586,11 +622,13 @@ const Matrix &Matrix::pseudoinverse() {
     Matrix *akT, *ckT, *dkT;
 
     for (r = 0; r < r_; r++)
-        for (c = 0; c < 1; c++)
+        for (c = 0; c < 1; c++) {
             ak->e(r, c) = 0.0;
+        }
 
-    for (r = 0; r < r_; r++)
+    for (r = 0; r < r_; r++) {
         ak->e(r, 0) = this->e(r, 0);
+    }
 
 //    ak->print();
 
@@ -603,15 +641,17 @@ const Matrix &Matrix::pseudoinverse() {
     } else {
         R_plus = new Matrix(1, r_);
         for (r = 0; r < 1; r++)
-            for (c = 0; c < r_; c++)
+            for (c = 0; c < r_; c++) {
                 R_plus->e(r, c) = 0.0;
+            }
     }
 //    fprintf(stderr,"@");
 
     while (k < c_) {
 //        fprintf(stderr,"#%d",k);
-        for (r = 0; r < r_; r++)
+        for (r = 0; r < r_; r++) {
             ak->e(r, 0) = this->e(r, k);
+        }
 
 //        fprintf(stderr,"\r\nRPlus\r\n");
 //        R_plus->print();
@@ -624,8 +664,9 @@ const Matrix &Matrix::pseudoinverse() {
         Matrix *T = new Matrix(r_, k);
 
         for (r = 0; r < r_; r++)
-            for (c = 0; c < k; c++)
+            for (c = 0; c < k; c++) {
                 T->e(r, c) = this->e(r, c);
+            }
 
 //        fprintf(stderr,"\r\nT\r\n");
 //        T->print();
@@ -665,10 +706,12 @@ const Matrix &Matrix::pseudoinverse() {
         R_plus = new Matrix(N->nrows() + 1, N->ncols());
 
         for (r = 0; r < N->nrows(); r++)
-            for (c = 0; c < N->ncols(); c++)
+            for (c = 0; c < N->ncols(); c++) {
                 R_plus->e(r, c) = N->e(r, c);
-        for (c = 0; c < N->ncols(); c++)
+            }
+        for (c = 0; c < N->ncols(); c++) {
             R_plus->e(R_plus->nrows() - 1, c) = bk->e(0, c);
+        }
 
 //        fprintf(stderr,"\r\nR_plus\r\n");
 //        R_plus->print();
@@ -695,8 +738,9 @@ const Matrix &Matrix::pseudoinverse() {
 bool Matrix::equals(double val) {
     for (int r = 0; r < this->r_; r++)
         for (int c = 0; c < this->c_; c++)
-            if (fabs(this->e(r, c) - val) > .0001)
+            if (fabs(this->e(r, c) - val) > .0001) {
                 return false;
+            }
     return true;
 }
 
@@ -705,8 +749,9 @@ double Matrix::dot(Matrix &m) {
     double sum = 0;
 
     for (int r = 0; r < this->r_; r++)
-        for (int c = 0; c < this->c_; c++)
+        for (int c = 0; c < this->c_; c++) {
             sum += this->e(r, c) * m.e(r, c);
+        }
 
     return sum;
 }
@@ -717,8 +762,9 @@ Matrix& Matrix::dotP(Matrix &m) {
     auto * res = new Matrix(r_, c_);
 
     for (int r = 0; r < this->r_; r++)
-        for (int c = 0; c < this->c_; c++)
+        for (int c = 0; c < this->c_; c++) {
             res->e(r, c) = this->e(r, c) * m.e(r, c);
+        }
 
     return *res;
 }

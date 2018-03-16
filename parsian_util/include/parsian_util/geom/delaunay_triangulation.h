@@ -238,8 +238,12 @@ public:
           So, this method should be called from Triangle's constructor.
          */
         void setTriangle(TrianglePtr tri) {
-            if (M_triangles[0] == tri) return;
-            if (M_triangles[1] == tri) return;
+            if (M_triangles[0] == tri) {
+                return;
+            }
+            if (M_triangles[1] == tri) {
+                return;
+            }
 
             if (! M_triangles[0]) {
                 //std::cout << "Edge::setTriangle() edge_id_" << M_id
