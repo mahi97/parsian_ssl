@@ -19,6 +19,11 @@ class BehaviorServer:
                                               buff_size=2 ** 24)
         self.selected_pub = rospy.Publisher('/behavior', parsian_behavior, queue_size=1, latch=True)
         self.timer = rospy.Timer(rospy.Duration(1), self.publisherCallBack, oneshot=False)
+
+
+        self.timeHasPassed = True
+        self.last_best_behavior = None
+
         rospy.loginfo('behavior server inited')
         rospy.spin()
 
@@ -26,11 +31,17 @@ class BehaviorServer:
         self.selector.update_data(msg)
 
     def publisherCallBack(self, event):
-        best = self.selector.get_best()
-        if best is not -1:
+
+        if self.last_best_behavior is not None:
+            if not self.timeHasPassed:
+                self.selected_pub.publish(self.last_best_behavior)
+
+        best_behavior = self.selector.get_best()
+        if best_behavior is not -1:
             if self.selector.hasTimePassed:
-                self.selector.timer.start()
-                self.selected_pub.publish(best)
+                self.last_best_behavior = best_behavior
+                rospy.Timer(rospy.Duration(3), self.timer_cb, oneshot=True)
+                self.selected_pub.publish(best_behavior)
                 self.selector.hasTimePassed = False
 
     def correctProbillty(self, msg):
@@ -48,6 +59,9 @@ class BehaviorServer:
 
         self.selector.update_config(config["queue_size"], config["threshold_amount"])
         return config
+
+    def timer_cb(self, event):
+        self.timeHasPassed = True
 
 
 if __name__ == '__main__':

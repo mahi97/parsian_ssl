@@ -15,15 +15,17 @@ class BestSelector:
         self.hasTimePassed = True
         self.rewards_penalties = {}
 
-    def update_data(self, new_action):
+    def update_data(self, new_behavior):
         # type:( parsian_behavior ) -> None
-        if new_action.name not in self.data.keys():
-            self.data[new_action.name] = NQueue(queue_size)
-            if new_action.name in self.rewards_penalties:
-                print(new_action.name + " behavior detected!")
-                value = self.rewards_penalties[new_action.name]
-                self.data[new_action.name].update_reward_penalty(value["reward"], value["penalty"])
-        self.data[new_action.name].update(new_action)
+        if new_behavior.name not in self.data.keys():
+            self.data[new_behavior.name] = NQueue(queue_size)
+            if new_behavior.name in self.rewards_penalties:
+                print(new_behavior.name + " behavior detected!")
+                value = self.rewards_penalties[new_behavior.name]
+                self.data[new_behavior.name].update_reward_penalty(value["reward"], value["penalty"])
+
+        self.data[new_behavior.name].update(new_behavior)
+
 
     def get_best(self):
         if len(self.data) is 0:
@@ -50,8 +52,8 @@ class BestSelector:
         self.upper_bound = upper_b
         self.lower_bound = lower_b
 
-    def check_bounds(self, action):
-        if action.probability < self.lower_bound:
+    def check_bounds(self, behavior):
+        if behavior.probability < self.lower_bound:
             if self.last_best is not None:
                 return self.last_best
             else:
@@ -59,7 +61,7 @@ class BestSelector:
         elif self.last_best.probabilty > self.upper_bound:
             return self.last_best
         else:
-            return action
+            return behavior
 
     def timer_cb(self):
         self.hasTimePassed = True
@@ -85,16 +87,16 @@ class NQueue:
         self.reward = reward
         self.penalty = penalty
 
-    def update(self, action):
+    def update(self, behavior):
         if len(self.queue) >= queue_size:
             self.queue.pop()
-        self.queue.insert(0, action)
+        self.queue.insert(0, behavior)
 
     def get_average(self):
         if len(self.queue) is 0:
             return 0
 
-        average_probability = (sum([action.probability for action in self.queue]) / len(self.queue))
+        average_probability = (sum([behavior.probability for behavior in self.queue]) / len(self.queue))
         average = average_probability * self.reward - (1 - average_probability) * self.penalty
         return average + self.has_threshold * threshold_amount
 
