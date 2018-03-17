@@ -12,10 +12,10 @@ class BestSelector:
         # data: a dictionary with name of behaviors as keys and a NQueue of them as values
         self.data = {}
 
-        # last best behavior that has been selected
+        # last best behavior(NQueue) that has been selected
         self.last_best = None
 
-        # a dictionary representing the reward and enal
+        # a dictionary representing the reward and penalties of behaviors
         self.rewards_penalties = {}
 
         # upper and lower bounds for behavior evaluation
@@ -48,6 +48,9 @@ class BestSelector:
         # gets the best plan and checks if it is beyond boundries
         best = self.data[max(self.data, key=lambda x: self.data[x].get_effective_probability())]
         best = self.check_bounds(best)
+
+        self.last_best = best
+        self.data[best.name].has_threshold = 1
         return best.queue[0]
 
     def update_success_rate(self, ai_status):
@@ -62,10 +65,12 @@ class BestSelector:
         self.lower_bound = lower_b
 
     def check_bounds(self, best_behavior):
-        if self.last_best.probabilty > self.upper_bound:
-            return self.last_best
-        else:
-            return best_behavior
+        if self.last_best is not None:
+            if self.last_best.get_average_probability() > self.upper_bound:
+                return self.last_best
+
+        return best_behavior
+
 
     def update_rewards_penalties(self, rewards_penalties):
         self.rewards_penalties = rewards_penalties

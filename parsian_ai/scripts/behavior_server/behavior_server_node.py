@@ -56,8 +56,8 @@ class BehaviorServer:
                 reward = config["groups"]["groups"][group]["parameters"]["reward"]
                 rewards_penalties[name] = {"penalty": penalty, "reward": reward}
         self.selector.update_rewards_penalties(rewards_penalties)
+        self.selector.update_config(config["queue_size"], config["threshold_amount"], config["upper_boundary"], config["lower_boundary"])
 
-        self.selector.update_config(config["queue_size"], config["threshold_amount"])
         return config
 
     def timer_cb(self, event):
