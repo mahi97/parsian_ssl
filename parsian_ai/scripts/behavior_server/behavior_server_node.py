@@ -9,17 +9,17 @@ from dynamic_reconfigure.server import Server
 from parsian_ai.cfg import behavior_serverConfig
 import best_selector
 
+
 class BehaviorServer:
     def __init__(self):
         rospy.init_node('behavior_server')
         self.selector = best_selector.BestSelector()
         self.srv = Server(behavior_serverConfig, self.cfg_callback)
         self.eval_sub = rospy.Subscriber('/eval', parsian_behavior, self.getEvals, queue_size=1, buff_size=2 ** 24)
-        self.ai_status_sub = rospy.Subscriber('/ai_status', parsian_ai_status, self.correctProbillty, queue_size=1,
+        self.ai_status_sub = rospy.Subscriber('/ai_status', parsian_ai_status, self.correct_probability, queue_size=1,
                                               buff_size=2 ** 24)
         self.selected_pub = rospy.Publisher('/behavior', parsian_behavior, queue_size=1, latch=True)
-        self.timer = rospy.Timer(rospy.Duration(1), self.publisherCallBack, oneshot=False)
-
+        self.timer = rospy.Timer(rospy.Duration(1), self.publisher_cb, oneshot=False)
 
         self.timeHasPassed = True
         self.last_best_behavior = None
@@ -30,12 +30,10 @@ class BehaviorServer:
     def getEvals(self, msg):
         self.selector.update_data(msg)
 
-    def publisherCallBack(self, event):
-
+    def publisher_cb(self, event):
         if self.last_best_behavior is not None:
             if not self.timeHasPassed:
                 self.selected_pub.publish(self.last_best_behavior)
-
         best_behavior = self.selector.get_best()
         if best_behavior is not -1:
             if self.timeHasPassed:
@@ -44,7 +42,7 @@ class BehaviorServer:
                 self.selected_pub.publish(best_behavior)
                 self.timeHasPassed = False
 
-    def correctProbillty(self, msg):
+    def correct_probability(self, msg):
         self.selector.update_success_rate(msg)
 
     def cfg_callback(self, config, level):

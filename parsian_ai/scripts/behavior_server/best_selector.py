@@ -30,14 +30,11 @@ class BestSelector:
                 print(new_behavior.name + " behavior detected!")
                 value = self.rewards_penalties[new_behavior.name]
                 self.data[new_behavior.name].update_reward_penalty(value["reward"], value["penalty"])
-
         self.data[new_behavior.name].update(new_behavior)
-
 
     def get_best(self):
         if len(self.data) is 0:
             return -1
-
         for behavior_name in self.data.keys():
             if self.last_best is not None:
                 if behavior_name == self.last_best.name:
@@ -50,7 +47,6 @@ class BestSelector:
         best = self.check_bounds(best)
 
         self.last_best = best
-        self.data[best.name].has_threshold = 1
         return best.queue[0]
 
     def update_success_rate(self, ai_status):
@@ -68,9 +64,7 @@ class BestSelector:
         if self.last_best is not None:
             if self.last_best.get_average_probability() > self.upper_bound:
                 return self.last_best
-
         return best_behavior
-
 
     def update_rewards_penalties(self, rewards_penalties):
         self.rewards_penalties = rewards_penalties
@@ -121,6 +115,7 @@ class NQueue:
     def get_corrected_eval(self):
         pass
 
-    def Geometric_mean(self, first, f_coef, second, s_coef):
+    @staticmethod
+    def geometric_mean(first, f_coef, second, s_coef):
         return (first ** f_coef * second ** s_coef) ** (1 / (f_coef + s_coef))
 
