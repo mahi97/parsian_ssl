@@ -38,11 +38,11 @@ class BehaviorServer:
 
         best_behavior = self.selector.get_best()
         if best_behavior is not -1:
-            if self.selector.hasTimePassed:
+            if self.timeHasPassed:
                 self.last_best_behavior = best_behavior
                 rospy.Timer(rospy.Duration(3), self.timer_cb, oneshot=True)
                 self.selected_pub.publish(best_behavior)
-                self.selector.hasTimePassed = False
+                self.timeHasPassed = False
 
     def correctProbillty(self, msg):
         self.selector.update_success_rate(msg)
