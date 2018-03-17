@@ -1,19 +1,26 @@
 from parsian_msgs.msg import parsian_behavior
 from parsian_msgs.msg import parsian_ai_status
-from threading import Timer
+
 
 threshold_amount = .1
-queue_size = 10
+queue_size = 5
+
 
 class BestSelector:
     def __init__(self):
+
+        # data: a dictionary with name of behaviors as keys and a NQueue of them as values
         self.data = {}
+
+        # last best behavior that has been selected
         self.last_best = None
+
+        # a dictionary representing the reward and enal
+        self.rewards_penalties = {}
+
+        # upper and lower bounds for behavior evaluation
         self.upper_bound = 0.9
         self.lower_bound = 0.1
-        self.timer = Timer(3, self.timer_cb)
-        self.hasTimePassed = True
-        self.rewards_penalties = {}
 
     def update_data(self, new_behavior):
         # type:( parsian_behavior ) -> None
@@ -32,13 +39,14 @@ class BestSelector:
             return -1
 
         # gets the best plan and checks if it is beyond boundries
-        best = self.data[max(self.data, key=lambda x: self.data[x].get_average())]
+        best = self.data[max(self.data, key=lambda x: self.data[x].get_effective_probability())]
         best = self.check_bounds(best)
 
         if self.last_best is not None:
+            self.last_best = best
             self.last_best.has_threshold = 0
         best.has_threshold = 1
-        self.last_best = best
+
         return best.queue[0]
 
     def update_success_rate(self, ai_status):
@@ -52,19 +60,11 @@ class BestSelector:
         self.upper_bound = upper_b
         self.lower_bound = lower_b
 
-    def check_bounds(self, behavior):
-        if behavior.probability < self.lower_bound:
-            if self.last_best is not None:
-                return self.last_best
-            else:
-                return -1
-        elif self.last_best.probabilty > self.upper_bound:
+    def check_bounds(self, best_behavior):
+        if self.last_best.probabilty > self.upper_bound:
             return self.last_best
         else:
-            return behavior
-
-    def timer_cb(self):
-        self.hasTimePassed = True
+            return best_behavior
 
     def update_rewards_penalties(self, rewards_penalties):
         self.rewards_penalties = rewards_penalties
@@ -75,6 +75,8 @@ class BestSelector:
                 self.data[name].update_reward_penalty(value["reward"], value["penalty"])
 
 
+# a structure for an action, including a stack of its instances, and it's evaluation properties
+# like reward, penalty and threshold
 class NQueue:
     def __init__(self, length):
         self.queue = []
@@ -92,13 +94,19 @@ class NQueue:
             self.queue.pop()
         self.queue.insert(0, behavior)
 
-    def get_average(self):
+    def get_effective_probability(self):
+        """
+        returns the effective probability of the current behavior
+        based on the average and reward/penalty of the behavior
+        """
         if len(self.queue) is 0:
             return 0
-
         average_probability = (sum([behavior.probability for behavior in self.queue]) / len(self.queue))
-        average = average_probability * self.reward - (1 - average_probability) * self.penalty
-        return average + self.has_threshold * threshold_amount
+        effective_probability = (0.3*average_probability + 0.7*self.queue[0].probability) * self.reward - (1 - average_probability) * self.penalty
+        return effective_probability + self.has_threshold * threshold_amount
+
+    def get_average_probability(self):
+        return sum([behavior.probability for behavior in self.queue]) / len(self.queue)
 
     def update_success_rate(self, success_rate):
         self.success_rate = success_rate
