@@ -25,7 +25,7 @@ class BestSelector:
     def update_data(self, new_behavior):
         # type:( parsian_behavior ) -> None
         if new_behavior.name not in self.data.keys():
-            self.data[new_behavior.name] = NQueue(queue_size)
+            self.data[new_behavior.name] = NQueue(queue_size, new_behavior.name)
             if new_behavior.name in self.rewards_penalties:
                 print(new_behavior.name + " behavior detected!")
                 value = self.rewards_penalties[new_behavior.name]
@@ -38,15 +38,16 @@ class BestSelector:
         if len(self.data) is 0:
             return -1
 
+        for behavior_name in self.data.keys():
+            if self.last_best is not None:
+                if behavior_name == self.last_best.name:
+                    self.data[behavior_name].has_threshold = 1
+                else:
+                    self.data[behavior_name].has_threshold = 0
+
         # gets the best plan and checks if it is beyond boundries
         best = self.data[max(self.data, key=lambda x: self.data[x].get_effective_probability())]
         best = self.check_bounds(best)
-
-        if self.last_best is not None:
-            self.last_best = best
-            self.last_best.has_threshold = 0
-        best.has_threshold = 1
-
         return best.queue[0]
 
     def update_success_rate(self, ai_status):
@@ -78,12 +79,13 @@ class BestSelector:
 # a structure for an action, including a stack of its instances, and it's evaluation properties
 # like reward, penalty and threshold
 class NQueue:
-    def __init__(self, length):
+    def __init__(self, length, name):
         self.queue = []
         self.success_rate = -1
         self.has_threshold = 0
         self.penalty = .5
         self.reward = .5
+        self.name = name
 
     def update_reward_penalty(self,reward, penalty):
         self.reward = reward
