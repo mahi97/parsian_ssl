@@ -28,7 +28,7 @@ void AINodelet::onInit() {
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-//    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
+    timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 

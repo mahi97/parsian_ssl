@@ -169,6 +169,7 @@ private:
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
     int playmakeId;
+    int supporterId;
     double playMakeTh;
     int lastPlayMake;
 
@@ -279,7 +280,7 @@ private:
 
     void sendBehaviorStatus();
 
-    void findDefneders(const int &max_number);
+    void findDefneders(const int &max_number, const int& min_number);
 
 };
 #endif //PARSIAN_AI_COACH_H

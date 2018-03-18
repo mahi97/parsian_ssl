@@ -861,9 +861,9 @@ void CCoach::decideAttack()
     }
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
-//    if (selectedBehavior != nullptr) {
-//        selectedBehavior->execute();
-//    }
+    if (selectedBehavior != nullptr) {
+        selectedBehavior->execute();
+    }
     lastPlayers.clear();
     lastPlayers.append(ourPlayers);
 }
@@ -1190,10 +1190,11 @@ void CCoach::execute()
 {
     findGoalieID();
     choosePlaymakeAndSupporter();
-//    findDefneders(conf.maxNumberOfDefenses);
-//    sendBehaviorStatus();
-//    ROS_INFO("MAHI IS THE BEST");
     decidePreferredDefenseAgentsCountAndGoalieAgent();
+    if (conf.numberOfDefenseEval > 0) findDefneders(preferedDefenseCounts + conf.numberOfDefenseEval, preferedDefenseCounts);
+    else findDefneders(preferedDefenseCounts, preferedDefenseCounts - conf.numberOfDefenseEval);
+    sendBehaviorStatus();
+//    ROS_INFO("MAHI IS THE BEST");
     decideDefense();
     checkTransitionToForceStart();
     // place your reset codes about knowledge vars in this function
@@ -1206,7 +1207,7 @@ void CCoach::execute()
     for(int i = 0; i < _MAX_NUM_PLAYERS; i++ ) {
         if (agents[i]->isVisible() && agents[i]->action != nullptr) {
             Action *mahi = agents[i]->action;
-            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
+//            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
         }
     }
     checkSensorShootFault();
@@ -1374,12 +1375,6 @@ void CCoach::decideNull(QList<int> &_ourPlayers) {
     {
         ourPlayOff->reset();
         ourPlayOff->deleted = true;
-    }
-}
-
-bool CCoach::isFastPlay() {
-    if (conf.UseFastPlay) {
-        return true; // TODO : fix this by considering that opp agents
     }
 }
 
@@ -1665,30 +1660,16 @@ void CCoach::sendBehaviorStatus() {
     parsian_msgs::parsian_ai_statusPtr status{new parsian_msgs::parsian_ai_status};
     status->GK = preferedGoalieID;
     status->playmake_id = playmakeId;
-    for (int i = 1; i <= conf.maxNumberOfDefenses; i++) {
-        for (int j = 0; j < i; j++) status->defenses.push_back(static_cast<unsigned char &&>(std::move(defenseMatched[0][i][j])));
-        delete defenseMatched[0][i];
-        if (conf.evalGoalie) delete defenseMatched[1][i];
-    }
-    delete[] defenseMatched[0];
-    if (conf.evalGoalie) delete[] defenseMatched[1];
-    status->supporter_id = status->INVALID_ID;
-    if (selectedBehavior != nullptr) {
-        status->behavior = selectedBehavior->getName();
-        status->finished = (selectedBehavior->process() == 1.0);
-    } else {
-        status->behavior = "";
-        status->finished = false;
-    }
+    status->supporter_id = supporterId;
     ai_status_pub->publish(status);
 
 }
 
-void CCoach::findDefneders(const int& max_number) {
+void CCoach::findDefneders(const int& max_number, const int& min_number) {
     defenseMatched[0] = new int* [max_number + 1];
-    for (int i = 1; i <= max_number; i++) defenseMatched[0][i] = new int[i];
+    for (int i = min_number; i <= max_number; i++) defenseMatched[0][i] = new int[i];
 
-    for (int i = 1; i <= max_number; i++) {
+    for (int i = min_number; i <= max_number; i++) {
         assignDefenseAgents(i);
         assignGoalieAgent(preferedGoalieID);
         selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
@@ -1696,18 +1677,22 @@ void CCoach::findDefneders(const int& max_number) {
         selectedPlay->defensePlan.execute();
         for (int j = 0; j < defenseAgents.size(); j++ ) defenseMatched[0][i][j] = defenseAgents[j]->id();
     }
-    if (conf.evalGoalie) {
-        defenseMatched[1] = new int* [max_number + 1];
-        for (int i = 1; i <= max_number; i++) defenseMatched[1][i] = new int[i];
+    defenseMatched[1] = new int* [max_number + 1];
+    for (int i = min_number; i <= max_number; i++) defenseMatched[1][i] = new int[i];
 
-        for (int i = 1; i <= max_number; i++) {
-            assignDefenseAgents(i);
-            assignGoalieAgent(-1);
-            selectedPlay->defensePlan.initGoalKeeper(nullptr);
-            selectedPlay->defensePlan.initDefense(defenseAgents);
-            selectedPlay->defensePlan.execute();
-            for (int j = 0; j < defenseAgents.size(); j++ ) defenseMatched[1][i][j] = defenseAgents[j]->id();
-        }
+    for (int i = min_number; i <= max_number; i++) {
+        assignDefenseAgents(i);
+        assignGoalieAgent(-1);
+        selectedPlay->defensePlan.initGoalKeeper(nullptr);
+        selectedPlay->defensePlan.initDefense(defenseAgents);
+        selectedPlay->defensePlan.execute();
+        for (int j = 0; j < defenseAgents.size(); j++ ) defenseMatched[1][i][j] = defenseAgents[j]->id();
     }
 
+}
+
+bool CCoach::isFastPlay() {
+    if (conf.UseFastPlay) {
+        return true; // TODO : fix this by considering that opp agents
+    }
 }
