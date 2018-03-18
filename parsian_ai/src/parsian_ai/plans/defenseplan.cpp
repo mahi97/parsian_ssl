@@ -7,8 +7,10 @@ using namespace std;
 
 QList<Vector2D> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
     QList<Vector2D> opponentPassOwners;
+    QList<QPair<int , double> > IDAndReachTimeOfOpponentsInPolygon;
+    QPair<int , double> tempPair;
     Vector2D solutions[4];
-    Polygon2D ballPathArea;
+    Polygon2D ballArea;
     Vector2D currentBallPosition = wm->ball->pos;
     Vector2D finalBallPosition = wm->ball->getPosInFuture(2);
     Circle2D downEdgeCircle(currentBallPosition , downEdgeLength / 2);
@@ -18,12 +20,26 @@ QList<Vector2D> DefensePlan::detectOpponentPassOwners(double downEdgeLength , do
         downEdgeCircle.intersection(ballPath.perpendicular(currentBallPosition) , &solutions[0] , &solutions[1]);
         upEdgeCircle.intersection(ballPath.perpendicular(finalBallPosition) , &solutions[2] , &solutions[3]);
         for(size_t i = 0 ; i < 4 ; i++){
-            ballPathArea.addVertex(solutions[i]);
+            ballArea.addVertex(solutions[i]);
         }
         for(size_t i = 0; i < 4 ; i++){
             drawer->draw(solutions[i] , "red");
         }
 //        drawer->draw(ballPathArea , "black");
+    }
+    for(size_t i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
+        if(ballArea.contains(wm->opp.active(i)->pos)){
+            tempPair.first = wm->opp.activeAgentID(i);
+            tempPair.second = ballPath.dist(wm->opp.active(i)->pos);
+            IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
+        }
+        else{
+            if(wm->opp.active(i)->vel.length() > 1 && ballArea.contains(wm->opp.active(i)->pos + wm->opp.active(i)->vel)){
+                tempPair.first = wm->opp.activeAgentID(i);
+                tempPair.second = ballPath.dist(wm->opp.active(i)->pos + wm->opp.active(i)->vel);
+                IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
+            }
+        }
     }
     return opponentPassOwners;
 }
