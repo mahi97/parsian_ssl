@@ -1,12 +1,36 @@
 #include "parsian_ai/plans/defenseplan.h"
+#include "parsian_util/tools/blackboard.h"
 
 using namespace std;
 
 #define LONG_CHIP_POWER 1023
 
-int DefensePlan::defenseNumber() {
-    if (conf.StrictFormation) {
-        if (conf.Defense > 3) {
+QList<Vector2D> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
+    QList<Vector2D> opponentPassOwners;
+    Vector2D solutions[4];
+    Polygon2D ballPathArea;
+    Vector2D currentBallPosition = wm->ball->pos;
+    Vector2D finalBallPosition = wm->ball->getPosInFuture(2);
+    Circle2D downEdgeCircle(currentBallPosition , downEdgeLength / 2);
+    Circle2D upEdgeCircle(finalBallPosition, upEdgeLength / 2);
+    Line2D ballPath(currentBallPosition , finalBallPosition);
+    if(wm->ball->vel.length()){
+        downEdgeCircle.intersection(ballPath.perpendicular(currentBallPosition) , &solutions[0] , &solutions[1]);
+        upEdgeCircle.intersection(ballPath.perpendicular(finalBallPosition) , &solutions[2] , &solutions[3]);
+        for(size_t i = 0 ; i < 4 ; i++){
+            ballPathArea.addVertex(solutions[i]);
+        }
+        for(size_t i = 0; i < 4 ; i++){
+            drawer->draw(solutions[i] , "red");
+        }
+//        drawer->draw(ballPathArea , "black");
+    }
+    return opponentPassOwners;
+}
+
+int DefensePlan::defenseNumber(){
+    if (conf.StrictFormation){
+        if (conf.Defense > 3){
             return 3;
         } else {
             return conf.Defense;
@@ -25,7 +49,7 @@ Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit) {
     int numberOfDefenseAgents = 1;
     wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
         getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
-    defensePosition = sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1];
+    defensePosition = sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1];
     return defensePosition;
 }
 
@@ -42,8 +66,8 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
         getBisectorSegment(anIntesection , ballPosition , ourGoalLeft) , &sol[0] , &sol[1]);
     wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
         getBisectorSegment(anIntesection , ballPosition , ourGoalRight) , &sol[2] , &sol[3]);
-    defensePosition.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1]);
-    defensePosition.append(sol[2].dist(wm->ball->pos) < sol[3].dist(wm->ball->pos) ? sol[2] : sol[3]);
+    defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
+    defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
     return defensePosition;
 }
 
@@ -102,9 +126,9 @@ QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upL
             }
         }
     }
-    defensePosition.append(sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1]);
-    defensePosition.append(sol[4].dist(wm->ball->pos) < sol[5].dist(wm->ball->pos) ? sol[4] : sol[5]);
-    defensePosition.append(sol[6].dist(wm->ball->pos) < sol[7].dist(wm->ball->pos) ? sol[6] : sol[7]);
+    defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
+    defensePosition.append(sol[4].dist(ballPosition) < sol[5].dist(ballPosition) ? sol[4] : sol[5]);
+    defensePosition.append(sol[6].dist(ballPosition) < sol[7].dist(ballPosition) ? sol[6] : sol[7]);
     return defensePosition;
 
 }
@@ -1350,7 +1374,7 @@ void DefensePlan::initDefense(QList <Agent*> _defenseAgents) {
     agents.append(_defenseAgents);
 }
 
-DefensePlan::DefensePlan() {
+DefensePlan::DefensePlan(){
     //// Constructor function of DefensePlan class
 
     goalieThr = 0.0;
@@ -1448,7 +1472,7 @@ DefensePlan::DefensePlan() {
 
 }
 
-void DefensePlan::preCalculate() {
+void DefensePlan::preCalculate(){
     //// This function initializes some variables from GUI &&
     //// sets some properties of kick && chip skill.
     //// Actually this function is used in "execute()" function , before any
@@ -1617,7 +1641,7 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
     }
 }
 
-void DefensePlan::execute() {
+void DefensePlan::execute(){
     ///// All of the goalKeeper && defense functions are linked in this function.
     ///// First of all, we determine the behavior of goalKeeper.
     ///// (first in penalty mode then other mode)
@@ -1626,7 +1650,10 @@ void DefensePlan::execute() {
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    DBUG(QString("defense agents size %1").arg(defenseAgents.size()), D_HAMED);
+    int defenseAgentSize = defenseAgents.size();
+    MONITOR(defenseAgentSize);
+    detectOpponentPassOwners(0.3 , 2);
+    ROS_INFO(QString("ballPos: %1 %2").arg(wm->ball->getPosInFuture(50).x).arg(wm->ball->getPosInFuture(50).y).toStdString().c_str());
     ////////////initialize////////////////
     initVars();
     preCalculate();
@@ -2956,12 +2983,14 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     //// consider the intersection point for the locaiton of the ball.
 
     Vector2D BallPos = wm->ball->pos;
-    Vector2D BallVel = wm->ball->vel  * 1;
+    Vector2D BallVel = wm->ball->vel  * 0.25;
     Segment2D ballPosVel(BallPos, BallPos + (BallVel));
     Vector2D predictedBall;
     Vector2D solu[4];
     Rect2D fieldRect(Vector2D(- wm->field->_FIELD_WIDTH / 2.0 , - wm->field->_FIELD_HEIGHT / 2.0) + Vector2D(-0.005, -0.005), Vector2D(wm->field->_FIELD_WIDTH / 2.0 , wm->field->_FIELD_HEIGHT / 2.0) + Vector2D(+0.005, +0.005));
     double dist2Ball = 1000;
+//    predictedBall = wm->ball->pos;
+//    return predictedBall;
     if (BallVel.x > 0 && BallPos.x > 0) {
         return BallPos;
     }
@@ -3002,11 +3031,17 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         drawer->draw(QString("Def follow"), Vector2D(0, 2), "red");
     }
 
-    if (!_isGoalie && wm->field->ourBigPenaltyArea(1, 0.2, 0).contains(wm->ball->pos)) {
+    if(!_isGoalie && wm->field->ourBigPenaltyArea(1, 0.2, 0).contains(wm->ball->pos)){
         wm->field->ourBigPenaltyArea(1, 1, 0).intersection(Line2D(wm->field->ourGoal() , wm->ball->pos) , &solu[2] , &solu[3]);
         predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2] : solu[3];
     }
-    drawer->draw(predictedBall);
+
+    if(!_isGoalie && wm->ball->pos.x < -5.8){
+        wm->field->ourBigPenaltyArea(1, 1, 0).intersection(Line2D(wm->field->ourGoal() , wm->ball->pos) , &solu[2] , &solu[3]);
+        predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2] : solu[3];
+    }
+
+    drawer->draw(predictedBall , "black");
     return predictedBall;
 }
 

@@ -74,6 +74,7 @@ protected:
     QList<Vector2D> defenseFormation(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
     QList<Vector2D> twoDefenseFormation(double downLimit , double upLimit);
     QList<Vector2D> threeDefenseFormation(double downLimit , double upLimit);
+    QList<Vector2D> detectOpponentPassOwners(double downEdge , double upEdge);
     Vector2D oneDefenseFormation(double downLimit , double upLimit);
 
     //atousa
