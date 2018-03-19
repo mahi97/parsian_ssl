@@ -23,6 +23,10 @@
 #include <behavior/mahi/mahi.h>
 #include <parsian_msgs/plan_service.h>
 #include <parsian_msgs/parsian_ai_status.h>
+#include <parsian_msgs/parsian_robot_task.h>
+#include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
+#include <parsian_msgs/parsian_skill_gotoPoint.h>
+
 
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
@@ -273,7 +277,7 @@ private:
     QList<CRobot *> toBeMopps;
     int desiredDefCount;
     QString stateForMark;
-    int** defenseMatched[2];
+    QPair<int, parsian_msgs::parsian_robot_task>** defenseMatched[2];
     parsian_msgs::parsian_behaviorConstPtr m_behavior;
 
     POffSkills strToEnum(const std::string &_str);
