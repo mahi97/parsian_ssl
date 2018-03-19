@@ -1,6 +1,7 @@
 uint8 id
 uint8 role
 vector2D target
+parsian_msgs/parsian_robot_task task
 
 # Roles
 uint8 IDLE = 255
@@ -19,3 +20,5 @@ uint8 NOT_DEFINED = 255
 
 # TARGET
 uint16 INVALID_POS = 5000
+
+

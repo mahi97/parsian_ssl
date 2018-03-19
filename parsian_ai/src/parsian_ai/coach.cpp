@@ -2,9 +2,9 @@
 //// Created by parsian-ai on 9/22/17.
 ////
 
+
+
 #include <parsian_ai/coach.h>
-
-
 CCoach::CCoach(Agent**_agents)
 {
 
@@ -1657,12 +1657,31 @@ int CCoach::findGoalieID() {
 }
 
 void CCoach::sendBehaviorStatus() {
-    parsian_msgs::parsian_ai_statusPtr status{new parsian_msgs::parsian_ai_status};
-    status->GK = preferedGoalieID;
-    status->playmake_id = playmakeId;
-    status->supporter_id = supporterId;
-    ai_status_pub->publish(status);
 
+    ai_status_pub->publish(fillAIStatus());
+}
+
+parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
+{
+        parsian_msgs::parsian_ai_statusPtr ai_status{new parsian_msgs::parsian_ai_status};
+        ai_status->GK = preferedGoalieID;
+        ai_status->playmake_id = playmakeId;
+        ai_status->supporter_id = supporterId;
+
+        int max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval: preferedDefenseCounts},
+            min{conf.numberOfDefenseEval < 0 ? preferedDefenseCounts + conf.numberOfDefenseEval: preferedDefenseCounts};
+
+        for (int i = 0; i < max - min + 2; i++)
+        {
+            for (int j = 0; j < i; i++)
+            {
+                parsian_msgs::parsian_pair_role pr;
+                pr.id = defenseMatched[0][i][j].first;
+                pr.task = defenseMatched[0][i][j].second;
+                pr.role = parsian_msgs::parsian_pair_role::DEFENSE;
+                ai_status->states[i].roles[j] = pr;
+            }
+        }
 }
 
 void CCoach::findDefneders(const int& max_number, const int& min_number) {

@@ -23,6 +23,7 @@
 #include <behavior/mahi/mahi.h>
 #include <parsian_msgs/plan_service.h>
 #include <parsian_msgs/parsian_ai_status.h>
+#include <parsian_msgs/parsian_pair_roles.h>
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
@@ -283,6 +284,8 @@ private:
     POffSkills strToEnum(const std::string &_str);
 
     void sendBehaviorStatus();
+
+    parsian_msgs::parsian_ai_statusPtr fillAIStatus();
 
     void findDefneders(const int &max_number, const int& min_number);
 
