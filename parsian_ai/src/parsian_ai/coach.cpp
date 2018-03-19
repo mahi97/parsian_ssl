@@ -1663,32 +1663,38 @@ void CCoach::sendBehaviorStatus() {
 
 parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
 {
+
         parsian_msgs::parsian_ai_statusPtr ai_status{new parsian_msgs::parsian_ai_status};
         ai_status->GK = preferedGoalieID;
         ai_status->playmake_id = playmakeId;
         ai_status->supporter_id = supporterId;
 
-        int max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval: preferedDefenseCounts},
-            min{conf.numberOfDefenseEval < 0 ? preferedDefenseCounts + conf.numberOfDefenseEval: preferedDefenseCounts};
+        int max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts},
+            min{conf.numberOfDefenseEval <= 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts};
+        ROS_INFO_STREAM("hamid: send: " << max << ", "<< min);
 
         for (int i = 0; i < max - min + 2; i++)
         {
-            for (int j = 0; j < i; i++)
+            ROS_INFO_STREAM("hamid: first loop :  " << max - min + 1);
+            for (int j = 0; j <= i; j++)
             {
                 parsian_msgs::parsian_pair_role pr;
                 pr.id = defenseMatched[0][i][j].first;
                 pr.task = defenseMatched[0][i][j].second;
                 pr.role = parsian_msgs::parsian_pair_role::DEFENSE;
                 ai_status->states[i].roles[j] = pr;
+                ROS_INFO_STREAM("hamid: second loop");
+
             }
         }
+        return ai_status;
 }
 
 void CCoach::findDefneders(const int& max_number, const int& min_number) {
-
+    ROS_INFO_STREAM("hamid: finaldef: " << max_number << ", "<< min_number);
     defenseMatched[0] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
-    for (int i = min_number; i <= max_number; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
-    for (int i = min_number; i <= max_number; i++) {
+    for (int i = 0; i < max_number - min_number + 2; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
+    for (int i = 0; i < max_number - min_number + 2; i++) {
         assignDefenseAgents(i);
         assignGoalieAgent(preferedGoalieID);
         selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
