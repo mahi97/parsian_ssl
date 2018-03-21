@@ -28,7 +28,7 @@ void AINodelet::onInit() {
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-//    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
+    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
@@ -56,6 +56,12 @@ void AINodelet::timerCb(const ros::TimerEvent& event) {
     if (debugger != nullptr) {
         debugPub.publish(debugger->debugs);
     }
+    drawer->draws.circles.clear();
+    drawer->draws.segments.clear();
+    drawer->draws.vectors.clear();
+    drawer->draws.rects.clear();
+    drawer->draws.polygons.clear();
+    drawer->draws.texts.clear();
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
