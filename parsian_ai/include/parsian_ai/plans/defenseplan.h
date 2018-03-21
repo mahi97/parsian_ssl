@@ -12,6 +12,7 @@
 #include <QList>
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/config.h>
+#include <parsian_util/geom/polygon_2d.h>
 
 #define LOOP_TIME_BYKK 0.016
 struct velAndAccByKK {

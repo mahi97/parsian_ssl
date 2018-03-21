@@ -60,7 +60,7 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
     drawer->draws.vectors.clear();
     drawer->draws.segments.clear();
     drawer->draws.rects.clear();
-    //drawer->draws.polygons.clear();
+    drawer->draws.polygons.clear();
     drawer->draws.texts.clear();
 }
 
