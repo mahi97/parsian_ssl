@@ -1082,7 +1082,7 @@ bool DefensePlan::isInIndirectArea(Vector2D aPoint) {
     //// checks that a point is in the circle around the ball
     //// with 50cm radius or not.
 
-    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);
+    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);    
     return localFlag;
 }
 
