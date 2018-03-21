@@ -45,7 +45,9 @@ QList<QPair<int , double> > DefensePlan::detectOpponentPassOwners(double downEdg
             IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
         }
         else{
-            if(wm->opp.active(i)->vel.length() > 1 && ballArea.contains(wm->opp.active(i)->pos + wm->opp.active(i)->vel)){
+            if(wm->opp.active(i)->vel.length() > 1
+                    && Line2D(wm->opp.active(i)->pos , wm->opp.active(i)->pos + wm->opp.active(i)->vel).
+                    intersection(Line2D(currentBallPosition , finalBallPosition)).valid()){
                 tempPair.first = wm->opp.activeAgentID(i);
                 tempPair.second = ballPath.dist(wm->opp.active(i)->pos + wm->opp.active(i)->vel) / maxOpponentVelocity;
                 IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
