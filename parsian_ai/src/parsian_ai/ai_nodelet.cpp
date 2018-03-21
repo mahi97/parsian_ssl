@@ -61,8 +61,7 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
     drawer->draws.polygons.clear();
     drawer->draws.rects.clear();
     drawer->draws.vectors.clear();
-    debugger->debugs.debugs.clear();
-
+    debugger->debugs.debugs.clear(); 
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
