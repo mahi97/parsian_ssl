@@ -14,6 +14,7 @@ QList<Vector2D> DefensePlan::detectOpponentPassOwners(double downEdgeLength , do
     Vector2D solutions[4];
     Vector2D solution;
     Polygon2D ballArea;
+    Rect2D tempRect;
     Vector2D currentBallPosition = wm->ball->pos;
     Vector2D finalBallPosition = wm->ball->getPosInFuture(2);
     Circle2D downEdgeCircle(currentBallPosition , downEdgeLength / 2);
@@ -34,33 +35,26 @@ QList<Vector2D> DefensePlan::detectOpponentPassOwners(double downEdgeLength , do
         }
         drawer->draw(ballArea , QColor("black"));
     }
+    ///////////////////// Calculate the reach time of each opponent agent ///////////////////////
+    tempRect = Rect2D(Vector2D(1,1) , Vector2D(-1,-1));
+    drawer->draw(tempRect);
     for(size_t i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
-        if(ballArea.contains(wm->opp.active(i)->pos)){
+//        if(tempRect.contains(wm->opp.active(i)->pos)){
             tempPair.first = wm->opp.activeAgentID(i);
             tempPair.second = ballPath.dist(wm->opp.active(i)->pos) / maxOpponentVelocity;
-            drawer->draw(Circle2D(wm->opp.active(i)->pos , 0.2) , "black");
+            drawer->draw(Circle2D(wm->opp.active(i)->pos, 0.3) , "black");
             IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
-        }
-        else{
-            if(wm->opp.active(i)->vel.length() > 1 && ballArea.contains(wm->opp.active(i)->pos + wm->opp.active(i)->vel)){
-                tempPair.first = wm->opp.activeAgentID(i);
-                tempPair.second = ballPath.dist(wm->opp.active(i)->pos + wm->opp.active(i)->vel) / maxOpponentVelocity;
-                IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
-            }
-        }
-    }
-    ROS_INFO(QString("count: %1").arg(1).toStdString().c_str());
-
+//        }
+//        else{
+//            if(wm->opp.active(i)->vel.length() > 1 && ballArea.contains(wm->opp.active(i)->pos + wm->opp.active(i)->vel)){
+//                tempPair.first = wm->opp.activeAgentID(i);
+//                tempPair.second = ballPath.dist(wm->opp.active(i)->pos + wm->opp.active(i)->vel) / maxOpponentVelocity;
+//                IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
+//            }
+//        }
+    }    
     ////////// Sort dangerous ///////////////////////////////
-    for(size_t i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
-        for(size_t j = 0 ; i < wm->opp.activeAgentsCount() ; j++){
-            if(IDAndReachTimeOfOpponentsInPolygon.at(i).second < IDAndReachTimeOfOpponentsInPolygon.at(j).second){
-                tempPair = IDAndReachTimeOfOpponentsInPolygon.at(j);
-//                IDAndReachTimeOfOpponentsInPolygon.at(j) = IDAndReachTimeOfOpponentsInPolygon.at(i);
-//                IDAndReachTimeOfOpponentsInPolygon.at(i) = tempPair;
-            }
-        }
-    }
+    qSort(IDAndReachTimeOfOpponentsInPolygon.begin() , IDAndReachTimeOfOpponentsInPolygon.end());
     return opponentPassOwners;
 }
 
