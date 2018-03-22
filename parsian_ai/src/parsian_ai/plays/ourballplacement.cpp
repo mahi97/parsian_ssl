@@ -37,25 +37,20 @@ void COurBallPlacement::execute_x(){
     ROS_INFO_STREAM(flag);
     if(agents.size() <= 1)
         return;
-
-    if (first) {
-        a = ap = agents[0];
-        first = false;
-    }
-
-    lockAgents = true;
     Vector2D ballpos = Vector2D(wm->ball->pos.x, wm->ball->pos.y);
     Vector2D pos = wm->ballplacementPoint();
     double dist = 0;
     double mindist = 10000;
-    CAgent *pap = ap;
-
-    for(int i = 0 ; i < agents.size()   ; i++){
-        dist = agents[i]->pos().dist(pos);
-        if (dist < mindist){
-            mindist = dist;
-            minIndexPos = i;
-            ap = agents[i];
+    if (first) {
+        a = ap = agents[0];
+        first = false;
+        for(int i = 0 ; i < agents.size()   ; i++){
+            dist = agents[i]->pos().dist(pos);
+            if (dist < mindist){
+                mindist = dist;
+                minIndexPos = i;
+                ap = agents[i];
+            }
         }
     }
     mindist = 10000;
@@ -70,8 +65,6 @@ void COurBallPlacement::execute_x(){
     }
     ROS_INFO("Executaion 1");
     auto *nothing = new NoAction;
-    if (pap->id() != ap->id())
-        pap->action = nothing;
     ROS_INFO("Executaion 1.2");
     if (pa->id() != a->id()) {
         pa->action = nothing;
@@ -206,41 +199,4 @@ void COurBallPlacement::execute_x(){
         default:
             break;
     }
-    //////////////////////////////////////////////////
-    /*
-    auto *gp = new GotopointavoidAction();
-    gp->setTargetpos(pos);
-    gp->setLookat(ballpos);
-    gp->setSlowmode(true);
-    gp->setRoller(7);
-    ROS_INFO("Executaion 2");
-    Circle2D c{agents[minIndexPos]->pos() + (agents[minIndexPos]->dir().norm() * 0.1), 0.1};
-    if (c.contains(ballpos))
-        agents[minIndexPos]->action = gp;
-    else
-        agents[minIndexPos]->action = rec;
-    ROS_INFO("Executaion 3");
-    auto *pass = new KickAction();
-    pass->setTarget(pos);
-    int power = 100 * pos.dist(ballpos);
-    ROS_INFO_STREAM(power);
-    pass->setKickspeed(power);
-    pass->setSpin(5);
-    pass->setSlow(true);
-
-    ROS_INFO("Executaion !");
-    Circle2D cir{agents[minIndexPos]->pos(), 0.5};
-    Vector2D sol1, sol2;//dorost nist
-    if (agents[minIndexPos]->pos().dist(ballpos) > 0.2 && cir.intersection(Ray2D(ballpos, wm->ball->dir.norm() * wm->ball->vel.length()),&sol1,&sol2) == 0
-     //&& wm->ball->vel.length() < 0.3
-     ){
-        if(agents[minIndex]->pos().dist(ballpos - Segment2D(ballpos , pos).length() * wm->ball->dir.norm()) > 0.2)
-            agents[minIndex]->action = gpa;
-        else
-            agents[minIndex]->action = pass;
-    }
-    else
-        agents[minIndex]->action = nothing;
-    ROS_INFO_STREAM(minIndexPos);
-    */
 }
