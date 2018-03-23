@@ -44,7 +44,7 @@ public:
 
     ros::Timer timer;
 
-    rosbag::Bag bag;
+        rosbag::Bag *bag;
 
 
     double radius = 0.0215;

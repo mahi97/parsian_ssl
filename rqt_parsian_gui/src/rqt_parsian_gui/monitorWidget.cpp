@@ -36,6 +36,7 @@ namespace rqt_parsian_gui
         cameraY=0.0;
         scaleFactor=1;
         isLogging= false;
+        isReplaying = false;
         recShowTimer = new QTimer();
         recShowTimer->setInterval(500);
         recShowTimer->start();
@@ -50,6 +51,11 @@ namespace rqt_parsian_gui
     void MonitorWidget::showHideRec(){
         recShowBool = !recShowBool;
     }
+    void MonitorWidget::showLogMode(bool isLogMode,bool isReplayMode){
+            isLogging=isLogMode;
+        isReplaying=isReplayMode;
+    }
+
     void MonitorWidget::setViewportWidth(int width)
     {
         viewportWidth = width;
@@ -102,18 +108,8 @@ namespace rqt_parsian_gui
 
         }
     }
-    void MonitorWidget::showLogMode(){
-        if(!isLogging)
-            isLogging=true;
-        else
-            isLogging =false;
-    }
-    void MonitorWidget::showReplayMode(){
-        if(!isReplaying)
-            isReplaying=true;
-        else
-            isReplaying =false;
-    }
+
+
 
     void MonitorWidget::initializeGL()
     {
@@ -140,26 +136,11 @@ namespace rqt_parsian_gui
             drawArc(-3.600 , 2.500 , 0.08 , 0 , 360 , QColor("red") , true);
             drawText(-3.480 , 2.400 , "REC" , QColor("red") , 14);
         }
-        if(isLogging) {
-
-            drawArc(-5,
-                    -6,
-                    0.1,
-                    0,
-                    360,
-                    QColor("red"),
-                    true);
+        if( isReplaying && recShowBool){
+            //show Replay Mode
+            drawArc(-3.600 , 2.500 , 0.08 , 0 , 360 , QColor("blue") , true);
         }
-        if(isReplaying){
 
-            drawArc(-5,
-                    -6,
-                    0.1,
-                    0,
-                    360,
-                    QColor("blue"),
-                    true);
-        }
         CGraphicalRobot rob;
         while (!drawerBuffer->robotBuffer.isEmpty()) {
             rob = drawerBuffer->robotBuffer.dequeue();
@@ -186,8 +167,10 @@ namespace rqt_parsian_gui
 
         parsian_msgs::parsian_draw_circle arc;
 ////        CGraphicalArc arc;
+
         while (!drawerBuffer->arcBuffer->isEmpty()) {
             arc = drawerBuffer->arcBuffer->dequeue();
+
             QColor col = QColor(arc.color.r, arc.color.g, arc.color.b);
 
             drawArc(arc.circle.center.x,
@@ -219,9 +202,11 @@ namespace rqt_parsian_gui
         }
 
 
+
         parsian_msgs::parsian_draw_rect rec;
         while (!drawerBuffer->rectBuffer->isEmpty()) {
             rec = drawerBuffer->rectBuffer->dequeue();
+
 
             QColor col = QColor(rec.color.r, rec.color.g, rec.color.b);
             ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
@@ -234,9 +219,11 @@ namespace rqt_parsian_gui
                      rec.filled);
         }
 
+
         parsian_msgs::parsian_draw_segment seg;
         while (!drawerBuffer->segBuffer->isEmpty()) {
             seg = drawerBuffer->segBuffer->dequeue();
+
 
             QColor col = QColor(seg.color.r, seg.color.g, seg.color.b);
 

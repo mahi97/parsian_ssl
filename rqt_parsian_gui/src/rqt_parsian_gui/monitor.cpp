@@ -47,10 +47,12 @@ namespace rqt_parsian_gui {
         lastdrawer = new CguiDrawer();
 
 
+
         widget_->setWindowTitle("nadia");
         ourCol = QColor("blue");
         oppCol = QColor("yellow");
 
+        bag=new rosbag::Bag();
 
         LogMode = new QAction(this);
         LogMode->setShortcut(*new QKeySequence(tr("Ctrl+L")));
@@ -101,7 +103,7 @@ namespace rqt_parsian_gui {
             std::string s;
             s = ros::package::getPath("rqt_parsian_gui");
             ROS_INFO_STREAM(s + "aa");
-            bag.open(s+"/logs/"+suggestionName.toStdString()+".bag", rosbag::bagmode::Write);
+            bag->open(s+"/logs/"+suggestionName.toStdString()+".bag", rosbag::bagmode::Write);
 
         }
 
@@ -116,7 +118,7 @@ namespace rqt_parsian_gui {
 
         if (isLogMode) {
             isLogMode = false;
-            bag.close();
+            bag->close();
         }
     }
 
@@ -141,13 +143,15 @@ namespace rqt_parsian_gui {
             mywm = _wm;
 
 
-                bag.write("log/world_model", ros::Time::now(), mywm);
-            }
-            if (!isReplayMode) {
+            bag->write("log/world_model", ros::Time::now(), mywm);
+        }
+        if(!isReplayMode){
 
-                mywm = _wm;
+            mywm = _wm;
 
-                drawer = new CguiDrawer();
+            drawer = new CguiDrawer();
+
+
 //        drawer->polygonBuffer=lastdrawer->polygonBuffer;
 //        drawer->rectBuffer=lastdrawer->rectBuffer;
 //        drawer->pointBuffer=lastdrawer->pointBuffer;
@@ -157,205 +161,208 @@ namespace rqt_parsian_gui {
 
 
 
-                drawer->guiBall.inSight = mywm->ball.inSight;
-                drawer->guiBall.pos.x = mywm->ball.pos.x;
-                drawer->guiBall.pos.y = mywm->ball.pos.y;
-                drawer->guiBall.radius = mywm->ball.obstacleRadius;
-                for (int i = 0; i < mywm->our.size(); i++) {
-                    if (fabs(mywm->our[i].inSight - 0.5) < 0.01) {
-                        ourCol.setAlpha(150);
-                    }
-                    drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
-                                      ourCol, mywm->our[i].id, i, "", true);
-
-                    //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
-                    //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
-
-
+            drawer->guiBall.inSight = mywm->ball.inSight;
+            drawer->guiBall.pos.x = mywm->ball.pos.x;
+            drawer->guiBall.pos.y = mywm->ball.pos.y;
+            drawer->guiBall.radius = mywm->ball.obstacleRadius;
+            for (int i = 0; i < mywm->our.size(); i++) {
+                if (fabs(mywm->our[i].inSight - 0.5) < 0.01) {
+                    ourCol.setAlpha(150);
                 }
+                drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
+                                  ourCol, mywm->our[i].id, i, "", true);
 
+                //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
+                //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
 
-                for (const auto &i : mywm->opp) {
-
-
-                    if (fabs(i.inSight - 0.5) < 0.01) {
-                        oppCol.setAlpha(150);
-                    }
-
-
-                    drawer->drawRobot(i.pos, i.dir,
-                                      oppCol, i.id, -1);
-
-                }
-//        fieldWidget->update();
 
             }
 
 
-        }
+            for (const auto &i : mywm->opp) {
 
 
-
-        void Monitor::logwmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-
-
-
-
-            if (isReplayMode) {
-                mywm = _wm;
-
-                drawer = new CguiDrawer();
-
-
-
-                drawer->guiBall.inSight = mywm->ball.inSight;
-                drawer->guiBall.pos.x = mywm->ball.pos.x;
-                drawer->guiBall.pos.y = mywm->ball.pos.y;
-                drawer->guiBall.radius = mywm->ball.obstacleRadius;
-                for (int i = 0; i < mywm->our.size(); i++) {
-                    if (fabs(mywm->our[i].inSight - 0.5) < 0.01) {
-                        ourCol.setAlpha(150);
-                    }
-                    drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
-                                      ourCol, mywm->our[i].id, i, "", false);
-
-                    //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
-                    //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
-
-
+                if (fabs(i.inSight - 0.5) < 0.01) {
+                    oppCol.setAlpha(150);
                 }
 
 
-                for (const auto &i : mywm->opp) {
+                drawer->drawRobot(i.pos, i.dir,
+                                  oppCol, i.id, -1);
 
-
-                    if (fabs(i.inSight - 0.5) < 0.01) {
-                        oppCol.setAlpha(150);
-                    }
-
-
-                    drawer->drawRobot(i.pos, i.dir,
-                                      oppCol, i.id, -1);
-
-                }
-//        fieldWidget->update();
-
-            }
-
-
-        }
-
-
-
-
-        void Monitor::drawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
-            if (isLogMode) {
-                bag.write("log/draws", ros::Time::now(), _draw);
-            }
-
-            if (!isReplayMode) {
-
-                for (parsian_msgs::parsian_draw_circle cir : _draw->circles) {
-                    lastdrawer->arcBuffer->append(cir);
-
-                }
-                for (parsian_msgs::parsian_draw_polygon polygon : _draw->polygons) {
-                    lastdrawer->polygonBuffer->append(polygon);
-
-                }
-                for (parsian_msgs::parsian_draw_rect rect : _draw->rects) {
-                    lastdrawer->rectBuffer->append(rect);
-
-                }
-                for (parsian_msgs::parsian_draw_segment seg : _draw->segments) {
-                    lastdrawer->segBuffer->append(seg);
-                }
-                for (parsian_msgs::parsian_draw_text txt : _draw->texts) {
-                    lastdrawer->textBuffer->append(txt);
-
-                }
-                for (parsian_msgs::parsian_draw_vector point : _draw->vectors) {
-                    lastdrawer->pointBuffer->append(point);
-
-                }
             }
 //        fieldWidget->update();
 
         }
 
 
-        void Monitor::logdrawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
-            if (isReplayMode) {
+    }
 
-                for (parsian_msgs::parsian_draw_circle cir : _draw->circles) {
-                    lastdrawer->arcBuffer->append(cir);
 
-                }
-                for (parsian_msgs::parsian_draw_polygon polygon : _draw->polygons) {
-                    lastdrawer->polygonBuffer->append(polygon);
 
-                }
-                for (parsian_msgs::parsian_draw_rect rect : _draw->rects) {
-                    lastdrawer->rectBuffer->append(rect);
+    void Monitor::logwmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
 
-                }
-                for (parsian_msgs::parsian_draw_segment seg : _draw->segments) {
-                    lastdrawer->segBuffer->append(seg);
-                }
-                for (parsian_msgs::parsian_draw_text txt : _draw->texts) {
-                    lastdrawer->textBuffer->append(txt);
 
-                }
-                for (parsian_msgs::parsian_draw_vector point : _draw->vectors) {
-                    lastdrawer->pointBuffer->append(point);
 
+
+        if (isReplayMode) {
+            mywm = _wm;
+
+            drawer = new CguiDrawer();
+
+
+            drawer->guiBall.inSight = mywm->ball.inSight;
+            drawer->guiBall.pos.x = mywm->ball.pos.x;
+            drawer->guiBall.pos.y = mywm->ball.pos.y;
+            drawer->guiBall.radius = mywm->ball.obstacleRadius;
+            for (int i = 0; i < mywm->our.size(); i++) {
+                if (fabs(mywm->our[i].inSight - 0.5) < 0.01) {
+                    ourCol.setAlpha(150);
                 }
+                drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
+                                  ourCol, mywm->our[i].id, i, "", false);
+
+                //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
+                //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);
+
+
+            }
+
+
+            for (const auto &i : mywm->opp) {
+
+
+                if (fabs(i.inSight - 0.5) < 0.01) {
+                    oppCol.setAlpha(150);
+                }
+
+
+                drawer->drawRobot(i.pos, i.dir,
+                                  oppCol, i.id, -1);
+
             }
 //        fieldWidget->update();
 
         }
 
-        void Monitor::timerCb(const ros::TimerEvent &_timer) {
 
-            if(isLogMode)
-            {
-                fieldWidget->showLogMode();
+    }
+
+
+
+
+
+    void Monitor::drawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
+        if(isLogMode) {
+            bag->write("log/draws", ros::Time::now(), _draw);
+        }
+
+
+        if (!isReplayMode) {
+
+            for (parsian_msgs::parsian_draw_circle cir : _draw->circles) {
+                lastdrawer->arcBuffer->append(cir);
+
             }
-            if(isLogMode)
-            {
-                fieldWidget->showReplayMode();
+            for (parsian_msgs::parsian_draw_polygon polygon : _draw->polygons) {
+                lastdrawer->polygonBuffer->append(polygon);
+
             }
+            for (parsian_msgs::parsian_draw_rect rect : _draw->rects) {
+                lastdrawer->rectBuffer->append(rect);
+
+            }
+            for (parsian_msgs::parsian_draw_segment seg : _draw->segments) {
+                lastdrawer->segBuffer->append(seg);
+            }
+            for (parsian_msgs::parsian_draw_text txt : _draw->texts) {
+                lastdrawer->textBuffer->append(txt);
+
+            }
+            for (parsian_msgs::parsian_draw_vector point : _draw->vectors) {
+                lastdrawer->pointBuffer->append(point);
+            }
+        }
+//        fieldWidget->update();
+
+    }
+
+
+    void Monitor::logdrawCb(const parsian_msgs::parsian_drawConstPtr &_draw) {
+        if (isReplayMode) {
+
+            for (parsian_msgs::parsian_draw_circle cir : _draw->circles) {
+                lastdrawer->arcBuffer->append(cir);
+
+            }
+            for (parsian_msgs::parsian_draw_polygon polygon : _draw->polygons) {
+                lastdrawer->polygonBuffer->append(polygon);
+
+            }
+            for (parsian_msgs::parsian_draw_rect rect : _draw->rects) {
+                lastdrawer->rectBuffer->append(rect);
+
+            }
+            for (parsian_msgs::parsian_draw_segment seg : _draw->segments) {
+                lastdrawer->segBuffer->append(seg);
+            }
+            for (parsian_msgs::parsian_draw_text txt : _draw->texts) {
+                lastdrawer->textBuffer->append(txt);
+
+            }
+            for (parsian_msgs::parsian_draw_vector point : _draw->vectors) {
+                lastdrawer->pointBuffer->append(point);
+
+            }
+        }
+//        fieldWidget->update();
+
+    }
+
+    void Monitor::timerCb(const ros::TimerEvent &_timer) {
+
+
+        fieldWidget->showLogMode(isLogMode,isReplayMode);
+
 //        fieldWidget->drawerBuffer->clear();
-            drawer->arcBuffer = lastdrawer->arcBuffer;
-            drawer->segBuffer = lastdrawer->segBuffer;
-            drawer->pointBuffer = lastdrawer->pointBuffer;
-            drawer->textBuffer = lastdrawer->textBuffer;
-            drawer->rectBuffer = lastdrawer->rectBuffer;
-            drawer->polygonBuffer = lastdrawer->polygonBuffer;
-            lastdrawer = drawer;
-            fieldWidget->drawerBuffer = lastdrawer;
+
+
+
+        drawer->arcBuffer = lastdrawer->arcBuffer;
+        drawer->segBuffer = lastdrawer->segBuffer;
+        drawer->pointBuffer = lastdrawer->pointBuffer;
+        drawer->textBuffer = lastdrawer->textBuffer;
+        drawer->rectBuffer = lastdrawer->rectBuffer;
+        drawer->polygonBuffer = lastdrawer->polygonBuffer;
+
+        lastdrawer = drawer;
+        fieldWidget->drawerBuffer = lastdrawer;
 
 //        fieldWidget->drawerBuffer->draw(Circle2D(ballpos, radius), 0, 360, QColor("orange"), true);
 
-            fieldWidget->update();
-            if (isReplayMode && mywm != nullptr) {
-                logwmCb(mywm);
-            }
+        fieldWidget->update();
+        if (isReplayMode && mywm != nullptr) {
+            logwmCb(mywm);
+        }
 
 
 //        fieldWidget->drawerBuffer->robotBuffer.clear();
-        }
+    }
 
 
-        void Monitor::shutdownPlugin() {
-            // unregister all publishers here
-            ROS_INFO("Monitor closed");
-            timer.stop();
-            n.shutdown();
-            n_private.shutdown();
 
-        }
+    void Monitor::shutdownPlugin()
+    {
+        // unregister all publishers here
+        ROS_INFO("Monitor closed");
+        timer.stop();
+        n.shutdown();
+        n_private.shutdown();
+        bag->close();
 
 
-    }  // namespace rqt_example_cpp
-    PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::Monitor, rqt_gui_cpp::Plugin)
+    }
+
+
+}  // namespace rqt_example_cpp
+PLUGINLIB_EXPORT_CLASS(rqt_parsian_gui::Monitor, rqt_gui_cpp::Plugin)

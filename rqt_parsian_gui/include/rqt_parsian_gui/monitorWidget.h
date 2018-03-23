@@ -51,8 +51,7 @@ namespace rqt_parsian_gui
         const double robot_radius_new = 0.0890;
         const double robot_radius_old = 0.0900;
         int getViewportWidth();
-        void showLogMode();
-        void showReplayMode();
+        void showLogMode(bool isLogMode,bool isReplayMode);
         QTimer *recShowTimer;
         bool recShowBool;
 
