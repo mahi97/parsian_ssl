@@ -12,6 +12,7 @@
 #include <QList>
 #include <parsian_ai/gamestate.h>
 #include <parsian_ai/config.h>
+#include <parsian_util/geom/polygon_2d.h>
 
 #define LOOP_TIME_BYKK 0.016
 struct velAndAccByKK {
@@ -74,6 +75,7 @@ protected:
     QList<Vector2D> defenseFormation(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
     QList<Vector2D> twoDefenseFormation(double downLimit , double upLimit);
     QList<Vector2D> threeDefenseFormation(double downLimit , double upLimit);
+    QList<int> detectOpponentPassOwners(double downEdge , double upEdge);
     Vector2D oneDefenseFormation(double downLimit , double upLimit);
 
     //atousa
