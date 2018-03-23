@@ -50,18 +50,15 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 
      ai->execute();
 
-    if (drawer != nullptr) {
-        drawPub.publish(drawer->draws);
-    }
-    if (debugger != nullptr) {
-        debugPub.publish(debugger->debugs);
-    }
+    if (drawer != nullptr)   drawPub.publish(drawer->draws);
+    if (debugger != nullptr) debugPub.publish(debugger->debugs);
     drawer->draws.circles.clear();
-    drawer->draws.vectors.clear();
     drawer->draws.segments.clear();
-    drawer->draws.rects.clear();
     drawer->draws.polygons.clear();
+    drawer->draws.rects.clear();
     drawer->draws.texts.clear();
+    drawer->draws.vectors.clear();
+    debugger->debugs.debugs.clear();
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {

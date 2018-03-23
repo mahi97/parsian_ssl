@@ -103,4 +103,14 @@ QList<Vector2D> WorldModel::AHZOurPAreaIntersect(Segment2D segment, QString role
     return results;
 }
 
+void WorldModel::updateRef(const parsian_msgs::ssl_refree_wrapperConstPtr _ref) {
+    our.data->goalieID = _ref->us.goalie;
+    opp.data->goalieID = _ref->them.goalie;
+    m_ballplacementPoint = Vector2D(_ref->designated_position);
+}
+
+Vector2D WorldModel::ballplacementPoint() {
+    return m_ballplacementPoint;
+}
+
 WorldModel * wm;

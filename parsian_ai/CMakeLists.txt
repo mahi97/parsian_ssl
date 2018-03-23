@@ -103,7 +103,7 @@ add_library(${PROJECT_NAME}
 add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/dynamicattack.cpp
 		src/parsian_ai/plays/masterplay.cpp
-		#		src/parsian_ai/plays/ourballplacement.cpp
+		src/parsian_ai/plays/ourballplacement.cpp
 		src/parsian_ai/plays/playoff.cpp
 		src/parsian_ai/plays/ourpenalty.cpp
 		src/parsian_ai/plays/theirpenalty.cpp
