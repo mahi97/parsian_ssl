@@ -53,10 +53,10 @@ public:
         drawer->draw(QString("salam"),Vector2D(1,1));
         mygpa->setTargetpos(mousePos);
         mygpa->setTargetdir(Vector2D(0,0));
-        mygpa->setNoavoid(true);
+        mygpa->setNoavoid(false);
         myKick->setTarget(Vector2D(6,0));
         myKick->setKickspeed(500);
-        agents[0]->action = myKick;
+        agents[7]->action = myKick;
         return;
     }
 private:
