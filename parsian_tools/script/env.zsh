@@ -88,6 +88,8 @@ function parsian() {
 				cd $PARSIAN_ROOT/src/parsian_ssl/parsian_tools
 				cd script/auto-generate
 				./behavior.py ${@:3}
+				cd $PARSIAN_ROOT/src/parsian_ssl/parsian_ai/cfg
+				chmod a+x ./$3.cfg
 				cd $temp
 			;;
 			list)

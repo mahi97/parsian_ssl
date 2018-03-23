@@ -54,6 +54,7 @@ catkin_python_setup()
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
+		cfg/direct.cfg
 		cfg/mahi.cfg
 		cfg/ai.cfg
 )
@@ -146,8 +147,8 @@ add_executable(${PROJECT_NAME}_node
 		)
 
 ### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./direct_CMakeLists.txt)
 include(./mahi_CMakeLists.txt)
-
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -248,9 +249,6 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${catkin_LIBRARIES}
 		${QJSON_LIBRARIES}
 		)
-
-
-
 
 #############
 ## Install ##

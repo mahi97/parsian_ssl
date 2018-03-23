@@ -28,7 +28,7 @@ void {{Tbehavior}}Nodelet::onInit() {
     dynamic_reconfigure::Server<ai_config::{{behavior}}Config>::CallbackType f;
     f = boost::bind(&{{Tbehavior}}Nodelet::ConfigServerCallBack,this, _1, _2);
     server->setCallback(f);
-
+    wm = new WorldModel();
 }
 
 void {{Tbehavior}}Nodelet::timerCb(const ros::TimerEvent& event) {

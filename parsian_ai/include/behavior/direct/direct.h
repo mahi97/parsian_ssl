@@ -1,13 +1,13 @@
-#ifndef BEHAVIOR{{UCbehavior}}_H
-#define BEHAVIOR{{UCbehavior}}_H
+#ifndef BEHAVIORDIRECT_H
+#define BEHAVIORDIRECT_H
 
 #include<parsian_ai/util/behavior.h>
 
-class Behavior{{Tbehavior}}: public Behavior {
+class BehaviorDirect: public Behavior {
 
 public:
-    Behavior{{Tbehavior}}();
-    virtual ~Behavior{{Tbehavior}}();
+    BehaviorDirect();
+    virtual ~BehaviorDirect();
     virtual void init(Agent** _agents);
     virtual int execute();
     virtual double eval(parsian_msgs::parsian_behaviorPtr _behav);
@@ -16,4 +16,4 @@ protected:
     Agent** agents;
 };
 
-#endif // BEHAVIOR{{UCbehavior}}_H
+#endif // BEHAVIORDIRECT_H
