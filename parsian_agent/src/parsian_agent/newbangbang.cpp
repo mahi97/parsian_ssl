@@ -125,7 +125,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     //////////////////////// dec calculations
     double vp = (posPidDist * posPid->kp);
     double moreDec = 0.7;
-    double decOffset = 0.3;
+    double decOffset = 0.4;
 
     switch (decidePlan()) {
     case _bangBangPosPID:
