@@ -105,7 +105,7 @@ void MonitorWidget::paintGL() {
     glShadeModel(GL_SMOOTH);
     glLoadIdentity();
     glTranslated(cameraX, cameraY, -10.0);
-    glRotated(90.0, 0.0, 0.0, 1.0);
+    glRotated(-90.0, 0.0, 0.0, 1.0);
     glScaled(scaleFactor, scaleFactor, 1);
     drawField();
 
@@ -334,7 +334,8 @@ void MonitorWidget::drawText(double x, double y, QString text, QColor color, int
 
     QFontMetrics fm(font);
     double pixelsWide = fm.width(text);
-
+    x = -1 * x ;
+    y = -1 * y ;
 
     painter.begin(this);
 

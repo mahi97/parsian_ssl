@@ -97,6 +97,7 @@ void Monitor::startLog() {
 //                QDir().mkdir("logs/"+baseFileName);
 //                suggestionName="logs/"+baseFileName+"/"+suggestionName+".bag";
 //            }
+
         bag.open("logs/" + suggestionName.toStdString() + ".bag", rosbag::bagmode::Write);
 
     }
@@ -131,9 +132,6 @@ void Monitor::colorCb(const parsian_msgs::parsian_team_configConstPtr& _color) {
 }
 
 void Monitor::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-
-
-
 
     if (isLogMode) {
         mywm = _wm;
