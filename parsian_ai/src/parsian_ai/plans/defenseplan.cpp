@@ -1745,13 +1745,13 @@ void DefensePlan::execute(){
                 //                ROS_INFO(QString("AHZ_Def: %1").arg(findNeededDefense()).toStdString().c_str());
                 if (defenseCount > 0) {
                     realDefSize = defenseCount - decideNumOfMarks();
-                    //                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
-                    //                    ROS_INFO(QString("decideNumOfMarks: %1").arg(decideNumOfMarks()).toStdString().c_str());
+                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
+                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
-                    AHZDefPoints = defenseFormation(defenseNumber() , realDefSize , 1.4 , 2.5);
-                    //                    ROS_INFO(QString("newDefSize: %1").arg(AHZDefPoints.size()).toStdString().c_str());
-                    //                    ROS_INFO(QString("realDefSize: %1").arg(realDefSize).toStdString().c_str());
+                    AHZDefPoints = defenseFormation(defenseNumber() , realDefSize , 1.4 ,2.5);
+                    ROS_INFO_STREAM("newDefSize: " << AHZDefPoints.size());
                     matchingDefPos(realDefSize);
+                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
                 }
             } else {
                 drawer->draw("Vision Problem", Vector2D(0, 0), "red");

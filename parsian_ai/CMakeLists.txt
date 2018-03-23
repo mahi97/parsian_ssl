@@ -58,6 +58,7 @@ catkin_python_setup()
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
+		cfg/direct.cfg
 		cfg/mahi.cfg
 		cfg/ai.cfg
 		cfg/behavior_server.cfg
@@ -149,6 +150,10 @@ add_executable(${PROJECT_NAME}_node
 		src/parsian_ai/ai_node.cpp
 		)
 
+### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./direct_CMakeLists.txt)
+include(./mahi_CMakeLists.txt)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -175,12 +180,14 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
 		${QT_LIBRARIES}
+
 		)
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
 		${PROJECT_NAME}
 		${PROJECT_NAME}_nodelet
 		${QT_LIBRARIES}
+		mahi
 		)
 
 add_dependencies(${PROJECT_NAME}
@@ -220,6 +227,7 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_plans
 		${PROJECT_NAME}_roles
 		${PROJECT_NAME}_util
+		mahi_nodelet
 		)
 
 target_link_libraries(${PROJECT_NAME}_plays
@@ -245,9 +253,6 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${catkin_LIBRARIES}
 		${QJSON_LIBRARIES}
 		)
-
-### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
-include(./mahi_CMakeLists.txt)
 
 #############
 ## Install ##

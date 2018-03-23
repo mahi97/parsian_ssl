@@ -9,6 +9,7 @@
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
 #include <parsian_msgs/parsian_robots_status.h>
+#include <parsian_msgs/parsian_behavior.h>
 #include <behavior/mahi/mahi.h>
 
 #include <dynamic_reconfigure/server.h>

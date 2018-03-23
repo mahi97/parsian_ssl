@@ -1,5 +1,5 @@
-#ifndef {{UCbehavior}}NODELET_H
-#define {{UCbehavior}}NODELET_H
+#ifndef DIRECTNODELET_H
+#define DIRECTNODELET_H
 
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
@@ -11,18 +11,18 @@
 #include <parsian_msgs/parsian_robots_status.h>
 #include <parsian_msgs/parsian_behavior.h>
 #include <parsian_msgs/parsian_ai_status.h>
-#include <behavior/{{behavior}}/{{behavior}}.h>
+#include <behavior/direct/direct.h>
 
 #include <dynamic_reconfigure/server.h>
-#include <parsian_ai/{{behavior}}Config.h>
+#include <parsian_ai/directConfig.h>
 #include <parsian_ai/config.h>
 
 
 namespace parsian_ai {
-    class {{Tbehavior}}Nodelet : public nodelet::Nodelet {
+    class DirectNodelet : public nodelet::Nodelet {
 
     private:
-        boost::shared_ptr<Behavior{{Tbehavior}}> {{behavior}};
+        boost::shared_ptr<BehaviorDirect> direct;
         ros::Subscriber worldModelSub;
         ros::Subscriber refereeSub;
         ros::Subscriber teamConfSub;
@@ -34,8 +34,8 @@ namespace parsian_ai {
         ros::Timer timer_;
 
         //config server setup
-        boost::shared_ptr<dynamic_reconfigure::Server<ai_config::{{behavior}}Config>> server;
-        void ConfigServerCallBack(const ai_config::{{behavior}}Config &config, uint32_t level) ;
+        boost::shared_ptr<dynamic_reconfigure::Server<ai_config::directConfig>> server;
+        void ConfigServerCallBack(const ai_config::directConfig &config, uint32_t level) ;
 
         void onInit() override;
         void robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs);
@@ -45,4 +45,4 @@ namespace parsian_ai {
         void timerCb(const ros::TimerEvent &event);
     };
 }
-#endif //{{UCbehavior}}NODELET_H
+#endif //DIRECTNODELET_H

@@ -449,7 +449,7 @@ private:
     bool isPlanDone();
     bool isPlanFaild();
     bool setTimer;
-    long tempStart;
+    unsigned int tempStart;
     ////////////////////////////
 
     bool isKickDone(CRolePlayOff*);

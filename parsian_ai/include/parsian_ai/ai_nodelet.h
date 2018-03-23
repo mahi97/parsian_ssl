@@ -17,6 +17,7 @@
 #include <parsian_msgs/parsian_draw.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_msgs/parsian_behavior.h>
+#include <parsian_msgs/parsian_ai_status.h>
 #include <parsian_ai/ai.h>
 
 #include <dynamic_reconfigure/server.h>
@@ -33,9 +34,9 @@ private:
     ros::Publisher drawPub;
     ros::Publisher debugPub;
 
-    ros::Publisher *robTask;
-
-    ros::Timer timer_;
+        ros::Publisher *robTask;
+        ros::Publisher behaviorPub;
+        ros::Timer timer_;
 
     ros::ServiceClient plan_client;
 
