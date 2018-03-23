@@ -660,6 +660,8 @@ void CCoach::updateAttackState() {
     */
 }
 void CCoach::choosePlaymakeAndSupporter(bool defenseFirst) {
+    playmakeId = 10;
+    return;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if (ourPlayers.contains(preferedGoalieAgent) != nullptr) {
         ourPlayers.removeOne(preferedGoalieAgent);
@@ -734,6 +736,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst) {
         }
         lastPlayMake = playmakeId;
     }
+
     debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
 }
 
@@ -1156,7 +1159,7 @@ void CCoach::execute() {
     virtualTheirPlayOffState();
     decidePreferredDefenseAgentsCountAndGoalieAgent();
     /////////////////////////////////////// choose play maker
-    double critAreaRadius = 1.6;
+    double critAreaRadius = 2.6;
     Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
     playmakeId = -1;
     if ((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")) {
