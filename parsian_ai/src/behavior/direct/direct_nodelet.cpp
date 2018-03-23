@@ -15,6 +15,7 @@ void DirectNodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &DirectNodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &DirectNodelet::robotStatusCallBack, this);
+    aiStatusSub = nh.subscribe("/status", 1000, &DirectNodelet::aiStatusCallBack, this);
 
     refereeSub = nh.subscribe("/referee", 1000,  &DirectNodelet::refereeCallBack, this);
 
@@ -64,8 +65,14 @@ void DirectNodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstP
 }
 
 void DirectNodelet::ConfigServerCallBack(const ai_config::directConfig &config, uint32_t level) {
+
 }
 
 void DirectNodelet::robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs) {
 
 }
+
+void DirectNodelet::aiStatusCallBack(const parsian_msgs::parsian_ai_statusConstPtr& _ais) {
+    direct->updateAIStatus(_ais);
+}
+

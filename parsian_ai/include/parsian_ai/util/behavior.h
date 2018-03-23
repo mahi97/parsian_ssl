@@ -6,6 +6,7 @@
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_msgs/parsian_behavior.h>
 #include <parsian_ai/util/agent.h>
+#include <parsian_msgs/parsian_ai_status.h>
 
 class Behavior
 {
@@ -21,10 +22,12 @@ public:
     virtual void init(QList<Agent*>& _agents, const parsian_msgs::parsian_behaviorConstPtr& _msg) { agents = _agents; msg = _msg;}
     void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) { /*TODO FIX*/ }
 	void updateWM(const parsian_msgs::parsian_world_modelConstPtr& _wm) { wm->update( _wm); }
+    void updateAIStatus(const parsian_msgs::parsian_ai_statusConstPtr& _ais) { status = _ais; }
     virtual double process() { return 0.0; } //// From 0 to 1 ~> 1 is Finished
 protected:
     QList<Agent*> agents;
     parsian_msgs::parsian_behaviorConstPtr msg;
+    parsian_msgs::parsian_ai_statusConstPtr status;
     double prob;
 	const std::string name;
 	const std::string description;

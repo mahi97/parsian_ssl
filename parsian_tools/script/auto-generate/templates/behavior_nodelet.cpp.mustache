@@ -15,6 +15,7 @@ void {{Tbehavior}}Nodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &{{Tbehavior}}Nodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &{{Tbehavior}}Nodelet::robotStatusCallBack, this);
+    aiStatusSub = nh.subscribe("/status", 1000, &{{Tbehavior}}Nodelet::aiStatusCallBack, this);
 
     refereeSub = nh.subscribe("/referee", 1000,  &{{Tbehavior}}Nodelet::refereeCallBack, this);
 
@@ -64,8 +65,14 @@ void {{Tbehavior}}Nodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrappe
 }
 
 void {{Tbehavior}}Nodelet::ConfigServerCallBack(const ai_config::{{behavior}}Config &config, uint32_t level) {
+
 }
 
 void {{Tbehavior}}Nodelet::robotStatusCallBack(const parsian_msgs::parsian_robots_statusConstPtr& _rs) {
 
 }
+
+void {{Tbehavior}}Nodelet::aiStatusCallBack(const parsian_msgs::parsian_ai_statusConstPtr& _ais) {
+    {{behavior}}->updateAIStatus(_ais);
+}
+
