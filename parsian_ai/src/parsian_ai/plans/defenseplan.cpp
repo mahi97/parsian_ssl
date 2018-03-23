@@ -1643,18 +1643,18 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
         //        }
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
         if (gameState->theirIndirectKick()) {
-            gpa[ourAgents[i]->id()]->setNoavoid(false);
+            gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         } else if (stopMode) {
-            gpa[ourAgents[i]->id()]->setNoavoid(false);
+            gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(true);
             gpa[ourAgents[i]->id()]->setDivemode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         } else {
-            gpa[ourAgents[i]->id()]->setNoavoid(false);
+            gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0);

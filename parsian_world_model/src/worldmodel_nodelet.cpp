@@ -9,7 +9,7 @@ void WMNodelet::onInit() {
     ros::NodeHandle& private_nh = getPrivateNodeHandle();
 
     wm.reset(new WorldModel);
-
+    drawer = new Drawer;
 //    timer = nh.createTimer(ros::Duration(.062), boost::bind(&WMNodelet::timerCb, this, _1));
     wm_pub = nh.advertise<parsian_msgs::parsian_world_model>("/world_model", 1000);
     team_config_sub = nh.subscribe("/team_config", 1000, & WMNodelet::teamConfigCb, this);
