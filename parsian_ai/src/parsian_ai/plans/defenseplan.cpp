@@ -6,20 +6,18 @@ using namespace std;
 
 #define LONG_CHIP_POWER 1023
 
-QList<QPair<int , double> > DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
-    double maxOpponentVelocity = 4.00;
-    QList<QPair<int , double> > IDAndReachTimeOfOpponentsInPolygon;
-    QPair<int , double> tempPair;
+QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
+    QList<int> IDOfOpponentsInPolygon;
     Vector2D solutions[4];
     Vector2D solution;
     Polygon2D ballArea;
     Rect2D temp;
     Vector2D currentBallPosition = wm->ball->pos;
-    Vector2D finalBallPosition = wm->ball->getPosInFuture(3);
+    Vector2D finalBallPosition = wm->ball->getPosInFuture(10);
     Circle2D downEdgeCircle(currentBallPosition , downEdgeLength / 2);
     Circle2D upEdgeCircle(finalBallPosition, upEdgeLength / 2);
     Line2D ballPath(currentBallPosition , finalBallPosition);
-    IDAndReachTimeOfOpponentsInPolygon.clear();
+    IDOfOpponentsInPolygon.clear();
     //////////////// Make the polygon2D ////////////////////////////////
     if(wm->ball->vel.length()){
         downEdgeCircle.intersection(ballPath.perpendicular(currentBallPosition) , &solutions[0] , &solutions[1]);
@@ -39,32 +37,18 @@ QList<QPair<int , double> > DefensePlan::detectOpponentPassOwners(double downEdg
     drawer->draw(temp);
     for(size_t i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
         if(temp.contains(wm->opp.active(i)->pos)){
-            tempPair.first = wm->opp.activeAgentID(i);
-            tempPair.second = ballPath.dist(wm->opp.active(i)->pos) / maxOpponentVelocity;
             drawer->draw(Circle2D(wm->opp.active(i)->pos, 0.3) , "black");
-            IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
+            IDOfOpponentsInPolygon.append(wm->opp.activeAgentID(i));
         }
-        else{
-            if(wm->opp.active(i)->vel.length() > 1
-                    && Line2D(wm->opp.active(i)->pos , wm->opp.active(i)->pos + wm->opp.active(i)->vel).
-                    intersection(Line2D(currentBallPosition , finalBallPosition)).valid()){
-                tempPair.first = wm->opp.activeAgentID(i);
-                tempPair.second = ballPath.dist(wm->opp.active(i)->pos + wm->opp.active(i)->vel) / maxOpponentVelocity;
-                IDAndReachTimeOfOpponentsInPolygon.append(tempPair);
-            }
+        else if(Line2D(wm->opp.active(i)->pos , wm->opp.active(i)->pos + wm->opp.active(i)->vel).
+                intersection(Line2D(currentBallPosition , finalBallPosition)).valid()){
+            drawer->draw(Circle2D(wm->opp.active(i)->pos, 0.3) , "black");
+            IDOfOpponentsInPolygon.append(wm->opp.activeAgentID(i));
         }
     }
     ////////// Sort dangerous ///////////////////////////////
-    qSort(IDAndReachTimeOfOpponentsInPolygon.begin() , IDAndReachTimeOfOpponentsInPolygon.end());
-    if(IDAndReachTimeOfOpponentsInPolygon.size()){
-        ROS_INFO(QString("ID: %1").arg(IDAndReachTimeOfOpponentsInPolygon.at(0).first).toStdString().c_str());
-        for(size_t i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
-            if(IDAndReachTimeOfOpponentsInPolygon.at(0).first == wm->opp.activeAgentID(i)){
-                drawer->draw(Circle2D(wm->opp.active(i)->pos , 1) , "blue");
-            }
-        }
-    }
-    return IDAndReachTimeOfOpponentsInPolygon;
+    qSort(IDOfOpponentsInPolygon.begin() , IDOfOpponentsInPolygon.end());
+    return IDOfOpponentsInPolygon;
 }
 
 int DefensePlan::defenseNumber(){
