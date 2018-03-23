@@ -96,7 +96,6 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/soccer.cpp
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
-		include/${PROJECT_NAME}/exprimental.h
 		src/${PROJECT_NAME}/coach.cpp
 		)
 

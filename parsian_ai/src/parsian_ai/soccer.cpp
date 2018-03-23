@@ -9,7 +9,6 @@ CSoccer::CSoccer() {
         agents[i]->action = nullptr;
     }
     coach = new CCoach(agents);
-    experimental = new Exprimental(agents);
 }
 
 CSoccer::~CSoccer() {
@@ -18,7 +17,6 @@ CSoccer::~CSoccer() {
     }
     delete agents;
     delete coach;
-    delete experimental;
 
 }
 
@@ -34,8 +32,6 @@ void CSoccer::execute() {
 
 void CSoccer::customControl(bool &custom) {
     custom = false;
-    custom = true;
-    experimental->execute();
 }
 
 CCoach* CSoccer::getCoach() {
