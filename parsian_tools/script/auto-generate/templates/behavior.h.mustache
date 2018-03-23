@@ -8,12 +8,8 @@ class Behavior{{Tbehavior}}: public Behavior {
 public:
     Behavior{{Tbehavior}}();
     virtual ~Behavior{{Tbehavior}}();
-    virtual void init(Agent** _agents);
     virtual int execute();
     virtual double eval(parsian_msgs::parsian_behaviorPtr _behav);
-
-protected:
-    Agent** agents;
 };
 
 #endif // BEHAVIOR{{UCbehavior}}_H

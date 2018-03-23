@@ -18,6 +18,3 @@ double BehaviorDirect::eval(parsian_msgs::parsian_behaviorPtr _behav) {
     return 0.0;
 }
 
-void BehaviorDirect::init(Agent** _agents) {
-    agents = _agents;
-}

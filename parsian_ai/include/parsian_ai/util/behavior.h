@@ -18,11 +18,14 @@ public:
 	std::string getName() const { return name; }
 	std::string getDescription() const { return description; }
 	double probability() const { return prob; }
-	void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) { /*TODO FIX*/ }
+    virtual void init(QList<Agent*>& _agents, const parsian_msgs::parsian_behaviorConstPtr& _msg) { agents = _agents; msg = _msg;}
+    void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) { /*TODO FIX*/ }
 	void updateWM(const parsian_msgs::parsian_world_modelConstPtr& _wm) { wm->update( _wm); }
     virtual double process() { return 0.0; } //// From 0 to 1 ~> 1 is Finished
 protected:
-	double prob;
+    QList<Agent*> agents;
+    parsian_msgs::parsian_behaviorConstPtr msg;
+    double prob;
 	const std::string name;
 	const std::string description;
 };
