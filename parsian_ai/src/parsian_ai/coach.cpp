@@ -35,7 +35,7 @@ CCoach::CCoach(Agent**_agents) {
     theirKickOff        = new CTheirKickOff;
     theirPenalty        = new CTheirPenalty;
     theirIndirect       = new CTheirIndirect;
-    //    ourBallPlacement    = new COurBallPlacement;
+    ourBallPlacement    = new COurBallPlacement;
     //    halfTimeLineup    = new CHalftimeLineup;
     theirBallPlacement  = new CTheirBallPlacement;
 
@@ -139,6 +139,11 @@ void CCoach::checkGoalieInsight() {
 
 void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
+
+    preferedDefenseCounts = 0;
+    preferedGoalieAgent = -1;
+    return;
+
     missMatchIds.clear();
     if (first) {
         if (wm->our.activeAgentsCount() != 0) {
@@ -182,6 +187,12 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     } else {
         preferedGoalieAgent = wm->our.data->goalieID;
     }
+
+    if (selectedPlay != nullptr && selectedPlay->lockAgents) {
+        preferedDefenseCounts = lastPreferredDefenseCounts;
+        return;
+    }
+
 
     // handle stop
     if (gameState->isStop()) {
@@ -249,9 +260,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    if (conf.StrictFormation) {
-        preferedDefenseCounts = conf.Defense;
-    }
+
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -474,6 +483,12 @@ BallPossesion CCoach::isBallOurs() {
 void CCoach::assignDefenseAgents(int defenseCount) {
 
 
+    if (selectedPlay != nullptr && selectedPlay->lockAgents) {
+        defenseAgents.clear();
+        defenseAgents.append(lastDefenseAgents);
+        return;
+    }
+
     QList<int> ids = wm->our.data->activeAgents;
     if (goalieAgent != nullptr) {
         ids.removeOne(goalieAgent->id());
@@ -660,6 +675,8 @@ void CCoach::updateAttackState() {
     */
 }
 void CCoach::choosePlaymakeAndSupporter(bool defenseFirst) {
+    playmakeId = 10;
+    return;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if (ourPlayers.contains(preferedGoalieAgent) != nullptr) {
         ourPlayers.removeOne(preferedGoalieAgent);
@@ -734,6 +751,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst) {
         }
         lastPlayMake = playmakeId;
     }
+
     debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
 }
 
@@ -1156,7 +1174,7 @@ void CCoach::execute() {
     virtualTheirPlayOffState();
     decidePreferredDefenseAgentsCountAndGoalieAgent();
     /////////////////////////////////////// choose play maker
-    double critAreaRadius = 1.6;
+    double critAreaRadius = 2.6;
     Circle2D critArea(wm->field->ourGoal(), critAreaRadius);
     playmakeId = -1;
     if ((critArea.contains(wm->ball->pos) && wm->field->isInField(wm->ball->pos)) || (transientFlag && stateForMark != "BlockPass")) {
@@ -1320,7 +1338,7 @@ void CCoach::decideStart(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurBallPlacement(QList<int> &_ourPlayers) {
-    //    selectedPlay = ourBallPlacement;
+       selectedPlay = ourBallPlacement;
 }
 
 void CCoach::decideTheirBallPlacement(QList<int> &_ourPlayers) {
