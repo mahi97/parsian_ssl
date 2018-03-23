@@ -105,7 +105,7 @@ void MonitorWidget::paintGL() {
     glShadeModel(GL_SMOOTH);
     glLoadIdentity();
     glTranslated(cameraX, cameraY, -10.0);
-    glRotated(90.0, 0.0, 0.0, 1.0);
+    glRotated(-90.0, 0.0, 0.0, 1.0);
     glScaled(scaleFactor, scaleFactor, 1);
     drawField();
 
@@ -174,11 +174,12 @@ void MonitorWidget::paintGL() {
         rec = drawerBuffer->rectBuffer->dequeue();
 
         QColor col = QColor(rec.color.r, rec.color.g, rec.color.b);
+        ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
 
         drawRect(rec.rect.left_x,
                  rec.rect.top_y,
                  rec.rect.left_x + rec.rect.width,
-                 rec.rect.top_y + rec.rect.length,
+                 rec.rect.top_y - rec.rect.length,
                  col,
                  rec.filled);
     }
@@ -333,7 +334,8 @@ void MonitorWidget::drawText(double x, double y, QString text, QColor color, int
 
     QFontMetrics fm(font);
     double pixelsWide = fm.width(text);
-
+    x = -1 * x ;
+    y = -1 * y ;
 
     painter.begin(this);
 

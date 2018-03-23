@@ -97,6 +97,7 @@ void Monitor::startLog() {
 //                QDir().mkdir("logs/"+baseFileName);
 //                suggestionName="logs/"+baseFileName+"/"+suggestionName+".bag";
 //            }
+
         bag.open("logs/" + suggestionName.toStdString() + ".bag", rosbag::bagmode::Write);
 
     }
@@ -120,7 +121,7 @@ void Monitor::playLog() {
 void Monitor::colorCb(const parsian_msgs::parsian_team_configConstPtr& _color) {
 
     mycolor = _color;
-    if (mycolor->color == 0) {
+    if (mycolor->color == 1) {
         ourCol = QColor("blue");
         oppCol = QColor("yellow");
     } else {
@@ -131,9 +132,6 @@ void Monitor::colorCb(const parsian_msgs::parsian_team_configConstPtr& _color) {
 }
 
 void Monitor::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-
-
-
 
     if (isLogMode) {
         mywm = _wm;
@@ -164,7 +162,7 @@ void Monitor::wmCb(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
                 ourCol.setAlpha(150);
             }
             drawer->drawRobot(mywm->our[i].pos, mywm->our[i].dir,
-                              ourCol, mywm->our[i].id, i, "", false);
+                              ourCol, mywm->our[i].id, i, "", true);
 
             //        if (soccer->agents[wm->our.active(i)->id]->goalVisibility>0)
             //            draw(QString::number(soccer->agents[wm->our.active(i)->id]->goalVisibility,'f',2), wm->our.active(i)->pos + Vector2D(-0.3, -0.1), QColor("black"), 14);

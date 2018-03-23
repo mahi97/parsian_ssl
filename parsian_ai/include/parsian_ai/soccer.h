@@ -18,6 +18,7 @@
 #include <parsian_util/action/autogenerate/receivepassaction.h>
 #include <parsian_ai/util/worldmodel.h>
 
+
 class CSoccer {
 
 public:
@@ -25,8 +26,6 @@ public:
     CSoccer();
     ~CSoccer();
     void execute();
-
-    void updateTask();
 
     virtual void customControl(bool& custom);
 
@@ -37,8 +36,6 @@ public:
     clock_t realTimeTime;
     struct timeval t1, t2;
 private:
-    KickAction* kick ;
-    GotopointavoidAction* gtp ;
 
 
 };
