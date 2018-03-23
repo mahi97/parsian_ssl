@@ -3018,7 +3018,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     if (BallVel.x > 0 && BallPos.x > 0) {
         return BallPos;
     }
-    if (wm->opp.activeAgentsCount() > 0) {
+    if(wm->opp.activeAgentsCount() > 0) {
         for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
             Circle2D oppCircle(wm->opp.active(i)->pos, 0.1);
             if (oppCircle.intersection(ballPosVel, &solu[0], &solu[1]) > 0 && BallVel.length() > 0.5) {
@@ -3061,7 +3061,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     }
 
     if(!_isGoalie && wm->ball->pos.x < -5.8){
-        wm->field->ourBigPenaltyArea(1, 1, 0).intersection(Line2D(wm->field->ourGoal() , wm->ball->pos) , &solu[2] , &solu[3]);
+        wm->field->ourBigPenaltyArea(1, 1, 0.1).intersection(Segment2D(wm->field->center() , wm->field->ourGoal()) , &solu[2] , &solu[3]);
         predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2] : solu[3];
     }
 
