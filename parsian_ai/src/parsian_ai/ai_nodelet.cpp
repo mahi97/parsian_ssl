@@ -37,7 +37,7 @@ void AINodelet::onInit() {
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::aiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::aiConfig>::CallbackType f;
-    f = boost::bind(&AINodelet::ConfigServerCallBack,this, _1, _2);
+    f = boost::bind(&AINodelet::ConfigServerCallBack, this, _1, _2);
     server->setCallback(f);
 
 }
@@ -46,9 +46,9 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
     teamConfig = *_conf;
 }
 
-void AINodelet::timerCb(const ros::TimerEvent& event) {
+void AINodelet::timerCb(const ros::TimerEvent& event){
 
-    // ai->execute();
+     ai->execute();
 
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
@@ -66,12 +66,12 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     ROS_INFO("wm updated");
     ai->execute();
 
-    for(int i=0; i < wm->our.activeAgentsCount(); i++) {
+    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
         robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
     }
 
     parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
-    ROS_INFO_STREAM("last plan name: "<<lastPlan.the_plan.planFile);
+    ROS_INFO_STREAM("last plan name: " << lastPlan.the_plan.planFile);
     /// handle plan request
 //    if(ai->getSoccer()->getCoach()->requestForPlan){
 //        parsian_msgs::plan_service req;
@@ -104,7 +104,7 @@ void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t
 }
 
 void AINodelet::behaviorCb(const parsian_msgs::parsian_behaviorConstPtr &_behavior) {
- ROS_INFO_STREAM("behavior "<<_behavior->name << " received !");
+    ROS_INFO_STREAM("behavior " << _behavior->name << " received !");
 }
 
 

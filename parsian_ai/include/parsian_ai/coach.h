@@ -56,8 +56,8 @@ public:
 
 private:
     /////////////////////transition to force start
-     void checkTransitionToForceStart();
-     QList <Vector2D> ballHist;
+    void checkTransitionToForceStart();
+    QList <Vector2D> ballHist;
     //////////////////////////
     bool lastASWasCritical;
     Vector2D passPos;
@@ -70,7 +70,7 @@ private:
     Agent *exeptionPlayMake;
     double exeptionPlayMakeThr;
     QList<Agent*> defenseAgents;
-    int preferedDefenseCounts ,lastPreferredDefenseCounts;
+    int preferedDefenseCounts , lastPreferredDefenseCounts;
     int preferedGoalieAgent;
     Vector2D defenseTargets[_MAX_NUM_PLAYERS];
     QTime intentionTimePossession;
@@ -142,8 +142,7 @@ private:
 
     ///////////////////////////////////////////////
 
-    enum attackState
-    {
+    enum attackState {
         SAFE     = 0,
         FAST     = 1,
         CRITICAL = 2
@@ -175,21 +174,21 @@ private:
     QList<int> lastPlayers;
     Vector2D lastBallVel;
     //////////////Decide Attack functions
-    void decideHalt               (QList<int>&);
-    void decideStop               (QList<int>&);
-    void decideOurKickOff         (QList<int>&);
-    void decideTheirKickOff       (QList<int>&);
-    void decideOurIndirect        (QList<int>&);
-    void decideTheirIndirect      (QList<int>&);
-    void decideOurDirect          (QList<int>&);
-    void decideTheirDirect        (QList<int>&);
-    void decideOurPenalty         (QList<int>&);
-    void decideTheirPenalty       (QList<int>&);
-    void decideStart              (QList<int>&);
-    void decideOurBallPlacement   (QList<int>&);
-    void decideTheirBallPlacement (QList<int>&);
-    void decideHalfTimeLineUp     (QList<int>&);
-    void decideNull               (QList<int>&);
+    void decideHalt(QList<int>&);
+    void decideStop(QList<int>&);
+    void decideOurKickOff(QList<int>&);
+    void decideTheirKickOff(QList<int>&);
+    void decideOurIndirect(QList<int>&);
+    void decideTheirIndirect(QList<int>&);
+    void decideOurDirect(QList<int>&);
+    void decideTheirDirect(QList<int>&);
+    void decideOurPenalty(QList<int>&);
+    void decideTheirPenalty(QList<int>&);
+    void decideStart(QList<int>&);
+    void decideOurBallPlacement(QList<int>&);
+    void decideTheirBallPlacement(QList<int>&);
+    void decideHalfTimeLineUp(QList<int>&);
+    void decideNull(QList<int>&);
     /////////////////////////////////////
     QTextStream out;
     bool isFastPlay();

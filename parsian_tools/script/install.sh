@@ -1,4 +1,4 @@
-# /bin/bash
+#!/bin/bash
 
 
 INSTALL_SCRIPTS_DIR=$(builtin cd -q "`dirname "$0"`" > /dev/null && pwd)

@@ -1,7 +1,7 @@
 #include <search.h>
 #include "parsian_ai/plays/ourballplacement.h"
 
-COurBallPlacement::COurBallPlacement(){
+COurBallPlacement::COurBallPlacement() {
 
     minIndexPos = 0;
     ap = nullptr;
@@ -11,7 +11,7 @@ COurBallPlacement::COurBallPlacement(){
     state = BallPlacement :: GO_FOR_BALL;
 }
 
-COurBallPlacement::~COurBallPlacement(){
+COurBallPlacement::~COurBallPlacement() {
 
 }
 
@@ -20,7 +20,7 @@ void COurBallPlacement::reset(){
     first = false;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
-void COurBallPlacement::init(const QList<Agent*>& _agents){
+void COurBallPlacement::init(const QList<Agent*>& _agents) {
     setAgentsID(_agents);
     initMaster();
     //if(knowledge->getLastPlayExecuted() != OurBallPlacement ){

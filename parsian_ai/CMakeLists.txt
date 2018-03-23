@@ -14,7 +14,11 @@ find_package(catkin REQUIRED COMPONENTS
 		roscpp
 		rospy
 		nodelet
+		roslint
 		)
+
+roslint_cpp()
+roslint_python()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -56,6 +60,7 @@ catkin_python_setup()
 generate_dynamic_reconfigure_options(
 		cfg/mahi.cfg
 		cfg/ai.cfg
+		cfg/behavior_server.cfg
 )
 
 ###################################

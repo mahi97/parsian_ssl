@@ -3,8 +3,7 @@
 
 #include <parsian_util/core/worldmodel.h>
 
-class WorldModel : public CWorldModel
-{
+class WorldModel : public CWorldModel {
 public:
 
     WorldModel();

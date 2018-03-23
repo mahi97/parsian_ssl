@@ -73,7 +73,7 @@ void AI::updateRobotStatus(const parsian_msgs::parsian_robotConstPtr & _rs) {
 
 void AI::updateWM(const parsian_msgs::parsian_world_modelConstPtr & _wm) {
     wm->update(_wm);
-    for(int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
+    for (int i = 0 ; i < _MAX_NUM_PLAYERS ; i++) {
         soccer->agents[i]->self = *wm->our[i];
     }
 }

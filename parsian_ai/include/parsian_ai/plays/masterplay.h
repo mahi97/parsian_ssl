@@ -9,7 +9,7 @@
 #include <queue>
 #include <regex>
 
-enum PlaysEnum{
+enum PlaysEnum {
     OurKickOffPlay,
     OurIndirectPlay,
     OurDirectPlay,
@@ -40,7 +40,9 @@ public:
     virtual void init(const QList <Agent*>& _agents) = 0;
 
     void execute();
-    virtual QString whoami() {return "MasterPlay";}
+    virtual QString whoami() {
+        return "MasterPlay";
+    }
     bool canScore();
     QList <Agent *> markAgents;
     //////////////////////////////////////
@@ -86,7 +88,7 @@ protected:
     void choosePlayMaker();
     void chooseBlocker();
     bool canOneTouch(QList<Agent*> positionAgents , Agent *playMake);
-    double coveredArea( std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles );
+    double coveredArea(std::priority_queue < QPair< edgeMode , double > , std::vector< QPair< edgeMode , double > > , Comparar >& obstacles);
     double getOpenness(Vector2D from, Vector2D p1, Vector2D p2, QList<int> ourRelaxedIDs, QList<int> oppRelaxedIDs);
 };
 
