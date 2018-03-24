@@ -1669,8 +1669,16 @@ void DefensePlan::execute(){
     int realDefSize = 0;
     int defenseAgentSize = defenseAgents.size();
     MONITOR(defenseAgentSize);
-    detectOpponentPassOwners(1 , 2);
-    //    ROS_INFO(QString("ballPos: %1 %2").arg(wm->ball->getPosInFuture(50).x).arg(wm->ball->getPosInFuture(50).y).toStdString().c_str());
+    detectOpponentPassOwners(1 , 2);    
+    Line2D perpBallLine(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm());
+    Line2D ballLine(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm());
+    if(defenseAgents.size()){
+        perpBallLine = Line2D(defenseAgents.at(0)->self.getKickerPos() , defenseAgents.at(0)->self.getKickerPos() + wm->ball->vel.norm());
+        perpBallLine = perpBallLine.perpendicular(defenseAgents.at(0)->self.getKickerPos());
+        drawer->draw(defenseAgents.at(0)->self.getKickerPos(),"black");
+    }
+    Vector2D intersect = perpBallLine.intersection(ballLine);
+    drawer->draw(intersect,"red");
     ////////////initialize////////////////
     initVars();
     preCalculate();
@@ -2151,7 +2159,7 @@ void DefensePlan::executeGoalKeeper() {
     stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
-    if (!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch /*&& defenseCount != 1*/) {
+    if (!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch && !stopMode) {
         tempSol = wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperTarget));
         if (tempSol.size()) {
             if (tempSol.size() == 1) {
@@ -2161,7 +2169,7 @@ void DefensePlan::executeGoalKeeper() {
             }
         }
     }
-    if (!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch /*&& defenseCount != 1*/) {
+    if(!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch && !stopMode) {
         tempSol.append(wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperAgent->pos())));
         if (tempSol.size() == 1) {
             goalKeeperTarget = tempSol.at(0);
@@ -2478,17 +2486,17 @@ bool DefensePlan::defenseOneTouchOrNot() {
                 otherAgents.append(i);
             }
         }
-        for (int &otherAgent : otherAgents) {
+        for (int i = 0 ; i < otherAgents.size() ; i++) {
             Segment2D otherAgentIntersect(wm->ball->pos , pointForKick);
             Vector2D sol1 , sol2;
-            Circle2D circ(defenseAgents.at(otherAgent)->pos() , Robot::robot_radius_new);
+            Circle2D circ(defenseAgents.at(otherAgents.at(i))->pos() , Robot::robot_radius_new);
             int num = circ.intersection(otherAgentIntersect , &sol1 , &sol2);
-            Segment2D oneToucherToOther(defensePoints[oneToucher], defensePoints[otherAgent]);
+            Segment2D oneToucherToOther(defensePoints[oneToucher], defensePoints[otherAgents.at(i)]);
             Line2D ballWay(wm->ball->pos , wm->ball->vel + wm->ball->pos);
             Segment2D ballWay1(wm->ball->pos , wm->ball->vel + wm->ball->pos);
             //////// danger for defense one touch ///////
-            for (auto defenseAgent : defenseAgents) {
-                if (Circle2D(defenseAgent->pos() , Robot::robot_radius_new).intersection(ballWay1 , &sol[0] , &sol[1])) {
+            for (int i = 0 ; i < defenseAgents.size() ; i++) {
+                if(Circle2D(defenseAgents.at(i)->pos() , Robot::robot_radius_new).intersection(ballWay1 , &sol[0] , &sol[1])) {
                     isIntersect = true;
                     break;
                 }
@@ -2497,17 +2505,16 @@ bool DefensePlan::defenseOneTouchOrNot() {
                 return false;
             }
             //////////////////////
-            if (pointForKick.valid() && (pointForKick.dist(defenseAgents.at(oneToucher)->pos()) - pointForKick.dist(defenseAgents.at(
-                                                                                                                        otherAgent)->pos()) > 0.2
-                                         || (num && defenseAgents.at(oneToucher)->pos().dist(defenseAgents.at(otherAgent)->pos()) > 0.19))) { //// ?????
+            if (pointForKick.valid() && (pointForKick.dist(defenseAgents.at(oneToucher)->pos()) - pointForKick.dist(defenseAgents.at(i)->pos()) > 0.2
+                                         || (num && defenseAgents.at(oneToucher)->pos().dist(defenseAgents.at(i)->pos()) > 0.19))) { //// ?????
                 int temp = oneToucher;
-                oneToucher = otherAgent;
-                otherAgent = temp;
+                oneToucher = i;
+                i = temp;
                 setPointToKick();
             } else if (!pointForKick.valid()) {
                 int temp = oneToucher;
-                oneToucher = otherAgent;
-                otherAgent = temp;
+                oneToucher = i;
+                i = temp;
                 setPointToKick();
                 if (!pointForKick.valid()) {
                     return false;
@@ -2549,7 +2556,7 @@ void DefensePlan::setPointToKick() {
     Vector2D ballPos = wm->ball->pos;
     Line2D ballLine(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm());
     if (!defenseAgents.empty()) {
-        Line2D perpBallLine(defenseAgents.at(oneToucher)->pos() + defenseAgents.at(oneToucher)->dir().norm() * 0.08 , defenseAgents.at(oneToucher)->self.getKickerPos() + wm->ball->vel.norm());
+        Line2D perpBallLine(defenseAgents.at(oneToucher)->self.getKickerPos() , defenseAgents.at(oneToucher)->self.getKickerPos() + wm->ball->vel.norm());
         perpBallLine = perpBallLine.perpendicular(defenseAgents.at(oneToucher)->self.getKickerPos());
         Vector2D intersect = perpBallLine.intersection(ballLine);
         if (intersect.valid()) {
@@ -2564,7 +2571,8 @@ void DefensePlan::setPointToKick() {
                     return;
                 }
             }
-        } else {
+        }
+        else {
             Vector2D *inter = getIntersectWithDefenseArea(Line2D(ballPos, midGoal), ballPos);
             if (inter == nullptr || !inter->valid()) {
                 pointForKick.invalidate();
@@ -3065,8 +3073,8 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     }
 
     if(!_isGoalie && (wm->ball->pos.x < -5.8 || wm->ball->pos.x > 5.8)){
-//        wm->field->ourBigPenaltyArea(1, 0.1, 0).intersection(Segment2D(wm->field->center() , wm->field->ourGoal()) , &solu[2] , &solu[3]);
-//        predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2] : solu[3];
+        //        wm->field->ourBigPenaltyArea(1, 0.1, 0).intersection(Segment2D(wm->field->center() , wm->field->ourGoal()) , &solu[2] , &solu[3]);
+        //        predictedBall = solu[2].dist(wm->field->center()) < solu[3].dist(wm->field->center()) ? solu[2] : solu[3];
         predictedBall = wm->field->center() - Vector2D(4 , 0);
     }
 
