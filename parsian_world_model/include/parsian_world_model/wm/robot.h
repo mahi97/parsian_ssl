@@ -11,6 +11,7 @@
 #include <parsian_util/core/field.h>
 #include <parsian_world_model/util/newkalman.h>
 #include <QTime>
+#include <parsian_util/tools/drawer.h>
 
 
 struct kalmParam {
@@ -18,8 +19,6 @@ struct kalmParam {
     double vy;
     double vw;
 };
-
-
 
 class Robot : public MovingObject {
 private:
@@ -81,10 +80,11 @@ public:
     Property(float, ReplDir, replDir);
     /////////////////new kalman
     qint64 kalmanLastTime, kalmanFutureLastTime;
+    QList <kalmParam> lastCommands;
     typedef KalmanFilter<6, 3> kalman;
     kalman *donKalman;
     kalman *donKalmanF;
-    void newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand);
+    void newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand, kalmParam _param);
     void visionUpdate();
     QTime kalmanTime;
     Vector2D lastDir;

@@ -20,11 +20,10 @@ void AINodelet::onInit() {
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
-
     refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
     teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
-
     behaviorSub = nh.subscribe("/behavior", 100, &AINodelet::behaviorCb, this);
+    mousePosSub = nh.subscribe("/mousePos", 100, &AINodelet::mousePosCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
@@ -43,7 +42,9 @@ void AINodelet::onInit() {
     server->setCallback(f);
 
 }
-
+void AINodelet::mousePosCb(const parsian_msgs::vector2DConstPtr &_mousePos) {
+    mousePos.assign(_mousePos.get()->y * -1,_mousePos.get()->x * -1);
+}
 void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf) {
     teamConfig = *_conf;
 }
