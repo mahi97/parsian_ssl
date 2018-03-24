@@ -61,6 +61,7 @@ generate_dynamic_reconfigure_options(
 	###	cfg/pass.cfg
 		cfg/direct.cfg
 		cfg/mahi.cfg
+                cfg/move_forward.cfg
 		cfg/ai.cfg
 		cfg/behavior_server.cfg
 )
