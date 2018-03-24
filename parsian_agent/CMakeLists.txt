@@ -18,7 +18,11 @@ find_package(catkin REQUIRED COMPONENTS
         parsian_util
         roscpp
         rospy
+	roslint
         )
+
+roslint_cpp()
+roslint_python()
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -284,4 +288,3 @@ catkin_install_python(PROGRAMS script/parsian_profiler/motion_profiler_node.py
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-

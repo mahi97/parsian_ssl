@@ -82,11 +82,11 @@ void* KickAction::getMessage() {
 }
 
 
-QString KickAction::getActionName(){
+QString KickAction::getActionName() {
     return SActionName();
 }
 
-QString KickAction::SActionName(){
+QString KickAction::SActionName() {
     return QString{"KickAction"};
 }
 

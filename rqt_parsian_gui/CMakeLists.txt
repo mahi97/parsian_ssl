@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         rqt_gui_cpp
         std_msgs
         parsian_util
+        rosbag
         )
 
 ## System dependencies are found with CMake's conventions
@@ -30,7 +31,7 @@ endif()
 catkin_python_setup()
 
 roslint_cpp()
-
+roslint_python()
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -120,34 +121,48 @@ catkin_package(
 
 
 set (${PROJECT_NAME}_SRCS
-        src/${PROJECT_NAME}/monitor.cpp
-        src/${PROJECT_NAME}/robotstatus.cpp
-        src/${PROJECT_NAME}/robotstatus_widget.cpp
-        src/${PROJECT_NAME}/monitorWidget.cpp
-        src/${PROJECT_NAME}/guiDrawer.cpp
-        src/${PROJECT_NAME}/mode_chooser.cpp
-        src/${PROJECT_NAME}/modeChooserWidget.cpp
-        src/${PROJECT_NAME}/playoffWidget.cpp
-        src/${PROJECT_NAME}/playoff.cpp
-        )
+  src/${PROJECT_NAME}/monitor.cpp
+  src/${PROJECT_NAME}/robotstatus.cpp
+  src/${PROJECT_NAME}/robotstatus_widget.cpp
+  src/${PROJECT_NAME}/monitorWidget.cpp
+  src/${PROJECT_NAME}/guiDrawer.cpp
+  src/${PROJECT_NAME}/mode_chooser.cpp
+  src/${PROJECT_NAME}/modeChooserWidget.cpp
+  src/${PROJECT_NAME}/handycontroller.cpp
+  src/${PROJECT_NAME}/playoffWidget.cpp
+  src/${PROJECT_NAME}/playoff.cpp
+  #src/${PROJECT_NAME}/blackboardMonitor.cpp
+  #src/${PROJECT_NAME}/blackboardMonitorWidget.cpp
+
+)
 
 set(${PROJECT_NAME}_HDRS
-        include/${PROJECT_NAME}/monitor.h
-        include/${PROJECT_NAME}/robotstatus.h
-        include/${PROJECT_NAME}/robotstatus_widget.h
-        include/${PROJECT_NAME}/monitorWidget.h
-        include/${PROJECT_NAME}/guiDrawer.h
-        include/${PROJECT_NAME}/mode_chooser.h
-        include/${PROJECT_NAME}/modeChooserWidget.h
-        include/${PROJECT_NAME}/playoffWidget.h
-        include/${PROJECT_NAME}/playoff.h
-        )
+  include/${PROJECT_NAME}/monitor.h
+  include/${PROJECT_NAME}/robotstatus.h
+  include/${PROJECT_NAME}/robotstatus_widget.h
+  include/${PROJECT_NAME}/monitorWidget.h
+  include/${PROJECT_NAME}/guiDrawer.h
+  include/${PROJECT_NAME}/mode_chooser.h
+  include/${PROJECT_NAME}/modeChooserWidget.h
+  include/${PROJECT_NAME}/handycontroller.h
+  include/${PROJECT_NAME}/playoffWidget.h
+  include/${PROJECT_NAME}/playoff.h
+  #include/${PROJECT_NAME}/blackboardMonitor.h
+  #include/${PROJECT_NAME}/blackboardMonitorWidget.h
+)
+
+
+set(${PROJECT_NAME}_UIS
+  resource/handycontroller.ui
+)
 
 
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-    qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt5_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt5_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 else()
-    qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt4_wrap_cpp(${PROJECT_NAME}_MOCS ${${PROJECT_NAME}_HDRS})
+  qt4_wrap_ui(${PROJECT_NAME}_UIS_H ${${PROJECT_NAME}_UIS})
 endif()
 
 ###########
@@ -164,9 +179,11 @@ include_directories(
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}
-        ${${PROJECT_NAME}_SRCS}
-        ${${PROJECT_NAME}_MOCS}
-        )
+    ${${PROJECT_NAME}_SRCS}
+    ${${PROJECT_NAME}_MOCS}
+    ${${PROJECT_NAME}_UIS_H}
+    )
+
 
 ## Declare a C++ executable
 # add_executable(rqt_example_cpp_node src/rqt_example_cpp_node.cpp)
@@ -216,11 +233,13 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-        plugin1.xml
-        plugin2.xml
-        mode_plugin.xml
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-        )
+  plugin1.xml
+  plugin2.xml
+  plugin3.xml
+  mode_plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 
 #############
 ## Testing ##

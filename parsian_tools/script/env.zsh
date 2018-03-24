@@ -76,7 +76,7 @@ function parsian() {
 			fi
 			;;
 		rebuild)
-			catkin clean "${@:2}"
+			catkin clean -y
 			catkin build "${@:2}"
 			;;
 		behavior)
@@ -89,7 +89,7 @@ function parsian() {
 				cd script/auto-generate
 				./behavior.py ${@:3}
 				cd $PARSIAN_ROOT/src/parsian_ssl/parsian_ai/cfg
-				chmod a+x $3.cfg
+				chmod a+x ./$3.cfg
 				cd $temp
 			;;
 			list)
@@ -140,7 +140,6 @@ EOS
 			fi
 			catkin "$@"
 esac
-
 cd $TEMP_DIR
 
 }
