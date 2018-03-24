@@ -23,10 +23,8 @@ namespace rqt_parsian_gui
     }
 
     void TaskRunner::shutdownPlugin() {
-        ROS_INFO("Sddf");
         n.shutdown();
         n_private.shutdown();
-
     }
 
 }
