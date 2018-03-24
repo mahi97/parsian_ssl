@@ -26,7 +26,7 @@
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/geom/geom.h>
-
+#include <behavior/direct/direct.h>
 
 #include <parsian_msgs/plan_service.h>
 
@@ -43,6 +43,9 @@ public:
         state = 0;
         mygpa = new GotopointavoidAction();
         myKick = new KickAction;
+        direct = new BehaviorDirect;
+        for (int i = 0; i < 12; i++) if (agents[i] != nullptr) agentList.append(_agents[i]);
+
     }
     ~Exprimental() {
 
@@ -51,14 +54,21 @@ public:
 
     }
     void execute() {
-
+        ROS_INFO("adsfasdf");
+        direct->init(agentList, m_behav);
+        direct->execute();
     }
 private:
     int state;
     QList<Vector2D> pos;
     QList<double> dist;
+    QList<Agent*> agentList;
     GotopointavoidAction *gpa;
     Agent** agents;
+    BehaviorDirect* direct;
+    parsian_msgs::parsian_behaviorConstPtr m_behav;
+
+
 };
 
 #endif //PARSIAN_AI_EXPRIMENTAL_H
