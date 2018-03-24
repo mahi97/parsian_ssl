@@ -72,8 +72,9 @@ namespace rqt_parsian_gui
     void MonitorWidget::mousePressEvent(QMouseEvent *event)
     {
 
-        mousePos->x=(double(event->pos().x())- centralPoint.x)/coeff/scaleFactor;
-        mousePos->y=(double(event->pos().y()) - centralPoint.y)/coeff/scaleFactor;
+        mousePos->x=(double(event->pos().x())- centralPoint.y)/coeff/scaleFactor;
+        mousePos->y=(double(event->pos().y()) - centralPoint.x)/coeff/scaleFactor;
+        ROS_INFO_STREAM("hii__"<<mousePos->x<<"__"<<mousePos->y);
         monitor_pub.publish(*mousePos);
     }
 
@@ -209,7 +210,6 @@ namespace rqt_parsian_gui
 
 
             QColor col = QColor(rec.color.r, rec.color.g, rec.color.b);
-            ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
 
             drawRect(rec.rect.left_x,
                      rec.rect.top_y,
@@ -371,8 +371,7 @@ namespace rqt_parsian_gui
 
         QFontMetrics fm(font);
         double pixelsWide = fm.width(text);
-        x = -1 * x ;
-        y = -1 * y ;
+
 
         painter.begin(this);
 
