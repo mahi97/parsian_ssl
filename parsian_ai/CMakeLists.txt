@@ -59,6 +59,7 @@ catkin_python_setup()
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
 		cfg/mahi.cfg
+                cfg/move_forward.cfg
 		cfg/ai.cfg
 		cfg/behavior_server.cfg
 )
@@ -248,6 +249,7 @@ target_link_libraries(${PROJECT_NAME}_roles
 		)
 
 ### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
+include(./move_forward_CMakeLists.txt)
 include(./mahi_CMakeLists.txt)
 
 #############
