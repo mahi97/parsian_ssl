@@ -123,9 +123,7 @@ protected:
     int decideNumOfMarks();
     kkDefPos tempDefPos;
     void matchingDefPos(int _defenseNum);
-    bool defenseOneTouchOrNot();
-    bool defenseClearOrNot();
-    void runClear();
+    bool defenseOneTouchOrNot();        
     bool agentEffectOnBallProbability(Vector2D ballPos, Vector2D ballVel, Vector2D agentPos, Vector2D agentVel, bool isTowardOurgoal);
     Vector2D getGoalieShootOutTarget(bool isSkyDive);
     bool canReachToBall(int agentId, int theirAgentId);
@@ -245,8 +243,7 @@ private:
     int cycleCounter;
     Vector2D oneTouchPoint[2];
     bool oneTouchPointFlag;
-    bool oneTouchPointFlagG;
-    bool isPathToOppGoalieClear();
+    bool oneTouchPointFlagG;    
     Vector2D findBestPointForChipTarget(double &chipDist, bool isGoalie);
     bool doBlockPass;
     double timeToReach;
