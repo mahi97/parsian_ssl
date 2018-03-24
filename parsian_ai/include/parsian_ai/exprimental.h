@@ -26,7 +26,7 @@
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/geom/geom.h>
-
+#include <behavior/direct/direct.h>
 
 #include <parsian_msgs/plan_service.h>
 
@@ -45,7 +45,9 @@ public:
         state = 0;
         mygpa = new GotopointavoidAction();
         myKick = new KickAction;
-        myKick2 = new KickAction;
+        direct = new BehaviorDirect;
+        for (int i = 0; i < 12; i++) if (agents[i] != nullptr) agentList.append(_agents[i]);
+
     }
     ~Exprimental() {
 
@@ -54,65 +56,6 @@ public:
 
     }
     void execute() {
-<<<<<<< cdf3df075bceff035ec37e0a6f1c386cfca666a7
-        int skillAgent = 5;
-        Rect2D penaltyArea(Vector2D(-6,-1.3),Vector2D(-4.7,1.3));
-        Vector2D finalPos = mousePos;
-        Segment2D directPath(agents[skillAgent]->pos(),finalPos);
-        Vector2D A(-3.5,-1.3) , B(-3.5 , 1.3);
-        Vector2D target;
-        mygpa->setTargetdir(agents[skillAgent]->pos() - wm->field->ourGoal());
-
-        Vector2D sol1,sol2;
-
-        if(penaltyArea.intersection(directPath,&sol1,&sol2) == 2)
-        {
-            if((sol1.y == -1.3 && sol2.y == 1.3) || (sol2.y == -1.3 && sol1.y == 1.3)) {
-                ROS_INFO_STREAM("sol1 , sol2 "<< sol1.y << sol2.y);
-
-                if(agents[skillAgent]->pos().dist(A) < agents[skillAgent]->pos().dist(B) ) {
-                    target = A;
-                } else {
-                    target = B;
-                }
-            } else if(sol1.y == -1.3 || sol2.y == -1.3) {
-                ROS_INFO_STREAM("ahz "<< sol1.y << sol2.y);
-                target = A + Vector2D(0,-0.5);
-            } else if(sol1.y == 1.3 || sol2.y == 1.3){
-                target = B + Vector2D(0,0.5);
-            }
-            drawer->draw(sol1);
-            drawer->draw(sol2);
-        } else {
-            target = finalPos;
-        }
-
-        drawer->draw(target,QColor(Qt::red));
-
-
-
-        mygpa->setTargetpos(target);
-       mygpa->setNoavoid(true);
-        mygpa->setAvoidpenaltyarea(false);
-        myKick->setTarget(Vector2D(6,0));
-//        myKick->setChipdist(0.1);
-        myKick->setIskickchargetime(true);
-        myKick->setKickchargetime(600);
-        myKick->setSpin(10);
-        //myKick->setKickspeed(0.5);
-        myKick->setChip(true);
-        myKick2->setTarget(Vector2D(6,-4.5));
-//        myKick->setChipdist(0.1);
-        myKick2->setIskickchargetime(true);
-        myKick2->setKickchargetime(400);
-        myKick2->setSpin(10);
-        //myKick->setKickspeed(0.5);
-        myKick2->setChip(true);
-
-        ROS_INFO_STREAM("salam2");
-        agents[5]->action = mygpa;
-        agents[1]->action = myKick2;
-=======
         myKick->setTarget(Vector2D{-3, 4.5});
         myKick->setChip(false);
         myKick->setKickspeed(2);
@@ -124,14 +67,18 @@ public:
             }
 
         agents[1]->action = myKick;
->>>>>>> experimental for chip_move_forward
     }
 private:
     int state;
     QList<Vector2D> pos;
     QList<double> dist;
+    QList<Agent*> agentList;
     GotopointavoidAction *gpa;
     Agent** agents;
+    BehaviorDirect* direct;
+    parsian_msgs::parsian_behaviorConstPtr m_behav;
+
+
 };
 
 #endif //PARSIAN_AI_EXPRIMENTAL_H

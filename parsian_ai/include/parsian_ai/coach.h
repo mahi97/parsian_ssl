@@ -21,6 +21,7 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 #include <behavior/mahi/mahi.h>
+#include <behavior/direct/direct.h>
 #include <parsian_msgs/plan_service.h>
 #include <parsian_msgs/parsian_ai_status.h>
 #include <parsian_msgs/parsian_pair_roles.h>

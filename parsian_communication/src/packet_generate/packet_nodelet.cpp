@@ -29,7 +29,7 @@ void PacketNodelet::onInit() {
 
 
 
-    visinSub  = n.subscribe("world_model" , 1000, &PacketNodelet::syncData, this);
+    visinSub  = n.subscribe("world_model" , 1, &PacketNodelet::syncData, this);
 
     for (auto &robotPacket : robotPackets) {
         for (unsigned char &j : robotPacket) {

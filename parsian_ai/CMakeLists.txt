@@ -232,6 +232,7 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_roles
 		${PROJECT_NAME}_util
 		mahi_nodelet
+		direct_nodelet
 		)
 
 target_link_libraries(${PROJECT_NAME}_plays
