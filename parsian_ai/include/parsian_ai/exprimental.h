@@ -56,17 +56,6 @@ public:
 
     }
     void execute() {
-        myKick->setTarget(Vector2D{-3, 4.5});
-        myKick->setChip(false);
-        myKick->setKickspeed(2);
-        for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++)
-            if(wm->opp[i]->pos.y - agents[1]->pos().y < 0.8 && fabs(wm->opp[i]->pos.x - agents[1]->pos().x < 0.8))
-            {
-                myKick->setChip(true);
-                myKick->setChipdist(0);
-            }
-
-        agents[1]->action = myKick;
     }
 private:
     int state;
