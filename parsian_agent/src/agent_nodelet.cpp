@@ -89,9 +89,25 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
         ROS_INFO_STREAM("GOTOPOINTAVOID executed!" << gotoPointAvoid->getTargetpos().y);
         break;
     case parsian_msgs::parsian_robot_task::KICK:
-        skillKick->setMessage(&_task->kickTask);
-        skill = skillKick;
-        //ROS_INFO("KICK executed!");
+			skillKick->setMessage(&_task->kickTask);
+            if(!_task->kickTask.chip)
+            {
+                if (!_task->kickTask.iskickchargetime)
+                    skillKick->setKickspeed(agent->kickSpeedValue(_task->kickTask.kickSpeed,_task->kickTask.spin));
+                else
+                    skillKick->setKickspeed(_task->kickTask.kickchargetime);
+            }
+            else
+            {
+                if (!_task->kickTask.iskickchargetime)
+                    skillKick->setKickspeed(agent->chipDistanceValue(_task->kickTask.kickSpeed,_task->kickTask.spin));
+                else
+                    skillKick->setKickspeed(_task->kickTask.kickchargetime);
+            }
+            skill = skillKick;
+            //ROS_INFO("KICK executed!");
+            break;
+
         break;
     case parsian_msgs::parsian_robot_task::ONETOUCH:
         oneTouch->setMessage(&_task->oneTouchTask);
