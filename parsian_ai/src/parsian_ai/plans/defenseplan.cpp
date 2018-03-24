@@ -195,7 +195,7 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents, int allOf
     return defensePosiotion;
 }
 
-QList<Segment2D> DefensePlan::getLinesOfBallTriangle() {
+QList<Segment2D> DefensePlan::getLinesOfBallTriangle(){
     QList<Segment2D> linesOfBallTriangle;
     Vector2D ballPos = ballPrediction(false);
     Vector2D ourGoalL = wm->field->ourGoalL();
@@ -1619,6 +1619,8 @@ void DefensePlan::execute(){
 
     int realDefSize = 0;
     detectOpponentPassOwners(1 , 2);
+    const double suitableRadius = sqrt(pow(wm->field->_PENALTY_DEPTH,2) + pow(wm->field->_PENALTY_WIDTH/2 , 2));
+    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
     stopMode = gameState->isStop();
     ballPosHistory.prepend(Vector2D(wm->ball->pos.x, wm->ball->pos.y));
     if (ballPosHistory.count() > 7){
@@ -2471,7 +2473,7 @@ Vector2D DefensePlan::checkDefensePoint(Agent* agent, const Vector2D& point) {
     double s = min(10.0, fabs(diff.degree()));
     double finalDeg = deg.degree() + s * sign(diff.degree());
     Vector2D finalPos = wm->field->ourGoal() + Vector2D().setPolar(100, finalDeg);
-    inter = getIntersectWithDefenseArea(Segment2D(finalPos, wm->field->ourGoal(), finalPos);
+    inter = getIntersectWithDefenseArea(Segment2D(finalPos, wm->field->ourGoal()), finalPos);
     Vector2D retPoint;
     if (inter != nullptr) {
         retPoint = *inter;
