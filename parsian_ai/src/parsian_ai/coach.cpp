@@ -833,7 +833,9 @@ void CCoach::decideAttack() {
     }
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
+
     if (selectedBehavior != nullptr) {
+        selectedBehavior->init(ourAgents, m_behavior);
         selectedBehavior->execute();
     }
     lastPlayers.clear();

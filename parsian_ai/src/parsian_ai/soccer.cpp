@@ -25,7 +25,7 @@ CSoccer::~CSoccer() {
 void CSoccer::execute() {
     bool custom = false;
     //customControl(custom);
-    if (true) {
+    if (false) {
         coach->execute();
     } else {
         exp->execute();

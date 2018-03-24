@@ -19,12 +19,12 @@ void PlannerNodelet::onInit() {
 
     planner.reset(new CPlanner(name.split('_').at(1).toInt()));
 
-    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 1000, &PlannerNodelet::commonConfigCb, this);
-    world_model_sub   = nh.subscribe("world_model", 10000, &PlannerNodelet::wmCb, this);
-    planner_sub       = nh.subscribe(QString("agent_%1/plan").arg(planner->getID()).toStdString(), 5, &PlannerNodelet::plannerCb, this);
+    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 5, &PlannerNodelet::commonConfigCb, this);
+    world_model_sub   = nh.subscribe("world_model", 1, &PlannerNodelet::wmCb, this);
+    planner_sub       = nh.subscribe(QString("agent_%1/plan").arg(planner->getID()).toStdString(), 1, &PlannerNodelet::plannerCb, this);
 
-    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 1000);
-    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
+    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 100);
+    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 100);
     planner->path_pub = private_nh.advertise<parsian_msgs::parsian_path>("path", 5);
 
 
@@ -48,7 +48,6 @@ void PlannerNodelet::timerCb(const ros::TimerEvent& event) {
         draw_pub.publish(drawer->draws);
         cleanDraws();
     }
-
     planner->run();
 
 
