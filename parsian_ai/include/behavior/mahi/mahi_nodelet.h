@@ -27,6 +27,7 @@ private:
     ros::Subscriber teamConfSub;
     ros::Subscriber robotStatusSub;
     ros::Publisher drawPub;
+    ros::Publisher behavPub;
     ros::Publisher debugPub;
 
     ros::Timer timer_;

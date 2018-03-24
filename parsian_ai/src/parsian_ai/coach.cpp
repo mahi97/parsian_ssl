@@ -146,7 +146,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
 
     preferedDefenseCounts = 0;
-    preferedGoalieAgent = -1;
+    preferedGoalieID = -1;
     return;
 
     missMatchIds.clear();
@@ -253,7 +253,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     }
 
     if (gameState->halfTimeLineUp()) {
-        preferedGoalieAgent = -1;
+        preferedGoalieID = -1;
         preferedDefenseCounts = 0;
     }
 

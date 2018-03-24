@@ -17,6 +17,7 @@
 #include <parsian_util/action/autogenerate/onetouchaction.h>
 #include <parsian_util/action/autogenerate/receivepassaction.h>
 #include <parsian_ai/util/worldmodel.h>
+#include <parsian_ai/exprimental.h>
 
 
 class CSoccer {
@@ -33,6 +34,7 @@ public:
 
     Agent **agents;
     CCoach *coach;
+    Exprimental* exp;
     clock_t realTimeTime;
     struct timeval t1, t2;
 private:

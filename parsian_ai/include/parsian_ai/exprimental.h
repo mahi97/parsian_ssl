@@ -22,6 +22,12 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 
+#include <parsian_util/action/autogenerate/gotopointaction.h>
+#include <parsian_util/action/autogenerate/gotopointavoidaction.h>
+#include <parsian_util/action/autogenerate/kickaction.h>
+#include <parsian_util/geom/geom.h>
+
+
 #include <parsian_msgs/plan_service.h>
 
 class Exprimental {
@@ -45,19 +51,7 @@ public:
 
     }
     void execute() {
-        ROS_INFO_STREAM("MAHI6" << state);
-        drawer->draw(Rect2D(Vector2D(0,0),Vector2D(1,1)));
-        drawer->draw(mousePos);
-        drawer->draw(Vector2D(2,2));
-        drawer->draw(Segment2D(Vector2D(0,0),Vector2D(2,1)));
-        drawer->draw(QString("salam"),Vector2D(1,1));
-        mygpa->setTargetpos(mousePos);
-        mygpa->setTargetdir(Vector2D(0,0));
-        mygpa->setNoavoid(false);
-        myKick->setTarget(Vector2D(6,0));
-        myKick->setKickspeed(500);
-        agents[7]->action = myKick;
-        return;
+
     }
 private:
     int state;
