@@ -37,7 +37,7 @@ public:
     Exprimental(Agent** _agents) {
         agents = _agents;
         gpa = new GotopointavoidAction();
-        pos  << Vector2D(1,-3) << Vector2D(1,3) << Vector2D(4.5,3) << Vector2D(1,3);
+        pos  << Vector2D(-3,4.5) << Vector2D(1,3) << Vector2D(4.5,3) << Vector2D(1,3);
         dist << 0.3 << 1 << 0.3 << 0.3;
         agents[8]->action = gpa;
         state = 0;
@@ -51,7 +51,17 @@ public:
 
     }
     void execute() {
+        myKick->setTarget(Vector2D{-3, 4.5});
+        myKick->setChip(false);
+        myKick->setKickspeed(2);
+        for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++)
+            if(wm->opp[i]->pos.y - agents[1]->pos().y < 0.8 && fabs(wm->opp[i]->pos.x - agents[1]->pos().x < 0.8))
+            {
+                myKick->setChip(true);
+                myKick->setChipdist(0);
+            }
 
+        agents[1]->action = myKick;
     }
 private:
     int state;
