@@ -50,7 +50,6 @@ QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double 
     qSort(IDOfOpponentsInPolygon.begin() , IDOfOpponentsInPolygon.end());
     return IDOfOpponentsInPolygon;
 }
-
 int DefensePlan::defenseNumber(){
     if (conf.StrictFormation){
         if (conf.Defense > 3){
@@ -401,6 +400,7 @@ void DefensePlan::agentsStuckTogether(const QList<Vector2D> &agentsPosition , QL
             }
         }
     }
+
     for (auto stuckPosition : stuckPositions) {
         for (int j = 0 ; j < agentsPosition.size() ; j++) {
             if (stuckPosition == agentsPosition.at(j)) {
@@ -422,7 +422,6 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
     QList<Vector2D> solvedPositionsAreNotInThePenaltyArea;
     QList<Vector2D> nonRepetitiveFinalSolvedPosition;
     Vector2D tempPoint = Vector2D(0, 0);
-    bool isRepeated = false;
     QList<Vector2D> tempVectors;
     ///////////////////// Update the state /////////////////////////////////////
     solvedPosition.clear();
@@ -461,13 +460,12 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
     for (int i = 0 ; i < stuckPositions.size() && i < stuckIndexs.size() && i < solvedPositionsAreNotInThePenaltyArea.size() ; i++) {
         for (int j = 0 ; j < stuckIndexs.size() ; j++) {
             if (stuckIndexs.at(i) == stuckIndexs.at(j) && i != j) {
-                isRepeated = true;
                 tempIndexs.append(j);
                 DBUG(QString("temp Index : %1").arg(j) , D_AHZ);
             }
         }
         tempIndexs.append(i);
-        if (isRepeated) {
+        if (tempIndexs.size() > 1) {
             tempPoint = stuckPositions.at(i);
             for (int k = 0 ; k < solvedPositionsAreNotInThePenaltyArea.size() ; k++) {
                 for (int tempIndex : tempIndexs) {
@@ -486,7 +484,6 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
         } else{
             finalSolvedPosition.append(solvedPositionsAreNotInThePenaltyArea.at(i));
         }
-        isRepeated = false;
         tempIndexs.clear();
         tempVectors.clear();
         temp.clear();
