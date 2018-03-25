@@ -65,7 +65,8 @@ void BehaviorDirect::generateFormation() {
         pos.setPolar(3, degree);
         gpa[i]->setTargetpos(pos + kicker->pos());
         gpa[i]->setLookat(wm->field->oppGoal());
-        gpa[i]->setNoavoid(true);
+        ROS_INFO("mahi mahipa");
+        gpa[i]->setNoavoid(false);
     }
     match(agents, gpa);
 
