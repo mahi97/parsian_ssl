@@ -54,8 +54,9 @@ protected:
     int defenseNumber();
     double findBestOffsetForDefenseArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
     double findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit);
-    Line2D getBestLineWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
-    Segment2D getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
+    Line2D getBestLineWithTallesForRecatngularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
+    Line2D getBestLineWithTallesForCircularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
+    Segment2D getBestSegmentWithTallesForRectangularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     QList<Segment2D> getLinesOfBallTriangle();
     QList<Vector2D> defenseFormationForRectangularPositioning(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
     QList<Vector2D> defenseFormationForCircularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit);
