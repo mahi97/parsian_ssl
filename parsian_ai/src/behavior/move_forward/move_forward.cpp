@@ -38,13 +38,21 @@ double BehaviorMove_Forward::eval() {
    drawer->draw(right, QColor(50, 55, 155));
    sortobstacles(obstacles);
 //   for(int i{}; i < obstacles.size(); i++)
+//   {
 //       ROS_INFO_STREAM("kian::: "<<obstacles[i].a().y);
+//       //drawer->draw(obstacles[i], QColor(50, 55, 155));
+//   }
    QList<double> angles;
+  // ROS_INFO_STREAM("kian: " << (1/3.14)*180*angleOfTwoSegment(Segment2D{Vector2D{0,0}, Vector2D{1,1}}, Segment2D{Vector2D{0,0}, Vector2D{1,0}}));
     for(int i{}; i < obstacles.size() - 1; i++)
     {
         angles.push_back(angleOfTwoSegment(obstacles[i], obstacles[i + 1]));
     }
-   //ROS_INFO_STREAM("kian: " << angleOfTwoSegment(Segment2D{Vector2D{1, 0}, Vector2D{0, 0}}, Segment2D{Vector2D{0,1}, Vector2D{0,0}}));
+    for(int i{}; i<angles.size(); i++)
+    {
+        ROS_INFO_STREAM("kian11: " << angles[i]*180/3.14 );
+    }
+    ROS_INFO("kian: -------" );
     QList<QPair<Vector2D, double>> result;
     double angsum{};
     for(int i{}; i<angles.size(); i++)
@@ -52,8 +60,13 @@ double BehaviorMove_Forward::eval() {
         QPair<Vector2D, double> tmp;
         if(i != 0)
             angsum += angles[i - 1];
-        double ang{angsum + angles[i]/2};
-        tmp.first = Vector2D{10000, tan(3.14-ang)*10000};
+        double ang{angsum + angles[i]/2.0};
+        //ROS_INFO_STREAM("kian: " << ang*180/3.14);
+        Vector2D tmp1{};
+        tmp1.setPolar(1, AngleDeg{-90 + ang*180/3.14});
+        tmp.first = tmp1;
+        tmp.first.x += wm->ball->pos.x + wm->ball->vel.x;
+        tmp.first.y += wm->ball->pos.y + wm->ball->vel.y;
         tmp.second = angles[i];
         result.push_back(tmp);
     }
@@ -86,7 +99,7 @@ double BehaviorMove_Forward::angleOfTwoSegment(const Segment2D &xp, const Segmen
     double theta1 = std::atan2(xp.a().y-xp.b().y,xp.a().x-xp.b().x);
     double theta2 = std::atan2(yp.a().y-yp.b().y,yp.a().x-yp.b().x);
     double diff = fabs(theta1-theta2);
-    return min(diff,fabs(180-diff));
+    return diff;
 }
 
 double BehaviorMove_Forward::findmax(const QList<double> &list)
