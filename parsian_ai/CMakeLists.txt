@@ -156,6 +156,7 @@ add_executable(${PROJECT_NAME}_node
 #####include(./pass_CMakeLists.txt)
 include(./direct_CMakeLists.txt)
 include(./mahi_CMakeLists.txt)
+include(./move_forward_CMakeLists.txt)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

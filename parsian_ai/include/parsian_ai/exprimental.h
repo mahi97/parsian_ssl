@@ -39,7 +39,7 @@ public:
     Exprimental(Agent** _agents) {
         agents = _agents;
         gpa = new GotopointavoidAction();
-        pos  << Vector2D(1,-3) << Vector2D(1,3) << Vector2D(4.5,3) << Vector2D(1,3);
+        pos  << Vector2D(-3,4.5) << Vector2D(1,3) << Vector2D(4.5,3) << Vector2D(1,3);
         dist << 0.3 << 1 << 0.3 << 0.3;
         agents[8]->action = gpa;
         state = 0;
@@ -54,6 +54,7 @@ public:
 
     }
     void execute() {
+<<<<<<< cdf3df075bceff035ec37e0a6f1c386cfca666a7
         int skillAgent = 5;
         Rect2D penaltyArea(Vector2D(-6,-1.3),Vector2D(-4.7,1.3));
         Vector2D finalPos = mousePos;
@@ -111,6 +112,19 @@ public:
         ROS_INFO_STREAM("salam2");
         agents[5]->action = mygpa;
         agents[1]->action = myKick2;
+=======
+        myKick->setTarget(Vector2D{-3, 4.5});
+        myKick->setChip(false);
+        myKick->setKickspeed(2);
+        for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++)
+            if(wm->opp[i]->pos.y - agents[1]->pos().y < 0.8 && fabs(wm->opp[i]->pos.x - agents[1]->pos().x < 0.8))
+            {
+                myKick->setChip(true);
+                myKick->setChipdist(0);
+            }
+
+        agents[1]->action = myKick;
+>>>>>>> experimental for chip_move_forward
     }
 private:
     int state;
