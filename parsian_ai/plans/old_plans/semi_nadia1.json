@@ -433,6 +433,8 @@
             },
             "chance": 1,
             "lastDist": 1.5,
+            "maxEffective": 4,
+            "minNeeded": 3,
             "planMode": "INDIRECT",
             "tags": [
                 ""

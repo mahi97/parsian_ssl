@@ -135,7 +135,7 @@ class Handler(FileSystemEventHandler):
                         print("empty: " + str(f) + " --> removed!")
                 else:
                     bad_files.append(f)
-                    print("not json: " + str(f) + " --> removed!")
+                    # print("not json: " + str(f) + " --> removed!")
 
         file_list2 = [f for f in file_list if f not in bad_files]
         # printfile_list2
