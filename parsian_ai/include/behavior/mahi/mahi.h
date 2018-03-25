@@ -9,7 +9,7 @@ public:
     BehaviorMahi();
     virtual ~BehaviorMahi();
     virtual int execute();
-    virtual double eval();
+    virtual double eval(parsian_msgs::parsian_behaviorPtr _behav);
 };
 
 #endif // BEHAVIORMAHI_H

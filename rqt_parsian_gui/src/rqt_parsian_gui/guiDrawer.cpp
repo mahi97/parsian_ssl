@@ -12,6 +12,7 @@ CguiDrawer::CguiDrawer() {
     pointBuffer = new QQueue<parsian_msgs::parsian_draw_vector>;
     textBuffer = new QQueue<parsian_msgs::parsian_draw_text>;
 
+
 }
 CguiDrawer::~CguiDrawer() {
 

@@ -16,6 +16,7 @@
 #include <parsian_msgs/parsian_world_model.h>
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_util/core/worldmodel.h>
+#include <ros/package.h>
 
 
 
@@ -43,7 +44,7 @@ public:
 
     ros::Timer timer;
 
-    rosbag::Bag bag;
+        rosbag::Bag *bag;
 
 
     double radius = 0.0215;
