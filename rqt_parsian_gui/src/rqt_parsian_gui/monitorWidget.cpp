@@ -174,7 +174,7 @@ void MonitorWidget::paintGL() {
         rec = drawerBuffer->rectBuffer->dequeue();
 
         QColor col = QColor(rec.color.r, rec.color.g, rec.color.b);
-        ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
+        // ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
 
         drawRect(rec.rect.left_x,
                  rec.rect.top_y,
