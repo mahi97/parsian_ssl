@@ -52,7 +52,8 @@ protected:
     bool isInIndirectArea(Vector2D);
     int findNeededDefense();
     int defenseNumber();
-    double findBestOffsetForPenaltyArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
+    double findBestOffsetForDefenseArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
+    double findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit);
     Line2D getBestLineWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Segment2D getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     QList<Segment2D> getLinesOfBallTriangle();

@@ -69,7 +69,7 @@ Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit) {
     Vector2D ourGoalRight = wm->field->ourGoalR();
     Vector2D ballPosition = ballPrediction(false);
     int numberOfDefenseAgents = 1;
-    wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
+    wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                 getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
     defensePosition = sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1];
     return defensePosition;
@@ -84,9 +84,9 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
     Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
     int numberOfDefenseAgents = 2;
-    wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
+    wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                 getBisectorSegment(anIntesection , ballPosition , ourGoalLeft) , &sol[0] , &sol[1]);
-    wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
+    wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                 getBisectorSegment(anIntesection , ballPosition , ourGoalRight) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
     defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
@@ -133,17 +133,17 @@ QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upL
             //            ROS_INFO(QString("sol2: %1").arg(sol[2].y).toStdString().c_str());
             //            ROS_INFO(QString("sol3: %1").arg(sol[3].y).toStdString().c_str());
             if (upIntesection.isValid()) {
-                wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit), 0).intersection(
+                wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit), 0).intersection(
                             getBisectorSegment(ourGoalLeft , ballPosition , upIntesection) , &sol[4] , &sol[5]);
             } else {
-                wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit), 0).intersection(
+                wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit), 0).intersection(
                             getLinesOfBallTriangle().at(0), &sol[4] , &sol[5]);
             }
             if (downIntersection.isValid()) {
-                wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
+                wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                             getBisectorSegment(ourGoalRight , ballPosition , downIntersection) , &sol[6] , &sol[7]);
             } else {
-                wm->field->ourBigPenaltyArea(1, findBestOffsetForPenaltyArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
+                wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTalles(1 , downIntersection , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                             getLinesOfBallTriangle().at(1) , &sol[6] , &sol[7]);
             }
         }
@@ -162,7 +162,7 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents, int allOf
     Vector2D ballPosition = ballPrediction(false);
     defensePosiotion.clear();
     //    ROS_INFO(QString("allOfDefenseAgents: %1").arg(allOfDefenseAgents).toStdString().c_str());
-    double temp = findBestOffsetForPenaltyArea(getBestLineWithTalles(neededDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit);
+    double temp = findBestOffsetForDefenseArea(getBestLineWithTalles(neededDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit);
     //    ROS_INFO(QString("Best Offset for penalty area: %1").arg(temp).toStdString().c_str());
     if (neededDefenseAgents == allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
@@ -281,21 +281,17 @@ Segment2D DefensePlan::getBestSegmentWithTalles(int defenseCount , Vector2D firs
     }
 }
 
-double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , double downLimit , double upLimit) {
+double DefensePlan::findBestOffsetForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit) {
     double bestOffsetForPenaltyArea = 0;
     Vector2D ballPos = ballPrediction(false);
-    Vector2D ourGoalR = wm->field->ourGoalR();
-    Vector2D ourGoalL = wm->field->ourGoalL();
     Segment2D biggerFrontageOfTriangle;
-    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
-    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
     Segment2D smallerFrontageOfTriangle;
-    if (rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()) {
-        biggerFrontageOfTriangle = rightFrontageOfTriangle;
-        smallerFrontageOfTriangle = leftFrontageOfTriangle;
+    if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
     } else {
-        biggerFrontageOfTriangle = leftFrontageOfTriangle;
-        smallerFrontageOfTriangle = rightFrontageOfTriangle;
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
     }
     if (wm->field->ourBigPenaltyArea(1, upLimit - wm->field->_PENALTY_DEPTH , 0).contains(ballPos)) {
         if (fabs(ballPos.x) >= 6 - wm->field->_PENALTY_DEPTH) {
@@ -334,6 +330,27 @@ double DefensePlan::findBestOffsetForPenaltyArea(Line2D bestLineWithTalles , dou
         bestOffsetForPenaltyArea = 0.2;
     }
     return bestOffsetForPenaltyArea;
+}
+
+double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit){
+    double bestRadiusForDefenseArea = 0;
+    Segment2D smallerFrontageOfTriangle;
+    Segment2D biggerFrontageOfTriangle;
+    if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+    } else {
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+    }
+    bestRadiusForDefenseArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).dist(wm->field->ourGoal());
+    if(bestRadiusForDefenseArea <= downLimit){
+        bestRadiusForDefenseArea = downLimit;
+    }
+    if(bestRadiusForDefenseArea >= upLimit){
+        bestRadiusForDefenseArea = upLimit;
+    }
+    return bestRadiusForDefenseArea;
 }
 
 int DefensePlan::findNeededDefense() {
