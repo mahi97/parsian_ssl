@@ -16,6 +16,7 @@
 #include <QToolButton>
 #include <parsian_msgs/vector2D.h>
 #include <parsian_msgs/parsian_robot_task.h>
+#include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <parsian_msgs/grsim_ball_replacement.h>
 namespace rqt_parsian_gui
 {
@@ -29,19 +30,21 @@ namespace rqt_parsian_gui
 
     public slots:
         void setTask(QAction*);
+        void setID(QAction * );
     protected:
 
     private:
+        int agent_id;
         parsian_msgs::grsim_ball_replacement *client ;
         ros::Subscriber mousePosSub;
         ros::Publisher *taskPub;
         ros::ServiceClient ballReplacementClient;
         ros::Publisher *robTaskPub;
-        void mousePosCallBack(parsian_msgs::vector2DConstPtr);
-        QAction ** tasks;
-
+        parsian_msgs::parsian_robot_taskPtr task;
+        QAction ** tasks, **ids;
         QToolButton *toolButton,*agentId;
         QGridLayout *gridLayout;
+        void mousePosCallBack(parsian_msgs::vector2DConstPtr);
 
     };
 }

@@ -6,26 +6,32 @@ namespace rqt_parsian_gui
     TaskRunnerWidget::TaskRunnerWidget(ros::NodeHandle & n) : QWidget() {
 
         client = new parsian_msgs::grsim_ball_replacement();
-        this->setFixedSize(200,50);
+        this->setFixedSize(300,200);
         gridLayout = new QGridLayout();
 
         toolButton = new QToolButton();
         toolButton->setText("Choose Task");
 
         agentId = new QToolButton;
-        agentId->setText("agent id");
+        agentId->setText("0");
+        agent_id =0;
 
         tasks = new QAction* [TASK_NUM];
+        ids   = new QAction* [_MAX_NUM_PLAYERS];
 
         for (int i = 0; i < TASK_NUM; ++i) {
             tasks[i] = new QAction(taskNames[i],this);
             connect(toolButton, SIGNAL(triggered(QAction * )), this, SLOT(setTask(QAction * )));
             toolButton->addAction(tasks[i]);
+
+            //##################################################
+
+            ids[i] = new QAction(QString::number(i),this);
+            connect(agentId, SIGNAL(triggered(QAction * )), this, SLOT(setID(QAction * )));
+            agentId->addAction(ids[i]);
+
         }
 
-
-
-        connect(toolButton,SIGNAL(),toolButton,SLOT());
         gridLayout->addWidget(toolButton);
         gridLayout->addWidget(agentId);
         this->setLayout(gridLayout);
@@ -35,12 +41,17 @@ namespace rqt_parsian_gui
         robTaskPub = new ros::Publisher[_MAX_NUM_PLAYERS];
         for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
             std::string topic(QString("/agent_%1/task").arg(i).toStdString());
-            robTaskPub[i] = n.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
+            robTaskPub[i] = n.advertise<parsian_msgs::parsian_robot_task>(topic, 100);
         }
     }
 
     void TaskRunnerWidget::setTask(QAction* action) {
         toolButton->setText(action->text());
+    }
+
+    void TaskRunnerWidget::setID(QAction * action ){
+        agentId->setText(action->text());
+        agent_id = action->text().toInt();
     }
 
     TaskRunnerWidget::~TaskRunnerWidget() {
@@ -57,6 +68,12 @@ namespace rqt_parsian_gui
             } else ROS_INFO_STREAM("CALL FAILED");
 
 
+        } else if(QString::fromStdString(taskNames[1]) == toolButton->text()){
+            task->gotoPointAvoidTask = *new parsian_msgs::parsian_skill_gotoPointAvoid();
+            task->gotoPointAvoidTask.base.targetPos.x=pos->x;
+            task->gotoPointAvoidTask.base.targetPos.y=pos->y;
+            task->select = parsian_msgs::parsian_robot_task::GOTOPOINTAVOID;
+            robTaskPub[agent_id].publish(task);
         } else{
         }
     }
