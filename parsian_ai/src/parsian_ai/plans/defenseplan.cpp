@@ -5,6 +5,98 @@
 using namespace std;
 
 #define LONG_CHIP_POWER 1023
+QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){
+    suitableRadius = sqrt(pow(wm->field->_PENALTY_DEPTH,2) + pow(wm->field->_PENALTY_WIDTH/2 , 2));
+    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
+    Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
+    bool isInCriticalDefenseArea = false;
+    for(int i = 0 ; i < circularPositions.size() ; i++){
+        if(defenseArea.contains(circularPositions.at(i))){
+            isInCriticalDefenseArea = true;
+            break;
+        }
+    }
+    if(isInCriticalDefenseArea){
+        return rectangularPositions;
+    }
+    return circularPositions;
+}
+
+QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit) {
+    QList<Vector2D> defensePosiotion;
+    defensePosiotion.clear();
+    if (neededDefenseAgents == allOfDefenseAgents) {
+        if (neededDefenseAgents == 1) {
+            defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
+        } else if (neededDefenseAgents == 2) {
+            defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
+        } else if (neededDefenseAgents == 3) {
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
+        }
+    } else if (neededDefenseAgents < allOfDefenseAgents) {
+        if (neededDefenseAgents == 1) {
+            defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
+        } else if (neededDefenseAgents == 2) {
+            defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
+        } else if (neededDefenseAgents == 3) {
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
+        }
+        for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
+            defensePosiotion.append(Vector2D(0, i));
+        }
+    } else {
+        if (allOfDefenseAgents == 1) {
+            defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
+        } else if (allOfDefenseAgents == 2) {
+            defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
+        } else if (allOfDefenseAgents == 3) {
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
+        }
+    }
+    return defensePosiotion;
+}
+
+Vector2D DefensePlan::oneDefenseFormationForCircularPositioning(double downLimit , double upLimit){
+    Vector2D defensePosition;
+    Vector2D sol[2];
+    Vector2D ourGoalLeft = wm->field->ourGoalL();
+    Vector2D ourGoalRight = wm->field->ourGoalR();
+    Vector2D ballPosition = ballPrediction(false);
+    int numberOfDefenseAgents = 1;
+    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
+    defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
+    defensePosition = sol[0].isValid() && sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1];
+    return defensePosition;
+}
+
+QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double downLimit , double upLimit){
+    QList<Vector2D> defensePosition;
+    Vector2D sol[4];
+    Vector2D ourGoalLeft = wm->field->ourGoalL();
+    Vector2D ourGoalRight = wm->field->ourGoalR();
+    Vector2D ballPosition = ballPrediction(false);
+    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
+    Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
+    int numberOfDefenseAgents = 2;
+    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTalles(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
+    defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , anIntesection) , &sol[0] , &sol[1]);
+    defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
+    defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
+    defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
+    return defensePosition;
+}
+
+//QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double downLimit, double upLimit){
+//    QList<Vector2D> defensePosition;
+//    Vector2D sol[8];
+//    Vector2D ourGoalLeft = wm->field->ourGoalL();
+//    Vector2D ourGoalRight = wm->field->ourGoalR();
+//    Vector2D ballPosition = ballPrediction(false);
+//    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
+//    Vector2D downIntersection;
+//    Vector2D upIntesection;
+
+//}
 
 QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
     QList<int> IDOfOpponentsInPolygon;
@@ -62,7 +154,7 @@ int DefensePlan::defenseNumber(){
     }
 }
 
-Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit) {
+Vector2D DefensePlan::oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit) {
     Vector2D defensePosition;
     Vector2D sol[2];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
@@ -75,7 +167,7 @@ Vector2D DefensePlan::oneDefenseFormation(double downLimit , double upLimit) {
     return defensePosition;
 }
 
-QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLimit) {
+QList<Vector2D> DefensePlan::twoDefenseFormationForRectangularPositioning(double downLimit , double upLimit) {
     QList<Vector2D> defensePosition;
     Vector2D sol[4];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
@@ -93,7 +185,7 @@ QList<Vector2D> DefensePlan::twoDefenseFormation(double downLimit , double upLim
     return defensePosition;
 }
 
-QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upLimit) {
+QList<Vector2D> DefensePlan::threeDefenseFormationForRecatangularPositioning(double downLimit , double upLimit) {
     QList<Vector2D> defensePosition;
     Vector2D sol[8];
     Vector2D ourGoalLeft = wm->field->ourGoalL();
@@ -155,7 +247,7 @@ QList<Vector2D> DefensePlan::threeDefenseFormation(double downLimit , double upL
 
 }
 
-QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit) {
+QList<Vector2D> DefensePlan::defenseFormationForRectangularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit) {
     QList<Vector2D> defensePosiotion;
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
@@ -166,30 +258,30 @@ QList<Vector2D> DefensePlan::defenseFormation(int neededDefenseAgents, int allOf
     //    ROS_INFO(QString("Best Offset for penalty area: %1").arg(temp).toStdString().c_str());
     if (neededDefenseAgents == allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
-            defensePosiotion.append(oneDefenseFormation(downLimit , upLimit));
+            defensePosiotion.append(oneDefenseFormationForRecatngularPositioning(downLimit , upLimit));
         } else if (neededDefenseAgents == 2) {
-            defensePosiotion = twoDefenseFormation(downLimit , upLimit);
+            defensePosiotion = twoDefenseFormationForRectangularPositioning(downLimit , upLimit);
         } else if (neededDefenseAgents == 3) {
-            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
         }
     } else if (neededDefenseAgents < allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
-            defensePosiotion.append(oneDefenseFormation(downLimit , upLimit));
+            defensePosiotion.append(oneDefenseFormationForRecatngularPositioning(downLimit , upLimit));
         } else if (neededDefenseAgents == 2) {
-            defensePosiotion = twoDefenseFormation(downLimit , upLimit);
+            defensePosiotion = twoDefenseFormationForRectangularPositioning(downLimit , upLimit);
         } else if (neededDefenseAgents == 3) {
-            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
         }
         for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
             defensePosiotion.append(Vector2D(0, i));
         }
     } else {
         if (allOfDefenseAgents == 1) {
-            defensePosiotion.append(oneDefenseFormation(downLimit , upLimit));
+            defensePosiotion.append(oneDefenseFormationForRecatngularPositioning(downLimit , upLimit));
         } else if (allOfDefenseAgents == 2) {
-            defensePosiotion = twoDefenseFormation(downLimit , upLimit);
+            defensePosiotion = twoDefenseFormationForRectangularPositioning(downLimit , upLimit);
         } else if (allOfDefenseAgents == 3) {
-            defensePosiotion = threeDefenseFormation(downLimit , upLimit);
+            defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
         }
     }
     return defensePosiotion;
@@ -344,9 +436,9 @@ double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , dou
         smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
     }
     bestRadiusForDefenseArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).dist(wm->field->ourGoal());
-    if(bestRadiusForDefenseArea <= downLimit){
-        bestRadiusForDefenseArea = downLimit;
-    }
+//    if(bestRadiusForDefenseArea <= downLimit){
+//        bestRadiusForDefenseArea = downLimit;
+//    }
     if(bestRadiusForDefenseArea >= upLimit){
         bestRadiusForDefenseArea = upLimit;
     }
@@ -1409,7 +1501,7 @@ void DefensePlan::initDefense(QList <Agent*> _defenseAgents) {
 }
 
 DefensePlan::DefensePlan(){
-    //// Constructor function of DefensePlan class
+    //// Constructor function of DefensePlan class    
 
     goalieThr = 0.0;
 
@@ -1635,10 +1727,10 @@ void DefensePlan::execute(){
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    detectOpponentPassOwners(1 , 2);
-    const double suitableRadius = sqrt(pow(wm->field->_PENALTY_DEPTH,2) + pow(wm->field->_PENALTY_WIDTH/2 , 2));
-    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
+    detectOpponentPassOwners(1 , 2);    
     stopMode = gameState->isStop();
+    suitableRadius = sqrt(pow(wm->field->_PENALTY_DEPTH,2) + pow(wm->field->_PENALTY_WIDTH/2 , 2));
+    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
     ballPosHistory.prepend(Vector2D(wm->ball->pos.x, wm->ball->pos.y));
     if (ballPosHistory.count() > 7){
         ballPosHistory.removeLast();
@@ -1695,8 +1787,9 @@ void DefensePlan::execute(){
                     ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
                     ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
-                    AHZDefPoints = defenseFormation(defenseNumber() , realDefSize , 1.4 ,2.5);
-                    ROS_INFO_STREAM("newDefSize: " << AHZDefPoints.size());
+                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , 1 , 2.5),
+                                                    defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.3 , 2.5));
+                    //ROS_INFO(QString("realDefSize: %1").arg(realDefSize).toStdString().c_str());
                     matchingDefPos(realDefSize);
                     ROS_INFO_STREAM("realDefSize: " << realDefSize);
                 }

@@ -57,12 +57,15 @@ protected:
     Line2D getBestLineWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Segment2D getBestSegmentWithTalles(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     QList<Segment2D> getLinesOfBallTriangle();
-    QList<Vector2D> defenseFormation(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
-    QList<Vector2D> twoDefenseFormation(double downLimit , double upLimit);
-    QList<Vector2D> threeDefenseFormation(double downLimit , double upLimit);
+    QList<Vector2D> defenseFormationForRectangularPositioning(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
+    QList<Vector2D> defenseFormationForCircularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit);
+    QList<Vector2D> twoDefenseFormationForRectangularPositioning(double downLimit , double upLimit);
+    QList<Vector2D> twoDefenseFormationForCircularPositioning(double downLimit , double upLimit);
+    QList<Vector2D> threeDefenseFormationForRecatangularPositioning(double downLimit , double upLimit);
     QList<int> detectOpponentPassOwners(double downEdge , double upEdge);
-    Vector2D oneDefenseFormation(double downLimit , double upLimit);
-
+    Vector2D oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit);
+    Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
+    QList<Vector2D> defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions);
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;
@@ -73,6 +76,7 @@ protected:
     double threshOld = 0.0;
     double ballCircleR = 0.5;
     double xLimitForblockingPass;
+    double suitableRadius;
     bool isPermissionToKick;
     bool isCrowdedInFrontOfPenaltyAreaByOurAgents;
     bool isCrowdedInFrontOfPenaltyAreaByOppAgents;
