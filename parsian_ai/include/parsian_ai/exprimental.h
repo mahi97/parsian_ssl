@@ -26,28 +26,23 @@
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/geom/geom.h>
-#include <behavior/direct/direct.h>
 
 #include <parsian_msgs/plan_service.h>
+
+enum class State{
+    SIMPLE_MOVE = 0,
+    WAITFORIT = 1,
+    CHIP = 2,
+    GOCURVE = 3,
+    CATCHBALL = 4
+};
 
 class Exprimental {
 public:
     GotopointavoidAction *mygpa;
     KickAction *myKick;
-    KickAction *myKick2;
-
-    Exprimental(Agent** _agents) {
         agents = _agents;
-        gpa = new GotopointavoidAction();
-        pos  << Vector2D(-3,4.5) << Vector2D(1,3) << Vector2D(4.5,3) << Vector2D(1,3);
-        dist << 0.3 << 1 << 0.3 << 0.3;
-        agents[8]->action = gpa;
-        state = 0;
-        mygpa = new GotopointavoidAction();
         myKick = new KickAction;
-        direct = new BehaviorDirect;
-        for (int i = 0; i < 12; i++) if (agents[i] != nullptr) agentList.append(_agents[i]);
-
     }
     ~Exprimental() {
 
@@ -58,16 +53,31 @@ public:
     void execute() {
     }
 private:
-    int state;
+    //int state;
     QList<Vector2D> pos;
     QList<double> dist;
     QList<Agent*> agentList;
     GotopointavoidAction *gpa;
     Agent** agents;
-    BehaviorDirect* direct;
-    parsian_msgs::parsian_behaviorConstPtr m_behav;
 
 
 };
+//        //my_move->eval();
+//        myKick->setTarget(Vector2D{-3, 4.5});
+//        myKick->setChip(false);
+//        myKick->setKickspeed(2.5);
+//        for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++)
+//            if(wm->opp[i]->pos.y - agents[1]->pos().y < 0.5)
+//            {
+//                ROS_INFO_STREAM("kian: inja 0");
+//                if(fabs(wm->opp[i]->pos.x - agents[1]->pos().x) < 0.5)
+//                {
+//                    ROS_INFO_STREAM("kian: inja");
+//                    myKick->setChip(true);
+//                    myKick->setChipdist(0.7);
+//                }
+//            }
+
+//        agents[1]->action = myKick;
 
 #endif //PARSIAN_AI_EXPRIMENTAL_H
