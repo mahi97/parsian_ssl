@@ -4,7 +4,8 @@
 namespace rqt_parsian_gui
 {
     TaskRunnerWidget::TaskRunnerWidget(ros::NodeHandle & n) : QWidget() {
-
+        task.reset(new parsian_msgs::parsian_robot_task());
+        task->select = 255;
         client = new parsian_msgs::grsim_ball_replacement();
         this->setFixedSize(300,200);
         gridLayout = new QGridLayout();
@@ -20,12 +21,12 @@ namespace rqt_parsian_gui
         ids   = new QAction* [_MAX_NUM_PLAYERS];
 
         for (int i = 0; i < TASK_NUM; ++i) {
-            tasks[i] = new QAction(taskNames[i],this);
+            tasks[i] = new QAction(taskNames[i], this);
             connect(toolButton, SIGNAL(triggered(QAction * )), this, SLOT(setTask(QAction * )));
             toolButton->addAction(tasks[i]);
-
+        }
             //##################################################
-
+        for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
             ids[i] = new QAction(QString::number(i),this);
             connect(agentId, SIGNAL(triggered(QAction * )), this, SLOT(setID(QAction * )));
             agentId->addAction(ids[i]);
@@ -43,13 +44,16 @@ namespace rqt_parsian_gui
             std::string topic(QString("/agent_%1/task").arg(i).toStdString());
             robTaskPub[i] = n.advertise<parsian_msgs::parsian_robot_task>(topic, 100);
         }
+        timer = n.createTimer(ros::Duration(0.016), &TaskRunnerWidget::timerCb, this);
     }
 
     void TaskRunnerWidget::setTask(QAction* action) {
+        task->select = 255;
         toolButton->setText(action->text());
     }
 
     void TaskRunnerWidget::setID(QAction * action ){
+        task->select = 255;
         agentId->setText(action->text());
         agent_id = action->text().toInt();
     }
@@ -73,11 +77,23 @@ namespace rqt_parsian_gui
             task->gotoPointAvoidTask.base.targetPos.x=pos->x;
             task->gotoPointAvoidTask.base.targetPos.y=pos->y;
             task->select = parsian_msgs::parsian_robot_task::GOTOPOINTAVOID;
-            robTaskPub[agent_id].publish(task);
-        } else{
+        }
+        else if(QString::fromStdString(taskNames[2]) == toolButton->text()){
+            task->gotoPointAvoidTask = *new parsian_msgs::parsian_skill_gotoPointAvoid();
+            task->gotoPointAvoidTask.base.targetPos.x=pos->x;
+            task->gotoPointAvoidTask.base.targetPos.y=pos->y;
+            task->gotoPointAvoidTask.noAvoid = static_cast<unsigned char>(true);
+            task->select = parsian_msgs::parsian_robot_task::GOTOPOINTAVOID;
+        }else{
         }
     }
 
+    void TaskRunnerWidget::timerCb(const ros::TimerEvent& _timer){
+        if(task->select != 255)
+            robTaskPub[agent_id].publish(task);
+    }
 }
+
+
 
 

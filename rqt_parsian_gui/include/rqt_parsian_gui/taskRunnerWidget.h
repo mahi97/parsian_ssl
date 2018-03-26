@@ -20,8 +20,8 @@
 #include <parsian_msgs/grsim_ball_replacement.h>
 namespace rqt_parsian_gui
 {
-    #define TASK_NUM 2
-    static const char* taskNames[TASK_NUM] = {"Ball Placement","GotoPointAvoid"};
+    #define TASK_NUM 3
+    static const char* taskNames[TASK_NUM] = {"Ball Placement","GotoPointAvoid","GotoPoint"};
     class TaskRunnerWidget:public QWidget {
     Q_OBJECT
     public:
@@ -35,9 +35,9 @@ namespace rqt_parsian_gui
 
     private:
         int agent_id;
+        ros::Timer timer;
         parsian_msgs::grsim_ball_replacement *client ;
         ros::Subscriber mousePosSub;
-        ros::Publisher *taskPub;
         ros::ServiceClient ballReplacementClient;
         ros::Publisher *robTaskPub;
         parsian_msgs::parsian_robot_taskPtr task;
@@ -45,6 +45,7 @@ namespace rqt_parsian_gui
         QToolButton *toolButton,*agentId;
         QGridLayout *gridLayout;
         void mousePosCallBack(parsian_msgs::vector2DConstPtr);
+        void timerCb(const ros::TimerEvent& _timer);
 
     };
 }
