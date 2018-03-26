@@ -442,6 +442,7 @@ private:
     bool doPass, doAfterlife;
 
     //////////////End  Plan
+    bool isBallPushed();
     bool isTimeOver();
     bool isBallDirChanged();
     SFail isAnyTaskFaild();
@@ -498,7 +499,6 @@ private:
     int dynamicState;
     long dynamicStartTime;
 
-    Vector2D prevBallPos;
 ////////////First
 public:
     bool isFirstFinished();

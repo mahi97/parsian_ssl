@@ -51,7 +51,6 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     criticalInit = true;
     criticalKick = new KickAction();
 
-    prevBallPos = wm->ball->pos;
 }
 
 CPlayOff::~CPlayOff() {
@@ -1128,7 +1127,11 @@ bool CPlayOff::isPlanDone() {
 
 bool CPlayOff::isPlanFaild() {
     SFail fail = isAnyTaskFaild();
-    if (isTimeOver()) {
+    if(isBallPushed()) {
+        // change passer agent
+
+        return false;
+    } else if (isTimeOver()) {
         DBUG("Faild By Time Over", D_MAHI);
         ROS_INFO("MAHIS: Faild By Time Over");
         //        masterPlan->common.addHistory(); // Not Changeing History
@@ -1171,6 +1174,12 @@ bool CPlayOff::isAllTasksDone() {
     }
 
     return true;
+}
+
+bool CPlayOff::isBallPushed() {
+    return false;
+//    masterPlan->common.matchedID.value(3);
+//    return lastBallPos.dist(wm->ball->pos) > 0.05 && wm->ball->vel.length() < 0.05;
 }
 
 bool CPlayOff::isTimeOver() {
@@ -1962,7 +1971,7 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
             // check ball direction
 //            Vector2D sol1, sol2;
 
-//                ((wm->ball->pos - _roleAgent->getAgent()->pos()) - (prevBallPos - _roleAgent->getAgent()->pos())).length() > 0.15
+//                ((wm->ball->pos - _roleAgent->getAgent()->pos()) - (lastBallPos - _roleAgent->getAgent()->pos())).length() > 0.15
 //            if (true || wm->ball->vel.angleWith(_roleAgent->getAgent()->dir()).RAD2DEG < 40 /*&& wm->ball->vel.length() > 0.2*/
 //                Circle2D(_roleAgent->getTarget(), 0.5).intersection(
 //                        Ray2D(wm->ball->pos, wm->ball->pos + wm->ball->vel), &sol1, &sol2)
@@ -1970,8 +1979,8 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
 //                DBUG("[playoff] direction is correct", D_MAHI);
             DBUG("[playoff] kick is Done", D_MAHI);
             return true;
+
 //            }
-//            prevBallPos = wm->ball->pos;
 //            }
         }
     }
