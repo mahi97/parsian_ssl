@@ -51,7 +51,10 @@ public:
 
     }
     void execute() {
-
+        mygpa->setTargetpos(mousePos);
+        mygpa->setTargetdir(Vector2D(0,0));
+        mygpa->setAvoidpenaltyarea(true);
+        agents[0]->action = mygpa;
     }
 private:
     int state;
