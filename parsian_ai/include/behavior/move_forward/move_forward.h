@@ -21,6 +21,7 @@ public:
     double angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp);
     double findmax(const QList<double> &list);
 private:
+    Segment2D left;
 
 };
 
