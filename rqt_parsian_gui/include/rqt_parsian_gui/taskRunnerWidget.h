@@ -34,11 +34,13 @@ namespace rqt_parsian_gui
     private:
         parsian_msgs::grsim_ball_replacement *client ;
         ros::Subscriber mousePosSub;
+        ros::Publisher *taskPub;
         ros::ServiceClient ballReplacementClient;
         ros::Publisher *robTaskPub;
         void mousePosCallBack(parsian_msgs::vector2DConstPtr);
         QAction ** tasks;
-        QToolButton *toolButton;
+
+        QToolButton *toolButton,*agentId;
         QGridLayout *gridLayout;
 
     };

@@ -8,8 +8,12 @@ namespace rqt_parsian_gui
         client = new parsian_msgs::grsim_ball_replacement();
         this->setFixedSize(200,50);
         gridLayout = new QGridLayout();
+
         toolButton = new QToolButton();
         toolButton->setText("Choose Task");
+
+        agentId = new QToolButton;
+        agentId->setText("agent id");
 
         tasks = new QAction* [TASK_NUM];
 
@@ -23,7 +27,7 @@ namespace rqt_parsian_gui
 
         connect(toolButton,SIGNAL(),toolButton,SLOT());
         gridLayout->addWidget(toolButton);
-
+        gridLayout->addWidget(agentId);
         this->setLayout(gridLayout);
 
         mousePosSub = n.subscribe("/mousePos",10, &TaskRunnerWidget::mousePosCallBack, this);
