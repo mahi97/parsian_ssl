@@ -58,6 +58,7 @@ public:
 
     }
     void execute() {
+        ROS_INFO_STREAM("kian: " << (int)state);
         if(state == State::SIMPLE_MOVE)
             simplemove();
         if(state == State::WAITFORIT)
@@ -65,10 +66,10 @@ public:
                 state = State::CHIP;
         if(state == State::CHIP)
             if(chip())
-                state = State::GOCURVE;
-        if(state == State::GOCURVE)
-            if(gocurve())
-                state = State::CATCHBALL;
+//                state = State::GOCURVE;
+//        if(state == State::GOCURVE)
+//            if(gocurve())
+//                state = State::CATCHBALL;
 
         if(isthreat())
             state = State::WAITFORIT;
@@ -88,14 +89,14 @@ private:
     {
         Vector2D ballvel{wm->ball->vel.x, wm->ball->vel.y};
         Segment2D tmp{Vector2D{0, 0}, ballvel};
-        Vector2D perballvel{tmp.perpendicularBisector()};
-        Vector2D ballpos{wm->ball->pos.x, wm->ball->pos.x};
+        Vector2D perballvel{1, -1*wm->ball->vel.x/wm->ball->vel.y};
+        Vector2D ballpos{wm->ball->pos.x, wm->ball->pos.y};
         Vector2D a1{ballpos.x + threatlen*ballvel.x + (threatlen/3)*perballvel.x , ballpos.y + threatlen*ballvel.y + (threatlen/3)*perballvel.y};
         Vector2D a2{ballpos.x + threatlen*ballvel.x + (-1*threatlen/3)*perballvel.x , ballpos.y + threatlen*ballvel.y + (-1*threatlen/3)*perballvel.y};
         Vector2D a3{ballpos.x + ballvel.x + (threatlen/8)*perballvel.x , ballpos.y + ballvel.y + (threatlen/8)*perballvel.y};
         Vector2D a4{ballpos.x + ballvel.x + (-1*threatlen/8)*perballvel.x , ballpos.y + ballvel.y + (-1*threatlen/8)*perballvel.y};
         std::vector<Vector2D> threathead;
-        threathead.push_back(a1); threathead.push_back(a2); threathead.push_back(a3); threathead.push_back(a4);
+        threathead.push_back(a1); threathead.push_back(a2); threathead.push_back(a3); threathead.push_back(a4); threathead.push_back(a1);
         Polygon2D threatZone{threathead};
         for(int i{}; i < wm->opp.activeAgentsCount(); i++)
             if(threatZone.contains(Vector2D{wm->opp[i]->pos.x + wm->opp[i]->vel.x, wm->opp[i]->pos.y + wm->opp[i]->vel.y}, false))
@@ -112,11 +113,15 @@ private:
     }
     bool waitforit()
     {
+        Vector2D ballposvel{wm->ball->pos.x - wm->ball->vel.x - 0.2, wm->ball->pos.y - wm->ball->vel.y - 0.2};
         myRec->setReceiveradius(3);
         myRec->setSlow(false);
-        myRec->setTarget(target);
-        if(sqrt(wm->ball->pos.x * wm->ball->pos.x + wm->ball->pos.y * wm->ball->pos.y) < 1)
+        myRec->setTarget(ballposvel);
+        myRec->setIatargetdir(target);
+        agents[ID]->action = myRec;
+        if(sqrt(wm->ball->vel.x * wm->ball->vel.x + wm->ball->vel.y * wm->ball->vel.y) < 1)
             return true;
+        return false;
     }
 
     bool chip()
@@ -127,6 +132,7 @@ private:
         agents[ID]->action = myKick;
         if(sqrt(wm->ball->pos.x * wm->ball->pos.x + wm->ball->pos.y * wm->ball->pos.y) > 1.2)
             return true;
+        return false;
     }
     bool gocurve()
     {
