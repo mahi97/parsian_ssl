@@ -81,7 +81,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
             angPid->kp = 1;
         }
     } else {
-        angPid->kp = 4;
+        angPid->kp = 2;
     }
     angPid->error = (dir2.th() -  agentDir.th()).radian();
 
@@ -113,7 +113,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
         posPid->kd = 15;
         posPid->ki = 0;
     } else {
-        posPid->kp = (conf->posKP) * (0.02 / (agentPos.dist(pos2) * agentPos.dist(pos2)));
+        posPid->kp = (conf->posKP) * (0.015 / (agentPos.dist(pos2) * agentPos.dist(pos2)));
         DEBUG(QString("kp: %1").arg(posPid->kp), D_MHMMD);
         posPid->kp = min(posPid->kp, conf->posKP * 2);
         posPid->kp = max(posPid->kp, conf->posKP);
@@ -124,8 +124,8 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
 
     //////////////////////// dec calculations
     double vp = (posPidDist * posPid->kp);
-    double moreDec = 0.8;
-    double decOffset = 0.2;
+    double moreDec = 0.7;
+    double decOffset = 0.4;
 
     switch (decidePlan()) {
     case _bangBangPosPID:

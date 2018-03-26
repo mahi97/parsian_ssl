@@ -63,7 +63,7 @@ def render_and_write(directory, renderer, behav, template):
                     continue
                 lines.append(line)
                 if '<export>' in line:
-                    lines.append('    <nodelet plugin="${prefix}/' + 'mahi' + '.xml"/>\n')
+                    lines.append('    <nodelet plugin="${prefix}/' + behav['behavior'] + '.xml"/>\n')
         with open('../../../parsian_ai/package.xml', 'w') as fd:
             for line in lines:
                 fd.write(line)
@@ -75,6 +75,8 @@ def render_and_write(directory, renderer, behav, template):
                 lines.append(line)
                 if 'BEHAVIORS' in line:
                     lines.append('include(./' + behav['behavior'] + '_CMakeLists.txt)\n')
+                if 'generate_dynamic_reconfigure_options(' in line:
+                    lines.append('		cfg/' + behav['behavior'] + '.cfg\n')
         with open('../../../parsian_ai/CMakeLists.txt', 'w') as fd:
             for line in lines:
                 fd.write(line)

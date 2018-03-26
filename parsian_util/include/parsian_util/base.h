@@ -123,16 +123,6 @@ struct GameStatePacket {
 #define _BANG_BANG_NONLINEAR_SWITCH 0.300
 
 
-
-#define _STADIUM_WIDTH   10.90
-#define _STADIUM_HEIGHT  7.70
-
-
-/* COM Port Constants */
-#define _SIM_COM_PORT   "/dev/ttyS6"
-#define _REAL_COM_PORT  "/dev/ttyUSB0"
-
-
 /* Skills */
 #define _DEFENCE_DIST       0.110
 
