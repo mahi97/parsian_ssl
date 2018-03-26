@@ -886,7 +886,7 @@ void CSkillKick::findPosToGo() {
         }
 
         //TODO : penalty area
-        if ((ballPath.intersection(targetNormalSeg).isValid()) && (agentPos.dist(ballPos) < 1) && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
+        if ((ballPath.intersection(targetNormalSeg).isValid()) && ((agentPos.dist(ballPos) < 1) || isKhafan) && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
             jTurn();
             return;
         }
