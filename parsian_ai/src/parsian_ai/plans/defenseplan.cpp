@@ -2322,6 +2322,24 @@ void DefensePlan::executeGoalKeeper() {
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
+        else if(ballIsBesidePoles){
+            if()
+            DBUG("Clear Mode" , D_AHZ);
+            AHZSkills = kickSkill;
+            kickSkill->setTolerance(10);
+            kickSkill->setDontkick(false);
+            kickSkill->setSlow(true);
+            kickSkill->setSpin(false);
+            kickSkill->setAvoidpenaltyarea(false);
+            kickSkill->setGoaliemode(true);
+            if (wm->ball->pos.y >= 0) {
+                kickSkill->setTarget(Vector2D(-4.5 , -6) - wm->field->ourGoal());
+            } else {
+                kickSkill->setTarget(Vector2D(-4.5 , 6) - wm->field->ourGoal());
+            }
+            kickSkill->setChip(true);
+            kickSkill->setKickspeed(1023);
+        }
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
             ROS_INFO_STREAM("8");
             know->variables["goalKeeperClearMode"] = true;
