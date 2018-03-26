@@ -2253,9 +2253,11 @@ void DefensePlan::executeGoalKeeper() {
         }
     }
     if (goalKeeperAgent != nullptr) {
+        ROS_INFO_STREAM("1");
         DBUG(QString("goalKeeper clear mode : %1").arg(know->variables["goalKeeperClearMode"].toBool()) , D_AHZ);
         DBUG(QString("goalKeeper oneTouch mode : %1").arg(know->variables["goalKeeperOneTouchMode"].toBool()) , D_AHZ);
         if (playOffMode) {
+            ROS_INFO_STREAM("2");
             know->variables["goalKeeperClearMode"] = false;
             know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2270,6 +2272,7 @@ void DefensePlan::executeGoalKeeper() {
 
         }
         else if (know->variables["transientFlag"].toBool()) {
+            ROS_INFO_STREAM("3");
             know->variables["goalKeeperClearMode"] = false;
             know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2281,15 +2284,18 @@ void DefensePlan::executeGoalKeeper() {
             gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
             kickSkill->setKickspeed(0);
             if (goalKeeperPredictionModeInPlayOff) {
+                ROS_INFO_STREAM("4");
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
             } else {
+                ROS_INFO_STREAM("5");
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(ballPrediction(true) - wm->field->ourGoal());
             }
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(stopMode){
+            ROS_INFO_STREAM("6");
             know->variables["goalKeeperClearMode"] = false;
             know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2303,6 +2309,7 @@ void DefensePlan::executeGoalKeeper() {
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if (ballIsOutOfField) {
+            ROS_INFO_STREAM("7");
             know->variables["goalKeeperClearMode"] = false;
             know->variables["goalKeeperOneTouchMode"] = false;
             AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2315,23 +2322,12 @@ void DefensePlan::executeGoalKeeper() {
             gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
-        else if (ballIsBesidePoles) {
-            know->variables["goalKeeperClearMode"] = false;
-            know->variables["goalKeeperOneTouchMode"] = false;
-            AHZSkills = gpa[goalKeeperAgent->id()];
-            DBUG("Ball is beside the poles" , D_AHZ);
-            gpa[goalKeeperAgent->id()]->setDivemode(false);
-            gpa[goalKeeperAgent->id()]->setSlowmode(true);
-            gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
-            kickSkill->setKickspeed(0);
-            gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
-            gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
-            goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
-        }
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
+            ROS_INFO_STREAM("8");
             know->variables["goalKeeperClearMode"] = true;
             know->variables["goalKeeperOneTouchMode"] = false;
             if (wm->ball->vel.length() > 0.4 && wm->ball->vel.length() < 1.3) {
+                ROS_INFO_STREAM("9");
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("Clear slow ball" , D_AHZ);
                 gpa[goalKeeperAgent->id()]->setDivemode(false);
@@ -2343,6 +2339,7 @@ void DefensePlan::executeGoalKeeper() {
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - wm->field->ourGoal());
             }
             else {
+                ROS_INFO_STREAM("10");
                 DBUG("Clear Mode" , D_AHZ);
                 AHZSkills = kickSkill;
                 kickSkill->setTolerance(10);
@@ -2362,6 +2359,7 @@ void DefensePlan::executeGoalKeeper() {
         }
         else {
             if (goalKeeperOneTouch) {
+                ROS_INFO_STREAM("11");
                 know->variables["goalKeeperClearMode"] = false;
                 know->variables["goalKeeperOneTouchMode"] = true;
                 AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2375,7 +2373,9 @@ void DefensePlan::executeGoalKeeper() {
                 goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
             }
             else if (dangerForGoalKeeperClear) {
+                ROS_INFO_STREAM("12");
                 if (dangerForInsideOfThePenaltyArea) {
+                    ROS_INFO_STREAM("13");
                     know->variables["goalKeeperClearMode"] = true;
                     know->variables["goalKeeperOneTouchMode"] = false;
                     DBUG("Danger Mode" , D_AHZ);
@@ -2388,15 +2388,18 @@ void DefensePlan::executeGoalKeeper() {
                     kickSkill->setAvoidpenaltyarea(false);
                     kickSkill->setGoaliemode(true);
                     if (wm->ball->pos.y >= 0) {
+                        ROS_INFO_STREAM("14");
                         kickSkill->setTarget(Vector2D(-4.5 , -6) - wm->field->ourGoal());
                     }
                     else {
+                        ROS_INFO_STREAM("15");
                         kickSkill->setTarget(Vector2D(-4.5 , 6) - wm->field->ourGoal());
                     }
                     kickSkill->setChip(true);
                     kickSkill->setKickspeed(1023);
                 }
                 else {
+                    ROS_INFO_STREAM("16");
                     know->variables["goalKeeperClearMode"] = false;
                     know->variables["goalKeeperOneTouchMode"] = false;
                     AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2411,6 +2414,7 @@ void DefensePlan::executeGoalKeeper() {
                 }
             }
             else {
+                ROS_INFO_STREAM("17");
                 //// strict follow
                 know->variables["goalKeeperClearMode"] = false;
                 know->variables["goalKeeperOneTouchMode"] = false;
