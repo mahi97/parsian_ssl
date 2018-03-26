@@ -50,6 +50,8 @@ CPlayOff::CPlayOff() : CMasterPlay() {
 
     criticalInit = true;
     criticalKick = new KickAction();
+
+    prevBallPos = wm->ball->pos;
 }
 
 CPlayOff::~CPlayOff() {
@@ -1942,7 +1944,7 @@ EMode CPlayOff::getMasterMode() {
 */
 bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
 
-    if (Circle2D(_roleAgent->getAgent()->pos(), 0.4).contains(wm->ball->pos)) {
+    if (Circle2D(_roleAgent->getAgent()->pos(), 0.2).contains(wm->ball->pos)) {
         _roleAgent->setBallIsNear(true);
     } else if (!Circle2D(_roleAgent->getAgent()->pos(), 0.6).contains(wm->ball->pos)
                && _roleAgent->getBallIsNear()) {
@@ -1954,16 +1956,23 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
             /** Ball gonna touch the target point **/
 
             // check ball speed
-            if (wm->ball->vel.length() / (_roleAgent->getAgent()->pos().dist(_roleAgent->getTarget())) > 1 || true) {
-                DBUG("[playoff] speed is enough", D_MAHI);
-                // check ball direction
-                Vector2D sol1, sol2;
-                if (Circle2D(_roleAgent->getTarget(), 0.5).intersection(Ray2D(wm->ball->pos, wm->ball->pos + wm->ball->vel), &sol1, &sol2)) {
-                    DBUG("[playoff] direction is correct", D_MAHI);
-                    DBUG("[playoff] kick is Done", D_MAHI);
-                    return true;
-                }
-            }
+//            if (wm->ball->vel.length() / (_roleAgent->getAgent()->pos().dist(_roleAgent->getTarget())) > 1 || true) {
+//            DBUG("[playoff] speed is enough", D_MAHI);
+
+            // check ball direction
+//            Vector2D sol1, sol2;
+
+//                ((wm->ball->pos - _roleAgent->getAgent()->pos()) - (prevBallPos - _roleAgent->getAgent()->pos())).length() > 0.15
+//            if (true || wm->ball->vel.angleWith(_roleAgent->getAgent()->dir()).RAD2DEG < 40 /*&& wm->ball->vel.length() > 0.2*/
+//                Circle2D(_roleAgent->getTarget(), 0.5).intersection(
+//                        Ray2D(wm->ball->pos, wm->ball->pos + wm->ball->vel), &sol1, &sol2)
+//                    ) {
+//                DBUG("[playoff] direction is correct", D_MAHI);
+            DBUG("[playoff] kick is Done", D_MAHI);
+            return true;
+//            }
+//            prevBallPos = wm->ball->pos;
+//            }
         }
     }
     return false;

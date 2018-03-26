@@ -498,6 +498,7 @@ private:
     int dynamicState;
     long dynamicStartTime;
 
+    Vector2D prevBallPos;
 ////////////First
 public:
     bool isFirstFinished();
@@ -517,6 +518,7 @@ private:
     void secondDegree();
     void thirdDegree();
     void doneDegree();
+
 
 
 };
