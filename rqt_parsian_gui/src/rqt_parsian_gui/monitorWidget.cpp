@@ -76,9 +76,10 @@ namespace rqt_parsian_gui
             cameraX=0.0;
             cameraY=0.0;
             scaleFactor=1;
+            centralPoint=Vector2D(viewportSize.width()/2,(viewportSize.height()/2));
         } else {
-            mousePos->x = (double(event->pos().x()) - centralPoint.x) / coeff / scaleFactor;
-            mousePos->y = (double(event->pos().y()) - centralPoint.y) / coeff / scaleFactor;
+            mousePos->y = (double(event->pos().x()) - centralPoint.x) / coeff / scaleFactor;
+            mousePos->x = (double(event->pos().y()) - centralPoint.y) / coeff / scaleFactor;
 //            mousePos->x = double(event->pos().x());
 //            mousePos->y = double(event->pos().y());
             ROS_INFO_STREAM("mousepos__" << mousePos->x << "__" << mousePos->y);
