@@ -7,15 +7,13 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275
 
-QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){
-    Vector2D ballPosition = ballPrediction(false);
+QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){    
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
     if(wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)){
         drawer->draw("oomad" , Vector2D(0,0) , 40);
         return rectangularPositions;
-    }
-    //    drawer->draw("nayoomad" , Vector2D(0,0) , 40);
+    }    
     return circularPositions;
 }
 
@@ -140,6 +138,7 @@ QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double 
     qSort(IDOfOpponentsInPolygon.begin() , IDOfOpponentsInPolygon.end());
     return IDOfOpponentsInPolygon;
 }
+
 int DefensePlan::defenseNumber(){
     if (conf.StrictFormation){
         if (conf.Defense > 3){
@@ -387,19 +386,20 @@ Line2D DefensePlan::getBestLineWithTallesForCircularPositioning(int defenseCount
     }
     Line2D aimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
     Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
-    if (tempAimLessLine.length() >= robotDiameter) {
+//    if(tempAimLessLine.length() >= robotDiameter){
         if(biggerFrontageOfTriangle.intersection(Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
                                                         Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5))).dist(wm->field->ourGoal()) <= RADIUS_FOR_CRITICAL_DEFENSE_AREA){
-            Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).intersection(biggerFrontageOfTriangle , &sol[0] , &sol[1]);
+            Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).intersection(biggerFrontageOfTriangle , &sol[0] , &sol[1]);            
             suitablePoint = sol[0].isValid() && sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1];
             aimLessLine = Line2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5));
             drawer->draw(Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5)));
         }
         else{
+            drawer->draw("is" ,  Vector2D(-1,0) , 40);
             aimLessLine = Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
                                  Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5));
         }
-    }
+//    }
     return aimLessLine;
 }
 
