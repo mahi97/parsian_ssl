@@ -19,20 +19,24 @@ enum class DynamicMode {
     BallInOppJaw    = 0b1000000000
 };
 
-enum class DynamicSkill {
-    NoSkill     = 0b0000000000,
-    ////PlayMake Skills
+enum class PlayMakeSkill {
+    NoSkill     = 0b000000,
     Pass        = 0b100001,
     CatchBall   = 0b100010,
     Shot        = 0b100100,
     Keep        = 0b101000,
     Chip        = 0b110000,
-    ////Positioning
+    Dribble     = 0b001000
+
+};
+
+enum class PositionSkill {
+    NoSkill     = 0b000000,
     Ready       = 0b000001,
     OneTouch    = 0b000010,
-    Move        = 0b000100,
-    Dribble     = 0b001000
+    Move        = 0b000100
 };
+
 
 enum class DynamicRegion {
     NoMatter    = 0b0000000,

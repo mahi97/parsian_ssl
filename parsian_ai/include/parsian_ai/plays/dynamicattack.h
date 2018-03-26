@@ -6,23 +6,35 @@
 //#define _MAX_REGION 7
 
 
-struct SDynamicAgent {
+struct SPositioningAgent {
 
-    void init(DynamicSkill _skill,
+    void init(PositionSkill _skill,
               DynamicRegion _region) {
         skill  = _skill;
         region = _region;
     }
 
-    DynamicSkill skill;
+    PositionSkill skill;
+    DynamicRegion region;
+};
+
+struct SPlayMakeAgent {
+
+    void init(PlayMakeSkill _skill,
+              DynamicRegion _region) {
+        skill  = _skill;
+        region = _region;
+    }
+
+    PlayMakeSkill skill;
     DynamicRegion region;
 };
 
 struct SDynamicPlan {
     int agentSize;
     DynamicMode mode;
-    SDynamicAgent positionAgents[6];
-    SDynamicAgent playmake;
+    SPositioningAgent positionAgents[_NUM_PLAYERS];
+    SPlayMakeAgent playmake;
     Vector2D passPos;
     int passID;
 };
@@ -52,6 +64,8 @@ public:
     void setBallInOppJaw(bool _ballInOppJaw);
 
     SDynamicPlan currentPlan;
+    SDynamicPlan nextPlanA;
+    SDynamicPlan nextPlanB;
 
     Agent* getMahiPlayMaker();
 
@@ -128,9 +142,6 @@ private:
     void managePasser();
     bool isPlayMakeChanged();
 
-
-    void ballLocation();
-
     QString getString(const DynamicMode& _mode) const;
 
     CRoleDynamic *roleAgents[5];
@@ -154,10 +165,6 @@ private:
 
     int playmakeID = -1;
     Agent* playmake;
-
-    Vector2D ballPos;
-    Vector2D ballVel;
-    Vector2D OppGoal;
 
     bool goToDynamic[5];
     int lastPlayMakerId;

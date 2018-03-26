@@ -24,7 +24,7 @@ CDynamicAttack::CDynamicAttack() {
     currentPlan.agentSize = 0;
     lastPasserRoleIndex  = -1;
 
-    isBallInOurField = ballPos.x < 0;
+    isBallInOurField = wm->ball->pos.x < 0;
 
     guards[0] = new Rect2D();
     for (size_t i = 1; i < 7; i++) {
@@ -87,69 +87,70 @@ void CDynamicAttack::reset() {
 }
 
 void CDynamicAttack::execute_x() {
-    DBUG(QString("Dynamic Attack : %1").arg(agents.size()),D_MAHI);
     ROS_INFO_STREAM("Dynamic Attack : " << agents.size());
     globalExecute(agents.size());
 }
 
 void CDynamicAttack::globalExecute(int agentSize) {
-    ballPos = wm->ball->pos;
-    ballVel = wm->ball->vel;
-    OppGoal = wm->field->oppGoal();
-    ballVel = (ballVel.length() < 0.2) ? Vector2D(0, 0) : ballVel;
-    ballLocation();
+    isBallInOurField = wm->ball->pos.x < 0;
     dynamicPlanner(agentSize);
 }
 
 void CDynamicAttack::makePlan(int agentSize) {
 
-    //Initialize Plan with null values
-    currentPlan.mode = DynamicMode::NoMode;
-    currentPlan.agentSize = agentSize;
-    DBUG(QString("[dynamicAttack] ball pos : %1").arg(ballPos.x), D_MAHI);
-
-    for (auto &positionAgent : currentPlan.positionAgents) {
+    //// Initialize Plan with null values
+    nextPlanA.mode = DynamicMode::NoMode;
+    nextPlanA.agentSize = agentSize;
+    for (auto &positionAgent : nextPlanA.positionAgents) {
         positionAgent.region = DynamicRegion::NoMatter;
-        positionAgent.skill  = DynamicSkill::NoSkill;
+        positionAgent.skill  = PositionSkill::NoSkill;
     }
 
-    lastPMInitWasDribble = (currentPlan.playmake.skill == DynamicSkill::Dribble);
+    //// Initialize Plan with null values
+    nextPlanB.mode = DynamicMode::NoMode;
+    nextPlanB.agentSize = agentSize;
+    for (auto &positionAgent : nextPlanB.positionAgents) {
+        positionAgent.region = DynamicRegion::NoMatter;
+        positionAgent.skill  = PositionSkill::NoSkill;
+    }
 
     //// We Don't have the ball -- counter-attack, blocking, move forward
+    //// And Ball is in our field
     if (wm->ball->pos.x < 0) {
-        currentPlan.mode = DynamicMode::NotWeHaveBall;
+        nextPlanA.mode = DynamicMode::NotWeHaveBall;
         if (conf.ChipForward) {
-            currentPlan.playmake.init(DynamicSkill::Chip, DynamicRegion::Forward);
+            nextPlanA.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Forward);
         } else {
-            currentPlan.playmake.init(DynamicSkill::Chip, DynamicRegion::Goal);
+            nextPlanA.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Goal);
         }
         for (size_t i = 0; i < agentSize; i++) {
-            currentPlan.positionAgents[i].region = DynamicRegion::Near;
-            currentPlan.positionAgents[i].skill  = DynamicSkill::Ready;
+            nextPlanA.positionAgents[i].region = DynamicRegion::Near;
+            nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;
         }
     }
     //// we have ball and
     //// shot prob is more than 50%
     else if (directShot) {
-        currentPlan.mode = DynamicMode::HighProb;
-        currentPlan.playmake.init(DynamicSkill::Shot, DynamicRegion::Goal);
+        nextPlanA.mode = DynamicMode::HighProb;
+        nextPlanA.playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
         for (size_t i = 0; i < agentSize; i++) {
-            currentPlan.positionAgents[i].region = DynamicRegion::Best;
-            currentPlan.positionAgents[i].skill  = DynamicSkill::Ready;
+            nextPlanA.positionAgents[i].region = DynamicRegion::Best;
+            nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;
         }
-    } else if (critical) {
-        currentPlan.mode = DynamicMode::Critical;
+    }
+    else if (critical) {
+        nextPlanA.mode = DynamicMode::Critical;
         {
             oppRob = wm->field->oppGoal();
             lastPMInitWasDribble = true;
             if (conf.DribbleInFast) {
-                currentPlan.playmake.init(DynamicSkill::Dribble, DynamicRegion::Goal);
+                nextPlanA.playmake.init(PlayMakeSkill::Dribble, DynamicRegion::Goal);
             } else {
-                currentPlan.playmake.init(DynamicSkill::Shot, DynamicRegion::Goal);
+                nextPlanA.playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
             }
             for (size_t i = 0; i < agentSize; i++) {
-                currentPlan.positionAgents[i].region = DynamicRegion::Best;
-                currentPlan.positionAgents[i].skill  = DynamicSkill::Ready;
+                nextPlanA.positionAgents[i].region = DynamicRegion::Best;
+                nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;
             }
         }
 
@@ -160,8 +161,8 @@ void CDynamicAttack::makePlan(int agentSize) {
     //// there isn't a critical situation and
     //// we don't have positioning agent
     else if (agentSize == 0) {
-        currentPlan.mode = DynamicMode::NoPositionAgent;
-        currentPlan.playmake.init(DynamicSkill::Shot, DynamicRegion::Goal);
+        nextPlanA.mode = DynamicMode::NoPositionAgent;
+        nextPlanA.playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
     }
     // we have ball and
     // shot prob isn't more than 50% and
@@ -170,15 +171,15 @@ void CDynamicAttack::makePlan(int agentSize) {
     // it's needed to be fast
     else if (fast) {
         oppRob = wm->field->oppGoal();
-        currentPlan.mode = DynamicMode ::Fast;
+        nextPlanA.mode = DynamicMode ::Fast;
         if (conf.DribbleInFast) {
-            currentPlan.playmake.init(DynamicSkill ::Dribble, DynamicRegion ::Goal);
+            nextPlanA.playmake.init(PlayMakeSkill::Dribble, DynamicRegion ::Goal);
         } else {
-            currentPlan.playmake.init(DynamicSkill ::Shot, DynamicRegion ::Goal);
+            nextPlanA.playmake.init(PlayMakeSkill::Shot, DynamicRegion ::Goal);
         }
         for (size_t i = 0; i < agentSize; i++) {
-            currentPlan.positionAgents[i].region = DynamicRegion ::Best;
-            currentPlan.positionAgents[i].skill  = DynamicSkill ::Ready;
+            nextPlanA.positionAgents[i].region = DynamicRegion::Best;
+            nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;
         }
     }
     // if Defense isn't clearing and
@@ -189,11 +190,11 @@ void CDynamicAttack::makePlan(int agentSize) {
     // there's no need to be fast and
     // there is no plan for this situation
     else {
-        currentPlan.mode = DynamicMode::NoMode;
-        currentPlan.playmake.init(DynamicSkill::Pass, DynamicRegion::Best);
+        nextPlanA.mode = DynamicMode::NoMode;
+        nextPlanA.playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
         for (size_t i = 0; i < agentSize; i++) {
-            currentPlan.positionAgents[i].region = DynamicRegion::Best;
-            currentPlan.positionAgents[i].skill  = DynamicSkill::Ready;
+            nextPlanA.positionAgents[i].region = DynamicRegion::Best;
+            nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;
         }
     }
 }
@@ -441,7 +442,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                         std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                  .dist(roleAgents[i]->getTarget())));
                     roleAgents[i]->setTarget(_points.at(i));
-                    roleAgents[i]->setTargetDir(ballPos - roleAgents[i]->getAgent()->pos());
+                    roleAgents[i]->setTargetDir(wm->ball->pos - roleAgents[i]->getAgent()->pos());
                     roleAgents[i]->setSelectedSkill(DynamicSkill ::Move);
 
                     break;
@@ -449,6 +450,12 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     roleAgents[i]->setSelectedSkill(DynamicSkill ::Ready);// Receive Skill
 
                     break;
+                    case DynamicSkill::Pass:break;
+                    case DynamicSkill::CatchBall:break;
+                    case DynamicSkill::Shot:break;
+                    case DynamicSkill::Keep:break;
+                    case DynamicSkill::Chip:break;
+                    case DynamicSkill::Dribble:break;
                 }
 
                 if (roleAgents[i]->getTarget() == currentPlan.passPos) {
@@ -1602,13 +1609,6 @@ QString CDynamicAttack::getString(const DynamicMode &_mode) const {
     }
 }
 
-void CDynamicAttack::ballLocation() {
-    if (ballPos.x < 0) {
-        isBallInOurField = true;
-    } else if (ballPos.x > 0) {
-        isBallInOurField = false;
-    }
-}
 
 void CDynamicAttack::setDefenseClear(bool _isDefenseClearing) {
     isDefenseClearing = _isDefenseClearing;
