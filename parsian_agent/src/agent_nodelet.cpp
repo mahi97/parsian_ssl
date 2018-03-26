@@ -109,11 +109,12 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
                     skillKick->setKickspeed(_task->kickTask.kickchargetime);
                 }
             }
-            else
+            if(_task->kickTask.chip)
             {
                 if (!_task->kickTask.iskickchargetime)
                     skillKick->setKickspeed(agent->chipDistanceValue(_task->kickTask.chipDist,_task->kickTask.spin));
-                else
+                if (_task->kickTask.iskickchargetime)
+                {
                     skillKick->setKickspeed(_task->kickTask.kickchargetime);
                 }
             }
