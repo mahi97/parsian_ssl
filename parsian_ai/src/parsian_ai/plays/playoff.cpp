@@ -1131,9 +1131,11 @@ bool CPlayOff::isPlanFaild() {
         ROS_INFO("MAHIS: Faild By Time Over");
         //        masterPlan->common.addHistory(); // Not Changeing History
         return true;
-    } else if (isBallPushed()) {
+
+    }
+// else if (isBallPushed()) {
         // change passer agent
-        return true;
+  //      return true;
 
     } else if (isBallDirChanged()) {
         DBUG("Faild By Ball Dir Changed", D_MAHI);
