@@ -15,7 +15,7 @@
 #include <parsian_util/geom/polygon_2d.h>
 
 #define LOOP_TIME_BYKK 0.016
-#define MIN_ROBOTS_DIST 0.02
+#define MIN_ROBOTS_DIST 0.05
 struct velAndAccByKK {
     double vel;
     double acc;

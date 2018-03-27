@@ -1738,7 +1738,7 @@ DefensePlan::DefensePlan(){
         lastMarker[i] = -1;
 
         gpa[i] = new GotopointavoidAction;
-        gpa[i]->setNoavoid(true);
+        gpa[i]->setNoavoid(false);
         gpa[i]->setOnetouchmode(true);
 
         gps[i] = new GotopointAction;
@@ -1856,13 +1856,13 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         } else if (stopMode) {
-            gpa[ourAgents[i]->id()]->setNoavoid(true);
+            gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(true);
             gpa[ourAgents[i]->id()]->setDivemode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         } else {
-            gpa[ourAgents[i]->id()]->setNoavoid(true);
+            gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(true);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
@@ -2110,7 +2110,7 @@ void DefensePlan::penaltyShootOutMode() {
         kickSkill->setTolerance(50);
         kickSkill->setDontkick(false);
         kickSkill->setSlow(false);
-        kickSkill->setSpin(false);
+        kickSkill->setSpin(0);
         kickSkill->setAvoidpenaltyarea(false);
         kickSkill->setGoaliemode(false);
         kickSkill->setChip(true);
