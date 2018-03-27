@@ -1132,7 +1132,7 @@ bool CPlayOff::isPlanFaild() {
         //        masterPlan->common.addHistory(); // Not Changeing History
         return true;
 
-    }
+    //}
 // else if (isBallPushed()) {
         // change passer agent
   //      return true;
@@ -1524,7 +1524,8 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
         //_roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
         DBUG(QString("VALUE : %1").arg(static_cast <double>(_posAgent.getArgs().rightData) / 200), D_MAHI);
     } else {
-        _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData));
+
+        _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData)/100);
         //        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().leftData)/100);
 
     }
