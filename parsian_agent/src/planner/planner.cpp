@@ -102,6 +102,14 @@ void CPlanner::runPlanner() {
         return;
     }
 
+    if (obst.check(Rgoal,goal)) {
+        result.clear();
+        Rresult.clear();
+        averageDir.assign(0, 0);
+        return;
+    }
+
+
     state *nearestToGoal = nullptr , *nearest = nullptr;
     Vector2D target;
     state *RnearestToGoal = nullptr , *Rnearest = nullptr;
@@ -269,10 +277,6 @@ void CPlanner::runPlanner() {
 
     resultModified.clear();
     RresultModified.clear();
-
-    for (int i = static_cast<int>(result.size() - 1); i > 0 ; i --) {
-        //draw(Segment2D(result[i],result[i-1]),QColor(Qt::red));
-    }
     //////////////////////////////////////////////////path smoothing
     if (temp.size() > 1) {
         resultModified.push_back(std::move(temp.back()));
@@ -308,25 +312,25 @@ void CPlanner::runPlanner() {
     reverse(RresultModified.begin() , RresultModified.end());
 
     // miangin vazn dar, az direction harkat
-    Vector2D newDir;
-    if (resultModified.size() > 1) {
-        newDir = (resultModified[1] - resultModified[0]).norm();
-    } else {
-        newDir = (goal - Rgoal).norm();
-    }
-    int cntcnt = 8;
-    int vd = 1;
-    if (dirs.count() > cntcnt - 1) {
-        averageDir = (averageDir * (cntcnt + (vd - 1)) - dirs.at(0) - (vd - 1) * dirs.last() + vd * newDir) / (cntcnt + (vd - 1));
-        dirs.pop_front();
-    } else {
-        if (dirs.count()) {
-            averageDir = (averageDir * (dirs.count() + (vd - 1)) - (vd - 1) * dirs.last() + vd * newDir) / (dirs.count() + vd);
-        } else {
-            averageDir = newDir;
-        }
-    }
-    dirs.push_back(newDir);
+//    Vector2D newDir;
+//    if (resultModified.size() > 1) {
+//        newDir = (resultModified[1] - resultModified[0]).norm();
+//    } else {
+//        newDir = (goal - Rgoal).norm();
+//    }
+//    int cntcnt = 8;
+//    int vd = 1;
+//    if (dirs.count() > cntcnt - 1) {
+//        averageDir = (averageDir * (cntcnt + (vd - 1)) - dirs.at(0) - (vd - 1) * dirs.last() + vd * newDir) / (cntcnt + (vd - 1));
+//        dirs.pop_front();
+//    } else {
+//        if (dirs.count()) {
+//            averageDir = (averageDir * (dirs.count() + (vd - 1)) - (vd - 1) * dirs.last() + vd * newDir) / (dirs.count() + vd);
+//        } else {
+//            averageDir = newDir;
+//        }
+//    }
+//    dirs.push_back(newDir);
 
     if (conf->Draw_Path) {
         for (int j = 1; j < resultModified.size(); j++) {
@@ -336,7 +340,7 @@ void CPlanner::runPlanner() {
                              static_cast<int>(255 / (resultModified.size() / (double) j))));
             drawer->draw(result[j]);
         }
-        Draw();
+        //Draw();
         obst.draw();
     }
 
@@ -512,7 +516,7 @@ void CPlanner::createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel,
             timeForObs *= agentPos.dist(intersectPoint) / agentPos.dist(agentGoal);
             timeForObs *= 1;
             timeForObs  = min(maxTime, timeForObs);
-            for (double i = 0; i < maxTime ; i += 0.05) {
+            for (double i = 0; i < maxTime ; i += 0.1) {
 
                 timeForObs += i;
                 _center = _pos + _vel * timeForObs;
