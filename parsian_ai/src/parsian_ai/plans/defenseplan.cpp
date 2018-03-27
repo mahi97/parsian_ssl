@@ -1850,6 +1850,7 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
         //            matchPoints[matchResult[i]] = checkDefensePoint(ourAgents[i], matchPoints[matchResult[i]]);
         //        }
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
+        gpa[ourAgents[i]->id()]->setSlowmode(false);
         if (gameState->theirIndirectKick()) {
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);

@@ -260,6 +260,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
+    preferedDefenseCounts = 2;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -676,6 +677,8 @@ void CCoach::updateAttackState() {
 
 void CCoach::choosePlaymakeAndSupporter()
 {
+    playmakeId = 10;
+    return;
     playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
