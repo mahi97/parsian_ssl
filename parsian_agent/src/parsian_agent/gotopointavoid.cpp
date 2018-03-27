@@ -200,7 +200,7 @@ void CSkillGotoPointAvoid::execute()
         DEBUG(QString("alpha : %1").arg(alpha), D_MHMMD);
         lllll = result[1];
 
-        vf = -1.8 * log(alpha) + 10.5 - (agentVel.length()) * 1;
+        vf = -1.8 * log(alpha) + 11.5 - (agentVel.length()) * 1;
         vf = max(vf , 0.5);
         vf = min(vf, 4);
     } else {
@@ -227,7 +227,10 @@ void CSkillGotoPointAvoid::execute()
     }
 
     bangBang->setSmooth(true);// = false;
+
     bangBang->bangBangSpeed(agentPos, agentVel, agent->dir(), lllll, targetDir, vf, 0.016, dVx, dVy, dW);
+//    bangBang->bangBangSpeed(agentPos, agentVel, agent->dir(), lllll, lllll - agentPos, vf, 0.016, dVx, dVy, dW);
+
     if (!addVel.isValid()) {
         addVel = Vector2D(0, 0);
     }
