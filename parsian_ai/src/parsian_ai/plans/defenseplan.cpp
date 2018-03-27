@@ -2323,7 +2323,7 @@ void DefensePlan::executeGoalKeeper() {
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
         else if(ballIsBesidePoles){
-            if()
+            ROS_INFO_STREAM("123");
             DBUG("Clear Mode" , D_AHZ);
             AHZSkills = kickSkill;
             kickSkill->setTolerance(10);
@@ -2332,6 +2332,7 @@ void DefensePlan::executeGoalKeeper() {
             kickSkill->setSpin(false);
             kickSkill->setAvoidpenaltyarea(false);
             kickSkill->setGoaliemode(true);
+            drawer->draw(Circle2D(Vector2D(-4.5 , -6) - wm->field->ourGoal() , 0.05) , 0 , 360 , "orange" , true);
             if (wm->ball->pos.y >= 0) {
                 kickSkill->setTarget(Vector2D(-4.5 , -6) - wm->field->ourGoal());
             } else {
