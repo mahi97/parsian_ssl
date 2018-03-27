@@ -138,7 +138,7 @@ void CDynamicAttack::makePlan(int agentSize) {
         case DynamicMode::DirectKick:
             nextPlanB->set(agentSize, DynamicMode::DirectKick, PlayMakeSkill::Shot, DynamicRegion::Goal, PositionSkill::Ready, DynamicRegion::Best);
             nextPlanA->set(agentSize, DynamicMode::DirectKick, PlayMakeSkill::Shot, DynamicRegion::Goal, PositionSkill::Ready, DynamicRegion::Best);
-            break;\
+            break;
 
         case DynamicMode::Fast:
             nextPlanB->set(agentSize, DynamicMode::DirectKick, PlayMakeSkill::Shot, DynamicRegion::Goal, PositionSkill::Ready, DynamicRegion::Best);
@@ -186,7 +186,7 @@ void CDynamicAttack::makePlan(int agentSize) {
             nextPlanA.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Forward);
         } else {
             nextPlanA.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Goal);
-
+        }
         for (size_t i = 0; i < agentSize; i++) {
             nextPlanA.positionAgents[i].region = DynamicRegion::Near;
             nextPlanA.positionAgents[i].skill  = PositionSkill::Ready;

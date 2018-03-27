@@ -142,32 +142,19 @@ void CCoach::checkGoalieInsight() {
 
 
 
-void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
-
-
-//    preferedDefenseCounts = 0;
-//    preferedGoalieID = -1;
-//    return;
+void CCoach::decidePreferredDefenseAgentsCount() {
 
     missMatchIds.clear();
-    if (first) {
-        if (wm->our.activeAgentsCount() != 0) {
-            robotsIdHist.clear();
-            for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-                robotsIdHist.append(wm->our.active(i)->id);
-            }
-            first = false;
-        }
-    }
-    if (gameState->isStop() || !gameState->canMove()) {
+    if (gameState->getState() == States::Stop || gameState->getState() == States::Halt || first) {
         if (wm->our.activeAgentsCount() != 0u) {
             robotsIdHist.clear();
             for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
                 robotsIdHist.append(wm->our.active(i)->id);
             }
         }
-
+        first = false;
     }
+
     if (wm->our.activeAgentsCount() > _NUM_PLAYERS) {
         missMatchIds.clear();
         for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
@@ -181,20 +168,21 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             }
         }
     }
-    int agentsCount = wm->our.data->activeAgents.count();
+
+    int agentsCount = wm->our.data->activeAgents.count() - missMatchIds.count();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
         }
     }
 
+    // TODO : Fix lock agent for unexpected robot fall
     if (selectedPlay != nullptr && selectedPlay->lockAgents) {
         preferedDefenseCounts = lastPreferredDefenseCounts;
         return;
     }
 
 
-    // handle stop
     if (gameState->isStop()) {
         if (wm->ball->pos.x < 0) {
             preferedDefenseCounts = agentsCount - 1;
@@ -260,6 +248,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
+
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -690,7 +679,6 @@ void CCoach::choosePlaymakeAndSupporter()
 
 
     ////////////////////first we choose our playmake
-    // third version
     double ballVel = wm->ball->vel.length();
     Vector2D ballPos = wm->ball->pos;
     if (ballVel < 0.3) {
@@ -698,7 +686,7 @@ void CCoach::choosePlaymakeAndSupporter()
         for (int ourPlayer : ourPlayers) {
             double o = -1 * agents[ourPlayer]->pos().dist(ballPos) ;
             if (ourPlayer == lastPlayMake) {
-                o += playMakeTh;
+                o += conf.playMakeStopThr;
             }
             if (o > maxD) {
                 maxD = o;
@@ -708,34 +696,30 @@ void CCoach::choosePlaymakeAndSupporter()
         ROS_INFO_STREAM("op :" << ballPos.x << "  " << agents[ourPlayers[0]]->pos().x);
         lastPlayMake = playmakeId;
     } else {
-        if (playMakeIntention.elapsed() < playMakeIntentionInterval) {
+        if (playMakeIntention.elapsed() < playMakeIntentionInterval) { // TODO : fix config
             playmakeId = lastPlayMake;
-            debugger->debug(QString("play make is : %1").arg(playmakeId), D_PARSA);
             return;
-        }
-        playMakeIntention.restart();
-        //Vector2D ballVel = wm->ball->vel;
-        double nearest[10] = {};
-        for (int ourPlayer : ourPlayers) {
-            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball, 4, 3, 2, 2);    // TODO FIX
-        }
-        if (lastPlayMake >= 0 && lastPlayMake <= 9) {
-            nearest[lastPlayMake] -= 0.2;
-        }
-        double minT = 1e8;
-        for (int ourPlayer : ourPlayers) {
-            if (nearest[ourPlayer] < minT) {
-                minT = nearest[ourPlayer];
-                playmakeId = ourPlayer;
-            }
-        }
-        for (int ourPlayer : ourPlayers) {
-            debugger->debug(QString("timeneeded of %1 is : %2 \n").arg(ourPlayer).arg(nearest[ourPlayer]), D_PARSA);
-        }
-        lastPlayMake = playmakeId;
-    }
 
-    debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
+            playMakeIntention.restart();
+            double nearest[10] = {};
+            for (int ourPlayer : ourPlayers) {
+                nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
+                                                                    4, 3, 2,
+                                                                    2); // TODO : read from common config agents
+            }
+            if (lastPlayMake >= 0 && lastPlayMake <= 9) {
+                nearest[lastPlayMake] -= conf.playMakeMoveThr;
+            }
+            double minT = 1e8; // 10 ^ 8
+            for (int ourPlayer : ourPlayers) {
+                if (nearest[ourPlayer] < minT) {
+                    minT = nearest[ourPlayer];
+                    playmakeId = ourPlayer;
+                }
+            }
+            lastPlayMake = playmakeId;
+        }
+    }
 }
 
 void CCoach::decideAttack() {
@@ -1158,45 +1142,31 @@ void CCoach::execute()
 {
     findGoalieID();
     choosePlaymakeAndSupporter();
-    decidePreferredDefenseAgentsCountAndGoalieAgent();
-    if (conf.numberOfDefenseEval > 0) findDefneders(preferedDefenseCounts + conf.numberOfDefenseEval, preferedDefenseCounts);
-    else findDefneders(preferedDefenseCounts, preferedDefenseCounts + conf.numberOfDefenseEval);
-    sendBehaviorStatus();
-//    ROS_INFO("MAHI IS THE BEST");
+
+    decidePreferredDefenseAgentsCount();
     decideDefense();
+
     checkTransitionToForceStart();
-    // place your reset codes about knowledge vars in this function
-    CRoleStop::info()->reset();
+
     virtualTheirPlayOffState();
     ROS_INFO_STREAM("M : " << preferedDefenseCounts);
     ROS_INFO_STREAM("PM :" << playmakeId);
-    ROS_INFO_STREAM("GAMESTATEEE : " << static_cast<int>(gameState->getState()));
+    ROS_INFO_STREAM("GAME STATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
+    //// Handle Roles Here
+    CRoleStop::info()->reset();
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
-    decideAttack();
-    for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-//            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
-        }
-    }
-    checkSensorShootFault();
-    //// Checks whether the goalie is under the net or not if it is moves out
-    checkGoalieInsight();
-    //// Old Role Base Execution -- used for block, old_playmaker
-    checkRoleAssignments();
 
-    //// Handle Roles Here
+    decideAttack();
+
     for (auto &stopRole : stopRoles) {
         if (stopRole->agent != nullptr) {
             stopRole->execute();
         }
     }
 
-
-    //    saveGoalie(); //if goalie is trapped under goal net , move it forward to be seen by the vision again
 }
 
 void CCoach::setFastPlay() {
