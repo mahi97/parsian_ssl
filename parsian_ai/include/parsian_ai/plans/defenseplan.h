@@ -253,6 +253,7 @@ private:
     bool defClearFlag;
     double overDefThr;
     int decideNumOfMarksInPlayOff(int _defenseCount);
+    bool FlagBesidePoles;
 };
 
 #endif // DEFENSE_H
