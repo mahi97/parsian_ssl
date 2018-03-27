@@ -529,19 +529,45 @@ bool CCoach::isBallcollide() {
     Circle2D dummyCircle;
     Vector2D sol1, sol2;
     Segment2D ballPath(wm->ball->pos, wm->ball->pos + wm->ball->vel);
-    debugger->debug("ball is colliding" , D_AHZ);
+
+//    debugger->debug("ball is colliding" , D_AHZ);
+
+
     for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
         dummyCircle.assign(wm->our.active(i)->pos, 0.08);
-        if ((dummyCircle.intersection(ballPath, &sol1, &sol2) != 0) && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.14 && fabs((wm->ball->vel - lastBallVel).length()) > 0.5) {
+        if ((dummyCircle.intersection(ballPath, &sol1, &sol2) != 0)
+            /* && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.14
+             * && fabs((wm->ball->vel - lastBallVel).length()) > 0.5*/) {
             lastBallVel = wm->ball->vel;
             return true;
         }
-        if (wm->ball->vel.length() < 0.5 && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.13) {
-            lastBallVel = wm->ball->vel;
-            return true;
-        }
+//        if (wm->ball->vel.length() < 0.5 && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.13) {
+//            lastBallVel = wm->ball->vel;
+//            return true;
+//        }
     }
     lastBallVel = wm->ball->vel;
+
+    return false;
+}
+
+bool CCoach::ballChiped(){
+   if(know->nearestOppToBall() == -1)
+       return false;
+    if(wm->ball == nullptr)
+        return false;
+    Vector2D nearest_dir = wm->opp[know->nearestOppToBall()]->dir;
+    double nearest_dist = wm->opp[know->nearestOppToBall()]->pos.dist(wm->ball->pos);
+    ROS_INFO_STREAM("ALIII2  "<<nearest_dist<<"    "<<lastNearestBallDist);
+    if (lastNearestBallDist < .18 && nearest_dist> .20){
+            if(nearest_dir.norm().innerProduct(wm->ball->dir.norm())<.3) {
+                ROS_INFO_STREAM("ALIII        CHIPPPPP");
+                lastNearestBallDist = nearest_dist;
+                return true;
+            } else
+                ROS_INFO_STREAM("ALIII:       ball kick");
+    }
+    lastNearestBallDist = nearest_dist;
     return false;
 }
 
@@ -566,9 +592,12 @@ void CCoach::virtualTheirPlayOffState() {
         transientFlag = false;
     }
 
-    if (isBallcollide() && 0) { // TODO : till we fix function && 0
+    if (isBallcollide() ) {
         transientFlag = false;
+//        ROS_INFO_STREAM("ENDDDDDDDDDDDDDD");
     }
+
+//    if (ballChiped()); // todo: ali
     PDEBUG("TS flag:", transientFlag, D_AHZ);
     lastState  = currentState;
 
@@ -1687,7 +1716,7 @@ parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
 }
 
 void CCoach::findDefneders(const int& max_number, const int& min_number) {
-    ROS_INFO_STREAM("hamid: finaldef: " << max_number << ", "<< min_number);
+//    ROS_INFO_STREAM("hamid: finaldef: " << max_number << ", "<< min_number);
     defenseMatched[0] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
     for (int i{ min_number }; i < max_number +1; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
     for (int i{min_number}; i < max_number + 1; i++) {
@@ -1702,7 +1731,7 @@ void CCoach::findDefneders(const int& max_number, const int& min_number) {
 
             parsian_msgs::parsian_robot_task task;
             auto task_name = defenseAgents[j]->action->getActionName().toStdString();
-            ROS_INFO_STREAM("hamid: r " << task_name);
+//            ROS_INFO_STREAM("hamid: r " << task_name);
 
             if (task_name == "GotopointavoidAction")
             {

@@ -1947,13 +1947,13 @@ void DefensePlan::execute(){
                 }
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
-                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
+//                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
+//                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 2.7),
                                                     defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                     matchingDefPos(realDefSize);
-                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
+//                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
                 }
             }
             else{
