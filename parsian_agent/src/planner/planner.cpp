@@ -345,10 +345,10 @@ void CPlanner::runPlanner() {
 void CPlanner::Draw() {
 
 
-    for (int i = 0 ; i < nodes.size() ; i++)
-        if (nodes.allNodes[i]->parent) {
-            drawer->draw(Segment2D(nodes.allNodes[i]->pos , nodes.allNodes[i]->parent->pos) , "white");
-        }
+//    for (int i = 0 ; i < nodes.size() ; i++)
+//        if (nodes.allNodes[i]->parent) {
+//            drawer->draw(Segment2D(nodes.allNodes[i]->pos , nodes.allNodes[i]->parent->pos) , "white");
+//        }
 
     for (int i = 0 ; i < Rnodes.size() ; i++)
         if (Rnodes.allNodes[i]->parent) {
@@ -451,38 +451,44 @@ void CPlanner::initPathPlanner(Vector2D _goal, const QList<int>& _ourRelaxList, 
 }
 
 double CPlanner::timeEstimator(Vector2D _pos, Vector2D _vel, Vector2D _dir, Vector2D posT) {
+
     double _x3;
-    double acc;
+    double acc = conf->AccMaxForward;
     double dec = conf->DecMax;
     double xSat;
-    double veltan = (_vel.x) * cos(_dir.th().radian()) + (_vel.y) * sin(_dir.th().radian());
-    double offset = 0.15;
-    double velnorm = -1 * (_vel.x) * sin(_dir.th().radian()) + (_vel.y) * cos(_dir.th().radian());
+    Vector2D tAgentVel = _vel;
+    Vector2D tAgentDir = _dir;
+    double veltan = (tAgentVel.x) * cos(tAgentDir.th().radian()) + (tAgentVel.y) * sin(tAgentDir.th().radian());
+    double offset = 0;
+    double velnorm = -1 * (tAgentVel.x) * sin(tAgentDir.th().radian()) + (tAgentVel.y) * cos(tAgentDir.th().radian());
+    double distCoef = 1, distEffect = 1, angCoef = 0.003;
+    double dist = 0;
+    double rrtAngSum = 0;
+    QList <Vector2D> _result;
+    Vector2D _target;
 
-    if (_vel.length() < 0.2) {
-        acc = (conf->AccMaxForward + conf->AccMaxNormal) / 2;
+    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _pos , _vel.norm()).radian());
+    double vXvirtual = (posT - _pos).x;
+    double vYvirtual = (posT - _pos).y;
+    double veltanV = (vXvirtual) * cos(tAgentDir.th().radian()) + (vYvirtual) * sin(tAgentDir.th().radian());
+    double velnormV = -1 * (vXvirtual) * sin(tAgentDir.th().radian()) + (vYvirtual) * cos(tAgentDir.th().radian());
+    double accCoef = 1, realAcc = 4;
+
+    accCoef = atan(fabs(veltanV) / fabs(velnormV)) / _PI * 2;
+    acc = accCoef * conf->AccMaxForward + (1 - accCoef) * conf->AccMaxNormal;
+
+    double tDec = conf->VelMax / dec;
+    double tAcc = (conf->VelMax - tAgentVelTanjent) / acc;
+    dist = posT.dist(_pos);
+    double dB = tDec * conf->VelMax / 2 + tAcc * (conf->VelMax + tAgentVelTanjent) / 2;
+
+    if (dist > dB) {
+        return tAcc + tDec + (dist - dB) / conf->VelMax;
     } else {
-        acc =  conf->AccMaxForward * (fabs(veltan) / _vel.length()) + conf->AccMaxNormal * (fabs(velnorm) / _vel.length());
+        return ((1 / dec) + (1 / acc)) * sqrt(dist * (2 * dec * acc / (acc + dec)) + (tAgentVelTanjent * tAgentVelTanjent / (2 * acc))) - (tAgentVelTanjent) / acc;
     }
 
-    double vMaxReal = sqrt(((_pos.dist(posT)  + (_vel.length() * _vel.length() / 2 * acc)) * 2 * acc * dec) / (acc + dec));
-    vMaxReal = min(vMaxReal, 4);
-    double vMax = conf->VelMax;
-    vMax = min(vMax, vMaxReal);
-    xSat = ((vMax * vMax) - (_vel.length() * _vel.length())) / acc + (vMax * vMax) / dec;
-    _x3 = (-1 * _vel.length() * _vel.length()) / (-2 * fabs(conf->DecMax)) ;
 
-    if (_pos.dist(posT) < _x3) {
-        return std::max(0.0, (_vel.length() / conf->DecMax - offset));
-    } else if (_vel.length() < (vMax)) {
-        if (_pos.dist(posT) < xSat) {
-            return std::max(0.0, (-1 * offset + vMax / dec + (vMax - _vel.length()) / acc + (_pos.dist(posT) - ((vMax * vMax / (2 * dec)) + ((vMax + _vel.length()) * (vMax - _vel.length()) / acc)) / 2) / vMax));
-        } else {
-            return std::max(0.0, (vMax / dec + (vMax - _vel.length()) / acc - offset));
-        }
-    } else {
-        return std::max(0.0, (vMax / dec + (_pos.dist(posT) - ((vMax * vMax / (2 * dec)))) / vMax - offset));
-    }
 
 }
 
