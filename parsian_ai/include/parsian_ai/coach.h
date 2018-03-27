@@ -151,7 +151,7 @@ private:
 
     void checkGoalieInsight();
 
-    void decidePreferredDefenseAgentsCountAndGoalieAgent();
+    void decidePreferredDefenseAgentsCount();
 
     void decideAttack();
 
