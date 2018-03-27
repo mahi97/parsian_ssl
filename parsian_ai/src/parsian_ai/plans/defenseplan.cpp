@@ -5,7 +5,7 @@
 using namespace std;
 
 #define LONG_CHIP_POWER 1023
-#define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275
+#define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
 QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){    
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
@@ -23,8 +23,7 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
     if (neededDefenseAgents == allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
             defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
-        } else if (neededDefenseAgents == 2) {
-            drawer->draw("2def" , Vector2D(0,0));
+        } else if (neededDefenseAgents == 2) {            
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         } else if (neededDefenseAgents == 3) {
             defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
