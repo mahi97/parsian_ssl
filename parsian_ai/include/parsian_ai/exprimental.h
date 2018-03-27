@@ -51,7 +51,7 @@ public:
 
     }
     void execute() {
-        ROS_INFO_STREAM("kian: " << (int)state);
+        ROS_INFO_STREAM("kian1: " << (int)state);
         if(state == State::SIMPLE_MOVE)
             simplemove();
         if(state == State::WAITFORIT)
@@ -102,6 +102,7 @@ private:
         myKick->setTarget(target);
         myKick->setChip(false);
         myKick->setKickspeed(2.5);
+        myKick->setIskhafan(true);
         agents[ID]->action = myKick;
 
     }
