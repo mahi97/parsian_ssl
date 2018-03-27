@@ -493,8 +493,8 @@ void CPlanner::createObstacleProb(CObstacles &obs, Vector2D _pos, Vector2D _vel,
     double timeForObs = 0;
     ///TODO: should read from vartypes
     double maxA = 4;
-    double maxObstRad = 1;
-    double maxTime = 0.5;
+    double maxObstRad = 0.4;
+    double maxTime = 0.2;
     if (_vel.length() < 0.2) {
         _center = _pos;
         _rad = Robot::robot_radius_new;
@@ -544,11 +544,11 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
     agentPath.assign(agentPos, agentGoal);
     Vector2D _center , dummy1, dummy2;
     double rad = 0;
-
+    //TODO : command vel bug :!!
     ROS_INFO_STREAM("OUR" << wm->our.activeAgentsCount());
     for (int j = 0; j < wm->our.activeAgentsCount(); j++) {
         if ((ourRelaxList.contains(wm->our.active(j)->id) == false) && (ID != wm->our.active(j)->id)) {
-
+            drawer->draw(wm->our.active(j)->vel);
             createObstacleProb(obs, wm->our.active(j)->pos, wm->our.active(j)->vel, Vector2D(0, 0), _center, rad, agentPos, agentVel, agentGoal, Vector2D(1, 1));
             obs.add_circle(wm->our.active(j)->pos.x , wm->our.active(j)->pos.y , 0.17 , 0 , 0);
 
