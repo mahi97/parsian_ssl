@@ -145,9 +145,9 @@ void CCoach::checkGoalieInsight() {
 void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
 
-    preferedDefenseCounts = 0;
-    preferedGoalieID = -1;
-    return;
+//    preferedDefenseCounts = 0;
+//    preferedGoalieID = -1;
+//    return;
 
     missMatchIds.clear();
     if (first) {
@@ -263,7 +263,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
-void CCoach::calcDesiredMarkCounts() {
+void CCoach::calcDesiredMarkCounts(){
 
     int agentsCount = wm->our.data->activeAgents.count();
     if (goalieAgent != nullptr) {
