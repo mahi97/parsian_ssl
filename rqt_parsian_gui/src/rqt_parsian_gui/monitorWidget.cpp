@@ -216,6 +216,7 @@ namespace rqt_parsian_gui
 
 
 
+        // ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
         parsian_msgs::parsian_draw_rect rec;
         while (!drawerBuffer->rectBuffer->isEmpty()) {
             rec = drawerBuffer->rectBuffer->dequeue();

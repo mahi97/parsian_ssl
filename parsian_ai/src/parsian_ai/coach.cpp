@@ -59,7 +59,7 @@ CCoach::CCoach(Agent**_agents)
     defenseTimeForVisionProblem[1].start();
     transientFlag = false;
     trasientTimeOut.start();
-    translationTimeOutTime = 2000;
+    translationTimeOutTime = 800;
     exeptionPlayMake = nullptr;
     exeptionPlayMakeThr = 0;
 
@@ -204,7 +204,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
         }
     } else if (gameState->isStart()) {
         if (transientFlag) {
-            if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
+            if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
 
             } else {
@@ -260,6 +260,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
+//    preferedDefenseCounts = 2;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -676,6 +677,8 @@ void CCoach::updateAttackState() {
 
 void CCoach::choosePlaymakeAndSupporter()
 {
+    playmakeId = 10;
+    return;
     playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
@@ -1157,9 +1160,9 @@ void CCoach::execute()
     findGoalieID();
     choosePlaymakeAndSupporter();
     decidePreferredDefenseAgentsCountAndGoalieAgent();
-    if (conf.numberOfDefenseEval > 0) findDefneders(preferedDefenseCounts + conf.numberOfDefenseEval, preferedDefenseCounts);
-    else findDefneders(preferedDefenseCounts, preferedDefenseCounts + conf.numberOfDefenseEval);
-    sendBehaviorStatus();
+//    if (conf.numberOfDefenseEval > 0) findDefneders(preferedDefenseCounts + conf.numberOfDefenseEval, preferedDefenseCounts);
+//    else findDefneders(preferedDefenseCounts, preferedDefenseCounts + conf.numberOfDefenseEval);
+//    sendBehaviorStatus();
 //    ROS_INFO("MAHI IS THE BEST");
     decideDefense();
     checkTransitionToForceStart();
