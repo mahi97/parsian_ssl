@@ -37,6 +37,26 @@ struct SDynamicPlan {
     SPlayMakeAgent playmake;
     Vector2D passPos;
     int passID;
+    void reset() {
+        agentSize = -1;
+        mode = DynamicMode::NoMode;
+        passID = -1;
+        passPos.invalidate();
+    }
+    void set(const int& _agentSize,
+             const DynamicMode& _mode,
+             const PlayMakeSkill& _pm,
+             const DynamicRegion &_pmreg,
+             const PositionSkill& _ps,
+             const DynamicRegion& _reg) {
+        agentSize = _agentSize;
+        mode = _mode;
+        for (auto& p : positionAgents) {p.region = _reg, p.skill = _ps;}
+        playmake.region = _pmreg; playmake.skill = _pm;
+        passPos.invalidate();
+        passID = -1;
+
+    }
 };
 
 
@@ -45,7 +65,6 @@ class CDynamicAttack : public CMasterPlay {
     typedef CMasterPlay super;
 
 public:
-
 
     CDynamicAttack();
     ~CDynamicAttack() override;
@@ -62,10 +81,11 @@ public:
     void setPlayMake(Agent* _playMake);
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
+    void choosePlan();
 
-    SDynamicPlan currentPlan;
-    SDynamicPlan nextPlanA;
-    SDynamicPlan nextPlanB;
+    SDynamicPlan* currentPlan;
+    SDynamicPlan* nextPlanA;
+    SDynamicPlan* nextPlanB;
 
     Agent* getMahiPlayMaker();
 
@@ -169,17 +189,15 @@ private:
     bool goToDynamic[5];
     int lastPlayMakerId;
 
-
     bool keepOrNot();
+    bool isPlanDone();
+    bool isPlanFailed();
     int lastPassPos;
     /////////Intentions
 //    int intenHighProb;
 
-
 protected:
     void reset() override;
-
-
 };
 
 #endif // DYNAMICATTACK_H
