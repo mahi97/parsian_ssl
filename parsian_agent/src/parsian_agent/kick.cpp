@@ -620,7 +620,7 @@ void CSkillKick::jTurn() {
     if (wm->ball->vel.length() < 0.2) {
         posPid->kp = 0;
     }
-    speedPid->kp = 6 + 2.1 * agentPos.dist(ballPos) + dirReduce;
+    speedPid->kp = 6 + 4.1 * agentPos.dist(ballPos)*std::max(wm->ball->vel.length()*2,1.0) + dirReduce +max(wm->ball->vel.length()*2,0);
 
 
     if (!jTurnFromBack) {
@@ -867,7 +867,7 @@ void CSkillKick::findPosToGo() {
                 }
             }
 
-            if (posFound == false || /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ !wm->field->isInField(finalPos + addVec)) {
+            if (posFound == false  /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ /*!wm->field->isInField(finalPos + addVec)*/) {
                 finalPos = ballPath.nearestPoint(kickerPoint);
             }
 
@@ -897,7 +897,7 @@ void CSkillKick::findPosToGo() {
         //   drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1,-1));
         if ((ballPath.intersection(targetNormalSeg).isValid())  && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
             finalDir = target - agentPos;
-            finalPos = ballPos - (target - finalPos).norm() * 0.15;
+           // finalPos = ballPos - (target - finalPos).norm() * 0.15;
 
         }
 
@@ -928,7 +928,7 @@ void CSkillKick::findPosToGo() {
     drawer->draw(directPath);
     finalPosArea.assign(ballPos , 0.145);
 
-    if (finalPosArea.intersection(directPath, &s1, &s2)) {
+     if (!((ballPath.intersection(targetNormalSeg).isValid())  && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60) )&&(finalPosArea.intersection(directPath, &s1, &s2))) {
         finalPosArea.assign(ballPos , 0.245);
         finalPosArea.tangent(agentPos, &s1, &s2);
         if (s2.dist(target) >= s1.dist(target)) {
@@ -942,7 +942,8 @@ void CSkillKick::findPosToGo() {
     drawer->draw(finalPos);
 
     gpa->init(finalPos, finalDir);
-    gpa->setNoavoid(true);
+    gpa->setNoavoid(false);
+    gpa->setBallobstacleradius(0);
     gpa->setSlowmode(slow);
     gpa->setDivemode(false);
     gpa->setAvoidpenaltyarea(true);
@@ -1039,6 +1040,11 @@ void CSkillKick::execute() {
     }
 
 
+    if(kickerOn) {
+        agent->setRoller(spin);
+    } else {
+        agent->setRoller(0);
+    }
     if (dontKick) {
         agent->setKick(0);
         agent->setChip(0);
