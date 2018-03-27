@@ -6,25 +6,57 @@
 //#define _MAX_REGION 7
 
 
-struct SDynamicAgent {
+struct SPositioningAgent {
 
-    void init(DynamicSkill _skill,
+    void init(PositionSkill _skill,
               DynamicRegion _region) {
         skill  = _skill;
         region = _region;
     }
 
-    DynamicSkill skill;
+    PositionSkill skill;
+    DynamicRegion region;
+};
+
+struct SPlayMakeAgent {
+
+    void init(PlayMakeSkill _skill,
+              DynamicRegion _region) {
+        skill  = _skill;
+        region = _region;
+    }
+
+    PlayMakeSkill skill;
     DynamicRegion region;
 };
 
 struct SDynamicPlan {
     int agentSize;
     DynamicMode mode;
-    SDynamicAgent positionAgents[6];
-    SDynamicAgent playmake;
+    SPositioningAgent positionAgents[_NUM_PLAYERS];
+    SPlayMakeAgent playmake;
     Vector2D passPos;
     int passID;
+    void reset() {
+        agentSize = -1;
+        mode = DynamicMode::NoMode;
+        passID = -1;
+        passPos.invalidate();
+    }
+    void set(const int& _agentSize,
+             const DynamicMode& _mode,
+             const PlayMakeSkill& _pm,
+             const DynamicRegion &_pmreg,
+             const PositionSkill& _ps,
+             const DynamicRegion& _reg) {
+        agentSize = _agentSize;
+        mode = _mode;
+        for (auto& p : positionAgents) {p.region = _reg, p.skill = _ps;}
+        playmake.region = _pmreg; playmake.skill = _pm;
+        passPos.invalidate();
+        passID = -1;
+
+    }
 };
 
 
@@ -33,7 +65,6 @@ class CDynamicAttack : public CMasterPlay {
     typedef CMasterPlay super;
 
 public:
-
 
     CDynamicAttack();
     ~CDynamicAttack() override;
@@ -50,8 +81,11 @@ public:
     void setPlayMake(Agent* _playMake);
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
+    void choosePlan();
 
-    SDynamicPlan currentPlan;
+    SDynamicPlan* currentPlan;
+    SDynamicPlan* nextPlanA;
+    SDynamicPlan* nextPlanB;
 
     Agent* getMahiPlayMaker();
 
@@ -128,9 +162,6 @@ private:
     void managePasser();
     bool isPlayMakeChanged();
 
-
-    void ballLocation();
-
     QString getString(const DynamicMode& _mode) const;
 
     CRoleDynamic *roleAgents[5];
@@ -155,24 +186,18 @@ private:
     int playmakeID = -1;
     Agent* playmake;
 
-    Vector2D ballPos;
-    Vector2D ballVel;
-    Vector2D OppGoal;
-
     bool goToDynamic[5];
     int lastPlayMakerId;
 
-
     bool keepOrNot();
+    bool isPlanDone();
+    bool isPlanFailed();
     int lastPassPos;
     /////////Intentions
 //    int intenHighProb;
 
-
 protected:
     void reset() override;
-
-
 };
 
 #endif // DYNAMICATTACK_H
