@@ -9,12 +9,12 @@ enum class DynamicMode {
     NoMode          = 0b0000000000,
     CounterAttack   = 0b0000000001,
     DefenseClear    = 0b0000000010,
-    HighProb        = 0b0000000100,
+    DirectKick      = 0b0000000100,
     Fast            = 0b0000001000,
     Critical        = 0b0000010000,
     NotWeHaveBall   = 0b0000100000,
     Plan            = 0b0001000000,
-    BallInOurField  = 0b0010000000,
+    Forward         = 0b0010000000,
     NoPositionAgent = 0b0100000000,
     BallInOppJaw    = 0b1000000000
 };
