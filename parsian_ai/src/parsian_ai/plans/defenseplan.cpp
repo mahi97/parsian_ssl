@@ -1452,10 +1452,13 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                 isPermissionToKick = false;
                 goalKeeperTarget = ballRectanglePoints.at(0).dist(goalKeeperAgent->pos()) < ballRectanglePoints.at(1).dist(goalKeeperAgent->pos()) ? ballRectanglePoints.at(0) : ballRectanglePoints.at(1);
             }
-            if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f < 10) {
+            if((fabs(wm->ball->pos.x - wm->field->ourGoalR().x) < 0.1 && fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1) || (fabs(wm->ball->pos.x - wm->field->ourGoalL().x) < 0.1 && fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)){
+                return;
+            }
+            if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f == 0) {
                 drawer->draw(Circle2D(goalKeeperTarget , 0.2) , QColor(Qt::red));
                 ROS_INFO_STREAM("sefr");
-                f = 11;
+                f = 1;
                 if (wm->ball->pos.y > 0) {
                     if (ballRectanglePoints.at(0).y < ballRectanglePoints.at(1).y) {
                         downBallRectanglePoint = ballRectanglePoints.at(0);
@@ -1465,8 +1468,9 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                         downBallRectanglePoint = ballRectanglePoints.at(1);
                         upBallRectanglePoint = ballRectanglePoints.at(0);
                     }
-                    if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)
-                        goalKeeperTarget = downBallRectanglePoint - Vector2D(0.25, 0);
+                    if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1){
+                        goalKeeperTarget = downBallRectanglePoint;
+                    }
                     else if(wm->ball->pos.y < wm->field->ourGoalL().y)
                         goalKeeperTarget = downBallRectanglePoint;
                     else
@@ -1480,17 +1484,18 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                         upBallRectanglePoint = ballRectanglePoints.at(0);
                         downBallRectanglePoint = ballRectanglePoints.at(1);
                     }
-                    if (fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1)
-                        goalKeeperTarget = upBallRectanglePoint - Vector2D(0.25, 0);
+                    if (fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1){
+                        goalKeeperTarget = upBallRectanglePoint;
+                    }
                     else if (wm->ball->pos.y < wm->field->ourGoalR().y)
                         goalKeeperTarget = downBallRectanglePoint;
                     else
                         goalKeeperTarget = upBallRectanglePoint;
                 }
             }
-            else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f >= 10 && f < 20 ) {
+            else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f == 1) {
                 ROS_INFO_STREAM("dah");
-                f= 21;
+                f= 2;
                 if (wm->ball->pos.y > 0) {
                     if (ballRectanglePoints.at(0).y < ballRectanglePoints.at(1).y) {
                         downBallRectanglePoint = ballRectanglePoints.at(0);
@@ -1503,9 +1508,9 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)
                         goalKeeperTarget = downBallRectanglePoint - Vector2D(0.25, 0);
                     else if(wm->ball->pos.y < wm->field->ourGoalL().y )
-                        goalKeeperTarget = downBallRectanglePoint - Vector2D(0.5 , 0);
+                        goalKeeperTarget = downBallRectanglePoint - Vector2D(0.4 , 0);
                     else
-                        goalKeeperTarget = upBallRectanglePoint - Vector2D(0.5 , 0);
+                        goalKeeperTarget = upBallRectanglePoint - Vector2D(0.4 , 0);
                 }
                 else {
                     if (ballRectanglePoints.at(0).y < ballRectanglePoints.at(1).y) {
@@ -1519,14 +1524,14 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1)
                         goalKeeperTarget = upBallRectanglePoint - Vector2D(0.25 ,0);
                     else if(wm->ball->pos.y < wm->field->ourGoalR().y)
-                        goalKeeperTarget = downBallRectanglePoint - Vector2D(0.5 , 0);
+                        goalKeeperTarget = downBallRectanglePoint - Vector2D(0.4 , 0);
                     else
-                        goalKeeperTarget = upBallRectanglePoint - Vector2D(0.5 , 0);
+                        goalKeeperTarget = upBallRectanglePoint - Vector2D(0.4 , 0);
                 }
             }
-            else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f >= 20) {
+            else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f == 2) {
                 ROS_INFO_STREAM("bist");
-                f = 31;
+                f = 3;
                 if (wm->ball->pos.y > 0) {
                     if (ballRectanglePoints.at(0).y < ballRectanglePoints.at(1).y) {
                         downBallRectanglePoint = ballRectanglePoints.at(0);
@@ -1539,9 +1544,9 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)
                         goalKeeperTarget = downBallRectanglePoint - Vector2D(0.25, 0);
                     else if(wm->ball->pos.y < wm->field->ourGoalL().y )
-                        goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y);
+                        goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                     else
-                        goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y);
+                        goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                 }
                 else {
                     if (ballRectanglePoints.at(0).y < ballRectanglePoints.at(1).y) {
@@ -1555,12 +1560,15 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1)
                         goalKeeperTarget = upBallRectanglePoint - Vector2D(0.25 ,0);
                     else if(wm->ball->pos.y < wm->field->ourGoalR().y)
-                        goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y);
+                        goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                     else
-                        goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y);
+                        goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                 }
             }
-            lastStateForGoalKeeper = QString("ballIsBesidePoles");
+            else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f >= 3) {
+                f = 4;
+            }
+                lastStateForGoalKeeper = QString("ballIsBesidePoles");
 //            drawer->draw(upBallRectanglePoint , QColor(Qt::blue));
 //            drawer->draw(upBallRectanglePoint - Vector2D(0.5 , 0) , QColor(Qt::blue));
 //            drawer->draw(Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y) , QColor(Qt::blue));
@@ -2431,8 +2439,8 @@ void DefensePlan::executeGoalKeeper() {
             if(goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && !FlagBesidePoles) {
                 FlagBesidePoles = true;
             }
-            if(f > 35){
-                if(fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1 || fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1) {
+            if(f > 3){
+                //if(fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1 || fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1) {
                     gpa[goalKeeperAgent->id()]->setDivemode(false);
                     gpa[goalKeeperAgent->id()]->setSlowmode(true);
                     gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
@@ -2440,7 +2448,8 @@ void DefensePlan::executeGoalKeeper() {
                     gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
                     goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
                     ROS_INFO_STREAM("???????????????????");
-                }
+                //}
+
             }
             else{
                 gpa[goalKeeperAgent->id()]->setDivemode(false);
