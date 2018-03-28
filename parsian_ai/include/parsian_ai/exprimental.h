@@ -26,6 +26,7 @@
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/geom/geom.h>
+#include <behavior/move_forward/move_forward.h>
 
 #include <parsian_msgs/plan_service.h>
 
@@ -43,6 +44,9 @@ public:
     KickAction *myKick;
         agents = _agents;
         myKick = new KickAction;
+        myRec = new ReceivepassAction;
+        state = State::SIMPLE_MOVE;
+        //my_move = new BehaviorMove_Forward;
     }
     ~Exprimental() {
 
