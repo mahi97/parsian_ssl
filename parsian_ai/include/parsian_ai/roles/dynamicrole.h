@@ -71,7 +71,8 @@ private:
     bool updated;
 
     SkillProperty(CRoleDynamic, Agent*, Agent, agent);
-    SkillProperty(CRoleDynamic, DynamicSkill, SelectedSkill, selectedSkill);
+    SkillProperty(CRoleDynamic, PositionSkill, SelectedPositionSkill, positionSkill);
+    SkillProperty(CRoleDynamic, PlayMakeSkill, SelectedPlayMakeSkill, playMakeSkill);
     SkillProperty(CRoleDynamic, Vector2D, Target, target);
     SkillProperty(CRoleDynamic, Vector2D, TargetDir, targetDir);
     SkillProperty(CRoleDynamic, bool, AvoidPenaltyArea, avoidPenaltyArea);
