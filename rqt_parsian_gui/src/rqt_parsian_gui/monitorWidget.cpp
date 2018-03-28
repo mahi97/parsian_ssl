@@ -226,8 +226,8 @@ namespace rqt_parsian_gui
 
             drawRect(rec.rect.left_x,
                      rec.rect.top_y,
-                     rec.rect.left_x + rec.rect.width,
-                     rec.rect.top_y - rec.rect.length,
+                     rec.rect.left_x + rec.rect.length,
+                     rec.rect.top_y - rec.rect.width,
                      col,
                      rec.filled);
         }
