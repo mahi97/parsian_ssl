@@ -253,6 +253,7 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd()) {
                 playOnFlag = true;
+                firstPass = true;
                 ROS_INFO("Playoff Ends");
             }
 
@@ -1341,26 +1342,27 @@ void CPlayOff::passManager() {
     // TODO : FOR MORE THAN ONE PASS
 
 
-    for (int index = 0; index < masterPlan->execution.reciver.size(); index++) {
-            const AgentPoint &p = masterPlan->execution.passer.at(index);
-            const AgentPoint &r = masterPlan->execution.reciver.at(index);
+//    for (int index = 0; index < masterPlan->execution.reciver.size(); index++) {
+    int index = 0;
+    const AgentPoint &p = masterPlan->execution.passer.at(index);
+    const AgentPoint &r = masterPlan->execution.reciver.at(index);
 
-            const int &i = masterPlan->common.matchedID.value(r.id);
+    const int &i = masterPlan->common.matchedID.value(r.id);
 
-            Agent *c = soccer->agents[i];
-            if (positionAgent[r.id].stateNumber == r.state
-                || positionAgent[r.id].stateNumber == r.state + 1) {
-                DBUG(QString("RC : %1, %2").arg(r.id).arg(r.state), D_MAHI);
-                drawer->draw(Circle2D(positionAgent[r.id].getAbsArgs(r.state).staticPos, masterPlan->common.lastDist),
-                             QColor(Qt::darkMagenta));
-                doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
-                         <= masterPlan->common.lastDist;
-                doAfterlife = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
-                              <= masterPlan->common.lastDist;
-                roleAgent[p.id]->setDoPass(doPass);
-            }
-
+    Agent *c = soccer->agents[i];
+    if (positionAgent[r.id].stateNumber == r.state
+        || positionAgent[r.id].stateNumber == r.state + 1) {
+        DBUG(QString("RC : %1, %2").arg(r.id).arg(r.state), D_MAHI);
+        drawer->draw(Circle2D(positionAgent[r.id].getAbsArgs(r.state).staticPos, masterPlan->common.lastDist),
+                     QColor(Qt::darkMagenta));
+        doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
+                 <= masterPlan->common.lastDist;
+        doAfterlife = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
+                      <= masterPlan->common.lastDist;
+        roleAgent[p.id]->setDoPass(doPass);
     }
+
+//    }
 }
 
 /**
@@ -2024,7 +2026,7 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
 
     if (Circle2D(_roleAgent->getAgent()->pos(), 0.2).contains(wm->ball->pos)) {
         _roleAgent->setBallIsNear(true);
-    } else if (!Circle2D(_roleAgent->getAgent()->pos(), 0.6).contains(wm->ball->pos)
+    } else if (!Circle2D(lastBallPos, 0.6).contains(wm->ball->pos)
                && _roleAgent->getBallIsNear()) {
         _roleAgent->setBallIsNear(false);
         if (_roleAgent->getChip()) {
