@@ -67,31 +67,32 @@ private:
     OnetouchAction       *oneTouchSkill;
     // CSKill "KEEP"
 
+    int dischargetime = 0;
+    bool isdischargetime = false;
+
     void update();
     bool updated;
 
     SkillProperty(CRoleDynamic, Agent*, Agent, agent);
     SkillProperty(CRoleDynamic, PositionSkill, SelectedPositionSkill, positionSkill);
     SkillProperty(CRoleDynamic, PlayMakeSkill, SelectedPlayMakeSkill, playMakeSkill);
+    SkillProperty(CRoleDynamic, bool, AvoidPenaltyArea, avoidPenaltyArea);
     SkillProperty(CRoleDynamic, Vector2D, Target, target);
     SkillProperty(CRoleDynamic, Vector2D, TargetDir, targetDir);
-    SkillProperty(CRoleDynamic, bool, AvoidPenaltyArea, avoidPenaltyArea);
+    SkillProperty(CRoleDynamic, bool, IsPlayMake, isplaymake);
     SkillProperty(CRoleDynamic, double, Tolerance, tolerance);
     SkillProperty(CRoleDynamic, bool, Chip, chip);
-    SkillProperty(CRoleDynamic, int, KickSpeed, kickSpeed);
+    SkillProperty(CRoleDynamic, double, KickSpeed, kickSpeed);
     SkillProperty(CRoleDynamic, double, ReceiveRadius, receiveRadius);
     SkillProperty(CRoleDynamic, Vector2D, WaitPos, waitPos);
     SkillProperty(CRoleDynamic, bool, VeryFine, veryFine);
     SkillProperty(CRoleDynamic, bool, EmptySpot, emptySpot);
     SkillProperty(CRoleDynamic, bool, NoKick, noKick);
-    SkillProperty(CRoleDynamic, int, AgentID, agentID);
 
 public:
-    CRoleDynamic* setKickRealSpeed(double val) {
-//        kickSpeed = knowledge -> getProfile(agent->id(), val, !chip, false);
-        kickSpeed = static_cast<int>(val * 100);
-        DBUG(QString("set kick real speed : %1 %2").arg(val).arg(kickSpeed), D_MAHI);
-        updated = true;
+    CRoleDynamic* setKickdischargetime(double _dischargetime) {
+        dischargetime = _dischargetime;
+        isdischargetime = true;
         return this;
     }
 

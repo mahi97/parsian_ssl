@@ -16,6 +16,7 @@ CDynamicAttack::CDynamicAttack() {
         roleAgents[i] = new CRoleDynamic();
     }
     roleAgentPM = new CRoleDynamic();
+    roleAgentPM -> setIsPlayMake(true);
 
     passFlag   = false;
     repeatFlag = false;
@@ -328,7 +329,6 @@ void CDynamicAttack::playMake() {
     }
 
     roleAgentPM->setAgent(mahiPlayMaker);
-    roleAgentPM->setAgentID(mahiAgentsID[0]);
     roleAgentPM->setAvoidPenaltyArea(true);
 
     Vector2D og = wm->ball->pos - wm->field->ourGoal();
@@ -348,9 +348,9 @@ void CDynamicAttack::playMake() {
         roleAgentPM -> setEmptySpot(false);
         roleAgentPM -> setNoKick(false);
         if (roleAgentPM->getChip()) {
-            roleAgentPM->setKickRealSpeed(appropriateChipSpeed());
+            roleAgentPM->setKickSpeed(appropriateChipSpeed());
         } else {
-            roleAgentPM->setKickRealSpeed(appropriatePassSpeed());
+            roleAgentPM->setKickSpeed(appropriatePassSpeed());
         }
 
         roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Pass);// Skill Kick
@@ -375,17 +375,17 @@ void CDynamicAttack::playMake() {
         if (currentPlan.playmake.region == DynamicRegion ::Goal) {
             roleAgentPM ->setTarget(wm->field->oppGoal());
             if (wm->ball->pos.x < -2) {
-                roleAgentPM ->setKickRealSpeed(conf.HighSpeedChip);
+                roleAgentPM ->setKickSpeed(conf.HighSpeedChip);
             } else {
-                roleAgentPM ->setKickRealSpeed(conf.MediumSpeedChip);
+                roleAgentPM ->setKickSpeed(conf.MediumSpeedChip);
 
             }
         } else if (currentPlan.playmake.region == DynamicRegion ::Forward) {
             roleAgentPM->setTarget(Vector2D(1000, 0));
-            roleAgentPM->setKickRealSpeed(conf.LowSpeedChip);
+            roleAgentPM->setKickSpeed(conf.LowSpeedChip);
         } else {
             roleAgentPM->setTarget(wm->field->oppGoal());
-            roleAgentPM->setKickRealSpeed(conf.LowSpeedChip);
+            roleAgentPM->setKickSpeed(conf.LowSpeedChip);
         }
         roleAgentPM->setChip(true);
         roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Chip);// Skill Chip
@@ -395,7 +395,7 @@ void CDynamicAttack::playMake() {
         roleAgentPM->setChip(false);
         roleAgentPM->setNoKick(false);
         roleAgentPM->setTarget(wm->field->oppGoal());
-        roleAgentPM->setKickSpeed(1023); // TODO : 8m/s by profiller
+        roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
         roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
         break;
     }
@@ -406,7 +406,7 @@ void CDynamicAttack::playMake() {
         roleAgentPM->setNoKick(false);
         roleAgentPM->setTarget(wm->field->oppGoal());
         // Parsa : ino hamintory avaz kardam kar kard...
-        roleAgentPM->setKickSpeed(8); // TODO : 8m/s by profiller
+        roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
         roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
         break;
     }
@@ -416,8 +416,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
     bool check = false;
     for (int i = 0 ; i < currentPlan.agentSize; i++) {
         if (mahiAgentsID[i] >= 0) {
-            ROS_INFO_STREAM("kian: too if set shodan : ID:" << mahiAgentsID[i] << ", agentID: " << mahiPositionAgents.at(i)->id());
-            roleAgents[i]->setAgentID(mahiAgentsID[i]);
+            ROS_INFO_STREAM("kian: too if set shodan : ID:" << agents.at(mahiAgentsID[i])->id() << ", agentID: " << mahiPositionAgents.at(i)->id());
             roleAgents[i]->setAgent(mahiPositionAgents.at(i));
             roleAgents[i]->setAvoidPenaltyArea(true);
             if (i < _points.size()) {
