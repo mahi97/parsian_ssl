@@ -13,7 +13,7 @@ QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions,
     if(wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)){
         drawer->draw("oomad" , Vector2D(0,0) , 40);
         return rectangularPositions;
-    }    
+    }
     return circularPositions;
 }
 
@@ -23,7 +23,7 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
     if (neededDefenseAgents == allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
             defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
-        } else if (neededDefenseAgents == 2) {            
+        } else if (neededDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
     }
@@ -63,17 +63,63 @@ Vector2D DefensePlan::oneDefenseFormationForCircularPositioning(double downLimit
 QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double downLimit , double upLimit){
     QList<Vector2D> defensePosition;
     Vector2D sol[4];
+    double robotRadius = Robot::robot_radius_new;
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
     Vector2D ballPosition = ballPrediction(false);
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
     Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
+    Vector2D anotherIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
     int numberOfDefenseAgents = 2;
     Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
     defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , anIntesection) , &sol[0] , &sol[1]);
     defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
     defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
+    /////////////////// Az chizaki bar sikhaki malideh im :) ///////////////////////////////
+    if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
+        double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
+        double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
+       if(distanceFromYalForFirstPosition > robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
+            defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
+       }
+       else if(distanceFromYalForFirstPosition <= robotRadius){
+           anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
+           defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+       }
+
+       if(distanceFromYalForSecondPosition > robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
+            defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
+       }
+       else if(distanceFromYalForSecondPosition <= robotRadius){
+           anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
+           defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+       }
+    }
+    else{
+        double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(0));
+        double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(1));
+       if(distanceFromYalForFirstPosition > robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
+            defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
+       }
+       else if(distanceFromYalForFirstPosition <= robotRadius){
+           anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
+           defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+       }
+
+       if(distanceFromYalForSecondPosition > robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
+            defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
+       }
+       else if(distanceFromYalForSecondPosition <= robotRadius){
+           anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
+           defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+       }
+    }
+
     return defensePosition;
 }
 
@@ -385,7 +431,7 @@ Line2D DefensePlan::getBestLineWithTallesForCircularPositioning(int defenseCount
         if(biggerFrontageOfTriangle.intersection(Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
                                                         Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5))).dist(wm->field->ourGoal()) <= RADIUS_FOR_CRITICAL_DEFENSE_AREA
                 || originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length() < -6)){
-            Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).intersection(biggerFrontageOfTriangle , &sol[0] , &sol[1]);            
+            Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).intersection(biggerFrontageOfTriangle , &sol[0] , &sol[1]);
             suitablePoint = sol[0].isValid() && sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1];
             aimLessLine = Line2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5));
             drawer->draw(Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5)));
@@ -556,9 +602,9 @@ bool DefensePlan::areAgentsStuckTogether(const QList<Vector2D> &agentsPosition) 
     //// If defense agents stuck together , this function
     for (int i = 0 ; i < agentsPosition.size() ; i++) {
         for (int j = i+1 ; j < agentsPosition.size() ; j++) {
-                if (agentsPosition.at(i).dist(agentsPosition.at(j)) <= 2 * Robot::robot_radius_new) {
-                    return true;
-                }
+            if (agentsPosition.at(i).dist(agentsPosition.at(j)) <= 2 * Robot::robot_radius_new) {
+                return true;
+            }
         }
     }
     return false;
@@ -614,7 +660,7 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
     }
     DBUG(QString("center : %1").arg(centerToCenter.size()) , D_AHZ);
     for (int i = 0 ; i < stuckPositions.size() ; i++)
-            solvedPosition.append(stuckPositions.at(i) + (1.2 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
+        solvedPosition.append(stuckPositions.at(i) + (1.2 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
     ///////////// Check the resulted points, don't be in the PArea /////////////
     for (int i = 0 ; i < solvedPosition.size() ; i++) {
         if (wm->field->isInOurPenaltyArea(solvedPosition.at(i))) {
@@ -3726,7 +3772,7 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayoff(QList<Vector2
 
         temp.second = danger;
         output.append(temp);
-//        drawer->draw(QString("HMD danger=%1").arg(danger), oppposdanger[i] + Vector2D(0, 0.3), QColor(Qt::red));
+        //        drawer->draw(QString("HMD danger=%1").arg(danger), oppposdanger[i] + Vector2D(0, 0.3), QColor(Qt::red));
         //drawer->draw(_poly, QColor(Qt::blue));
 
 
