@@ -26,12 +26,7 @@
 #include <parsian_util/action/autogenerate/gotopointavoidaction.h>
 #include <parsian_util/action/autogenerate/kickaction.h>
 #include <parsian_util/geom/geom.h>
-<<<<<<< HEAD
-#include <behavior/direct/direct.h>
-=======
 #include <behavior/move_forward/move_forward.h>
-
->>>>>>> 9aa220c126ca5f62059157c2276912ae0a885676
 
 #include <parsian_msgs/plan_service.h>
 
@@ -51,15 +46,9 @@ public:
     Exprimental(Agent** _agents) {
         agents = _agents;
         myKick = new KickAction;
-<<<<<<< HEAD
-        direct = new BehaviorDirect;
-        for (int i = 0; i < 12; i++) if (agents[i] != nullptr) agentList.append(_agents[i]);
-
-=======
         myRec = new ReceivepassAction;
         state = State::SIMPLE_MOVE;
         //my_move = new BehaviorMove_Forward;
->>>>>>> 9aa220c126ca5f62059157c2276912ae0a885676
     }
     ~Exprimental() {
 
@@ -68,11 +57,7 @@ public:
 
     }
     void execute() {
-<<<<<<< HEAD
-        ROS_INFO("adsfasdf");
-        direct->init(agentList, m_behav);
-        direct->execute();
-=======
+
         ROS_INFO_STREAM("kian1: " << (int)state);
         if(state == State::SIMPLE_MOVE)
             simplemove();
@@ -88,7 +73,6 @@ public:
 
         if(isthreat())
             state = State::WAITFORIT;
->>>>>>> 9aa220c126ca5f62059157c2276912ae0a885676
     }
 private:
     //int state;
@@ -97,10 +81,6 @@ private:
     QList<Agent*> agentList;
     GotopointavoidAction *gpa;
     Agent** agents;
-<<<<<<< HEAD
-    BehaviorDirect* direct;
-    parsian_msgs::parsian_behaviorConstPtr m_behav;
-=======
     BehaviorMove_Forward *my_move;
     State state;
     Vector2D target{-3, 4.5};
@@ -160,7 +140,6 @@ private:
     {
 
     }
->>>>>>> 9aa220c126ca5f62059157c2276912ae0a885676
 
 
 };

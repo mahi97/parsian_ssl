@@ -192,16 +192,16 @@ void CCoach::decidePreferredDefenseAgentsCount() {
         }
     } else if (gameState->isStart()) {
         if (transientFlag) {
+            //// Add Playmake after time
             if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
-                preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
+                preferedDefenseCounts = std::max(0, agentsCount - missMatchIds.count() - 1);
 
             } else {
                 preferedDefenseCounts = agentsCount - missMatchIds.count();
 
             }
-        } else { // PLAYON
+        } else { //// PLAYON
             bool oppsAttack = false;
-
             for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
                 if (wm->opp.active(i)->pos.x <= 0) {
                     oppsAttack = true;
@@ -209,15 +209,15 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             }
 
             if (agentsCount == 1) {
-                preferedDefenseCounts = 0; // just one playmake
+                preferedDefenseCounts = 0; //// just one playmake
 
             } else if (agentsCount == 2) {
-                preferedDefenseCounts = 1; // one playmake and one defense
+                preferedDefenseCounts = 1; //// one playmake and one defense
             } else {
-                if (!oppsAttack) {
-                    preferedDefenseCounts = 1;
-                } else {
+                if (oppsAttack) {
                     preferedDefenseCounts = 2;
+                } else {
+                    preferedDefenseCounts = 1;
                 }
 
             }
@@ -482,64 +482,8 @@ double CCoach::findMostPossible(Vector2D agentPos) {
 }
 
 void CCoach::updateAttackState() {
-    Polygon2D robotCritArea;
-    double    safeRegion = 1   ;
-    double    critLenth = 0.4 ;
-    double    critThrsh = 0.95;
-    double    critAng   = 30  ;
-    CRobot    *oppNearest;
-    if (wm->opp.activeAgentsCount() > 0) {
-        //        int id = CKnowledge::getNearestRobotToPoint(wm->opp, wm->ball->pos);
-        //        ROS_INFO_STREAM(id);
-        //        oppNearest = wm->opp[id];
-        ourAttackState = SAFE;
-        return;
-
-    } else {
-        ourAttackState = SAFE;
-        return;
-    }
-    /*
-        QList<int> ids;
-        Segment2D oppNearestPath(oppNearest->pos,oppNearest->pos + oppNearest->vel);
-        ids = wm->our.data->activeAgents;
-        //    ourNearestAgent = knowledge->getAgent(knowledge->getNearestAgentToPoint(wm->ball->pos,&ids));
-        if (playmakeId != -1) {
-            CRobot* PMA = wm->our[playmakeId];
-            if (PMA != nullptr) {
-                if (lastASWasCritical) {
-                    robotCritArea.addVertex(PMA->pos + Vector2D(0, 0.8));
-                    robotCritArea.addVertex(PMA->pos + Vector2D(1.1, 0));
-                    robotCritArea.addVertex(PMA->pos - Vector2D(0, 0.8));
-                    robotCritArea.addVertex(PMA->pos - Vector2D(0.5, 0));
-                    //                robotCritArea.addVertex(PMA->pos + PMA->dir.norm() * critL + PMA->dir.norm().rotate(critA )* critL);
-                    //                robotCritArea.addVertex(PMA->pos + PMA->dir.norm() * critL + PMA->dir.norm().rotate(-critA)* critL);
-                } else {
-                    robotCritArea.addVertex(PMA->pos);
-                    robotCritArea.addVertex(PMA->pos + Vector2D(0, 0.7));
-                    robotCritArea.addVertex(PMA->pos + Vector2D(1, 0));
-                    robotCritArea.addVertex(PMA->pos - Vector2D(0, 0.7));
-                }
-            }
-        }
-        ROS_INFO_STREAM("Z");
-
-
-        drawer->draw(robotCritArea, QColor(Qt::cyan));
-
-        if (robotCritArea.contains(oppNearest->pos)) {
-            ourAttackState = CRITICAL;
-            debugger->debug(QString("Attack: critical"), D_MHMMD);
-        } else if (oppNearestPath.nearestPoint(wm->ball->pos).dist(wm->ball->pos) >= safeRegion) {
-            ourAttackState = SAFE;
-            debugger->debug(QString("Attack: safe"), D_MHMMD);
-        } else {
-            ourAttackState = FAST;
-            debugger->debug(QString("Attack: fast"), D_MHMMD);
-        }
-
-        lastASWasCritical = (ourAttackState == CRITICAL);
-    */
+    ourAttackState = SAFE;
+    return;
 }
 
 void CCoach::choosePlaymakeAndSupporter()
@@ -602,11 +546,6 @@ void CCoach::choosePlaymakeAndSupporter()
 }
 
 void CCoach::decideAttack() {
-    ballPState = isBallOurs();
-    updateAttackState();
-
-    lastBallPossesionState = ballPState;
-
     // find unused agents!
     QList<int> ourPlayersID = wm->our.data->activeAgents;
     if (goalieAgent != nullptr) {
@@ -728,15 +667,15 @@ void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
     }
 }
 void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
-
-    BallPossesion ballPState = isBallOurs();
+    ballPState = isBallOurs();
+    updateAttackState(); //// Too Bad Conditions will be Handle here
 
     if (0 <= playmakeId && playmakeId <= 11) {
         dynamicAttack->setPlayMake(agents[playmakeId]);
         ourPlayers.removeOne(playmakeId);
     }
 
-    dynamicAttack->setDefenseClear(false);
+    dynamicAttack->setDefenseClear(false); // TODO : fix
 
     if (playmakeId != -1 && wm->our[playmakeId] != nullptr) {
         double mostPossible = findMostPossible(wm->our[playmakeId]->pos);
@@ -746,19 +685,17 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         pushingPenalty.setWidth(wm->field->oppPenaltyRect().size().width() + conf.penaltyMargin);
         pushingPenalty.setTopLeft(wm->field->oppPenaltyRect().topLeft() + Vector2D(-conf.penaltyMargin, conf.penaltyMargin));
 
-        if (pushingPenalty.contains(wm->ball->pos) {
+        if (pushingPenalty.contains(wm->ball->pos)) {
             dynamicAttack->setDirectShot(true);
-        } else if (mostPossible > (conf.DirectTrsh - shotToGoalthr) {
+        } else if (mostPossible > (conf.DirectTrsh - shotToGoalthr)) { // TODO : Fix This
             dynamicAttack->setDirectShot(true);
             shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.2);
-
         } else {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
         }
 
     }
-    /////////////////////////////////////////////////////////////////////////
 
     dynamicAttack->setWeHaveBall(ballPState   == BallPossesion::WEHAVETHEBALL);
     dynamicAttack->setFast(ourAttackState     == FAST);
@@ -770,13 +707,13 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     int MarkNum = 0;
     switch (ballPState) {
         case BallPossesion::WEHAVETHEBALL:
-            MarkNum = 2;
+            MarkNum = 0;
             break;
         case BallPossesion::WEDONTHAVETHEBALL:
             MarkNum = (overdef) ? 4 : 3;
             break;
         case BallPossesion::SOSOOUR:
-            MarkNum = 3;
+            MarkNum = 2;
             break;
         case BallPossesion::SOSOTHEIR:
             MarkNum = 3;
@@ -792,7 +729,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         ourPlayers = lastPlayers;
 
     } else {
-        // TODO : matching is based on ID, It should be Goal-Oriented
+        // TODO : matching is based on ID, It should be Goal-Oriented -- optimal -- base of position
         qSort(ourPlayers.begin(), ourPlayers.end());
         for (int i = 0; i < MarkNum; i++) {
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
@@ -801,6 +738,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         }
 
     }
+    lastBallPossesionState = ballPState;
 }
 
 
@@ -1019,7 +957,6 @@ void CCoach::execute()
     checkTransitionToForceStart();
 
     virtualTheirPlayOffState();
-    ROS_INFO_STREAM("M : " << preferedDefenseCounts);
     ROS_INFO_STREAM("PM :" << playmakeId);
     ROS_INFO_STREAM("GAME STATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////

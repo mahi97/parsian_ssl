@@ -5,36 +5,37 @@
 
 //#define _MAX_REGION 7
 
+namespace AttackAgent{
+    struct SPositioningAgent {
 
-struct SPositioningAgent {
+        void init(PositionSkill _skill,
+                  DynamicRegion _region) {
+            skill  = _skill;
+            region = _region;
+        }
 
-    void init(PositionSkill _skill,
-              DynamicRegion _region) {
-        skill  = _skill;
-        region = _region;
-    }
+        PositionSkill skill;
+        DynamicRegion region;
+    };
 
-    PositionSkill skill;
-    DynamicRegion region;
-};
+    struct SPlayMakeAgent {
 
-struct SPlayMakeAgent {
+        void init(PlayMakeSkill _skill,
+                  DynamicRegion _region) {
+            skill  = _skill;
+            region = _region;
+        }
 
-    void init(PlayMakeSkill _skill,
-              DynamicRegion _region) {
-        skill  = _skill;
-        region = _region;
-    }
-
-    PlayMakeSkill skill;
-    DynamicRegion region;
-};
+        PlayMakeSkill skill;
+        DynamicRegion region;
+    };
+}
 
 struct SDynamicPlan {
     int agentSize;
     DynamicMode mode;
-    SPositioningAgent positionAgents[_NUM_PLAYERS];
-    SPlayMakeAgent playmake;
+    AttackAgent::SPositioningAgent positionAgents[_NUM_PLAYERS];
+    AttackAgent::SPlayMakeAgent playmake;
     Vector2D passPos;
     int passID;
     void reset() {
@@ -83,7 +84,7 @@ public:
     void setBallInOppJaw(bool _ballInOppJaw);
     void choosePlan();
 
-    SDynamicPlan* currentPlan;
+    SDynamicPlan currentPlan;
     SDynamicPlan* nextPlanA;
     SDynamicPlan* nextPlanB;
 
@@ -164,7 +165,7 @@ private:
 
     QString getString(const DynamicMode& _mode) const;
 
-    CRoleDynamic *roleAgents[5];
+    CRoleDynamic *roleAgents[8];
     CRoleDynamic *roleAgentPM;
 
     ////////Plan Making
@@ -180,7 +181,7 @@ private:
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
     Agent* mahiPlayMaker;
-    int mahiAgentsID[5];
+    int mahiAgentsID[8];
     bool isBallInOurField;
 
     int playmakeID = -1;
