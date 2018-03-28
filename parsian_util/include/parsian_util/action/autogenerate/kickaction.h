@@ -27,6 +27,7 @@ public:
     SkillProperty(KickAction, bool, Iskickchargetime, iskickchargetime);
     SkillProperty(KickAction, double, Kickchargetime, kickchargetime);
     SkillProperty(KickAction, double, Kickspeed, kickSpeed);
+    SkillProperty(KickAction, double, Chipdist, chipDist);
     SkillProperty(KickAction, int, Spin, spin);
     SkillProperty(KickAction, bool, Slow, slow);
     SkillProperty(KickAction, bool, Avoidpenaltyarea, avoidPenaltyArea);
@@ -43,6 +44,7 @@ public:
     SkillProperty(KickAction, bool, Kickwithcenterofdribbler, kickWithCenterOfDribbler);
     SkillProperty(KickAction, bool, Playmakemode, playMakeMode);
     SkillProperty(KickAction, bool, Isplayoff, isPlayoff);
+    SkillProperty(KickAction, bool, Iskhafan, isKhafan);
     SkillProperty(KickAction, Vector2D, Target, target);
 
 
