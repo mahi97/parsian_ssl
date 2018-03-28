@@ -93,5 +93,3 @@ void AINodelet::behaviorCb(const parsian_msgs::parsian_behaviorConstPtr &_behavi
     ROS_INFO_STREAM("behavior " << _behavior->name << " received !");
     soccer->coach->updateBehavior(_behavior);
 }
-
-
