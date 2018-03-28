@@ -59,7 +59,7 @@ CCoach::CCoach(Agent**_agents)
     defenseTimeForVisionProblem[1].start();
     transientFlag = false;
     trasientTimeOut.start();
-    translationTimeOutTime = 2000;
+    translationTimeOutTime = 4000;
     exeptionPlayMake = nullptr;
     exeptionPlayMakeThr = 0;
 
@@ -531,20 +531,17 @@ bool CCoach::isBallcollide() {
     Segment2D ballPath(wm->ball->pos, wm->ball->pos + wm->ball->vel);
 
 //    debugger->debug("ball is colliding" , D_AHZ);
-
-
     for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-        dummyCircle.assign(wm->our.active(i)->pos, 0.08);
-        if ((dummyCircle.intersection(ballPath, &sol1, &sol2) != 0)
-            /* && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.14
-             * && fabs((wm->ball->vel - lastBallVel).length()) > 0.5*/) {
+        dummyCircle.assign(wm->our.active(i)->pos, 0.3);
+        if ((dummyCircle.intersection(ballPath, &sol1, &sol2) != 0)) {
             lastBallVel = wm->ball->vel;
+            ROS_INFO_STREAM("ppppppppppppppppppppppppp");
+            ROS_INFO_STREAM("ppppppppppppppppppppppppp");
+            ROS_INFO_STREAM("ppppppppppppppppppppppppp");
+            ROS_INFO_STREAM("ppppppppppppppppppppppppp");
+            ROS_INFO_STREAM("ppppppppppppppppppppppppp");
             return true;
         }
-//        if (wm->ball->vel.length() < 0.5 && wm->our.active(i)->pos.dist(wm->ball->pos) < 0.13) {
-//            lastBallVel = wm->ball->vel;
-//            return true;
-//        }
     }
     lastBallVel = wm->ball->vel;
 
@@ -596,6 +593,7 @@ void CCoach::virtualTheirPlayOffState() {
         transientFlag = false;
 //        ROS_INFO_STREAM("ENDDDDDDDDDDDDDD");
     }
+    drawer->draw(QString("TS:%1").arg(transientFlag),Vector2D(0,0),"red",30);
 
 //    if (ballChiped()); // todo: ali
     PDEBUG("TS flag:", transientFlag, D_AHZ);
