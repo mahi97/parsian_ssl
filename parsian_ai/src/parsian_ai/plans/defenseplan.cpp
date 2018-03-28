@@ -1136,8 +1136,9 @@ void DefensePlan::setGoalKeeperState() {
     dangerForInsideOfThePenaltyArea = false;
     dangerForGoalKeeperClearByOurAgents = false;
     dangerForGoalKeeperClearByOppAgents = false;
-    isCrowdedInFrontOfPenaltyAreaByOppAgents = false;    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.2 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
-    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.2 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
+    isCrowdedInFrontOfPenaltyAreaByOppAgents = false;
+    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.3 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
+    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.3 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
 
     isCrowdedInFrontOfPenaltyAreaByOurAgents = false;
     playOnMode = gameState->isStart();
@@ -1324,7 +1325,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             dangerForGoalKeeperClear = false;
             drawer->draw(QString("Ball Is Out Of Field"), Vector2D(0, 1), "red");
-            goalKeeperTarget = wm->field->center();//wm->field->ourGoal() + goalKeeperTargetOffSet;
+            goalKeeperTarget = wm->field->ourGoal() + goalKeeperTargetOffSet;
             return;
         }
         else if(playOffMode){
@@ -1334,7 +1335,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             DBUG(QString("Their Indirect") , D_AHZ);
             oppPasser = wm->opp[know->nearestOppToBall()]->pos; //todo: move to wm
             if(gameState->theirIndirectKick()){
-                goalKeeperTarget = wm->field->center();//wm->field->ourGoal() + goalKeeperTargetOffSet;
+                goalKeeperTarget = wm->field->ourGoal() + goalKeeperTargetOffSet;
             }
             else {
                 goalKeeperTarget = strictFollowBall(wm->ball->pos);
