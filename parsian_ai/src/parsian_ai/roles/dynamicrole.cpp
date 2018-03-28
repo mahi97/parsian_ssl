@@ -7,6 +7,7 @@ CRoleDynamic::CRoleDynamic() {
     oneTouchSkill = new OnetouchAction;
     positionSkill = PositionSkill ::NoSkill;
     playMakeSkill = PlayMakeSkill ::NoSkill;
+    isplaymake = false;
 
     agent = nullptr;
 }
@@ -45,55 +46,31 @@ void CRoleDynamic::update() {
 
     shotSkill->setPlaymakemode(true);
     shotSkill->setKickwithcenterofdribbler(true);
-
-    switch (positionSkill) {
-    case PositionSkill ::Ready:
-        receiveSkill->setTarget(target);
-        receiveSkill->setReceiveradius(receiveRadius);
-        break;
-//   case DynamicEnums::Dribble:
-//       dribbleSkill->setAgent(agent);
-//       dribbleSkill->setTarget(target);
-//       dribbleSkill->setInitialLook(wm->field->oppGoal());
-//       dribbleSkill->setKickTol(tolerance);
-//       dribbleSkill->setChip(chip);
-//       if(wm->getIsSimulMode())
-//           dribbleSkill->setKickSpeed(kickSpeed);
-//       else if (chip) {
-//               dribbleSkill->setKickSpeed(max(200, kickSpeed));
-//       } else {
-//               dribbleSkill->setKickSpeed(max(300, kickSpeed));
-//       }
-//       break;
-    case PositionSkill ::Move:
-        moveSkill->setTargetpos(target);
-        moveSkill->setTargetdir(targetDir);
-        moveSkill->setAvoidpenaltyarea(true);
-        moveSkill->setSlowmode(false);
-        break;
-    case PositionSkill ::OneTouch:
-        oneTouchSkill->setWaitpos(waitPos);
-        oneTouchSkill->setTarget(target);
-        break;
-    case PositionSkill ::NoSkill:
-    default:
-        break;
+    if(!isplaymake)
+    {
+        switch (positionSkill) {
+        case PositionSkill ::Ready:
+            receiveSkill->setTarget(target);
+            receiveSkill->setReceiveradius(receiveRadius);
+            break;
+        case PositionSkill ::Move:
+            moveSkill->setTargetpos(target);
+            moveSkill->setTargetdir(targetDir);
+            moveSkill->setAvoidpenaltyarea(true);
+            moveSkill->setSlowmode(false);
+            break;
+        case PositionSkill ::OneTouch:
+            oneTouchSkill->setWaitpos(waitPos);
+            oneTouchSkill->setTarget(target);
+            break;
+        case PositionSkill ::NoSkill:
+        default:
+            break;
+        }
     }
-    switch (playMakeSkill) {
-//   case DynamicEnums::Dribble:
-//       dribbleSkill->setAgent(agent);
-//       dribbleSkill->setTarget(target);
-//       dribbleSkill->setInitialLook(wm->field->oppGoal());
-//       dribbleSkill->setKickTol(tolerance);
-//       dribbleSkill->setChip(chip);
-//       if(wm->getIsSimulMode())
-//           dribbleSkill->setKickSpeed(kickSpeed);
-//       else if (chip) {
-//               dribbleSkill->setKickSpeed(max(200, kickSpeed));
-//       } else {
-//               dribbleSkill->setKickSpeed(max(300, kickSpeed));
-//       }
-//       break;
+    if(isplaymake)
+    {
+        switch (playMakeSkill) {
         case PlayMakeSkill ::Shot:
             shotSkill->setTarget(target);
             shotSkill->setTolerance(tolerance);
@@ -102,12 +79,17 @@ void CRoleDynamic::update() {
             shotSkill->setPlaymakemode(true);
             shotSkill->setChip(chip);
             shotSkill->setVeryfine(veryFine);
-//       shotSkill->setShotToEmptySpot(emptySpot);
             shotSkill->setDontkick(false);
-//       if(wm->getIsSimulMode()) // TODO : WM SIMUL
-            shotSkill->setKickspeed(kickSpeed / 50);
-//       else
-            shotSkill->setKickspeed(std::max(900, kickSpeed));
+            if(isdischargetime)
+            {
+                shotSkill->setIskickchargetime(true);
+                shotSkill->setKickchargetime(static_cast<double>(dischargetime));
+            }
+            else
+            {
+                shotSkill->setIskickchargetime(false);
+                shotSkill->setKickspeed(kickSpeed);
+            }
             break;
         case PlayMakeSkill::Chip:
             shotSkill->setTarget(target);
@@ -118,10 +100,16 @@ void CRoleDynamic::update() {
             shotSkill->setChip(true);
             shotSkill->setVeryfine(veryFine);
             shotSkill->setDontkick(false);
-//       if(wm->getIsSimulMode()) // TODO : WM SIMUL
-            shotSkill->setKickspeed(kickSpeed / 100);
-//       else
-            shotSkill->setKickspeed(std::max(200, kickSpeed));
+            if(isdischargetime)
+            {
+                shotSkill->setIskickchargetime(true);
+                shotSkill->setKickchargetime(static_cast<double>(dischargetime));
+            }
+            else
+            {
+                shotSkill->setIskickchargetime(false);
+                shotSkill->setKickspeed(kickSpeed);
+            }
             break;
         case PlayMakeSkill ::Pass:
             shotSkill->setTarget(target);
@@ -132,14 +120,16 @@ void CRoleDynamic::update() {
             shotSkill->setChip(chip);
             shotSkill->setDontkick(noKick);
             shotSkill->setVeryfine(veryFine);
-//       shotSkill->setShotToEmptySpot(false);
-//       if(wm->getIsSimulMode()) // TODO : WM SIMUL
-//            shotSkill->setKickspeed(kickSpeed / 100);
-//       else if (chip) {
-            shotSkill->setKickspeed(std::max(200, kickSpeed));
-//       } else {
-            shotSkill->setKickspeed(std::max(300, kickSpeed));
-//       }
+            if(isdischargetime)
+            {
+                shotSkill->setIskickchargetime(true);
+                shotSkill->setKickchargetime(static_cast<double>(dischargetime));
+            }
+            else
+            {
+                shotSkill->setIskickchargetime(false);
+                shotSkill->setKickspeed(kickSpeed);
+            }
             break;
         case PlayMakeSkill ::CatchBall:
             shotSkill->setTarget(target);
@@ -147,17 +137,23 @@ void CRoleDynamic::update() {
             shotSkill->setAvoidpenaltyarea(true);
             shotSkill->setChip(chip);
             shotSkill->setVeryfine(false);
-//       shotSkill->setShotToEmptySpot(emptySpot);
-//       if(wm->getIsSimulMode())
-            shotSkill->setKickspeed(kickSpeed / 50);
-//       else
-            shotSkill->setKickspeed(1023);
+            if(isdischargetime)
+            {
+                shotSkill->setIskickchargetime(true);
+                shotSkill->setKickchargetime(static_cast<double>(dischargetime));
+            }
+            else
+            {
+                shotSkill->setIskickchargetime(false);
+                shotSkill->setKickspeed(kickSpeed);
+            }
             break;
         case PlayMakeSkill ::Keep:
             break;
         case PlayMakeSkill ::NoSkill:
         default:
             break;
+        }
     }
 
 }
@@ -168,37 +164,50 @@ void CRoleDynamic::execute() {
         update();
     }*/
     update();
-    switch (positionSkill) {
-    case PositionSkill ::Ready:
-        agent->action = receiveSkill;
-        break;
-        DBUG(QString("[dynamicRole] kickSpeed : %1").arg(kickSpeed), D_MAHI);
-        agent->action = shotSkill;
-        break;
-    case PositionSkill::Move:
-        agent->action = moveSkill;
-        break;
-    case PositionSkill::OneTouch:
-        agent->action = oneTouchSkill;
-        break;
-    case PositionSkill::NoSkill:
-    default:
-        agent->action = nullptr;
-        break;
+    if(!isplaymake)
+    {
+        switch (positionSkill) {
+        case PositionSkill ::Ready:
+            ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: ready");
+            agent->action = receiveSkill;
+            break;
+            DBUG(QString("[dynamicRole] kickSpeed : %1").arg(kickSpeed), D_MAHI);
+            agent->action = shotSkill;
+            ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: shotSkill");
+            break;
+        case PositionSkill::Move:
+            agent->action = moveSkill;
+            ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: move");
+            break;
+        case PositionSkill::OneTouch:
+            agent->action = oneTouchSkill;
+            ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: oneTouchSkill");
+            break;
+        case PositionSkill::NoSkill:
+        default:
+            agent->action = nullptr;
+            break;
+        }
     }
-    switch (playMakeSkill) {
+    if(isplaymake)
+    {
+        switch (playMakeSkill) {
         case PlayMakeSkill ::Shot:
         case PlayMakeSkill ::Chip:
         case PlayMakeSkill ::Pass:
         case PlayMakeSkill ::CatchBall:
             DBUG(QString("[dynamicRole] kickSpeed : %1").arg(kickSpeed), D_MAHI);
+            ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: playmake hame");
             agent->action = shotSkill;
             break;
-        case PlayMakeSkill ::NoSkill:
+        case PlayMakeSkill::NoSkill:
         default:
             agent->action = nullptr;
             break;
+        }
     }
+//    if(playMakeSkill == PlayMakeSkill::NoSkill && positionSkill == PositionSkill::NoSkill)
+//        agent->action = nullptr;
 }
 
 CRoleDynamic& CRoleDynamic::operator=(CRoleDynamic &&_move) noexcept {
