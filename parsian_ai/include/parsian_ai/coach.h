@@ -226,10 +226,11 @@ private:
     int preferedShotSpot;
 
     QList<int> lastPlayers;
-    Vector2D lastBallVel;
+
     //////////////////////////////////// ALI GAVAHI
     double lastNearestBallDist;
-
+    QList<Vector2D> lastBallVels;
+    int last_happen;
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);

@@ -615,7 +615,7 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
     }
     DBUG(QString("center : %1").arg(centerToCenter.size()) , D_AHZ);
     for (int i = 0 ; i < stuckPositions.size() ; i++)
-            solvedPosition.append(stuckPositions.at(i) + (1.2 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
+            solvedPosition.append(stuckPositions.at(i) + (1.4 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
     ///////////// Check the resulted points, don't be in the PArea /////////////
     for (int i = 0 ; i < solvedPosition.size() ; i++) {
         if (wm->field->isInOurPenaltyArea(solvedPosition.at(i))) {
@@ -1798,7 +1798,7 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
     findPos(decideNumOfMarks());
     matchPoints.append(markPoses);
     /////////////// Stucking agents ///////////////////////////////////////////
-    if (areAgentsStuckTogether(matchPoints)) {
+    while (areAgentsStuckTogether(matchPoints)) {
         agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
         DBUG("Agents Stuck together" , D_AHZ);
         DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
