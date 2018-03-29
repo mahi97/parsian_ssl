@@ -316,6 +316,7 @@ class Handler(FileSystemEventHandler):
             return math.sqrt(b)
 
     def get_all_plans_gui_msgs(self):
+        self.refresh();
         plans_msg = []
         for plan in self.__final_dict:
             plans_msg.append(self.gui_message_generator(plan))
