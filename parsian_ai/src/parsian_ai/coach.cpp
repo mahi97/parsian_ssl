@@ -528,47 +528,34 @@ bool CCoach::isBallcollide() {
     // TODO : change this :P
 
 
-    if(lastBallVels.size()>0 && 0){
-        Vector2D sol1, sol2;
-        Segment2D ballPath(wm->ball->pos, wm->ball->pos + lastBallVels.first()*0.02);
+    if(lastBallVels.size()>0){
         float innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
-        drawer->draw(QString("inter product: %1").arg(innerproduct),Vector2D(1,0),"blue",30);
-
-        if(wm->ball->vel < .02){
-            lastBallVels.clear();
-            lastBallVels.reserve(10);
-            last_happen =0;
+        ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
+        if(wm->ball->vel.length() < .02){
+                        lastBallVels.clear();
+                        lastBallVels.reserve(7);
+            ROS_INFO_STREAM("KALI : istad");
             return true;
         }
+
         if(innerproduct > .999){  // 2.5 degree
-            if(lastBallVels.size() > 8)
+            if(lastBallVels.size() > 5)
                 lastBallVels.removeFirst();
-            last_happen =1;
+            ROS_INFO_STREAM("KALI : saff mire");
             return false;
         }
-
+        ROS_INFO_STREAM("KALI : 3");
         if(innerproduct < .99){// 8.1 degree
-            lastBallVels.clear();
-            lastBallVels.reserve(10);
-            last_happen =2;
+                        lastBallVels.clear();
+                        lastBallVels.reserve(7);
+            ROS_INFO_STREAM("KALI : taghir jahat");
             return true;
-        }
-
-        for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-            Circle2D dummyCircle;
-            dummyCircle.assign(wm->our.active(i)->pos, 0.08);
-            if ((dummyCircle.intersection(ballPath, &sol1, &sol2) > 0)) {
-                lastBallVels.clear();
-                lastBallVels.reserve(10);
-                last_happen =3;
-                return true;
-            }
         }
     }
     lastBallVels.append(std::move(wm->ball->vel));
-    if(lastBallVels.size() > 3)
+    if(lastBallVels.size() > 5)
         lastBallVels.removeFirst();
-    last_happen =4;
+    ROS_INFO_STREAM("KALI : hichi nashod");
     return false;
 }
 
@@ -616,7 +603,6 @@ void CCoach::virtualTheirPlayOffState() {
         if (isBallcollide()) {
             transientFlag = false;
         }
-    drawer->draw(QString("las:%1").arg(last_happen),Vector2D(0,0),"red",30);
 
     //    if (ballChiped()); // todo: ali
     PDEBUG("TS flag:", transientFlag, D_AHZ);

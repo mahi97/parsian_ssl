@@ -230,7 +230,6 @@ private:
     //////////////////////////////////// ALI GAVAHI
     double lastNearestBallDist;
     QList<Vector2D> lastBallVels;
-    int last_happen;
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);
