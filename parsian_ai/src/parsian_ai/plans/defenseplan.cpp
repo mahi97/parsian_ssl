@@ -10,7 +10,7 @@ using namespace std;
 QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){    
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
-    if(wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)){
+    if((wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)) || defenseArea.contains(wm->ball->pos)){
         drawer->draw("oomad" , Vector2D(0,0) , 40);
         return rectangularPositions;
     }
@@ -80,60 +80,49 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double do
     if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
         double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
         double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
-       if(distanceFromYalForFirstPosition > robotRadius){
+        if(distanceFromYalForFirstPosition > robotRadius){
             anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
             defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-       }
-       else if(distanceFromYalForFirstPosition <= robotRadius){
-           anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
-           defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-       }
+        }
+        else if(distanceFromYalForFirstPosition <= robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
+            defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+        }
 
-       if(distanceFromYalForSecondPosition > robotRadius){
+        if(distanceFromYalForSecondPosition > robotRadius){
             anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
             defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-       }
-       else if(distanceFromYalForSecondPosition <= robotRadius){
-           anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
-           defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-       }
+        }
+        else if(distanceFromYalForSecondPosition <= robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
+            defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+        }
     }
     else{
         double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(0));
         double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(1));
-       if(distanceFromYalForFirstPosition > robotRadius){
+        if(distanceFromYalForFirstPosition > robotRadius){
             anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
             defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-       }
-       else if(distanceFromYalForFirstPosition <= robotRadius){
-           anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
-           defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-       }
+        }
+        else if(distanceFromYalForFirstPosition <= robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
+            defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+        }
 
-       if(distanceFromYalForSecondPosition > robotRadius){
+        if(distanceFromYalForSecondPosition > robotRadius){
             anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
             defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-       }
-       else if(distanceFromYalForSecondPosition <= robotRadius){
-           anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
-           defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-       }
+        }
+        else if(distanceFromYalForSecondPosition <= robotRadius){
+            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
+            defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+        }
     }
 
+    ROS_INFO_STREAM("AYA injas");
     return defensePosition;
 }
-
-//QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double downLimit, double upLimit){
-//    QList<Vector2D> defensePosition;
-//    Vector2D sol[8];
-//    Vector2D ourGoalLeft = wm->field->ourGoalL();
-//    Vector2D ourGoalRight = wm->field->ourGoalR();
-//    Vector2D ballPosition = ballPrediction(false);
-//    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
-//    Vector2D downIntersection;
-//    Vector2D upIntesection;
-
-//}
 
 QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
     QList<int> IDOfOpponentsInPolygon;
@@ -435,56 +424,52 @@ Line2D DefensePlan::getBestLineWithTallesForCircularPositioning(int defenseCount
             drawer->draw("is" ,  Vector2D(-1,0) , 40);
             suitablePoint = sol[0].isValid() && sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1];
             aimLessLine = Line2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5));
-            drawer->draw(Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5)));
+            //            drawer->draw(Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5)));
         }
-        else{            
+        else{
             aimLessLine = Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
                                  Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5));
-            drawer->draw(Segment2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
-                                   Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5)));
+            //            drawer->draw(Segment2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
+            //                                   Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5)));
         }
     }
     return aimLessLine;
 }
 
-//Segment2D DefensePlan::getBestSegmentWithTallesForCircularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint) {
-//    double robotDiameter = 2 * Robot::robot_radius_new;
-//    Segment2D ourGoalLine(firstPoint, secondPoint);
-//    Segment2D biggerFrontageOfTriangle;
-//    Segment2D smallerFrontageOfTriangle;
-//    Vector2D desirePoint;
-//    if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
-//        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
-//        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
-//    } else {
-//        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
-//        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
-//    }
-
-//    Line2D aimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
-//    Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
-//    if (tempAimLessLine.length() >= robotDiameter) {
-//        if (originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()) > (-6 + 1.4)) {
-//            aimLessLine = Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5),
-//                                 Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5));
-//            desirePoint = smallerFrontageOfTriangle.intersection(aimLessLine);
-//            tempAimLessLine = Segment2D(biggerFrontageOfTriangle.nearestPoint(smallerFrontageOfTriangle.intersection(aimLessLine)) , smallerFrontageOfTriangle.intersection(aimLessLine));
-//        } else {
-//            if (originPoint.x < -6 + 1.4) {
-//                aimLessLine = Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5),
-//                                     Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5));
-//                desirePoint = smallerFrontageOfTriangle.intersection(aimLessLine);
-//                tempAimLessLine = Segment2D(biggerFrontageOfTriangle.nearestPoint(smallerFrontageOfTriangle.intersection(aimLessLine)) , smallerFrontageOfTriangle.intersection(aimLessLine));
-//            } else {
-//                aimLessLine = Line2D(Vector2D(-6 + 1.4, -4.5), Vector2D(-6 + 1.4, 4.5));
-//                desirePoint = smallerFrontageOfTriangle.intersection(aimLessLine);
-//                tempAimLessLine = Segment2D(biggerFrontageOfTriangle.nearestPoint(smallerFrontageOfTriangle.intersection(aimLessLine)) , smallerFrontageOfTriangle.intersection(aimLessLine));
-
-//            }
-//        }
-//        return tempAimLessLine;
-//    }
-//}
+Segment2D DefensePlan::getBestSegmentWithTallesForCircularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint) {
+    double robotDiameter = 2 * Robot::robot_radius_new;
+    Vector2D sol[2];
+    Vector2D suitablePoint;
+    Segment2D ourGoalLine(firstPoint, secondPoint);
+    Segment2D biggerFrontageOfTriangle;
+    Segment2D smallerFrontageOfTriangle;
+    if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+    } else {
+        biggerFrontageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
+    }
+    Segment2D tempAimLessLine(ourGoalLine.intersection(smallerFrontageOfTriangle) , biggerFrontageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrontageOfTriangle)));
+    if(tempAimLessLine.length() >= robotDiameter){
+        if(biggerFrontageOfTriangle.intersection(Line2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
+                                                        Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5))).dist(wm->field->ourGoal()) <= RADIUS_FOR_CRITICAL_DEFENSE_AREA
+                || (originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length())) < -6){
+            Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).intersection(biggerFrontageOfTriangle , &sol[0] , &sol[1]);
+            drawer->draw("is" ,  Vector2D(-1,0) , 40);
+            suitablePoint = sol[0].isValid() && sol[0].dist(wm->ball->pos) < sol[1].dist(wm->ball->pos) ? sol[0] : sol[1];
+            tempAimLessLine = Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5));
+            //            drawer->draw(Segment2D(Vector2D(suitablePoint.x, -4.5), Vector2D(suitablePoint.x, 4.5)));
+        }
+        else{
+            tempAimLessLine = Segment2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
+                                        Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5));
+            //            drawer->draw(Segment2D(Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), -4.5),
+            //                                   Vector2D(originPoint.x - (defenseCount * robotDiameter * (6 - fabs(originPoint.x)) / tempAimLessLine.length()), 4.5)));
+        }
+    }
+    return tempAimLessLine;
+}
 
 double DefensePlan::findBestOffsetForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit) {
     double bestOffsetForPenaltyArea = 0;
@@ -549,9 +534,9 @@ double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , dou
         smallerFrontageOfTriangle = getLinesOfBallTriangle().at(0);
     }
     bestRadiusForDefenseArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).dist(wm->field->ourGoal());
-    //    if(bestRadiusForDefenseArea <= downLimit){
-    //        bestRadiusForDefenseArea = downLimit;
-    //    }
+    if(bestRadiusForDefenseArea <= downLimit){
+        bestRadiusForDefenseArea = downLimit;
+    }
     if(bestRadiusForDefenseArea >= upLimit){
         bestRadiusForDefenseArea = upLimit;
     }
@@ -559,42 +544,51 @@ double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , dou
     return bestRadiusForDefenseArea;
 }
 
-int DefensePlan::findNeededDefense() {
+int DefensePlan::findNeededDefense(){
     int neededDefense = 0;
     int numOfDefenses = 0;
+    Vector2D sol[4];
     double robotDiameter = 2 * Robot::robot_radius_new;
     Vector2D ballPos = ballPrediction(false);
     Vector2D ourGoalL = wm->field->ourGoalL();
     Vector2D ourGoalR = wm->field->ourGoalR();
     Segment2D aimLessLine;
-    Segment2D leftFrontageOfTriangle(ballPos , ourGoalL);
-    Segment2D rightFrontageOfTriangle(ballPos , ourGoalR);
     Segment2D ourGoalLine(ourGoalL, ourGoalR);
     Segment2D biggerFrintageOfTriangle;
     Segment2D smallerFrintageOfTriangle;
-    if (rightFrontageOfTriangle.length() > leftFrontageOfTriangle.length()) {
-        biggerFrintageOfTriangle = rightFrontageOfTriangle;
-        smallerFrintageOfTriangle = leftFrontageOfTriangle;
+    if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
+        biggerFrintageOfTriangle = getLinesOfBallTriangle().at(0);
+        smallerFrintageOfTriangle = getLinesOfBallTriangle().at(1);
     } else {
-        biggerFrintageOfTriangle = leftFrontageOfTriangle;
-        smallerFrintageOfTriangle = rightFrontageOfTriangle;
+        biggerFrintageOfTriangle = getLinesOfBallTriangle().at(1);
+        smallerFrintageOfTriangle = getLinesOfBallTriangle().at(0);
     }
     aimLessLine = Segment2D(ourGoalLine.intersection(smallerFrintageOfTriangle) , biggerFrintageOfTriangle.nearestPoint(ourGoalLine.intersection(smallerFrintageOfTriangle)));
     //////// with itterative algorithm /////////////////////////
-    if (aimLessLine.length() <= robotDiameter) {
+    //            Circle2D(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numOfDefenses,ourGoalL,ballPos, ourGoalR),RADIUS_FOR_CRITICAL_DEFENSE_AREA,2.7)).intersection(getBestSegmentWithTallesForCircularPositioning(numOfDefenses,ourGoalL,ballPos,ourGoalR) , &sol[0],&sol[1]);
+    //            Segment2D(sol[0] , sol[1]).length()
+    if (aimLessLine.length() <= robotDiameter){
         neededDefense = 1;
-    } else {
-        for (numOfDefenses = 2 ; numOfDefenses < 4 ; numOfDefenses++) {
-            if (getBestSegmentWithTallesForRectangularPositioning(numOfDefenses , ourGoalL , ballPos , ourGoalR).length() <= (numOfDefenses + 1) * (robotDiameter)) {
+    }
+    else{
+        for(numOfDefenses = 2 ; numOfDefenses < 3 ; numOfDefenses++){
+            Circle2D temp = Circle2D(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numOfDefenses,ourGoalL,ballPos, ourGoalR),RADIUS_FOR_CRITICAL_DEFENSE_AREA,2.7));
+            temp.intersection(getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
+            temp.intersection(getLinesOfBallTriangle().at(1) , &sol[2] , &sol[3]);
+            drawer->draw(temp,0,360);
+            drawer->draw(Segment2D(sol[0] , sol[2]) , "blue");
+            if(Segment2D(sol[0] , sol[2]).length() <= ((numOfDefenses) * (robotDiameter))){
                 neededDefense = numOfDefenses;
                 break;
             }
         }
-        if (neededDefense == 0 && aimLessLine.length() > robotDiameter) {
+        if(Circle2D(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA).contains(wm->ball->pos)){
+            neededDefense = 2;
+        }
+        if(neededDefense == 0){
             neededDefense = 2;
         }
     }
-    //    ROS_INFO(QString("neededDefenseAgents: %1").arg(neededDefense).toStdString().c_str());
     return neededDefense;
 }
 
@@ -660,7 +654,7 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
     }
     DBUG(QString("center : %1").arg(centerToCenter.size()) , D_AHZ);
     for (int i = 0 ; i < stuckPositions.size() ; i++)
-        solvedPosition.append(stuckPositions.at(i) + (1.2 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
+        solvedPosition.append(stuckPositions.at(i) + (0.1 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
     ///////////// Check the resulted points, don't be in the PArea /////////////
     for (int i = 0 ; i < solvedPosition.size() ; i++) {
         if (wm->field->isInOurPenaltyArea(solvedPosition.at(i))) {
@@ -1843,13 +1837,13 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
     findPos(decideNumOfMarks());
     matchPoints.append(markPoses);
     /////////////// Stucking agents ///////////////////////////////////////////
-    if (areAgentsStuckTogether(matchPoints)) {
-        agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
-        DBUG("Agents Stuck together" , D_AHZ);
-        DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
-        DBUG(QString("stuck index: %1").arg(stuckIndexs.size()),  D_AHZ);
-        correctingTheAgentsAreStuckTogether(matchPoints , stuckPositions , stuckIndexs);
-    }
+//    if (areAgentsStuckTogether(matchPoints)) {
+//        agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
+//        DBUG("Agents Stuck together" , D_AHZ);
+//        DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
+//        DBUG(QString("stuck index: %1").arg(stuckIndexs.size()),  D_AHZ);
+//        correctingTheAgentsAreStuckTogether(matchPoints , stuckPositions , stuckIndexs);
+//    }
     //////////////////// Added for RC 2017 /////////////////////////////////////
     Vector2D tempMatchPoints[matchPoints.size()];
     if (ourAgents.size() > matchPoints.size()) {
@@ -1936,12 +1930,12 @@ void DefensePlan::execute(){
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    detectOpponentPassOwners(1 , 2);
+    //    detectOpponentPassOwners(1 , 2);
     stopMode = gameState->isStop();
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
-    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
-    drawer->draw(getLinesOfBallTriangle().at(0));
-    drawer->draw(getLinesOfBallTriangle().at(1));
+        drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
+        drawer->draw(getLinesOfBallTriangle().at(0));
+        drawer->draw(getLinesOfBallTriangle().at(1));
     ballPosHistory.prepend(Vector2D(wm->ball->pos.x, wm->ball->pos.y));
     if (ballPosHistory.count() > 7){
         ballPosHistory.removeLast();
@@ -1995,13 +1989,13 @@ void DefensePlan::execute(){
                 }
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
-                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
+                    //                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
+                    //                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 2.7),
                                                     defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                     matchingDefPos(realDefSize);
-                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
+                    //                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
                 }
             }
             else{
@@ -3743,7 +3737,6 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayoff(QList<Vector2
     double Polycontain = 0;
     for (int i = 0; i < oppposdanger.count(); i++) {
         if (_poly.contains(oppposdanger[i])) {
-            ROS_INFO(QString("count: %1").arg(85).toStdString().c_str());
             drawer->draw(Circle2D(oppposdanger[i] , 0.3) , "black");
             Polycontain = 1;
         } else {

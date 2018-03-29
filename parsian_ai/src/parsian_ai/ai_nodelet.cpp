@@ -53,13 +53,13 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 
      ai->execute();
 
+     drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.polygons.clear();
     drawer->draws.rects.clear();
-    drawer->draws.texts.clear();
     drawer->draws.vectors.clear();
     debugger->debugs.debugs.clear();
 }
