@@ -1817,9 +1817,10 @@ void CDynamicAttack::chooseBestPositons_new()
 
                     double prob = 0.0;
                     //factors for pass
-                    double receiverDistanceFactor; // be the closer than opp robots (temp), could change based on timing
-                    double senderDistanceFactor; // being within a specified intervval (temp), ccould change based on timing
-                    double clearPathFactor; // if the path to the point is clear for receiving robot
+                    double receiverDistanceFactor = 0; // be the closer than opp robots (temp), could change based on timing
+                    double senderDistanceFactor = 0; // being within a specified intervval (temp), ccould change based on timing
+                    double clearPathFactor = 0; // if the path to the point is clear for receiving robot
+                    double widenessFactor = 0;
 
                     // factors for shoot
                     double oneTouchAngleFactor; // if the angle to the opp goal is whitin a desird interval
@@ -1830,9 +1831,11 @@ void CDynamicAttack::chooseBestPositons_new()
                     senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
                     clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
                     oneTouchAngleFactor = calcOneTouchAngleFactor(point, passSenderPos);
+                    widenessFactor = calcWidenessFactor(passSenderPos, point);
 
                     double f = 1.0;
                     prob += f1(shootFactor,2.0*f);
+                    prob += f1(widenessFactor,0.5*f);
                     prob += f1(receiverDistanceFactor,2.0*f);
                     prob += f1(senderDistanceFactor,0.1*f);
                     prob += f1(clearPathFactor,1.0*f);
@@ -2114,4 +2117,15 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D point, Vector2D passSend
     }
     return oneTouchAngleFactor;
 }
+
+double CDynamicAttack::calcWidenessFactor(Vector2D passSenderPos, Vector2D point)
+{
+    double widenessAngle = fabs((passSenderPos - wm->field->oppGoal()).th().degree() - (wm->field->oppGoal() - point).th().degree());
+    if (widenessAngle < 0.005)
+        return 0.0;
+    if (widenessAngle > 170)
+        return 1.0;
+    return widenessAngle/180.0;
+}
+
 
