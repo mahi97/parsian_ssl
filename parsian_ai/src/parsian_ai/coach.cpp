@@ -145,9 +145,9 @@ void CCoach::checkGoalieInsight() {
 void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
 
-    //    preferedDefenseCounts = 0;
+        preferedDefenseCounts = 6;
     //    preferedGoalieID = -1;
-    //    return;
+        return;
 
     missMatchIds.clear();
     if (first) {

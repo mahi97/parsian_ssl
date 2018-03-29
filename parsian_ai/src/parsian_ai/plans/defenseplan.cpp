@@ -1823,16 +1823,14 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
         }
     }
     ///////////////// Added By AHZ for segment (before MRL game) ///////////////
-    if (stopMode) {
+    if(stopMode){
         ourAgents.clear();
         ourAgents.append(defenseAgents);
     }
     //////////////////////////////////////////////////////////////////////
     matchPoints.clear();
-    for (int i = 0 ; i < AHZDefPoints.size() ; i++) {
-        drawer->draw(tempDefPos.pos[i], QColor(Qt::blue));
-        matchPoints.append(AHZDefPoints.at(i));
-        //        ROS_INFO(QString("pos: %1 %2").arg(AHZDefPoints.at(i).x).arg(AHZDefPoints.at(i).y).toStdString().c_str());
+    for (int i = 0 ; i < AHZDefPoints.size() ; i++) {        
+        matchPoints.append(AHZDefPoints.at(i));        
     }
     findOppAgentsToMark();
     findPos(decideNumOfMarks());
@@ -2911,8 +2909,8 @@ int DefensePlan::decideNumOfMarks() {
 
     playOnMode = gameState->isStart();
     playOffMode = gameState->theirDirectKick() || gameState->theirIndirectKick();
-    if (defenseCount > 0) {
-        if (gameState->isStop() && defenseCount >= 2) {
+    if (defenseCount > 0){
+        if (gameState->isStop()) {
             return defenseCount - defenseNumber();
         }
         if (playOffMode) {
@@ -3006,62 +3004,46 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     return predictedBall;
 }
 
-void DefensePlan::findOppAgentsToMark() {
-
+void DefensePlan::findOppAgentsToMark(){
     oppAgentsToMark.clear();
-    oppAgentsToMarkPos.clear();
-    DBUG(QString("opp goalie ID : %1").arg(wm->opp.data->goalieID), D_AHZ);
-    for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
+    oppAgentsToMarkPos.clear();    
+    for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
         if (wm->opp.activeAgentID(i) != wm->opp.data->goalieID) {
             oppAgentsToMark.append(wm->opp.active(i));
         }
     }
-
-    if (gameState->theirPlayOffKick() || gameState->isStop()) {
-        //Ommiting nearest to ball
+    if(gameState->theirPlayOffKick() || gameState->isStop()) {
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
-
-        for (int i = 0 ; i < oppAgentsToMark.count() ; i++) {
-            if ((oppAgentsToMark[i]->pos).dist(wm->ball->pos) < nearestToBallDist) {
+        for(int i = 0 ; i < oppAgentsToMark.count() ; i++){
+            if((oppAgentsToMark[i]->pos).dist(wm->ball->pos) < nearestToBallDist){
                 nearestToBall = i;
-                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
-                // DBUG(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id),D_HAMED);
-                drawer->draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
+                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);                                
             }
         }
-        if (nearestToBall != -1) {
+        if(nearestToBall != -1){
             oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
         }
-        ///////////////////////
     }
-    if (gameState->theirKickoff()) {
-        for (int i = 0; i < oppAgentsToMark.count(); i++) {
+    if(gameState->theirKickoff()){
+        for (int i = 0; i < oppAgentsToMark.count(); i++){
             if (oppAgentsToMark[i]->pos.x > conf.OppOmitLimitKickOff) {
-                oppAgentsToMark.removeOne(oppAgentsToMark[i]);
-                // TODO: chage the transeint this flag
-                /*if(oppAgentsToMark[i]->vel.length() > 1)
-                    HMDtransient = 1;*/
+                oppAgentsToMark.removeOne(oppAgentsToMark[i]);                
                 i--;
             }
         }
-    } else if (gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isStop() || know->variables["transientFlag"].toBool()) {
+    }
+    else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isStop() || know->variables["transientFlag"].toBool()) {
         for (int i = 0; i < oppAgentsToMark.count(); i++) {
             if (oppAgentsToMark[i]->pos.x > conf.OppOmitLimitPlayoff) {
-                oppAgentsToMark.removeOne(oppAgentsToMark[i]);
-                // a minor change
-                // TODO: chage the transeint this flag
-                /*if(oppAgentsToMark[i]->vel.length() > 1)
-                HMDtransient = 1;*/
+                oppAgentsToMark.removeOne(oppAgentsToMark[i]);                
                 i--;
             }
         }
     }
-    for (int i = 0; i < oppAgentsToMark.count(); i++) {
-        drawer->draw(oppAgentsToMark[i]->pos);
+    for(int i = 0; i < oppAgentsToMark.count(); i++) {
         oppAgentsToMarkPos.append(posvel(oppAgentsToMark[i], conf.VelReliability));
-    }
-    DBUG(QString("OppAgenttoMark count %1").arg(oppAgentsToMarkPos.count()), D_HAMED);
+    }    
 }
 
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
