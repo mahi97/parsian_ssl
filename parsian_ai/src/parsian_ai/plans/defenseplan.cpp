@@ -1091,7 +1091,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
         }
     }
     else if(_markAgentSize > oppAgentsToMarkPos.count()){
-        for (int i = 0; i < oppAgentsToMarkPos.count(); i++) {
+        for(int i = 0; i < oppAgentsToMarkPos.count(); i++){
             markRoles.append(QString("shotBlocker"));
             if(!isInTheIndirectAreaShoot(oppAgentsToMarkPos[i])){
                 markPoses.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).first());
@@ -1103,7 +1103,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
             }
         }
         QList<QPair<Vector2D, double> > tempsorted = sortdangerpassplayoff(oppAgentsToMarkPos);
-        for (int i = 0; i < min(_markAgentSize - oppAgentsToMarkPos.count(), oppAgentsToMarkPos.count()); i++) {
+        for(int i = 0; i < min(_markAgentSize - oppAgentsToMarkPos.count(), oppAgentsToMarkPos.count()); i++) {
             markRoles.append(QString("passBlocker"));
             if (!isInTheIndirectAreaPass(tempsorted[i].first)) {
                 markPoses.append(PassBlockRatio(segmentperpass, tempsorted[i].first).first());
@@ -1155,7 +1155,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
     }
     for(int i = 0 ; i < markPoses.size() ; i++){
         drawer->draw(markRoles.at(i) , markPoses.at(i) - Vector2D(0, 0.4) , "white");
-    }    
+    }
 }
 
 void DefensePlan::setGoalKeeperState(){
@@ -1816,8 +1816,8 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     }
     //////////////////////////////////////////////////////////////////////
     matchPoints.clear();
-    for (int i = 0 ; i < AHZDefPoints.size() ; i++) {        
-        matchPoints.append(AHZDefPoints.at(i));        
+    for (int i = 0 ; i < AHZDefPoints.size() ; i++) {
+        matchPoints.append(AHZDefPoints.at(i));
     }
     findOppAgentsToMark();
     findPos(decideNumOfMarks());
@@ -1871,7 +1871,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
                 gpa[ourAgents[i]->id()]->addOurrelax(ourAgents[j]->id());//TODO: gotopiontaction
             }
         }
-        assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);       
+        assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
         gpa[ourAgents[i]->id()]->setSlowmode(false);
         if (gameState->theirIndirectKick()) {
@@ -2991,7 +2991,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
 
 void DefensePlan::findOppAgentsToMark(){
     oppAgentsToMark.clear();
-    oppAgentsToMarkPos.clear();    
+    oppAgentsToMarkPos.clear();
     for(int i = 0 ; i < wm->opp.activeAgentsCount() ; i++){
         if (wm->opp.activeAgentID(i) != wm->opp.data->goalieID) {
             oppAgentsToMark.append(wm->opp.active(i));
@@ -3003,7 +3003,7 @@ void DefensePlan::findOppAgentsToMark(){
         for(int i = 0 ; i < oppAgentsToMark.count() ; i++){
             if((oppAgentsToMark[i]->pos).dist(wm->ball->pos) < nearestToBallDist){
                 nearestToBall = i;
-                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);                                
+                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
             }
         }
         if(nearestToBall != -1){
@@ -3013,7 +3013,7 @@ void DefensePlan::findOppAgentsToMark(){
     if(gameState->theirKickoff()){
         for (int i = 0; i < oppAgentsToMark.count(); i++){
             if (oppAgentsToMark[i]->pos.x > conf.OppOmitLimitKickOff) {
-                oppAgentsToMark.removeOne(oppAgentsToMark[i]);                
+                oppAgentsToMark.removeOne(oppAgentsToMark[i]);
                 i--;
             }
         }
@@ -3021,14 +3021,14 @@ void DefensePlan::findOppAgentsToMark(){
     else if(gameState->theirIndirectKick() || gameState->theirDirectKick() || gameState->isStop() || know->variables["transientFlag"].toBool()) {
         for (int i = 0; i < oppAgentsToMark.count(); i++) {
             if (oppAgentsToMark[i]->pos.x > conf.OppOmitLimitPlayoff) {
-                oppAgentsToMark.removeOne(oppAgentsToMark[i]);                
+                oppAgentsToMark.removeOne(oppAgentsToMark[i]);
                 i--;
             }
         }
     }
     for(int i = 0; i < oppAgentsToMark.count(); i++) {
         oppAgentsToMarkPos.append(posvel(oppAgentsToMark[i], conf.VelReliability));
-    }    
+    }
 }
 
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
@@ -3131,20 +3131,22 @@ QList<Vector2D> DefensePlan::ShootBlockRatio(double ratio, Vector2D opp) {
     tempQlist.clear();
     Segment2D tempSeg;
     tempSeg.assign(opp + (wm->field->ourGoal() - opp) * (-10), wm->field->ourGoal());
-    Vector2D pos = opp + (wm->field->ourGoal() - opp) * ratio;
-    if ((wm->field->ourGoal() - pos).length() < markRadiusStrict) {
-        wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(tempSeg, &solutions[0] , &solutions[1]);
-        for (int i = 0 ; i < 2 ; i++) {
-            if (solutions[i].isValid()) {
-                tempQlist.append(solutions[i]);
-            }
+    Vector2D pos = know->getPointInDirection(wm->field->ourGoal() , opp , ratio);
+    if(wm->field->isInOurPenaltyArea(opp)){
+        wm->field->ourBigPenaltyArea(1,0.3,0).intersection(tempSeg, &solutions[0] , &solutions[1]);
+        tempQlist.append(solutions[0].isValid() && !wm->field->isInOurPenaltyArea(solutions[0]) ? solutions[0] : solutions[1]);
+        tempQlist.append(tempQlist.first() - wm->field->ourGoal());
+    }
+    else{
+        if(wm->field->isInOurPenaltyArea(pos)){
+            wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(tempSeg, &solutions[0] , &solutions[1]);
+            tempQlist.append(solutions[0].isValid() && !wm->field->isInOurPenaltyArea(solutions[0]) ? solutions[0] : solutions[1]);
+            tempQlist.append(tempQlist.first() - wm->field->ourGoal());
         }
-        tempQlist.append(opp - wm->field->ourGoal());
-        drawer->draw(tempSeg, "blue");
-    } else {
-        tempQlist.append(pos);
-        tempQlist.append(opp - wm->field->ourGoal());
-        drawer->draw(tempSeg, "blue");
+        else{
+            tempQlist.append(pos);
+            tempQlist.append(opp - wm->field->ourGoal());
+        }
     }
     return tempQlist;
 }
