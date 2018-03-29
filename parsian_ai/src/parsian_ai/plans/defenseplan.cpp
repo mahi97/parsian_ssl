@@ -1091,7 +1091,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
         }
     }
     else if(_markAgentSize > oppAgentsToMarkPos.count()){
-        for(int i = 0; i < oppAgentsToMarkPos.count(); i++){
+        for (int i = 0; i < oppAgentsToMarkPos.count(); i++) {
             markRoles.append(QString("shotBlocker"));
             if(!isInTheIndirectAreaShoot(oppAgentsToMarkPos[i])){
                 markPoses.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).first());
@@ -1157,6 +1157,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
         drawer->draw(markRoles.at(i) , markPoses.at(i) - Vector2D(0, 0.4) , "white");
     }
 }
+
 
 void DefensePlan::setGoalKeeperState(){
     //// In this function,we determine the specific states that goalkeeper must
