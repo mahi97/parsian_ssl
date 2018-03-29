@@ -253,7 +253,6 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd()) {
                 playOnFlag = true;
-                firstPass = true;
                 ROS_INFO("Playoff Ends");
             }
 
@@ -1339,13 +1338,8 @@ Vector2D CPlayOff::getEmptyTarget(Vector2D _position, double _radius) {
 }
 ///////////////PassManager///////////////////
 void CPlayOff::passManager() {
-    // TODO : FOR MORE THAN ONE PASS
-
-
-//    for (int index = 0; index < masterPlan->execution.reciver.size(); index++) {
-    int index = 0;
-    const AgentPoint &p = masterPlan->execution.passer.at(index);
-    const AgentPoint &r = masterPlan->execution.reciver.at(index);
+    const AgentPoint &p = masterPlan->execution.passer.at(0);
+    const AgentPoint &r = masterPlan->execution.reciver.at(0);
 
     const int &i = masterPlan->common.matchedID.value(r.id);
 
@@ -1357,12 +1351,9 @@ void CPlayOff::passManager() {
                      QColor(Qt::darkMagenta));
         doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
                  <= masterPlan->common.lastDist;
-        doAfterlife = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
-                      <= masterPlan->common.lastDist;
+        doAfterlife = !Circle2D(lastBallPos, 0.5).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
-
-//    }
 }
 
 /**
@@ -1629,6 +1620,7 @@ void CPlayOff::assignMove(CRolePlayOff* _roleAgent,
         _roleAgent -> setMaxVelocity(static_cast<float>(getMaxVel(_roleAgent, _posAgent.getArgs())));
 
     }
+    _roleAgent -> setAvoidBall(true);
     _roleAgent -> setSelectedSkill(RoleSkill::GotopointAvoid);
 }
 
@@ -1983,6 +1975,8 @@ void CPlayOff::reset() {
 
     firstStepEnums = Stay;
     blockerStep = S0;
+
+    firstPass = true;
 
     DBUG(QString("reset Plan"), D_MAHI);
     ROS_INFO("reset Plan");
