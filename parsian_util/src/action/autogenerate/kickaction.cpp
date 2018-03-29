@@ -9,7 +9,6 @@ KickAction::KickAction() {
        kickchargetime = 0.0;
        kickSpeed = 0.0;
        chipDist = 0.0;
-       kickSpeed = 0.0;
        spin = 0;
        slow = false;
        avoidPenaltyArea = false;
@@ -37,7 +36,6 @@ void KickAction::setMessage(const void* _msg) {
         kickchargetime = msg.kickchargetime;
         kickSpeed = msg.kickSpeed;
         chipDist = msg.chipDist;
-        kickSpeed = msg.kickSpeed;
         spin = msg.spin;
         slow = msg.slow;
         avoidPenaltyArea = msg.avoidPenaltyArea;
