@@ -610,7 +610,7 @@ void DefensePlan::agentsStuckTogether(const QList<Vector2D> &agentsPosition , QL
     stuckIndexs.clear();
     for (int i = 0 ; i < agentsPosition.size() ; i++) {
         for (int j = 0 ; j < i ; j++) {
-            if (agentsPosition.at(i).dist(agentsPosition.at(j)) <= 2 * Robot::robot_radius_new + MIN_ROBOTS_DIST) {
+            if (agentsPosition.at(i).dist(agentsPosition.at(j)) <= 2 * Robot::robot_radius_new + MIN_TWO_ROBOTS_DIST) {
                 stuckPositions.append(agentsPosition.at(i));
                 stuckPositions.append(agentsPosition.at(j));
             }
@@ -653,8 +653,9 @@ void DefensePlan::correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPos
         }
     }
     DBUG(QString("center : %1").arg(centerToCenter.size()) , D_AHZ);
+    int desire_robot_dist = stuckPositions.size() == 2 ? MIN_TWO_ROBOTS_DIST:MIN_MORE_ROBOTS_DIST;
     for (int i = 0 ; i < stuckPositions.size() ; i++)
-        solvedPosition.append(stuckPositions.at(i) + (0.1 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + MIN_ROBOTS_DIST) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
+        solvedPosition.append(stuckPositions.at(i) + (1.1 * (Robot::robot_radius_new - centerToCenter.at(i).length() / 2) + desire_robot_dist) * ((centerToCenter.at(i).a() - centerToCenter.at(i).b()).norm()));
     ///////////// Check the resulted points, don't be in the PArea /////////////
     for (int i = 0 ; i < solvedPosition.size() ; i++) {
         if (wm->field->isInOurPenaltyArea(solvedPosition.at(i))) {
@@ -1608,10 +1609,10 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             else if (goalKeeperAgent->pos().dist(goalKeeperTarget) < 0.05 && f >= 3) {
                 f = 4;
             }
-                lastStateForGoalKeeper = QString("ballIsBesidePoles");
-//            drawer->draw(upBallRectanglePoint , QColor(Qt::blue));
-//            drawer->draw(upBallRectanglePoint - Vector2D(0.5 , 0) , QColor(Qt::blue));
-//            drawer->draw(Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y) , QColor(Qt::blue));
+            lastStateForGoalKeeper = QString("ballIsBesidePoles");
+            //            drawer->draw(upBallRectanglePoint , QColor(Qt::blue));
+            //            drawer->draw(upBallRectanglePoint - Vector2D(0.5 , 0) , QColor(Qt::blue));
+            //            drawer->draw(Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.5 , 0) + Vector2D(0 , wm->ball->pos.y) , QColor(Qt::blue));
             drawer->draw(goalKeeperTarget , "cyan");
             return;
         }
@@ -1837,13 +1838,13 @@ void DefensePlan::matchingDefPos(int _defenseNum) {
     findPos(decideNumOfMarks());
     matchPoints.append(markPoses);
     /////////////// Stucking agents ///////////////////////////////////////////
-//    if (areAgentsStuckTogether(matchPoints)) {
-//        agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
-//        DBUG("Agents Stuck together" , D_AHZ);
-//        DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
-//        DBUG(QString("stuck index: %1").arg(stuckIndexs.size()),  D_AHZ);
-//        correctingTheAgentsAreStuckTogether(matchPoints , stuckPositions , stuckIndexs);
-//    }
+    while (areAgentsStuckTogether(matchPoints)) {
+        agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
+        DBUG("Agents Stuck together" , D_AHZ);
+        DBUG(QString("stuck position: %1").arg(stuckPositions.size()),  D_AHZ);
+        DBUG(QString("stuck index: %1").arg(stuckIndexs.size()),  D_AHZ);
+        correctingTheAgentsAreStuckTogether(matchPoints , stuckPositions , stuckIndexs);
+    }
     //////////////////// Added for RC 2017 /////////////////////////////////////
     Vector2D tempMatchPoints[matchPoints.size()];
     if (ourAgents.size() > matchPoints.size()) {
@@ -1933,9 +1934,9 @@ void DefensePlan::execute(){
     //    detectOpponentPassOwners(1 , 2);
     stopMode = gameState->isStop();
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
-        drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
-        drawer->draw(getLinesOfBallTriangle().at(0));
-        drawer->draw(getLinesOfBallTriangle().at(1));
+    drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
+    drawer->draw(getLinesOfBallTriangle().at(0));
+    drawer->draw(getLinesOfBallTriangle().at(1));
     ballPosHistory.prepend(Vector2D(wm->ball->pos.x, wm->ball->pos.y));
     if (ballPosHistory.count() > 7){
         ballPosHistory.removeLast();
@@ -1989,13 +1990,10 @@ void DefensePlan::execute(){
                 }
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    //                    ROS_INFO(QString("DefenseCount: %1").arg(defenseCount).toStdString().c_str());
-                    //                    ROS_INFO_STREAM("decideNumOfMarks: " << decideNumOfMarks());
                     //tempDefPos = defPos.getDefPositions(ballPrediction(false), realDefSize, 1.5, 2.5);
                     AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 2.7),
                                                     defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                     matchingDefPos(realDefSize);
-                    //                    ROS_INFO_STREAM("realDefSize: " << realDefSize);
                 }
             }
             else{
@@ -2484,13 +2482,13 @@ void DefensePlan::executeGoalKeeper() {
             }
             if(f > 3){
                 //if(fabs(wm->ball->pos.y - wm->field->ourGoalR().y) < 0.1 || fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1) {
-                    gpa[goalKeeperAgent->id()]->setDivemode(false);
-                    gpa[goalKeeperAgent->id()]->setSlowmode(true);
-                    gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
-                    gpa[goalKeeperAgent->id()]->setTargetpos(wm->ball->pos); //HINT : gpa->init
-                    gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
-                    goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
-                    ROS_INFO_STREAM("???????????????????");
+                gpa[goalKeeperAgent->id()]->setDivemode(false);
+                gpa[goalKeeperAgent->id()]->setSlowmode(true);
+                gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
+                gpa[goalKeeperAgent->id()]->setTargetpos(wm->ball->pos); //HINT : gpa->init
+                gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
+                goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
+                ROS_INFO_STREAM("???????????????????");
                 //}
 
             }
