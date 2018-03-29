@@ -124,6 +124,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
     if (wm->ball->pos.x < 0) {
+        ROS_INFO_STREAM("kian: dont have the ball");
         nextPlanA->mode = DynamicMode::NotWeHaveBall;
         if (conf.ChipForward) {
             nextPlanA->playmake.init(PlayMakeSkill::Chip, DynamicRegion::Forward);
@@ -138,6 +139,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     //// we have ball and
     //// shot prob is more than 50%
     else if (directShot) {
+        ROS_INFO_STREAM("kian: diret shot");
         nextPlanA->mode = DynamicMode::DirectKick;
         nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
         for (size_t i = 0; i < agentSize; i++) {
@@ -146,6 +148,7 @@ void CDynamicAttack::makePlan(int agentSize) {
         }
     }
     else if (critical) {
+        ROS_INFO_STREAM("kian: critical");
         nextPlanA->mode = DynamicMode::Critical;
         {
             oppRob = wm->field->oppGoal();
@@ -168,6 +171,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     //// there isn't a critical situation and
     //// we don't have positioning agent
     else if (agentSize == 0) {
+        ROS_INFO_STREAM("kian: no positioning");
         nextPlanA->mode = DynamicMode::NoPositionAgent;
         nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
     }
@@ -177,6 +181,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     // we have positioning agents
     // it's needed to be fast
     else if (fast) {
+        ROS_INFO_STREAM("kian: fast");
         oppRob = wm->field->oppGoal();
         nextPlanA->mode = DynamicMode ::Fast;
         if (conf.DribbleInFast) {
@@ -196,9 +201,20 @@ void CDynamicAttack::makePlan(int agentSize) {
     // we have positioning agents
     // there's no need to be fast and
     // there is no plan for this situation
+    ///the correct mode is as below but the ::choosebesrtposforpass:: giving a  bad position
+    /////////TODO: fix the pos
+///    else {
+///        ROS_INFO_STREAM("kian: nomode");
+///        nextPlanA->mode = DynamicMode::NoMode;
+///        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
+///        for (size_t i = 0; i < agentSize; i++) {
+///            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
+///            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
+///        }
     else {
+        ROS_INFO_STREAM("kian: nomode");
         nextPlanA->mode = DynamicMode::NoMode;
-        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
+        nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
         for (size_t i = 0; i < agentSize; i++) {
             nextPlanA->positionAgents[i].region = DynamicRegion::Best;
             nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
@@ -334,7 +350,8 @@ void CDynamicAttack::playMake() {
     Vector2D og = wm->ball->pos - wm->field->ourGoal();
     switch (currentPlan.playmake.skill) {
     case PlayMakeSkill ::Dribble:
-        ROS_INFO_STREAM("drrible");//<< currentPlan.playmake.skill);
+        ROS_INFO_STREAM("kian: drrible");//<< currentPlan.playmake.skill);
+        ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
         roleAgentPM -> setTargetDir(currentPlan.passPos);
         roleAgentPM -> setTarget(oppRob);
         roleAgentPM -> setChip(false);
@@ -342,7 +359,8 @@ void CDynamicAttack::playMake() {
         roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Dribble); // skill Dribble
         break;
     case PlayMakeSkill ::Pass:
-        ROS_INFO_STREAM("pass");
+        ROS_INFO_STREAM("kian: pass");
+        ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
         roleAgentPM -> setChip(chipOrNot(currentPlan.passPos, 0.5, 0.1));
         roleAgentPM -> setTarget(currentPlan.passPos);
         roleAgentPM -> setEmptySpot(false);
