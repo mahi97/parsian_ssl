@@ -256,7 +256,7 @@ private:
     double overDefThr;
     int decideNumOfMarksInPlayOff(int _defenseCount);
     bool FlagBesidePoles;
-    int f = 0;
+    int f = 0 , counterBallWasBesidePoles = 0;
 
 };
 
