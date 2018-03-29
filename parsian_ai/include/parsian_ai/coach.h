@@ -74,6 +74,7 @@ public:
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
+    bool ballChiped();
 private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
@@ -225,9 +226,12 @@ private:
     int preferedShotSpot;
 
     QList<int> lastPlayers;
-    Vector2D lastBallVel;
 
+    //////////////////////////////////// ALI GAVAHI
+    double lastNearestBallDist;
+    QList<Vector2D> lastBallVels;
     //////////////Decide Attack functions
+
     void decideHalt(QList<int> &);
 
     void decideStop(QList<int> &);
