@@ -143,6 +143,8 @@ private:
     QList<int> ourRelaxedIDs, oppRelaxedIDs;
     double robotRegionsWeights[11][9];
     Vector2D bestPointForRobotsInRegions[11][9];
+    QList<int> matchingIDs;
+    QList<int> matchingRegions;
     // END NEW PASS ZONE
 
 
