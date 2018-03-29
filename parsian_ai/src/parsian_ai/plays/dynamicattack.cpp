@@ -1,6 +1,11 @@
 #include <parsian_ai/plays/dynamicattack.h>
 
 CDynamicAttack::CDynamicAttack() {
+    // NEW PASS
+    createRegions();
+    clearRobotsRegionsWeights();
+
+
     dribbleIntention.start();
     lastPMInitWasDribble = false;
     //isShotInPass = false;
@@ -270,7 +275,6 @@ void CDynamicAttack::assignTasks() {
         ROS_INFO_STREAM("kian: too if positioning : currentPlan.agentSize:" << currentPlan.agentSize);
         positioning(semiDynamicPosition);
     }
-
 }
 
 /**
@@ -278,6 +282,7 @@ void CDynamicAttack::assignTasks() {
  * @param agentSize number of positioning Agents
  */
 void CDynamicAttack::dynamicPlanner(int agentSize) {
+    //HAMID HERE
 
     for (size_t i = 0; i < 8; i++) {
         mahiAgentsID[i] = -1;
@@ -293,6 +298,9 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
     if (agentSize > 0) {
         chooseBestPositons();
+        assignId();
+        chooseBestPosForPass(semiDynamicPosition);
+        assignTasks();
     }
     assignId();
     if (agentSize > 0) {
@@ -623,6 +631,13 @@ int CDynamicAttack::appropriateChipSpeed() {
 }
 
 void CDynamicAttack::chooseBestPositons() {
+
+    /*
+     *
+     *
+     *
+     *
+     * OLD CODE*/
     //it has three code of choosing best position that only one of them must be uncommented
     int agentSize = agents.size();
     int cntD = 0;
@@ -836,6 +851,15 @@ void CDynamicAttack::chooseBestPositons() {
             //        debug(QString(""), D_PARSA);
         }
     }
+
+   /*
+   *
+   *
+   *
+   *
+   *
+   *
+   */
 }
 
 void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
@@ -1481,5 +1505,273 @@ bool CDynamicAttack::isPlanDone() {
     case DynamicMode::NoPositionAgent:break;
     case DynamicMode::BallInOppJaw:break;
     }
+}
+
+
+// NEW PASS
+void CDynamicAttack::createRegions()
+{
+    // <make rectangles>
+    QList<QList<Rect2D>> rectangles;
+    QList<Rect2D> row0;
+    QList<Rect2D> row1;
+    QList<Rect2D> row2;
+    for(int i{0}; i<3; i++)
+    {
+        row0.push_back(Rect2D(Vector2D(2*i,4.5), 2, 2.8));
+        row1.push_back(Rect2D(Vector2D(2*i,1.7), 2, 3.4));
+        row2.push_back(Rect2D(Vector2D(2*i,-1.7), 2, 2.8));
+    }
+    rectangles.push_back(row0);
+    rectangles.push_back(row1);
+    rectangles.push_back(row2);
+    // </make rectangles>
+    // <make eval points>
+    QList<Vector2D> points[3][3];
+    for(int i{0}; i<3; i++)
+    {
+        for(int j{0}; j<3; j++)
+        {
+            points[i][j].push_back(rectangles[i][j].center());
+        }
+    }
+    // </make eval points>
+    // <fill the regions>
+    int _id = 0;
+    for(int i{0}; i<3; i++)
+    {
+        for(int j{0}; j<3; j++)
+        {
+            regions[i][j] = FieldRegion(rectangles[i][j], points[i][j]);
+            regions[i][j].id = _id++;
+        }
+    }
+    regions[1][2].points[0] += Vector2D(-0.6, 0);
+    // </fill the regions>
+}
+
+void CDynamicAttack::chooseBestPositons_new()
+{
+
+}
+
+void CDynamicAttack::assignId_new()
+{
+
+}
+
+void CDynamicAttack::chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition)
+{
+
+}
+
+void CDynamicAttack::assignTasks_new()
+{
+
+}
+
+Vector2D CDynamicAttack::getBestPosToShootToGoal(Vector2D from, double &regionWidth, bool oppGaol )
+{
+    Rect2D playingField(wm->field->ourCornerL(), wm->field->oppCornerR());
+    if( ! playingField.contains(from) )
+    {
+        regionWidth = 0.0;
+        double goalProbablity = 0.0;
+        auto shootPos = Vector2D(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+        return shootPos;
+    }
+    Vector2D goal;
+    Vector2D goalL;
+    Vector2D goalR;
+    if( oppGaol )
+    {
+        goal = wm->field->oppGoal();
+        goalL = wm->field->oppGoalL();
+        goalR = wm->field->oppGoalR();
+    }
+    else
+    {
+        goal = wm->field->ourGoal();
+        goalL = wm->field->ourGoalL();
+        goalR = wm->field->ourGoalR();
+    }
+    double StepOnGoal = _GOAL_WIDTH / _GOAL_STEP;
+    double MaxRegionWidth = 0 , MaxRegionTemp = 0;
+    double BeginPos = 0 , EndPos = 0;
+    Vector2D MaxRegionCenter(Vector2D::ERROR_VALUE , Vector2D::ERROR_VALUE) , RegionCenterTemp;
+    bool WasLastPosClear = false;
+
+    for( double y = goalR.y ; y <= goalL.y ; y += StepOnGoal ){
+        Vector2D pos(goal.x , y);
+        if( WasLastPosClear == false )
+            BeginPos = y;
+
+        if( this->isPathClear(pos, from, (ROBOT_RADIUS + 2*CBall::radius), true) ){
+            WasLastPosClear = true;
+            //            draw(Segment2D(from,pos) , "white");
+        }
+        else
+            WasLastPosClear = false;
+        EndPos = y;
+        if( WasLastPosClear ){
+            RegionCenterTemp = Segment2D(goalL , goalR).intersection(Line2D(from,(from+Vector2D(Vector2D(goal.x,BeginPos)-from).rotate(Vector2D::angleBetween( Vector2D(goal.x,BeginPos)-from , Vector2D(goal.x,EndPos)-from).degree()/2))));
+            if( RegionCenterTemp.x == Vector2D::ERROR_VALUE || RegionCenterTemp.y == Vector2D::ERROR_VALUE )
+                RegionCenterTemp = Vector2D(goal.x , (EndPos - BeginPos)/2);
+            MaxRegionTemp = (EndPos - BeginPos + 0.001)*from.dist(Line2D(goalL , goalR).projection(from))/from.dist(RegionCenterTemp);
+            if( MaxRegionWidth < MaxRegionTemp ){
+                MaxRegionWidth = MaxRegionTemp;
+                MaxRegionCenter = RegionCenterTemp;
+            }
+        }
+    }
+    //    if( MaxRegionCenter.x != Vector2D::ERROR_VALUE  )
+    //    {
+    //        if( oppGaol )
+    //        {
+    //            regionWidth = (MaxRegionWidth / _GOAL_WIDTH) * 0.7 +
+    //                          ((Vector2D::dirTo_deg(from,goalL) - Vector2D::dirTo_deg(from,goalR)) / 180.0) * 0.3;
+    //            goalProbablity = regionWidth;
+    //        }
+    //        else
+    //        {
+    //            double dirL = Vector2D::dirTo_deg(from,goalL);
+    //            dirL = dirL < 0.0? dirL + 360.0 : dirL;
+    //            double dirR = Vector2D::dirTo_deg(from,goalR);
+    //            dirR = dirR < 0.0? dirR + 360.0 : dirR;
+
+    //            regionWidth = (MaxRegionWidth / _GOAL_WIDTH) * 0.7 +
+    //                          ((dirR - dirL) / 180.0) * 0.3;
+    //            goalProbablity = regionWidth;
+    //        }
+    //        shootPos = MaxRegionCenter;
+    //        draw(Circle2D(shootPos, 0.05), 0, 360, "blue", true);
+    //        return shootPos;
+    //    }
+    double goalProbablity;
+    Vector2D shootPos;
+    if( MaxRegionCenter.x != Vector2D::ERROR_VALUE && MaxRegionCenter.y != Vector2D::ERROR_VALUE ){
+        regionWidth = MaxRegionWidth / _GOAL_WIDTH ;
+        goalProbablity = regionWidth;
+        Vector2D shootPos = MaxRegionCenter;
+        //        draw(Segment2D(from,shootPos) , "red");
+        return shootPos;
+    }
+    regionWidth = 0.0;
+    goalProbablity = 0.0;
+    shootPos = Vector2D(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+    return shootPos;
+}
+
+bool CDynamicAttack::isPathClear(Vector2D point, Vector2D from, double rad, bool considerRelaxedIDs){
+    Vector2D posIntersect1(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+    Vector2D posIntersect2(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+    Segment2D l(from, point);
+    for(int i = 0; i < wm->opp.activeAgentsCount(); i++){
+        if((wm->opp.active(i)->inSight > 0.0)){
+            if(considerRelaxedIDs && oppRelaxedIDs.contains(wm->opp.activeAgentID(i))){
+                continue;
+            }
+            Circle2D c(wm->opp.active(i)->pos, rad);
+            if(c.intersection(l,&posIntersect1, &posIntersect2) != 0){
+                return false;
+            }
+        }
+    }
+    for(int i = 0; i < wm->our.activeAgentsCount(); i++){
+        if (wm->our.active(i)->inSight > 0.0){
+            if(considerRelaxedIDs && ourRelaxedIDs.contains(wm->our.activeAgentID(i))){
+                continue;
+            }
+            Circle2D c(wm->our.active(i)->pos, rad);
+            if(c.intersection(l,&posIntersect1, &posIntersect2) != 0){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int CDynamicAttack::getNearestOppToPoint(Vector2D point) {
+    double minDist = 10000.0;
+    int nearest = -1;
+    for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
+        if (wm->opp.active(i)->inSight <= 0) {
+            continue;
+        }
+        double dist = (wm->opp.active(i)->pos - point).length();
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = wm->opp.active(i)->id;
+        }
+    }
+    return nearest;
+}
+
+void CDynamicAttack::clearRobotsRegionsWeights()
+{
+    for(int i{0}; i<11; i++)
+    {
+        for(int j{0}; j<9; j++)
+        {
+            robotRegionsWeights[i][j] = -1.0;
+            bestPointForRobotsInRegions[i][j] = Vector2D(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+        }
+    }
+}
+
+double CDynamicAttack::calcReceiverDistanceFactor(Vector2D point, int passReceiverID)
+{
+    int nearestOppID = getNearestOppToPoint(point);
+    if(nearestOppID == -1)
+        return 1;
+    double nearestOppDist = (wm->opp[nearestOppID]->pos - point).length();
+    double receiverDist = (wm->our[passReceiverID]->pos - point).length();
+    if (fabs(receiverDist) < 0.0005 )
+        return 1;
+    double res = nearestOppDist/receiverDist;
+    if(res > 1 )
+        return 0;
+    else if (res < 0.05)
+        return 1;
+    else
+        return 1.0 - res;
+}
+
+double CDynamicAttack::calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point)
+{
+    auto passSenderDist = (passSenderPos - point).length();
+    if(passSenderDist > 5.0)
+        return 0;
+    else if (passSenderDist < 0.5)
+        return 1;
+    else
+        return passSenderDist/5;
+}
+
+double CDynamicAttack::caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis)
+{
+    if(isPathClear(point, passSenderPos, robot_raduis, true))
+        return 1.0;
+    else
+        return 0.0;
+}
+
+double CDynamicAttack::calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos)
+{
+    double oneTouchAngleFactor;
+    double oneTouchAng = fabs((passSenderPos - point).th().degree() - (wm->field->oppGoal() - point).th().degree());
+    if(oneTouchAng <= 45)
+    {
+        oneTouchAngleFactor = 0.9*(oneTouchAng/45.0);
+    }
+    else if(oneTouchAng <= 90)
+    {
+        oneTouchAngleFactor = 0.9 + 0.1*(90-oneTouchAng)/45;
+    }
+    else
+    {
+        oneTouchAngleFactor = 0;
+    }
+    return oneTouchAngleFactor;
 }
 

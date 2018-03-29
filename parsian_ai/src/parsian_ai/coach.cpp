@@ -694,7 +694,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
         }
-
     }
 
     dynamicAttack->setWeHaveBall(ballPState   == BallPossesion::WEHAVETHEBALL);
@@ -719,7 +718,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             MarkNum = 3;
             break;
     }
-
     MarkNum = std::min(MarkNum, ourPlayers.count());
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
@@ -734,13 +732,10 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         for (int i = 0; i < MarkNum; i++) {
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
             ourPlayers.removeFirst();
-
         }
-
     }
     lastBallPossesionState = ballPState;
 }
-
 
 void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     ROS_INFO_STREAM("HSHM: agentSize: " << agentSize);
