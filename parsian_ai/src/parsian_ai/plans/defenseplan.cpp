@@ -741,7 +741,7 @@ bool DefensePlan::isInIndirectArea(Vector2D aPoint) {
     //// checks that a point is in the circle around the ball
     //// with 50cm radius or not.
 
-    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);    
+    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);
     return localFlag;
 }
 
@@ -1257,10 +1257,10 @@ void DefensePlan::setGoalKeeperState(){
                 }
                 else if (wm->field->isInOurPenaltyArea(wm->ball->pos)){
                     if(wm->ball->vel.length() < 0.1 && (ourLeftPole.contains(wm->ball->pos) || ourRightPole.contains(wm->ball->pos) ||
-                            (wm->field->ourGoalL().y >= wm->ball->pos.y
-                             && wm->field->ourGoalR().y < wm->ball->pos.y
-                             && wm->field->ourGoal().x < wm->ball->pos.x
-                             && wm->field->ourGoal().x + 0.05 > wm->ball->pos.x))){
+                                                        (wm->field->ourGoalL().y >= wm->ball->pos.y
+                                                         && wm->field->ourGoalR().y < wm->ball->pos.y
+                                                         && wm->field->ourGoal().x < wm->ball->pos.x
+                                                         && wm->field->ourGoal().x + 0.05 > wm->ball->pos.x))){
                         ballIsBesidePoles = true;
                         goalKeeperOneTouch = false;
                         goalKeeperClearMode = false;
@@ -1824,6 +1824,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     }
     //////////////////////////////////////////////////////////////////////
     matchPoints.clear();
+
     for (int i = 0 ; i < AHZDefPoints.size() ; i++) {
         matchPoints.append(AHZDefPoints.at(i));
     }
@@ -3044,6 +3045,7 @@ void DefensePlan::findOppAgentsToMark(){
         oppAgentsToMarkPos.append(posvel(oppAgentsToMark[i], conf.VelReliability));
     }
 }
+
 
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
     //// This function predicts the opponent agent with considering the position
