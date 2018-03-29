@@ -5,6 +5,33 @@
 
 //#define _MAX_REGION 7
 
+// NEW PASS ZONE
+#define KILL_ZONE 5
+#define _GOAL_STEP 35
+#define _GOAL_WIDTH 1.2
+#define ROBOT_RADIUS 0.0890
+
+
+struct FieldRegion
+{
+    Rect2D rectangle;
+    QList<Vector2D> points;
+    int id;
+
+    FieldRegion(){};
+
+    FieldRegion(Rect2D r, QList<Vector2D> p)
+    {
+        rectangle = r;
+        for(auto& point : p)
+            points.push_back(point);
+    }
+};
+
+
+// END NEW PASS ZONE
+
+
 namespace AttackAgent{
     struct SPositioningAgent {
 
@@ -67,6 +94,26 @@ class CDynamicAttack : public CMasterPlay {
 
 public:
 
+    // NEW PASS ZONE
+    void chooseBestPositons_new();
+    void assignId_new();
+    void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
+    void assignTasks_new();
+
+
+    void createRegions(); // splits the opp field into a grid of regions
+    Vector2D getBestPosToShootToGoal(Vector2D from, double &regionWidth, bool oppGaol );
+    bool isPathClear(Vector2D point, Vector2D from, double rad, bool considerRelaxedIDs);
+    Vector2D getEmptyPosOnPoints(Vector2D from, double &regionWidth, QList<Vector2D> points);
+    int getNearestOppToPoint(Vector2D point);
+    void clearRobotsRegionsWeights();
+
+    double calcReceiverDistanceFactor(Vector2D point, int passReceiverID);
+    double calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point);
+    double caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis_new);
+    double calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos);
+    // END NEW PASS ZONE
+
     CDynamicAttack();
     ~CDynamicAttack() override;
 
@@ -93,6 +140,14 @@ public:
     Agent* getMahiPlayMaker();
 
 private:
+    // NEW PASS ZONE
+    FieldRegion regions[3][3];
+    QList<int> ourRelaxedIDs, oppRelaxedIDs;
+    double robotRegionsWeights[11][9];
+    Vector2D bestPointForRobotsInRegions[11][9];
+    // END NEW PASS ZONE
+
+
     double thrshDribble = 0;
     bool lastPMInitWasDribble;
     Vector2D oppRob;
