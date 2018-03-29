@@ -260,7 +260,6 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    preferedDefenseCounts = 0;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
