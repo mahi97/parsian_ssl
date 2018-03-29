@@ -112,6 +112,7 @@ public:
     double calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point);
     double caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis_new);
     double calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos);
+    double calcWidenessFactor(Vector2D passSenderPos, Vector2D point);
     // END NEW PASS ZONE
 
     CDynamicAttack();
