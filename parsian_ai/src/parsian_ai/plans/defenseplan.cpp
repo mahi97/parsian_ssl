@@ -3239,88 +3239,30 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp) {
     //// This function produces a point that block the pass path.Also if the
     //// resulted point is in the penalty area, this function geneates a suitable
     //// point.
-    Vector2D solutions[2];
-    for (int i = 0 ; i < 2 ; i++) {
-        solutions[i].invalidate();
-    }
-    Segment2D tempSeg;
-    QList<Vector2D> tempQlist;
-    tempQlist.clear();
-    tempSeg.assign(wm->ball->pos, wm->ball->pos + (opp - wm->ball->pos) * 10);
-    Vector2D pos = wm->ball->pos + (opp - wm->ball->pos) * ratio;
-    double distance = (wm->ball->pos - opp).length();
-    Vector2D sol;
-    Segment2D isInPenaltyArea;
-    isInPenaltyArea.assign(opp, wm->ball->pos);
-    QList<Vector2D> tempVec;
-    tempVec.clear();
-    Segment2D posToGoal;
-    posToGoal.assign(pos, wm->field->ourGoal());
-    DBUG(QString("Dist %1").arg(distance), D_HAMED);
-    if (gameState->theirPlayOffKick() || gameState->isStop()) {
-        if (distance > 1) {
-            if ((pos - wm->ball->pos).length() > 0.7) {
-                DBUG(QString("First"), D_HAMED);
-            } else {
-                DBUG(QString("second"), D_HAMED);
-                pos = wm->ball->pos + (opp - wm->ball->pos).norm() * 0.7;
-            }
-        } else {
-            DBUG(QString("Third"), D_HAMED);
-            Vector2D oppAng;
-            oppAng.setLength(opp.length());
-            oppAng.setDir(opp.dir() + 0.2);
-            if (!isInTheIndirectAreaShoot(opp)) {
-                tempQlist.append(ShootBlockRatio(0.3, opp).first());
-                tempQlist.append(ShootBlockRatio(0.3, opp).last());
-            } else {
-                tempQlist.append(indirectAvoidShoot(opp).first());
-                tempQlist.append(indirectAvoidShoot(opp).last());
-            }
-            return tempQlist;
+    QList<Vector2D> passBlocker;
+    Vector2D sol1,sol2,sol3,sol4,sol5,sol6,sol7,sol8;
+    double opponentAgentsCircleR = 0.2;
+    Circle2D opponentAgentsToBeMarkCircle = Circle2D(opp , opponentAgentsCircleR);
+    if(wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(Segment2D(wm->ball->pos , opp) , &sol7,  &sol8)){
+        if(!wm->field->isInOurPenaltyArea(opp)){
+            opponentAgentsToBeMarkCircle.intersection(Segment2D(wm->ball->pos , opp), &sol1 , &sol2);
+            Circle2D(wm->ball->pos , ballCircleR).intersection(Segment2D(wm->ball->pos , opp), &sol3 , &sol4);
+            wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(Segment2D(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2, Segment2D(sol3 , opp).length() < Segment2D(sol4 , opp).length() ? sol3 : sol4) , &sol5 , &sol6);
+            passBlocker.append(know->getPointInDirection(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2 , Segment2D(sol5 , opp).length() < Segment2D(sol6 , opp).length() ? sol5 : sol6 , ratio));
+        }
+        else{
+            wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(Line2D(wm->field->ourGoal() , opp) , &sol1 , &sol2);
+            passBlocker.append(Segment2D(sol1 , opp).length() < Segment2D(sol2 , opp).length() ? sol1 : sol2);
         }
     }
-    if (wm->field->ourBigPenaltyArea(1, 0.15, 0).intersection(isInPenaltyArea , &solutions[0] , &solutions[1])) {
-        for (int i = 0 ; i < 2 ; i++) {
-            if (solutions[i].isValid()) {
-                tempVec.append(solutions[i]);
-            }
-        }
-        if (tempVec.size() == 1) {
-            tempQlist.append(tempVec.first());
-        } else if (tempVec.size() == 2) {
-            if ((tempVec.first() - wm->ball->pos).length() > (tempVec.last() - wm->ball->pos).length()) {
-                sol = tempVec.first();
-            } else if ((tempVec.last() - wm->ball->pos).length() > (tempVec.first() - wm->ball->pos).length()) {
-                if ((tempVec.first() - opp).length() > (tempVec.last() - opp).length()) {
-                    sol = tempVec.last();
-                } else if ((tempVec.last() - opp).length() > (tempVec.first() - opp).length()) {
-                    sol = tempVec.first();
-                }
-                tempQlist.append(sol);
-            }
-            tempQlist.append(sol);
-        }
-        tempQlist.append(wm->ball->pos - opp);
-        drawer->draw(tempSeg, "red");
-        DBUG(QString("this is in the penalty area, Block pass Mode"), D_HAMED);
-    } else {
-        tempQlist.append(pos);
-        drawer->draw(pos, QColor(100, 100, 100));
+    else{
+        opponentAgentsToBeMarkCircle.intersection(Segment2D(wm->ball->pos , opp), &sol1 , &sol2);
+        Circle2D(wm->ball->pos , ballCircleR).intersection(Segment2D(wm->ball->pos , opp), &sol3 , &sol4);
+        passBlocker.append(know->getPointInDirection(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2, Segment2D(sol3 , opp).length() < Segment2D(sol4 , opp).length() ? sol3 : sol4, ratio));
+    }
+    passBlocker.append(wm->ball->pos - passBlocker.first());
+    return passBlocker;
 
-        tempQlist.append(wm->ball->pos - pos);
-        drawer->draw(tempSeg, "red");
-    }
-    Segment2D oppToGoal;
-    oppToGoal.assign(wm->field->ourGoal(), opp);
-    if (!wm->field->ourBigPenaltyArea(1, 0.15, 0).intersection(isInPenaltyArea , &solutions[0] , &solutions[1])) {
-        tempQlist.clear();
-        Vector2D tempPos;
-        tempPos = ShootBlockRatio(1, opp + (wm->ball->pos - opp).norm() * .1).first();
-        tempQlist.append(tempPos);
-        tempQlist.append(wm->ball->pos - tempPos);
-    }
-    return tempQlist;
 }
 
 void DefensePlan::fillDefencePositionsTo(Vector2D *poses) {
