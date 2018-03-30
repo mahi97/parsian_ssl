@@ -477,7 +477,7 @@ void CRolePlayMake::execute() {
     }
 
     if (kickMode == FixedPass) {
-        DBUG("HERE" , D_MASOOD);
+        DBUG("HERE" , D_KK);
         setThrough(false);
         target = pointToPass;
         kickSpeed = agent->pos().dist(target);
@@ -495,10 +495,10 @@ void CRolePlayMake::execute() {
         kick->setTolerance(0.06);
         kick->setAvoidpenaltyarea(true);
         agent->action = kick;
-        DBUG("HERE2" , D_MASOOD);
+        DBUG("HERE2" , D_KK);
     }
 
-    DBUG("HERE3" , D_MASOOD);
+    DBUG("HERE3" , D_KK);
     kick->setSlow(false);
     kick->setTarget(target);
     kick->setKickspeed(kickSpeed);
