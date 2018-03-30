@@ -70,6 +70,7 @@ protected:
     Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<Vector2D> defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions);
     double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
+    QPair<Vector2D, Vector2D> avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity);
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;

@@ -7,6 +7,56 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
+QPair<Vector2D , Vector2D> DefensePlan::avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity){
+    int skillAgent = 7;
+    Rect2D penaltyArea = wm->field->ourBigPenaltyArea(1,0.1,0);
+    Segment2D directPath(agentPosition,finalPosition);
+    Vector2D A(-3.5,-1.3) , B(-3.5 , 1.3);
+    Vector2D target , targetDir;
+    Rect2D penaltyAreaK = wm->field->ourBigPenaltyArea(1,0,0);
+
+    Vector2D sol1,sol2;
+    if(penaltyAreaK.contains(agentPosition)) {
+        Segment2D agentSeg (wm->field->ourGoal(), wm->field->ourGoal() + (agents[skillAgent]->pos() - wm->field->ourGoal()).norm()*10);
+        penaltyArea.intersection(agentSeg,&sol1,&sol2);
+        target = sol1;
+        if(sol1 == wm->field->ourGoal()) {
+            target = sol2;
+        }
+        targetDir = agentDirection;
+        target = target + (agentPosition - wm->field->ourGoal()).norm()*2;
+    }
+
+    else if(penaltyArea.intersection(directPath,&sol1,&sol2) == 2){
+        if((sol1.y == -1.3 && sol2.y == 1.3) || (sol2.y == -1.3 && sol1.y == 1.3)){
+            if(agentPosition.dist(A) < agentDirection.dist(B) ) {
+                target = A + Vector2D(0* std::min(agentVelocity.length(),1.0),0* std::min(agentVelocity.length(),1.0));
+            } else {
+                target = B + Vector2D(0* std::min(agentVelocity.length(),1.0),-0* std::min(agentVelocity.length(),1.0));
+            }
+        }
+        else if(sol1.y == -1.3 || sol2.y == -1.3) {
+            ROS_INFO_STREAM("ahz "<< sol1.y << sol2.y);
+            target = A + Vector2D(-1.2,-0.5);
+        }
+        else if(sol1.y == 1.3 || sol2.y == 1.3){
+            target = B + Vector2D(-1.2,0.5);
+        }
+        drawer->draw(sol1);
+        drawer->draw(sol2);
+        targetDir = target - agentPosition;
+    }
+    else{
+        target = finalPosition;
+        targetDir = target - wm->field->ourGoal();
+    }
+    drawer->draw(target,QColor(Qt::red));
+    QPair<Vector2D , Vector2D> temp;
+    temp.first = target;
+    temp.second = targetDir;
+    return temp;
+}
+
 
 double DefensePlan::timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid){
 
