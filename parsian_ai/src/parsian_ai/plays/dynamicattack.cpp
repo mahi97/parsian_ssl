@@ -527,6 +527,7 @@ void CDynamicAttack::playMake() {
         roleAgentPM->setNoKick(false);
         if (currentPlan.playmake.region == DynamicRegion ::Goal) {
             roleAgentPM ->setTarget(wm->field->oppGoal());
+            roleAgentPM->setChip(true);
             if (wm->ball->pos.x < -2) {
                 roleAgentPM ->setChipDist(conf.HighDistChip);
             } else {
@@ -535,12 +536,13 @@ void CDynamicAttack::playMake() {
             }
         } else if (currentPlan.playmake.region == DynamicRegion ::Forward) {
             roleAgentPM->setTarget(move_fwd_target);
-            roleAgentPM->setChipDist(conf.LowDistChip);
+            roleAgentPM->setChip(false);
+            roleAgentPM->setKickSpeed(conf.LowSpeedPass);
         } else {
+            roleAgentPM->setChip(true);
             roleAgentPM->setTarget(wm->field->oppGoal());
             roleAgentPM->setChipDist(conf.LowDistChip);
         }
-        roleAgentPM->setChip(true);
         roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Chip);// Skill Chip
         break;
     case PlayMakeSkill ::Shot: {

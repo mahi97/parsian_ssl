@@ -106,7 +106,7 @@ void CRoleDynamic::update() {
             shotSkill->setAvoidpenaltyarea(true);
             shotSkill->setAvoidopppenaltyarea(true);
             shotSkill->setPlaymakemode(true);
-            shotSkill->setChip(true);
+            shotSkill->setChip(chip);
             shotSkill->setVeryfine(veryFine);
             shotSkill->setDontkick(false);
             if(isdischargetime)
