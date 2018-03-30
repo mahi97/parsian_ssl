@@ -316,9 +316,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (agentSize > 0) {
         //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
-        ROS_INFO_STREAM("hamid after chooseBestPosForPass");
     }
-    ROS_INFO_STREAM("kian: ghable assign task");
     assignTasks();
 
 //    DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
@@ -1709,6 +1707,17 @@ void CDynamicAttack::assignId_new()
     if (playmakeID != -1) {
         mahiPlayMaker = playmake;
     }
+
+    QList<Rect2D> searchRegions;
+    for(int i{0}; i<3; i++)
+    {
+        for(int j{0}; j<3; j++)
+        {
+            searchRegions.append(regions[i][j].rectangle);
+        }
+    }
+
+
     QList<int> robotIDs;
     MWBM matcher;
     for(int k{0}; k<11; k++)
@@ -1726,9 +1735,9 @@ void CDynamicAttack::assignId_new()
         for(int j{0}; j<9; j++)
         {
 //            matcher.setWeight(i, j, robotRegionsWeights[robotIDs[i]][j]);
+//            auto regionIDforRobot = getNearestRegionToRobot(agentPos);
             auto agentPos = wm->our[robotIDs[i]]->pos;
-            auto regionIDforRobot = getNearestRegionToRobot(agentPos);
-            matcher.setWeight(i, j, -1*(agentPos - regions[regionIDforRobot/3][regionIDforRobot%3].rectangle.center()).length());
+            matcher.setWeight(i, j, -1*(agentPos.dist(searchRegions[j].center())));
         }
     }
     matcher.findMatching();
