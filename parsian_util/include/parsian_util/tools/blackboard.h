@@ -36,6 +36,7 @@
 #define NDEBUG(value, type) MONITOR(#value,value,type)
 #define PDEBUGV2D(prefix, value, type) MONITOR_V2D(prefix,value,type)
 #define NDEBUGV2D(value, type) MONITOR_V2D(#value,value,type)
+#define DBUG(value, type) MONITOR("",value,type)
 #define DEBUG(value, type) MONITOR("",value,type)
 
 #define MONITOR_V2D(prefix,var) \
