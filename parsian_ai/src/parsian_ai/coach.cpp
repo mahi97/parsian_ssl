@@ -630,7 +630,6 @@ void CCoach::decideAttack() {
             decideStop(ourPlayersID);
             return;
             break;
-
         case States::OurKickOff:
             decideOurKickOff(ourPlayersID);
             break;
