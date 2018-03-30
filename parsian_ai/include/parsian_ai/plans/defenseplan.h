@@ -156,8 +156,7 @@ public:
     //////////////////HMD/////////////////
     QList<Vector2D> markPoses;
     QList<Vector2D> markAngs;
-    double markRadius;
-    double markRadiusStrict;
+    double markRadius;    
     double segmentpershoot;
     double segmentperpass;
     bool MantoManAllTransientFlag;
