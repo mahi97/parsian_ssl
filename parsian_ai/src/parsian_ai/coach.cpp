@@ -200,7 +200,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
         }
     } else if (gameState->isStart()) {
         if (transientFlag) {
-            if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
+            if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
 
             } else {
