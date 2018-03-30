@@ -145,9 +145,9 @@ void CCoach::checkGoalieInsight() {
 void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
 
 
-        preferedDefenseCounts = 6;
+    //    preferedDefenseCounts = 6;
     //    preferedGoalieID = -1;
-        return;
+    //    return;
 
     missMatchIds.clear();
     if (first) {
@@ -260,7 +260,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    preferedDefenseCounts = 2;
+    // preferedDefenseCounts = 2;
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -735,6 +735,12 @@ void CCoach::choosePlaymakeAndSupporter()
     if (ballVel < 0.3) {
         double maxD = -1000.1;
         for (int ourPlayer : ourPlayers) {
+            if(selectedPlay->playoff_badPasserID != -1){
+                if(ourPlayer == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
+                    ROS_INFO_STREAM("playofff: skipped: "<<ourPlayer);
+                    continue;
+                }
+            }
             double o = -1 * agents[ourPlayer]->pos().dist(ballPos) ;
             if (ourPlayer == lastPlayMake) {
                 o += playMakeTh;
@@ -756,6 +762,12 @@ void CCoach::choosePlaymakeAndSupporter()
         //Vector2D ballVel = wm->ball->vel;
         double nearest[10] = {};
         for (int ourPlayer : ourPlayers) {
+            if(selectedPlay->playoff_badPasserID != -1){
+                if(ourPlayer == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
+                    ROS_INFO_STREAM("playofff: skipped: "<<ourPlayer);
+                    continue;
+                }
+            }
             nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball, 4, 3, 2, 2);    // TODO FIX
         }
         if (lastPlayMake >= 0 && lastPlayMake <= 9) {

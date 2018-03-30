@@ -39,8 +39,9 @@ CPlayOff::CPlayOff() : CMasterPlay() {
 
     initial    = true;
     playOnFlag = false;
-    havePassInPlan = false;
-    firstPass = true;
+    firstPass  = true;
+    havePassInPlan    = false;
+    playoff_badPasserID = -1;
 
     //Dynamic
     ready = pass = shot = false;
@@ -253,7 +254,7 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd()) {
                 playOnFlag = true;
-                ROS_INFO("Playoff Ends");
+                ROS_INFO("Playofff Ends");
             }
 
         } else {
@@ -1133,10 +1134,9 @@ bool CPlayOff::isPlanFaild() {
         //        masterPlan->common.addHistory(); // Not Changeing History
         return true;
 
-    //}
-// else if (isBallPushed()) {
-        // change passer agent
-  //      return true;
+    } else if(firstKickFailed()){
+            DBUG("playofff : passer didn't kick the ball properly", D_FATEME);
+            return true;
 
     } else if (isBallDirChanged()) {
         DBUG("Faild By Ball Dir Changed", D_MAHI);
@@ -1977,6 +1977,7 @@ void CPlayOff::reset() {
     blockerStep = S0;
 
     firstPass = true;
+    playoff_badPasserID = -1;
 
     DBUG(QString("reset Plan"), D_MAHI);
     ROS_INFO("reset Plan");
@@ -2008,6 +2009,19 @@ EMode CPlayOff::getMasterMode() {
 ///////////////////////////////////////
 /////////////Check Execution///////////
 
+bool CPlayOff::firstKickFailed() {
+//    return false;
+    if (lastBallPos.dist(wm->ball->pos) > 0.15 && Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)
+        && wm->ball->vel.length() < 0.1) {
+        const int &i = masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id);
+
+        playoff_badPasserID = soccer->agents[i]->id();
+        ROS_INFO("playofff bad kick");
+        return true;
+    }
+    return false;
+}
+
 /*!
 *   \brief check if ball get distance from robot,
 *
@@ -2017,6 +2031,7 @@ EMode CPlayOff::getMasterMode() {
 *
 */
 bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
+
 
     if (Circle2D(_roleAgent->getAgent()->pos(), 0.2).contains(wm->ball->pos)) {
         _roleAgent->setBallIsNear(true);
@@ -2049,8 +2064,10 @@ bool CPlayOff::isKickDone(CRolePlayOff * _roleAgent) {
 //            }
         }
     }
+
     return false;
 }
+
 
 bool CPlayOff::isReceiveDone(const CRolePlayOff * _roleAgent) {
     if (Circle2D(_roleAgent->getAgent()->pos(), 0.3).contains(wm->ball->pos)) {
@@ -2062,13 +2079,34 @@ bool CPlayOff::isReceiveDone(const CRolePlayOff * _roleAgent) {
 }
 
 bool CPlayOff::isOneTouchDone(CRolePlayOff * _roleAgent) {
-    if (isKickDone(_roleAgent)) {
-        DBUG("[playoff] OneTouch is Done", D_MAHI);
-        return true;
-    } else {
-        return false;
+
+    if (Circle2D(_roleAgent->getAgent()->pos(), 0.4).contains(wm->ball->pos)) {
+        ROS_INFO("playofff one-touch BallIsNear");
+        _roleAgent->setBallIsNear(true);
+    } else if (!Circle2D(_roleAgent->getAgent()->pos(), 0.6).contains(wm->ball->pos)
+               && _roleAgent->getBallIsNear()) {
+        _roleAgent->setBallIsNear(false);
+
+        if (_roleAgent->getChip()) {
+            DBUG("[playoff] chip Done", D_MAHI);
+            ROS_INFO("playofff chip one-touch is done");
+            return true;
+        } else {
+            // check ball direction
+            Vector2D sol1, sol2;
+            if (wm->ball->vel.length() > 0.6 && Circle2D(_roleAgent->getTarget(), 0.75).intersection(
+                    Ray2D(wm->ball->pos, wm->ball->pos + wm->ball->vel), &sol1, &sol2)) {
+                DBUG("[playoff] direction is correct", D_MAHI);
+                ROS_INFO("playofff one-touch is now done");
+                return true;
+            }
+
+        }
     }
+
+    return false;
 }
+
 
 bool CPlayOff::isMoveDone(const CRolePlayOff * _roleAgent) {
 
