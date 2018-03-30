@@ -257,7 +257,8 @@ private:
     int decideNumOfMarksInPlayOff(int _defenseCount);
     bool FlagBesidePoles;
     int f = 0 , counterBallWasBesidePoles = 0;
-
+    bool firstTimeGoalKeeperOneTouch = false;
+    Vector2D oneTouchDir;
 };
 
 #endif // DEFENSE_H
