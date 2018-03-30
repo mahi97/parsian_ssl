@@ -16,7 +16,6 @@ void AINodelet::onInit() {
         robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
     }
     drawer = new Drawer();
-    debugger = new Debugger();
 
     worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
@@ -26,7 +25,6 @@ void AINodelet::onInit() {
     mousePosSub = nh.subscribe("/mousePos", 100, &AINodelet::mousePosCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
-    debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
     timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
@@ -55,13 +53,11 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 
      drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
-    if (debugger != nullptr) debugPub.publish(debugger->debugs);
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.polygons.clear();
     drawer->draws.rects.clear();
     drawer->draws.vectors.clear();
-    debugger->debugs.debugs.clear();
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
