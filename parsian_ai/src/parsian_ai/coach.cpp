@@ -524,8 +524,6 @@ void CCoach::updateAttackState() {
 
 void CCoach::choosePlaymakeAndSupporter()
 {
-    playmakeId = 10;
-    return;
     playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
@@ -765,6 +763,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     }
 
     MarkNum = std::min(MarkNum, ourPlayers.count());
+    MarkNum = 0;
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
             && selectedPlay->lockAgents

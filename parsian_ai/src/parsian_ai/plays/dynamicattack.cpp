@@ -114,20 +114,20 @@ bool CDynamicAttack::evalmovefwd()
        Segment2D right{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y + default_dist}, Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}};
        obstacles.push_back(left);
        obstacles.push_back(right);
-       drawer->draw(Circle2D(Vector2D(wm->ball->pos.x +  wm->ball->vel.x, wm->ball->pos.y +  wm->ball->vel.y), default_dist), QColor(100, 255, 50), false);
+      // drawer->draw(Circle2D(Vector2D(wm->ball->pos.x +  wm->ball->vel.x, wm->ball->pos.y +  wm->ball->vel.y), default_dist), QColor(100, 255, 50), false);
        //ROS_INFO_STREAM("debug: 1");
        for (int i{}; i < wm->opp.activeAgentsCount(); i++) {
            if (wm->opp.active(i)->pos.x + wm->opp.active(i)->vel.x > wm->ball->pos.x + wm->ball->vel.x + 0.001) {
                if (Vector2D(wm->opp.active(i)->pos.x + wm->opp.active(i)->vel.x, wm->opp.active(i)->pos.y + wm->opp.active(i)->vel.y).dist(Vector2D(wm->ball->pos.x +  wm->ball->vel.x, wm->ball->pos.y +  wm->ball->vel.y)) < default_dist) {
                    Segment2D temp{Vector2D{wm->opp.active(i)->pos.x + wm->opp.active(i)->vel.x, wm->opp.active(i)->pos.y + wm->opp.active(i)->vel.y}, Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}};
-                   drawer->draw(temp, QColor(50, 55, 155));
+//                   drawer->draw(temp, QColor(50, 55, 155));
                    obstacles.push_back(temp);
                }
            }
        }
       // ROS_INFO_STREAM("debug: 2");
-       drawer->draw(left, QColor(50, 55, 155));
-       drawer->draw(right, QColor(50, 55, 155));
+      // drawer->draw(left, QColor(50, 55, 155));
+      // drawer->draw(right, QColor(50, 55, 155));
        sortobstacles(obstacles);
     //   for(int i{}; i < obstacles.size(); i++)
     //   {
@@ -174,8 +174,8 @@ bool CDynamicAttack::evalmovefwd()
             result.push_back(tmp);
         }
         //ROS_INFO_STREAM("debug: 5");
-        for(int i{}; i <result.size(); i++)
-            drawer->draw(Segment2D{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}, result[i].first}, QColor(50, 10, 50));
+//        for(int i{}; i <result.size(); i++)
+           // drawer->draw(Segment2D{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}, result[i].first}, QColor(50, 10, 50));
         //ROS_INFO_STREAM("debug: 6");
         double maxeval{-1};
         int whichres = -1;
@@ -192,7 +192,7 @@ bool CDynamicAttack::evalmovefwd()
         last_move_fwd_target = Vector2D{100, 0};
         if(whichres != -1)
         {
-            drawer->draw(Segment2D{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}, result[whichres].first}, QColor(250, 10, 50));
+        //    drawer->draw(Segment2D{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}, result[whichres].first}, QColor(250, 10, 50));
             if(angles[whichres]*180/3.14 > 30 || nearestoppdist[whichres] > 0.6)
             {
                 if(wm->ball->pos.y + wm->ball->vel.y > 1.4 && angsum[whichres]*180/3.14 > 90 )

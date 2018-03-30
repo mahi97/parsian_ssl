@@ -2010,7 +2010,7 @@ EMode CPlayOff::getMasterMode() {
 /////////////Check Execution///////////
 
 bool CPlayOff::firstKickFailed() {
-//    return false;
+    return false;
     if (lastBallPos.dist(wm->ball->pos) > 0.15 && Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)
         && wm->ball->vel.length() < 0.1) {
         const int &i = masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id);
