@@ -27,11 +27,7 @@ void AINodelet::onInit() {
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-<<<<<<< HEAD
     timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
-=======
-    timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
->>>>>>> d8d7fd025fff399f5e84cfdf1ea63364efb34ca0
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
@@ -47,7 +43,7 @@ void AINodelet::onInit() {
 
 }
 void AINodelet::mousePosCb(const parsian_msgs::vector2DConstPtr &_mousePos) {
-    mousePos.assign(_mousePos.get()->y ,_mousePos.get()->x );
+    mousePos.assign(_mousePos.get()->x ,_mousePos.get()->y );
 }
 void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf) {
     teamConfig = *_conf;
@@ -56,31 +52,15 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
      ai->execute();
-
-<<<<<<< HEAD
-    if (drawer != nullptr) {
-        drawPub.publish(drawer->draws);
-    }
-    if (debugger != nullptr) {
-        debugPub.publish(debugger->debugs);
-    }
-    drawer->draws.circles.clear();
-    drawer->draws.segments.clear();
-    drawer->draws.vectors.clear();
-    drawer->draws.rects.clear();
-    drawer->draws.polygons.clear();
-    drawer->draws.texts.clear();
-=======
+     drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.polygons.clear();
     drawer->draws.rects.clear();
-    drawer->draws.texts.clear();
     drawer->draws.vectors.clear();
     debugger->debugs.debugs.clear();
->>>>>>> d8d7fd025fff399f5e84cfdf1ea63364efb34ca0
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
@@ -93,7 +73,7 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
     }
 
     parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
-    ROS_INFO_STREAM("last plan name: " << lastPlan.the_plan.planFile);
+    ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
 
 }
 

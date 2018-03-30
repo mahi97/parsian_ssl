@@ -216,6 +216,7 @@ namespace rqt_parsian_gui
 
 
 
+        // ROS_INFO_STREAM("Rect LX : "<< rec.rect.left_x << "Rect TY : "<< rec.rect.top_y << "Rect w : "<< rec.rect.width << "Rect L : "<< rec.rect.length);
         parsian_msgs::parsian_draw_rect rec;
         while (!drawerBuffer->rectBuffer->isEmpty()) {
             rec = drawerBuffer->rectBuffer->dequeue();
@@ -225,8 +226,8 @@ namespace rqt_parsian_gui
 
             drawRect(rec.rect.left_x,
                      rec.rect.top_y,
-                     rec.rect.left_x + rec.rect.width,
-                     rec.rect.top_y - rec.rect.length,
+                     rec.rect.left_x + rec.rect.length,
+                     rec.rect.top_y - rec.rect.width,
                      col,
                      rec.filled);
         }

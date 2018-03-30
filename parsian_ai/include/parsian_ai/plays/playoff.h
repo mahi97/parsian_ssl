@@ -264,8 +264,8 @@ struct SExecution {
     int theLastAgent = -1;
     int theLastState = -1;
     int passCount;
-    AgentPoint passer;
-    AgentPoint reciver;
+    QList<AgentPoint> passer;
+    QList<AgentPoint> reciver;
 };
 
 struct SGUI {
@@ -336,6 +336,8 @@ private:
     bool criticalInit;
 
     bool initial;
+
+    bool firstPass;
 
     SPlan* masterPlan;
     EMode masterMode;
@@ -442,6 +444,7 @@ private:
     bool doPass, doAfterlife;
 
     //////////////End  Plan
+    bool isBallPushed();
     bool isTimeOver();
     bool isBallDirChanged();
     SFail isAnyTaskFaild();
@@ -517,6 +520,7 @@ private:
     void secondDegree();
     void thirdDegree();
     void doneDegree();
+
 
 
 };

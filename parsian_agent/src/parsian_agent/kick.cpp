@@ -346,39 +346,23 @@ void CSkillKick::avoidOppPenalty() {
     Segment2D ballSeg;
     Segment2D ballPosSeg;
     Segment2D penaltyStraightLine;
-    penaltyStraightLine.assign(Vector2D(wm->field->_FIELD_WIDTH / 2 - wm->field->_FIELD_PENALTY_POINT - 0.1, 0.7), Vector2D(wm->field->_FIELD_WIDTH / 2 - wm->field->_FIELD_PENALTY_POINT - 0.1 , -0.7));
-    ballPosSeg.assign(wm->field->oppGoal(), wm->field->oppGoal() + tempVector.norm() * 2);
-    ballSeg.assign(ballPos, ballPos + wm->ball->vel.norm() * 10);
-    penaltyCircle.assign(wm->field->oppGoal() + Vector2D(0.15, 0), 1.4);
 
-    if (wm->ball->vel.length() > 0.5) {
-        penaltyCircle.intersection(ballSeg, &dummyPos1, &dummyPos);
-        if (!wm->field->isInField(dummyPos1)) {
-            penaltyCircle.intersection(ballPosSeg, &dummyPos1, &dummyPos);
-        }
+    Rect2D penalty = wm->field->oppPenaltyRect();
+    drawer->draw(penalty , QColor(Qt::red));
+    ballSeg.assign(wm->field->oppGoal(),wm->field->oppGoal() + (wm->ball->pos - wm->field->oppGoal()).norm()* 10);
 
+    if(wm->ball->vel.length() > 0.3 && !wm->field->isInOppPenaltyArea(wm->ball->getPosInFuture(1000))) {
+        ballSeg.assign(wm->ball->pos,wm->ball->pos + wm->ball->vel.norm()*10);
+    }
+    penalty.intersection(ballSeg,&dummyPos,&dummyPos1);
+    if(dummyPos == wm->field->oppGoal()) {
+        finalPos = dummyPos1 + (wm->ball->pos - wm->field->oppGoal()).norm()* 0.1;
     } else {
-        penaltyCircle.intersection(ballPosSeg, &dummyPos1, &dummyPos);
+        finalPos = dummyPos + (wm->ball->pos - wm->field->oppGoal()).norm()* 0.1;
     }
+    drawer->draw(finalPos , QColor(Qt::red));
 
-    if (wm->field->isInField(dummyPos1)) {
-        finalPos = dummyPos1;
-    }
-//    draw(finalPos);
-    if (ballPos.dist(agentPos) > 0.2) {
-        finalDirVec = target - agentPos;
-    }
-    gpa->setDivemode(false);
     gpa->setAvoidpenaltyarea(true);
-    gpa->setNoavoid(false);
-
-    //    if(!wm->field->isInOppPenaltyArea(finalPos + (wm->field->oppGoal() - finalPos).norm()*0.1))
-    //    {
-    //        if(penaltyStraightLine.intersection(ballPosSeg).isValid())
-    //        {
-    //            finalPos = penaltyStraightLine.intersection(ballPosSeg);
-    //        }
-    //    }
     gpa->init(finalPos, finalDirVec);
     gpa->execute();
 //    agent->setKick(kickSpeed); // TODO : Robot Command
@@ -842,7 +826,7 @@ void CSkillKick::findPosToGo() {
     Circle2D dribblerArea(agentPos + agentDir.norm() * 0.1, 0.25);
     Circle2D robotArea(agentPos, 1);
     gpa->setAddvel(Vector2D(0, 0));
-    kickerArea.assign(agentPos + agent->dir().norm() * 0.09 , 0.1);
+    kickerArea.assign(agentPos + agent->dir().norm() * 0.09 , 0.15);
     Segment2D kickerSeg(agentPos + agent->dir().norm() * 0.08 + agent->dir().rotate(90).norm() * 0.02 , agentPos + agent->dir().norm() * 0.08 - agent->dir().rotate(90).norm() * 0.02);
     Vector2D dummy;
     Segment2D targetNormalSeg(target + wm->ball->vel.norm().rotate(90) * 10, target - wm->ball->vel.norm().rotate(90) * 10);
@@ -943,6 +927,7 @@ void CSkillKick::findPosToGo() {
 
     gpa->init(finalPos, finalDir);
     gpa->setNoavoid(false);
+    gpa->setAvoidpenaltyarea(true);
     gpa->setBallobstacleradius(0);
     gpa->setSlowmode(slow);
     gpa->setDivemode(false);
@@ -996,6 +981,7 @@ void CSkillKick::findPosToGoAlt() {
 }
 
 void CSkillKick::execute() {
+
 
     ballRealVel = wm->ball->vel.length();
     agentPos = agent->pos();
