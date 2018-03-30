@@ -3146,8 +3146,8 @@ QList<Vector2D> DefensePlan::ShootBlockRatio(double ratio, Vector2D opp) {
     Vector2D solutions[2];
     QList<Vector2D> tempQlist;
     tempQlist.clear();
-    Segment2D tempSeg;
-    tempSeg.assign(opp + (wm->field->ourGoal() - opp) * (-10), wm->field->ourGoal());
+    Segment2D tempSeg = getBisectorSegment(wm->field->ourGoalL() , opp , wm->field->ourGoalR());
+    drawer->draw(tempSeg);
     Vector2D pos = know->getPointInDirection(wm->field->ourGoal() , opp , ratio);
     if(wm->field->isInOurPenaltyArea(opp)){
         wm->field->ourBigPenaltyArea(1,0.3,0).intersection(tempSeg, &solutions[0] , &solutions[1]);
