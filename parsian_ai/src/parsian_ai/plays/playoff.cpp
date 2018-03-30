@@ -1351,8 +1351,7 @@ void CPlayOff::passManager() {
                      QColor(Qt::darkMagenta));
         doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
                  <= masterPlan->common.lastDist;
-        doAfterlife = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
-                      <= masterPlan->common.lastDist;
+        doAfterlife = !Circle2D(lastBallPos, 0.5).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
 }
@@ -1621,6 +1620,7 @@ void CPlayOff::assignMove(CRolePlayOff* _roleAgent,
         _roleAgent -> setMaxVelocity(static_cast<float>(getMaxVel(_roleAgent, _posAgent.getArgs())));
 
     }
+    _roleAgent -> setAvoidBall(true);
     _roleAgent -> setSelectedSkill(RoleSkill::GotopointAvoid);
 }
 
