@@ -2507,9 +2507,9 @@ void DefensePlan::executeGoalKeeper() {
             }
             else{
                 if (wm->ball->pos.y >= 0) {
-                    kickSkill->setTarget(Vector2D(0 , -6) - wm->field->ourGoal());
+                    kickSkill->setTarget(Vector2D(-10 , -4) - wm->field->ourGoal());
                 } else {
-                    kickSkill->setTarget(Vector2D(-4.5 , 6) - wm->field->ourGoal());
+                    kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
                 }
             }
             know->variables["goalKeeperClearMode"] = true;
@@ -2537,7 +2537,7 @@ void DefensePlan::executeGoalKeeper() {
                 kickSkill->setAvoidpenaltyarea(false);
                 kickSkill->setGoaliemode(true);
                 kickSkill->setChip(true);
-                kickSkill->setKickspeed(6.5);
+                kickSkill->setKickspeed(5);
             }
         }
         else {
@@ -2556,6 +2556,7 @@ void DefensePlan::executeGoalKeeper() {
                 goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
             }
             else if (dangerForGoalKeeperClear) {
+                drawer->draw(Circle2D(goalKeeperTarget , 0.5), QColor(Qt::red));
                 ROS_INFO_STREAM("12");
                 if (dangerForInsideOfThePenaltyArea) {
                     ROS_INFO_STREAM("13");
@@ -2572,14 +2573,14 @@ void DefensePlan::executeGoalKeeper() {
                     kickSkill->setGoaliemode(true);
                     if (wm->ball->pos.y >= 0) {
                         ROS_INFO_STREAM("14");
-                        kickSkill->setTarget(Vector2D(-4.5 , -6) - wm->field->ourGoal());
+                        kickSkill->setTarget(Vector2D(-10 , -4) - wm->field->ourGoal());
                     }
                     else {
                         ROS_INFO_STREAM("15");
-                        kickSkill->setTarget(Vector2D(-4.5 , 6) - wm->field->ourGoal());
+                        kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
                     }
                     kickSkill->setChip(true);
-                    kickSkill->setKickspeed(6.5);
+                    kickSkill->setKickspeed(5);
                 }
                 else {
                     ROS_INFO_STREAM("16");
