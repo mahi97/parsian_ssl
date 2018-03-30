@@ -229,7 +229,11 @@ private:
 
     //////////////////////////////////// ALI GAVAHI
     double lastNearestBallDist;
+    double averageVel;
     QList<Vector2D> lastBallVels;
+
+    void removeLastBallVel();
+    void clearBallVels();
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);

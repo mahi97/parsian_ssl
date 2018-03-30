@@ -7,7 +7,8 @@
 
 CCoach::CCoach(Agent**_agents)
 {
-    lastBallVels.reserve(3);
+    clearBallVels();
+    averageVel = 0;
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -521,38 +522,56 @@ void CCoach::assignDefenseAgents(int defenseCount) {
 }
 
 bool CCoach::isBallcollide() {
-    // TODO : change this :P
 
-
-    if(lastBallVels.size()>0){
+    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0){
+        ROS_INFO_STREAM("KALI : hanooz harkat nakarde");
+        return false;
+    }
+    lastBallVels.append(std::move(wm->ball->vel));
+    averageVel += wm->ball->vel.length();
+    if(lastBallVels.size()>2){
         float innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
-        if(wm->ball->vel.length() < .02){
-                        lastBallVels.clear();
-                        lastBallVels.reserve(7);
-            ROS_INFO_STREAM("KALI : istad");
-            return true;
+
+        if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
+                (innerproduct < .1 && innerproduct >-.1)){
+            ROS_INFO("khord ro zamin");
+            removeLastBallVel();
+            return false;
         }
 
-        if(innerproduct > .999){  // 2.5 degree
-            if(lastBallVels.size() > 5)
-                lastBallVels.removeFirst();
+        if(innerproduct > .985){  // <10 degree
+            removeLastBallVel();
             ROS_INFO_STREAM("KALI : saff mire");
             return false;
         }
-        ROS_INFO_STREAM("KALI : 3");
-        if(innerproduct < .99){// 8.1 degree
-                        lastBallVels.clear();
-                        lastBallVels.reserve(7);
+
+        if(innerproduct < .966){// 15 degree
             ROS_INFO_STREAM("KALI : taghir jahat");
+            clearBallVels();
+            return true;
+        }
+        if(wm->ball->vel.length() < .01){
+            clearBallVels();
+            ROS_INFO_STREAM("KALI : istad");
             return true;
         }
     }
-    lastBallVels.append(std::move(wm->ball->vel));
-    if(lastBallVels.size() > 5)
-        lastBallVels.removeFirst();
+
+    removeLastBallVel();
     ROS_INFO_STREAM("KALI : hichi nashod");
     return false;
+}
+void CCoach::removeLastBallVel(){
+    averageVel -=  lastBallVels.first().length();
+    if(lastBallVels.size() > 5)
+        lastBallVels.removeFirst();
+
+}
+
+void CCoach::clearBallVels(){
+    lastBallVels.clear();
+    lastBallVels.reserve(6);
 }
 
 bool CCoach::ballChiped(){

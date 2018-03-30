@@ -49,6 +49,7 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
+
      ai->execute();
 
      drawer->draws.texts.clear();
