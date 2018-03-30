@@ -7,6 +7,48 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
+
+double DefensePlan::timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid){
+
+    double _x3;
+    double acc = 4.5;
+    double dec = 3.5;
+    double xSat;
+    Vector2D tAgentVel = _agentT->vel();
+    Vector2D tAgentDir = _agentT->dir();
+    double veltan = (tAgentVel.x) * cos(tAgentDir.th().radian()) + (tAgentVel.y) * sin(tAgentDir.th().radian());
+    double offset = 0;
+    double velnorm = -1 * (tAgentVel.x) * sin(tAgentDir.th().radian()) + (tAgentVel.y) * cos(tAgentDir.th().radian());
+    double distCoef = 1, distEffect = 1, angCoef = 0.003;
+    double dist = 0;
+    double rrtAngSum = 0;
+    QList <Vector2D> _result;
+    Vector2D _target;
+
+    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
+
+    double vXvirtual = (posT - _agentT->pos()).x;
+    double vYvirtual = (posT - _agentT->pos()).y;
+    double veltanV = (vXvirtual) * cos(tAgentDir.th().radian()) + (vYvirtual) * sin(tAgentDir.th().radian());
+    double velnormV = -1 * (vXvirtual) * sin(tAgentDir.th().radian()) + (vYvirtual) * cos(tAgentDir.th().radian());
+    double accCoef = 1, realAcc = 4;
+
+    accCoef = atan(fabs(veltanV) / fabs(velnormV)) / _PI * 2;
+    acc = accCoef * 4.5 + (1 - accCoef) * 3.5;
+
+    double tDec = vMax / dec;
+    double tAcc = (vMax - tAgentVelTanjent) / acc;
+    dist = posT.dist(_agentT->pos());
+    double dB = tDec * vMax / 2 + tAcc * (vMax + tAgentVelTanjent) / 2;
+
+    if (dist > dB) {
+        return tAcc + tDec + (dist - dB) / vMax;
+    } else {
+        return ((1 / dec) + (1 / acc)) * sqrt(dist * (2 * dec * acc / (acc + dec)) + (tAgentVelTanjent * tAgentVelTanjent / (2 * acc))) - (tAgentVelTanjent) / acc;
+    }
+
+}
+
 QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){    
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
@@ -3073,6 +3115,7 @@ Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
         return opp->pos + VelReliabiity * opp->vel;
     }
 }
+
 
 void DefensePlan::findPos(int _markAgentSize){
     //// In this function, we choose the different plans of the mark in different
