@@ -9,10 +9,8 @@
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
-#include "parsian_msgs/parsian_debugs.h"
 #include "parsian_msgs/parsian_draw.h"
 #include "parsian_util/tools/drawer.h"
-#include "parsian_util/tools/debuger.h"
 #include "parsian_msgs/parsian_robot_command.h"
 #include "parsian_msgs/parsian_packets.h"
 #include <parsian_communication/packet_generate/packet.h>
@@ -28,7 +26,6 @@ private:
     parsian_msgs::parsian_packets robotPacks;
 
     ros::Publisher  drawPub;
-    ros::Publisher  debugPub;
     ros::Publisher  packetPub;
     ros::Timer      timer;
 
