@@ -506,7 +506,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             i = false;
         }
     }
-    hamidDebug();
+//    hamidDebug();
 }
 
 void CDynamicAttack::playMake() {
@@ -1841,7 +1841,7 @@ void CDynamicAttack::chooseBestPositons_new()
                     double oneTouchAngleFactor = 0; // if the angle to the opp goal is whitin a desird interval
                     double shootFactor = 0;
 
-                    getBestPosToShootToGoal(point, shootFactor, true);
+//                    getBestPosToShootToGoal(point, shootFactor, true);
                     receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID, region_id);
                     senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
                     clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
@@ -1849,7 +1849,7 @@ void CDynamicAttack::chooseBestPositons_new()
                     widenessFactor = calcWidenessFactor(passSenderPos, point);
 
                     double f = 1.0;
-                    prob += f1(shootFactor,2.0*f);
+//                    prob += f1(shootFactor,2.0*f);
                     prob += f1(widenessFactor,0.5*f);
                     prob += f1(receiverDistanceFactor,2.0*f);
                     prob += f1(senderDistanceFactor,0.1*f);
@@ -2054,9 +2054,9 @@ bool CDynamicAttack::isPathClear(Vector2D point, Vector2D from, double rad, bool
     Segment2D l(from, point);
     for(int i = 0; i < wm->opp.activeAgentsCount(); i++){
         if((wm->opp.active(i)->inSight > 0.0)){
-            if(considerRelaxedIDs && oppRelaxedIDs.contains(wm->opp.activeAgentID(i))){
-                continue;
-            }
+//            if(considerRelaxedIDs && oppRelaxedIDs.contains(wm->opp.activeAgentID(i))){
+//                continue;
+//            }
             Circle2D c(wm->opp.active(i)->pos, rad);
             if(c.intersection(l,&posIntersect1, &posIntersect2) != 0){
                 return false;
@@ -2065,9 +2065,9 @@ bool CDynamicAttack::isPathClear(Vector2D point, Vector2D from, double rad, bool
     }
     for(int i = 0; i < wm->our.activeAgentsCount(); i++){
         if (wm->our.active(i)->inSight > 0.0){
-            if(considerRelaxedIDs && ourRelaxedIDs.contains(wm->our.activeAgentID(i))){
-                continue;
-            }
+//            if(considerRelaxedIDs && ourRelaxedIDs.contains(wm->our.activeAgentID(i))){
+//                continue;
+//            }
             Circle2D c(wm->our.active(i)->pos, rad);
             if(c.intersection(l,&posIntersect1, &posIntersect2) != 0){
                 return false;
