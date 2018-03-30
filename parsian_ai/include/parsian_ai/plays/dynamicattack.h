@@ -107,8 +107,9 @@ public:
     Vector2D getEmptyPosOnPoints(Vector2D from, double &regionWidth, QList<Vector2D> points);
     int getNearestOppToPoint(Vector2D point);
     void clearRobotsRegionsWeights();
+    int getNearestRegionToRobot(Vector2D agentPos);
 
-    double calcReceiverDistanceFactor(Vector2D point, int passReceiverID);
+    double calcReceiverDistanceFactor(Vector2D point, int passReceiverID, int region_id);
     double calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point);
     double caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis_new);
     double calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos);
