@@ -251,7 +251,7 @@ void CPlayOff::staticExecute() {
 
             }
 
-            if (isPlanEnd() && false) {
+            if (isPlanEnd()) {
                 playOnFlag = true;
                 ROS_INFO("Playoff Ends");
             }
@@ -1547,7 +1547,7 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
         DBUG(QString("VALUE : %1").arg(static_cast <double>(_posAgent.getArgs().rightData) / 200), D_MAHI);
     } else {
 
-        _roleAgent->setKickSpeed(static_cast<int>(_posAgent.getArgs().leftData)/100);
+        _roleAgent->setKickSpeed(static_cast<double>(_posAgent.getArgs().leftData)/100.0);
         //        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().leftData)/100);
 
     }
