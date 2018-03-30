@@ -55,7 +55,7 @@ public:
       \brief create polygon with points
       \param v array of points
     */
-    Polygon2D(const std::vector< Vector2D > & v);
+    Polygon2D( const std::vector< Vector2D > & v );
 
     /*!
       \brief set polygon to empty polygon
@@ -68,13 +68,13 @@ public:
       \param v array of points
       \return const reference to itself
     */
-    const Polygon2D & assign(const std::vector< Vector2D > & v);
+    const Polygon2D & assign( const std::vector< Vector2D > & v );
 
     /*!
       \brief append point to polygon
       \param p new point
     */
-    void addVertex(const Vector2D & p);
+    void addVertex( const Vector2D & p );
 
     /*!
       \brief get list of point of this polygon
@@ -95,8 +95,8 @@ public:
       if this parameter is set to true, returns true
       \return true if point is in this polygon
     */
-    bool contains(const Vector2D & p,
-                  bool allow_on_segment = true) const;
+    bool contains( const Vector2D & p,
+                   bool allow_on_segment = true ) const;
 
     /*!
       \brief get bounding box of this polygon
@@ -122,8 +122,8 @@ public:
       between each segments of this polygon.
       \return minimum distance between this polygon and point
     */
-    double dist(const Vector2D & p,
-                bool check_as_plane = true) const;
+    double dist( const Vector2D & p,
+                 bool check_as_plane = true ) const;
 
     /*!
       \brief get area of this polygon
@@ -158,7 +158,7 @@ public:
       \return a polygon. if polygon is separated by edges of rectangle,
       each separated polygon is connected to one polygon.
     */
-    Polygon2D getScissoredConnectedPolygon(const Rect2D & r) const;
+    Polygon2D getScissoredConnectedPolygon( const Rect2D & r ) const;
 };
 
 }

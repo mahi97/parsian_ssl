@@ -418,10 +418,6 @@ QList<Vector2D> CMarkPlan::ZoneMark(QList<QPair<Vector2D, double> > Posdanger , 
             {
                 sol = sol1;
             }
-            else
-            {
-                sol = sol2;
-            }
 
             if(!circlelimit.contains(sol))
             {

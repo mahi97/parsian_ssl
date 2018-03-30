@@ -66,6 +66,8 @@ class Handler(FileSystemEventHandler):
         self.__ignore = []
         self.__shuffleCount = 0
         self.__final_dict = []
+        self.__all_master_plans = {}
+        self.__all_active_plans = {}
 
         global final_list, shuffleCount, path
         path = p
@@ -135,7 +137,7 @@ class Handler(FileSystemEventHandler):
                         print("empty: " + str(f) + " --> removed!")
                 else:
                     bad_files.append(f)
-                    print("not json: " + str(f) + " --> removed!")
+                    # print("not json: " + str(f) + " --> removed!")
 
         file_list2 = [f for f in file_list if f not in bad_files]
         # printfile_list2
@@ -216,39 +218,42 @@ class Handler(FileSystemEventHandler):
         elif game_mode == 3:
             plan_mode = "KICKOFF"
 
-        # get a sublist from final_list based on player_num, game_mode and ball_pos
         sublist = []
-        rad = 0.9
-        master_list = []
-        active_list = []
+        rad = 1
 
-        for plan in self.__final_dict:
+        active_list = self.get_master_active_plans(self.__final_dict)
+
+        for plan in active_list:
             if self.check_plan(plan, ball_x, ball_y, rad, player_num, plan_mode):
                 sublist.append(plan)
 
         if len(sublist) > 0:
-            for plan in sublist:
-                if plan["isMaster"]:
-                    master_list.append(plan)
-            if len(master_list) > 0:
-                active_list = master_list
-            else:
-                for plan in sublist:
-                    if plan["isActive"]:
-                        active_list.append(plan)
-
-            if len(active_list) == 0:
-                print ("There's No Active Plan!!!")
-                return
-
-            i = self.__shuffleCount % len(active_list)
+            print("# active and valid plans: "+str(len(sublist))+"\n")
+            i = self.__shuffleCount % len(sublist)
             self.__shuffleCount += 1
-            print ("\n" + active_list[i]["filename"].split("plans/")[1] + "  " + str(active_list[i]["planMode"]))
-            return self.ai_message_generator(active_list[i])
-
+            print ("\n" + sublist[i]["filename"].split("plans/")[1] +
+                   ": "+str(sublist[i]["index"]) + "   " + str(sublist[i]["planMode"]))
+            return self.ai_message_generator(sublist[i])
         else:
-            print ("of invalid plans")
-            return self.nearest_plan(player_num, game_mode, ball_x, ball_y)
+            print ("of invalid plans ...")
+            return self.nearest_plan(player_num, ball_x, ball_y)
+
+    def get_master_active_plans(self, plan_list):
+        master_list = []
+        active_list = []
+
+        for plan in plan_list:
+            if plan["isMaster"]:
+                master_list.append(plan)
+
+        if len(master_list) > 0:
+            active_list = master_list
+        else:
+            for plan in plan_list:
+                if plan["isActive"]:
+                    active_list.append(plan)
+
+        return active_list
 
     def check_plan(self, plan, ball_x, ball_y, rad, player_num, plan_mode):
         DIRECT = 1
@@ -270,37 +275,26 @@ class Handler(FileSystemEventHandler):
                 return True
         return False
 
-    def nearest_plan(self, player_num, game_mode, ball_x, ball_y):
-        new_list = sorted(self.__final_dict, key=lambda x: self.ball_dist(x, x["ballInitPos"]["x"], x["ballInitPos"]["y"],
-                                                                          ball_x, ball_y))
-        sublist = []
-        master_list = []
-        active_list = []
+    def nearest_plan(self, player_num, ball_x, ball_y):
+        player_num_filter = []
 
-        for plan in new_list:
-            if len(plan["agentInitPos"]) >= player_num \
-                    and plan["chance"] > 0 and plan["lastDist"] >= 0:
-                sublist.append(plan)
+        for plan in self.__final_dict:
+            if len(plan["agentInitPos"]) >= player_num:
+                player_num_filter.append(plan)
+
+        active_list = self.get_master_active_plans(player_num_filter)
+
+        sublist = sorted(active_list, key=lambda x: self.ball_dist(
+            x, x["ballInitPos"]["x"], x["ballInitPos"]["y"], ball_x, ball_y))
 
         if len(sublist) > 0:
-            for plan in sublist:
-                if plan["isMaster"]:
-                    master_list.append(plan)
-            if len(master_list) > 0:
-                active_list = master_list
-            else:
-                for plan in sublist:
-                    if plan["isActive"]:
-                        active_list.append(plan)
+            print("# active and valid plans: " + str(len(sublist)) + "\n")
 
-            if len(active_list) == 0:
-                print ("There's No Active Plan!!!")
-                return
-
-            print ("\n" + active_list[0]["filename"].split("plans/")[1] + " : " + str(active_list[0]["planMode"]))
-            return self.ai_message_generator(active_list[0])
+            print ("\n" + sublist[0]["filename"].split("plans/")[1] +
+                   ": " + str(sublist[0]["index"]) + "   " + str(sublist[0]["planMode"]))
+            return self.ai_message_generator(sublist[0])
         else:
-            print ("\nNO PLAN MATCHED!\n")
+            print ("There is No master or active plan with proper number of players :/")
             return None
 
     @staticmethod
@@ -322,17 +316,20 @@ class Handler(FileSystemEventHandler):
             return math.sqrt(b)
 
     def get_all_plans_gui_msgs(self):
+        self.refresh();
         plans_msg = []
         for plan in self.__final_dict:
             plans_msg.append(self.gui_message_generator(plan))
         return plans_msg
 
-    def update_master_active(self, name_list, plan_index, is_master, is_active):
+    def update_master_active(self, name_list, plan_index_list, is_master, is_active):
         for plan in self.__final_dict:
             for i in range(0, len(name_list)):
-                if plan["filename"] == name_list[i] and plan["index"] == plan_index[i]:
+                if plan["filename"] == name_list[i] and plan["index"] == plan_index_list[i]:
                     plan["isMaster"] = is_master
                     plan["isActive"] = is_active
+                    self.__all_active_plans[(plan["filename"], plan_index_list[i])] = is_active
+                    self.__all_master_plans[(plan["filename"], plan_index_list[i])] = is_master
 
         for plan in self.__final_dict:
             print(plan["filename"] + ": " + "master: " + str(plan["isMaster"]) + " , " + "active: " + str(plan["isActive"]))
@@ -349,12 +346,22 @@ class Handler(FileSystemEventHandler):
                     dict1 = tmp["plans"][i]
                     dict1.update({"index": i})
                     dict1.update({"filename": str(plan)})
-                    dict1.update({"isMaster": False})
-                    dict1.update({"isActive": True})
                     dict1.update({"successRate": 0})
                     dict1.update({"planRepeat": 0})
                     dict1.update({"symmetry": False})
+
+                    if (dict1["filename"], dict1["index"]) in self.__all_active_plans:
+                        dict1.update({"isActive": self.__all_active_plans[dict1["filename"], dict1["index"]]})
+                    else:
+                        dict1.update({"isActive": True})
+
+                    if (dict1["filename"], dict1["index"]) in self.__all_master_plans:
+                        dict1.update({"isMaster": self.__all_master_plans[dict1["filename"], dict1["index"]]})
+                    else:
+                        dict1.update({"isMaster": False})
+
                     self.__final_dict.append(dict1)
+
         return self.__final_dict
 
     def gui_message_generator(self, plan_dict):

@@ -20,8 +20,9 @@ void MahiNodelet::onInit() {
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1000);
-    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&MahiNodelet::timerCb, this, _1));
+    timer_ = nh.createTimer(ros::Duration(.016), boost::bind(&MahiNodelet::timerCb, this, _1));
 
+    behavPub = nh.advertise<parsian_msgs::parsian_behavior>("/eval", 10); // TODO: make it private
     //config server settings
     server.reset(new dynamic_reconfigure::Server<ai_config::mahiConfig>(private_nh));
     dynamic_reconfigure::Server<ai_config::mahiConfig>::CallbackType f;
@@ -49,6 +50,14 @@ void MahiNodelet::timerCb(const ros::TimerEvent& event) {
 
 void MahiNodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     mahi->updateWM(_wm);
+    parsian_msgs::parsian_behaviorPtr behav;
+    behav.reset(new parsian_msgs::parsian_behavior);
+    auto prob = mahi->eval(behav);
+    if (prob == 0.0 || behav == nullptr) return;
+    behav->name = "mahi";
+    behav->probability = prob;
+    behavPub.publish(behav);
+
 }
 
 void MahiNodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {

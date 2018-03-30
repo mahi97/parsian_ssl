@@ -96,7 +96,7 @@ Robot::Robot(int _id, bool isOurTeam, bool noKalman) : MovingObject(true) {
     markedByDefense = false;
     markedByMark = false;
 }
-void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand) {
+void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand, kalmParam _param) {
     kalman *kalman = donKalman;
     const qint64 lastTime = (updateFuture) ? kalmanFutureLastTime : kalmanLastTime;
     double timeDiff = (max(kalmanTime.elapsed() , 1)) * 0.001; //(time - lastTime);
@@ -126,9 +126,9 @@ void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, boo
     // radio commands are intended to be applied over 10ms
     float cmd_interval = (float)(timeDiff);
     //TODO: add radio command
-    float cmd_omega = vAngCmd * _DEG2RAD;
-    float cmd_v_y = vForwardCmd * sin(-phi) - (vNormalCmd * cos(-phi));
-    float cmd_v_x = -1 * vForwardCmd * cos(-phi) - (vNormalCmd * sin(-phi));
+    float cmd_omega = _param.vw;
+    float cmd_v_y = _param.vy;
+    float cmd_v_x = _param.vx;
     float a_w = (cmd_omega - omega) / cmd_interval;
 
     float accel_x = (cmd_v_x - v_x) / cmd_interval;
@@ -137,11 +137,12 @@ void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, boo
     float accel_f = (std::sin(-phi) * accel_x + std::cos(-phi) * accel_y) * timeDiff;
 
 
-    /* if(fabs(accel_f) > conf()->BangBang_AccMaxForward())
-        accel_f = conf()->BangBang_AccMaxForward() * sign(accel_f);
-    if(fabs(accel_s )> conf()->BangBang_AccMaxNormal())
-        accel_s = conf()->BangBang_AccMaxNormal() * sign(accel_s);
-    */
+
+     if(fabs(accel_f) > 5)
+        accel_f = 5 * sign(accel_f);
+    if(fabs(accel_s )> 5)
+        accel_s = 5 * sign(accel_s);
+
     //debug(QString("acc : %1").arg(accel_f),D_MHMMD);
 
 
@@ -150,9 +151,9 @@ void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, boo
     kalman->u(2) = 0;
     //TODO : must know is it simulator or not
     if (/*(!knowledge->isSimulMode) &&*/ applyCommand) {
-        kalman->u(3) = accel_s / time;
-        kalman->u(4) =  accel_f / time;
-        kalman->u(5) = a_w * timeDiff / time;
+        kalman->u(3) = 0;//accel_s ;
+        kalman->u(4) = 0;//  accel_f;
+        kalman->u(5) = 0;//a_w * timeDiff;
     }
 
     // update covariance jacobian
@@ -265,27 +266,38 @@ void Robot::filter(int vanished) {
     }
 
     ANGULAR_DIRECTION = observation->dir.th().degree();
-    double kalmanDelayTime = 0.15;
+    double kalmanDelayTime = 0.05;
+
     if (0 && inOurTeam) {
         if (vanished <= 0) {
 
 
             int nStep = kalmanDelayTime / 0.016;
+            while(lastCommands.count() > nStep-1) {
+                lastCommands.removeAt(lastCommands.count() - 1);
+            }
+            ROS_INFO_STREAM("tedade ina : "<< lastCommands.count());
+            kalmParam  temp;
+            const float phi = donKalman->baseState()(2) - (_PI / 2);
+            temp.vw = vAngCmd * _DEG2RAD;
+            temp.vy = vForwardCmd * sin(-phi) - (vNormalCmd * cos(-phi));
+            temp.vx = -1 * vForwardCmd * cos(-phi) - (vNormalCmd * sin(-phi));
+            lastCommands.append(temp);
             // newPredict(0,false,true,false,(inOurTeam));
-            for (int i = 0  ; i < (nStep) ; i++) {
-                newPredict(nStep, false, true, false, inOurTeam);
+            for (int i = 0  ; i < (lastCommands.count()) ; i++) {
+                newPredict(nStep, false, true, false, inOurTeam,lastCommands[i]);
             }
             visionUpdate();
 
             pos = Vector2D(donKalman->state()(1), -1 * donKalman->state()(0));
             dir = Vector2D(cos(donKalman->state()(2)), sin(donKalman->state()(2)));
 
-            double phi = donKalman->state()(2);
+            double phiii = donKalman->state()(2);
             const float v_s = donKalman->state()(3);
             const float v_f = donKalman->state()(4);
             //debug(QString("phi: %1").arg(phi))
-            float vx = -1 * std::cos(phi) * v_s + std::sin(phi) * v_f;
-            float vy = -1 * std::sin(phi) * v_s - std::cos(phi) * v_f;
+            float vx = -1 * std::cos(phiii) * v_s + std::sin(phiii) * v_f;
+            float vy = -1 * std::sin(phiii) * v_s - std::cos(phiii) * v_f;
 
             vel = Vector2D(vx, vy);
             acc = Vector2D(0, 0);
@@ -295,7 +307,11 @@ void Robot::filter(int vanished) {
         } else if (vanished <= blindness) {
             //TODO: get from config
             int nStep = kalmanDelayTime / 0.016;
-            newPredict(1, false, true, false, (false));
+            kalmParam temp;
+            temp.vx = 0;
+            temp.vy = 0;
+            temp.vw = 0;
+            newPredict(1, false, true, false, (false),temp);
             visionUpdate();
 
             pos = Vector2D(donKalman->state()(1), -1 * donKalman->state()(0));
