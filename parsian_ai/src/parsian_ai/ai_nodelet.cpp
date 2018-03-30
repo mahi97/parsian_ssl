@@ -51,8 +51,6 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
-     ai->execute();
-
      drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     if (debugger != nullptr) debugPub.publish(debugger->debugs);
