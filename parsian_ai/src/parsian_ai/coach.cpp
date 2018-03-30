@@ -7,7 +7,8 @@
 
 CCoach::CCoach(Agent**_agents)
 {
-    lastBallVels.reserve(3);
+    clearBallVels();
+    averageVel = 0;
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -87,7 +88,7 @@ CCoach::~CCoach() {
 
 //void CCoach::saveGoalie()
 //{
-//     debugger->debug((QString("goalie under net timer : %1").arg(goalieTimer.elapsed())), D_MHMMD);
+//     DBUG((QString("goalie under net timer : %1").arg(goalieTimer.elapsed())), D_MHMMD);
 //
 //    if(goalieTimer.elapsed() > 100 )
 //    {
@@ -135,7 +136,7 @@ void CCoach::checkGoalieInsight() {
         //        {
         //            goalieTimer.restart();
         //        }
-        debugger->debug("inja miad", D_MHMMD);
+        DBUG("inja miad", D_MHMMD);
 
     }
 }
@@ -200,7 +201,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
         }
     } else if (gameState->isStart()) {
         if (transientFlag) {
-            if (trasientTimeOut.elapsed() > 1000 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
+            if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = static_cast<int>(max(0, agentsCount - missMatchIds.count() - 1));
 
             } else {
@@ -245,7 +246,7 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
             preferedDefenseCounts = std::max(agentsCount - missMatchIds.count() - 1, 0);
         }
     } else {
-        debugger->debug("UNKNOWN STATE", D_ERROR, QColor(Qt::red));
+        DBUG("UNKNOWN STATE", D_ERROR);
     }
 
     if (gameState->halfTimeLineUp()) {
@@ -256,7 +257,6 @@ void CCoach::decidePreferredDefenseAgentsCountAndGoalieAgent() {
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
     }
-    
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
 
@@ -522,38 +522,56 @@ void CCoach::assignDefenseAgents(int defenseCount) {
 }
 
 bool CCoach::isBallcollide() {
-    // TODO : change this :P
 
-
-    if(lastBallVels.size()>0){
+    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0){
+        ROS_INFO_STREAM("KALI : hanooz harkat nakarde");
+        return false;
+    }
+    lastBallVels.append(std::move(wm->ball->vel));
+    averageVel += wm->ball->vel.length();
+    if(lastBallVels.size()>2){
         float innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
-        if(wm->ball->vel.length() < .02){
-                        lastBallVels.clear();
-                        lastBallVels.reserve(7);
-            ROS_INFO_STREAM("KALI : istad");
-            return true;
+
+        if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
+                (innerproduct < .1 && innerproduct >-.1)){
+            ROS_INFO("khord ro zamin");
+            removeLastBallVel();
+            return false;
         }
 
-        if(innerproduct > .999){  // 2.5 degree
-            if(lastBallVels.size() > 5)
-                lastBallVels.removeFirst();
+        if(innerproduct > .985){  // <10 degree
+            removeLastBallVel();
             ROS_INFO_STREAM("KALI : saff mire");
             return false;
         }
-        ROS_INFO_STREAM("KALI : 3");
-        if(innerproduct < .99){// 8.1 degree
-                        lastBallVels.clear();
-                        lastBallVels.reserve(7);
+
+        if(innerproduct < .966){// 15 degree
             ROS_INFO_STREAM("KALI : taghir jahat");
+            clearBallVels();
+            return true;
+        }
+        if(wm->ball->vel.length() < .01){
+            clearBallVels();
+            ROS_INFO_STREAM("KALI : istad");
             return true;
         }
     }
-    lastBallVels.append(std::move(wm->ball->vel));
-    if(lastBallVels.size() > 5)
-        lastBallVels.removeFirst();
+
+    removeLastBallVel();
     ROS_INFO_STREAM("KALI : hichi nashod");
     return false;
+}
+void CCoach::removeLastBallVel(){
+    averageVel -=  lastBallVels.first().length();
+    if(lastBallVels.size() > 5)
+        lastBallVels.removeFirst();
+
+}
+
+void CCoach::clearBallVels(){
+    lastBallVels.clear();
+    lastBallVels.reserve(6);
 }
 
 bool CCoach::ballChiped(){
@@ -694,13 +712,13 @@ void CCoach::updateAttackState() {
 
         if (robotCritArea.contains(oppNearest->pos)) {
             ourAttackState = CRITICAL;
-            debugger->debug(QString("Attack: critical"), D_MHMMD);
+            DBUG(QString("Attack: critical"), D_MHMMD);
         } else if (oppNearestPath.nearestPoint(wm->ball->pos).dist(wm->ball->pos) >= safeRegion) {
             ourAttackState = SAFE;
-            debugger->debug(QString("Attack: safe"), D_MHMMD);
+            DBUG(QString("Attack: safe"), D_MHMMD);
         } else {
             ourAttackState = FAST;
-            debugger->debug(QString("Attack: fast"), D_MHMMD);
+            DBUG(QString("Attack: fast"), D_MHMMD);
         }
 
         lastASWasCritical = (ourAttackState == CRITICAL);
@@ -745,7 +763,7 @@ void CCoach::choosePlaymakeAndSupporter()
     } else {
         if (playMakeIntention.elapsed() < playMakeIntentionInterval) {
             playmakeId = lastPlayMake;
-            debugger->debug(QString("play make is : %1").arg(playmakeId), D_PARSA);
+            DBUG(QString("play make is : %1").arg(playmakeId), D_PARSA);
             return;
         }
         playMakeIntention.restart();
@@ -765,12 +783,12 @@ void CCoach::choosePlaymakeAndSupporter()
             }
         }
         for (int ourPlayer : ourPlayers) {
-            debugger->debug(QString("timeneeded of %1 is : %2 \n").arg(ourPlayer).arg(nearest[ourPlayer]), D_PARSA);
+            DBUG(QString("timeneeded of %1 is : %2 \n").arg(ourPlayer).arg(nearest[ourPlayer]), D_PARSA);
         }
         lastPlayMake = playmakeId;
     }
 
-    debugger->debug(QString("playmake is : %1").arg(playmakeId), D_PARSA);
+    DBUG(QString("playmake is : %1").arg(playmakeId), D_PARSA);
 }
 
 void CCoach::decideAttack() {
@@ -794,7 +812,7 @@ void CCoach::decideAttack() {
     for (int ourPlayer : ourPlayers) {
         str += QString(" %1").arg(ourPlayer);
     }
-    debugger->debug(QString("%1: Size: %2 HSHM: (%3)").arg("text: ").arg(ourPlayers.size()).arg(str) , D_ERROR , "blue");
+    DBUG(QString("%1: Size: %2 HSHM: (%3)").arg("text: ").arg(ourPlayers.size()).arg(str) , D_ERROR);
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -919,7 +937,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     if (-1 < playmakeId && playmakeId < 12) {
         dynamicAttack->setPlayMake(agents[playmakeId]);
         ourPlayers.removeOne(playmakeId);
-        debugger->debug(QString("playMake : %1").arg(playmakeId), D_MHMMD);
+        DBUG(QString("playMake : %1").arg(playmakeId), D_MHMMD);
     }
 
     dynamicAttack->setDefenseClear(false);
@@ -1412,7 +1430,7 @@ void CCoach::checkSensorShootFault() {
     for (int ourPlayer : ourPlayers) {
         s += QString(" %1 ").arg(ourPlayer);
         if (agents[ourPlayer]->changeIsNeeded) {
-            debugger->debug(QString("[ROBOT FAULT] %1").arg(ourPlayer), D_ERROR);
+            DBUG(QString("[ROBOT FAULT] %1").arg(ourPlayer), D_ERROR);
 
         }
 

@@ -506,9 +506,12 @@ class KickProfiler():
                 task2.target.y = self.startingpoint2.y
                 current_task2.receivePassTask = task2
                 self.task_pub2.publish(current_task2)
-                return True
+                if self.robotarrived(self.my_robot2, self.startingpoint2, 0.2):
+                    return True
+                else:
+                    return False
             else:
-                return  False
+                return False
 
         if self.kickstat == KickStat.ROBOT2KICKING:
             current_task2 = parsian_robot_task()
@@ -530,9 +533,12 @@ class KickProfiler():
                 task1.target.y = self.startingpoint1.y
                 current_task1.receivePassTask = task1
                 self.task_pub1.publish(current_task1)
-                return True
+                if self.robotarrived(self.my_robot1, self.startingpoint1, 0.2):
+                    return True
+                else:
+                    return False
             else:
-                return  False
+                return False
 
 
 
