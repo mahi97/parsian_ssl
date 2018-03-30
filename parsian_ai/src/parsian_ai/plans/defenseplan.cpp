@@ -1729,8 +1729,7 @@ DefensePlan::DefensePlan(){
     ballIsBesidePoles = false;
 
     oneTouchCnt = 5;
-    markRadius = 1.6;
-    markRadiusStrict = 1.39;
+    markRadius = 1.6;    
     segmentpershoot = conf.ShootRatioBlock / 100.0;
     segmentperpass = conf.PassRatioBlock / 100.0;
     dir  = Vector2D(1, 0);
@@ -3013,7 +3012,7 @@ void DefensePlan::findOppAgentsToMark(){
             oppAgentsToMark.append(wm->opp.active(i));
         }
     }
-    if(gameState->theirPlayOffKick() || gameState->isStop()) {
+    if(gameState->theirIndirectKick() || gameState->isStop()) {
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
         for(int i = 0 ; i < oppAgentsToMark.count() ; i++){
@@ -3027,8 +3026,8 @@ void DefensePlan::findOppAgentsToMark(){
         }
     }
     if(gameState->theirKickoff()){
-        for (int i = 0; i < oppAgentsToMark.count(); i++){
-            if (oppAgentsToMark[i]->pos.x > conf.OppOmitLimitKickOff) {
+        for(int i = 0; i < oppAgentsToMark.count(); i++){
+            if(oppAgentsToMark[i]->pos.x > conf.OppOmitLimitKickOff){
                 oppAgentsToMark.removeOne(oppAgentsToMark[i]);
                 i--;
             }
