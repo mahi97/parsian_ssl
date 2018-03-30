@@ -2137,7 +2137,7 @@ void DefensePlan::penaltyShootOutMode() {
 
     case shootOutClear:
         assignSkill(goalKeeperAgent, kickSkill);
-        kickSkill->setKickspeed(1023);
+        kickSkill->setKickspeed(6.5);
         kickSkill->setTolerance(50);
         kickSkill->setDontkick(false);
         kickSkill->setSlow(false);
@@ -2537,7 +2537,7 @@ void DefensePlan::executeGoalKeeper() {
                 kickSkill->setAvoidpenaltyarea(false);
                 kickSkill->setGoaliemode(true);
                 kickSkill->setChip(true);
-                kickSkill->setKickspeed(1023);
+                kickSkill->setKickspeed(6.5);
             }
         }
         else {
@@ -2566,7 +2566,7 @@ void DefensePlan::executeGoalKeeper() {
                     kickSkill->setTolerance(10);
                     kickSkill->setDontkick(false);
                     kickSkill->setSlow(false);
-                    kickSkill->setSpin(false);
+                    kickSkill->setSpin(0);
                     kickSkill->setChip(false);
                     kickSkill->setAvoidpenaltyarea(false);
                     kickSkill->setGoaliemode(true);
@@ -2579,7 +2579,7 @@ void DefensePlan::executeGoalKeeper() {
                         kickSkill->setTarget(Vector2D(-4.5 , 6) - wm->field->ourGoal());
                     }
                     kickSkill->setChip(true);
-                    kickSkill->setKickspeed(1023);
+                    kickSkill->setKickspeed(6.5);
                 }
                 else {
                     ROS_INFO_STREAM("16");
