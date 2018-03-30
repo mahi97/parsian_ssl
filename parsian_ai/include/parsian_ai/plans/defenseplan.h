@@ -15,7 +15,8 @@
 #include <parsian_util/geom/polygon_2d.h>
 
 #define LOOP_TIME_BYKK 0.016
-#define MIN_ROBOTS_DIST 0.02
+#define MIN_TWO_ROBOTS_DIST 0.02
+#define MIN_MORE_ROBOTS_DIST 0.05
 struct velAndAccByKK {
     double vel;
     double acc;
@@ -31,7 +32,7 @@ protected:
     Action* AHZSkills;
     CDefPos defPos;
     Vector2D pointForKick, oneToucherDir;    
-    Vector2D goalKeeperTarget, goalieDirection , defensePoints[12], defenseTargets[12];            
+    Vector2D goalKeeperTarget,lastTarget, goalieDirection , defensePoints[12], defenseTargets[12];
     void setPointToKick();
     void setGoalKeeperState();
     void setGoalKeeperTargetPoint();
@@ -57,6 +58,7 @@ protected:
     Line2D getBestLineWithTallesForRecatngularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Line2D getBestLineWithTallesForCircularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Segment2D getBestSegmentWithTallesForRectangularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
+    Segment2D getBestSegmentWithTallesForCircularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     QList<Segment2D> getLinesOfBallTriangle();
     QList<Vector2D> defenseFormationForRectangularPositioning(int neededDefenseAgents , int allOfDefenseAgents , double downLimit, double upLimit);
     QList<Vector2D> defenseFormationForCircularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit);
@@ -254,6 +256,8 @@ private:
     double overDefThr;
     int decideNumOfMarksInPlayOff(int _defenseCount);
     bool FlagBesidePoles;
+    int f = 0 , counterBallWasBesidePoles = 0;
+
 };
 
 #endif // DEFENSE_H
