@@ -598,59 +598,59 @@ void CCoach::decideAttack() {
 
 
     case States::Halt:
-        decideHalt(ourPlayers);
+        decideHalt(ourPlayersID);
         return;
         break;
     case States::Stop:
-        decideStop(ourPlayers);
+        decideStop(ourPlayersID);
         return;
         break;
 
     case States::OurKickOff:
-        decideOurKickOff(ourPlayers);
+        decideOurKickOff(ourPlayersID);
         break;
 
     case States::TheirKickOff:
-        decideTheirKickOff(ourPlayers);
+        decideTheirKickOff(ourPlayersID);
         break;
 
     case States::OurDirectKick:
-        decideOurDirect(ourPlayers);
+        decideOurDirect(ourPlayersID);
         break;
 
     case States::TheirDirectKick:
-        decideTheirDirect(ourPlayers);
+        decideTheirDirect(ourPlayersID);
         break;
 
     case States::OurIndirectKick:
-        decideOurIndirect(ourPlayers);
+        decideOurIndirect(ourPlayersID);
         break;
 
     case States::TheirIndirectKick:
-        decideTheirIndirect(ourPlayers);
+        decideTheirIndirect(ourPlayersID);
         break;
 
     case States::OurPenaltyKick:
-        decideOurPenalty(ourPlayers);
+        decideOurPenalty(ourPlayersID);
         break;
 
     case States::TheirPenaltyKick:
-        decideTheirPenalty(ourPlayers);
+        decideTheirPenalty(ourPlayersID);
         break;
     case States::Start:
-        decideStart(ourPlayers);
+        decideStart(ourPlayersID);
         break;
     case States::OurBallPlacement:
-        decideOurBallPlacement(ourPlayers);
+        decideOurBallPlacement(ourPlayersID);
         break;
     case States::TheirBallPlacement:
-        decideStop(ourPlayers);
+        decideStop(ourPlayersID);
         break;
     case States::HalfTime:
-        decideHalfTimeLineUp(ourPlayers);
+        decideHalfTimeLineUp(ourPlayersID);
         break;
     default:
-        decideNull(ourPlayers);
+        decideNull(ourPlayersID);
         return;
         break;
     }
