@@ -109,7 +109,7 @@ protected:
     ///////////////////////////////////////////////////
     void executeGoalKeeper();
     Vector2D strictFollowBall(Vector2D _ballPos);
-    Vector2D checkDefensePoint(Agent* agent, const Vector2D& point);    
+    QPair<Vector2D , Vector2D> avoidCircularPenaltyAreaByArash(Agent* agent, const Vector2D& point);
     int decideNumOfMarks();
     kkDefPos tempDefPos;
     void matchingDefPos(int _defenseNum);
