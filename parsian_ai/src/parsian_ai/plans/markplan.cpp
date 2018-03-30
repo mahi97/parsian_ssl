@@ -45,9 +45,6 @@ CMarkPlan::~CMarkPlan() {
     }
 }
 
-#define Ball_Ours_History 25
-#define Our_Fastest_History 25
-#define Opp_Fastest_History 25
 
 //////////////////////////////// AHZ //////////////////////////////////////////
 bool CMarkPlan::isInIndirectArea(Vector2D aPoint) {
@@ -1008,9 +1005,10 @@ bool CMarkPlan::sortBy(const Vector2D &robot1, const Vector2D &robot2) {
 }
 
 Vector2D CMarkPlan::posvel(CRobot* opp) {
-    if (opp->vel.length() > 0.5 && opp->vel.x < 0) {
-        return opp->pos + 0.5 * opp->vel;
-    } else {
+    if (opp->vel.length() > 0.3 && opp->vel.x < 0) {
+        return opp->pos + (conf.VelReliability * opp->vel);
+    }
+    else {
         return opp->pos;
     }
 }
@@ -1035,56 +1033,46 @@ void CMarkPlan::findOppAgentsToMark() {
                 i--;
             }
         }
-
-        if (conf.OmmitNearestToBallPlayon) {
-            DBUG(QString("Ommit nearest to ball"), D_MAHI);
+        if(conf.OmmitNearestToBallPlayon){
             int nearestToBall = -1;
             double nearestToBallDist = 100000;
-
             for (int i = 0 ; i < oppAgentsToMark.count() ; i++) {
                 if ((oppAgentsToMark[i]->pos).dist(wm->ball->pos) < nearestToBallDist) {
                     nearestToBall = i;
-                    nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
-                    DBUG(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id), D_MAHI);
-                    drawer->draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
+                    nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);                                        
                 }
             }
             if (nearestToBall != -1) {
                 oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
             }
         }
-    } else if (gameState->theirKickoff()) {
+    }
+    else if(gameState->theirKickoff()){
         for (int i = 0; i < oppAgentsToMark.count(); i++) {
             if (posvel(oppAgentsToMark[i]).x > conf.OppOmitLimitKickOff) {
                 oppAgentsToMark.removeOne(oppAgentsToMark[i]);
                 i--;
             }
         }
-
-        //ommiting nearest to ball
-        DBUG(QString("Ommit nearest to ball kick off"), D_MAHI);
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
-
         for (int i = 0 ; i < oppAgentsToMark.count() ; i++) {
-            if ((oppAgentsToMark[i]->pos/*+ oppAgentsToMark[i]->vel*/).dist(wm->ball->pos /*+  wm->ball->vel*/) < nearestToBallDist) {
+            if((oppAgentsToMark[i]->pos).dist(wm->ball->pos) < nearestToBallDist) {
                 nearestToBall = i;
-                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);
-                DBUG(QString("the nearest id is:%1").arg(oppAgentsToMark[i]->id), D_MAHI);
-                drawer->draw(oppAgentsToMark[i]->pos + oppAgentsToMark[i]->vel);
+                nearestToBallDist = oppAgentsToMark[i]->pos.dist(wm->ball->pos);                                
             }
         }
         if (nearestToBall != -1) {
             oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
         }
-
     }
 
     //setting the positions
-    for (int i = 0; i < oppAgentsToMark.count(); i++) {
-        if (gameState->isStart()) {
-            oppAgentsToMarkPos.append(oppAgentsToMark[i]->pos);
-        } else if (gameState->theirKickoff()) {
+    for(int i = 0; i < oppAgentsToMark.count(); i++){
+        if(gameState->isStart()){
+            oppAgentsToMarkPos.append(posvel(oppAgentsToMark[i]));
+        }
+        else if(gameState->theirKickoff()){
             oppAgentsToMarkPos.append(posvel(oppAgentsToMark[i]));
         }
     }
