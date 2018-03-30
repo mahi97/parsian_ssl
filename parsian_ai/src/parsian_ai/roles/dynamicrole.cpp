@@ -88,7 +88,16 @@ void CRoleDynamic::update() {
             else
             {
                 shotSkill->setIskickchargetime(false);
-                shotSkill->setKickspeed(kickSpeed);
+                if(chip)
+                {
+                    shotSkill->setChipdist(chipdist);
+                    shotSkill->setKickspeed(0);
+                }
+                else
+                {
+                    shotSkill->setKickspeed(kickSpeed);
+                    shotSkill->setChipdist(0);
+                }
             }
             break;
         case PlayMakeSkill::Chip:
@@ -108,7 +117,16 @@ void CRoleDynamic::update() {
             else
             {
                 shotSkill->setIskickchargetime(false);
-                shotSkill->setKickspeed(kickSpeed);
+                if(chip)
+                {
+                    shotSkill->setChipdist(chipdist);
+                    shotSkill->setKickspeed(0);
+                }
+                else
+                {
+                    shotSkill->setKickspeed(kickSpeed);
+                    shotSkill->setChipdist(0);
+                }
             }
             break;
         case PlayMakeSkill ::Pass:
@@ -128,7 +146,16 @@ void CRoleDynamic::update() {
             else
             {
                 shotSkill->setIskickchargetime(false);
-                shotSkill->setKickspeed(kickSpeed);
+                if(chip)
+                {
+                    shotSkill->setChipdist(chipdist);
+                    shotSkill->setKickspeed(0);
+                }
+                else
+                {
+                    shotSkill->setKickspeed(kickSpeed);
+                    shotSkill->setChipdist(0);
+                }
             }
             break;
         case PlayMakeSkill ::CatchBall:
@@ -145,7 +172,16 @@ void CRoleDynamic::update() {
             else
             {
                 shotSkill->setIskickchargetime(false);
-                shotSkill->setKickspeed(kickSpeed);
+                if(chip)
+                {
+                    shotSkill->setChipdist(chipdist);
+                    shotSkill->setKickspeed(0);
+                }
+                else
+                {
+                    shotSkill->setKickspeed(kickSpeed);
+                    shotSkill->setChipdist(0);
+                }
             }
             break;
         case PlayMakeSkill ::Keep:

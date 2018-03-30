@@ -113,6 +113,12 @@ private:
     void assignTasks();
     ///////////////////////30em 2015
 
+    bool evalmovefwd();
+    void swap(Segment2D *xp, Segment2D *yp);
+    void sortobstacles(QList<Segment2D> &obstacles);
+    double angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp);
+    double findmax(const QList<double> &list);
+
     //[RegionCount][RegionIndex]
     Rect2D* guards[7];
     void showRegions(unsigned int agentSize, QColor color = QColor(Qt::gray));
@@ -194,6 +200,8 @@ private:
     bool isPlanDone();
     bool isPlanFailed();
     int lastPassPos;
+    Segment2D left;
+    Vector2D move_fwd_target;
     /////////Intentions
 //    int intenHighProb;
 

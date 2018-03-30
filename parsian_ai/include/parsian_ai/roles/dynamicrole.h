@@ -83,6 +83,7 @@ private:
     SkillProperty(CRoleDynamic, double, Tolerance, tolerance);
     SkillProperty(CRoleDynamic, bool, Chip, chip);
     SkillProperty(CRoleDynamic, double, KickSpeed, kickSpeed);
+    SkillProperty(CRoleDynamic, double, ChipDist, chipdist);
     SkillProperty(CRoleDynamic, double, ReceiveRadius, receiveRadius);
     SkillProperty(CRoleDynamic, Vector2D, WaitPos, waitPos);
     SkillProperty(CRoleDynamic, bool, VeryFine, veryFine);
