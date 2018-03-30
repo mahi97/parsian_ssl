@@ -2,6 +2,7 @@
 
 CDynamicAttack::CDynamicAttack() {
     dribbleIntention.start();
+    playmakeIntention.start();
     lastPMInitWasDribble = false;
     //isShotInPass = false;
     lastPassPosLoc = Vector2D(5000, 5000);
@@ -975,6 +976,26 @@ void CDynamicAttack::chooseBestPositons() {
     }
 }
 
+//void CDynamicAttack::swapPlaymakeInPass()
+//{
+//    if(playmakeIntention.elapsed() <= 1000)
+//    {
+//        playmakeID = /*receiverAgentID*/;
+//        playmake = /*receiverAgent*/;
+//    }
+//}
+//bool CDynamicAttack::isInpass()
+//{
+//    Line2D ballpath{wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10};
+//    Circle2D receiverRegion(/*receiverAgentPos*/, 1.3);
+//    if(receiverRegion.intersection(ballpath) && mahiPlayMaker->pos().dist(wm->ball->pos) > 0.7 && wm->ball->vel.length() > 1.2)
+//    {
+//        playmakeIntention.restart();
+//        return true;
+//    }
+//    return false;
+//}
+
 void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     //the new one:
     QList <Vector2D> temp;
@@ -1548,8 +1569,11 @@ void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
 }
 
 void CDynamicAttack::setPlayMake(Agent* _playMake) {
-    playmakeID = _playMake->id();
-    playmake = _playMake;
+    if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
+    {
+        playmakeID = _playMake->id();
+        playmake = _playMake;
+    }
 }
 
 void CDynamicAttack::setWeHaveBall(bool _ballPoss) {

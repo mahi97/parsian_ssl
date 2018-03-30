@@ -83,6 +83,8 @@ public:
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
     void choosePlan();
+    void swapPlaymakeInPass();
+    bool isInpass();
 
     SDynamicPlan currentPlan;
     SDynamicPlan* nextPlanA;
@@ -100,6 +102,7 @@ private:
     int guardSize;
     QTime positioningIntention;
     QTime dribbleIntention;
+    QTime playmakeIntention;
     double positioningIntentionInterval;
     bool shotInPass;
 
