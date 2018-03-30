@@ -101,7 +101,7 @@ void CRoleStop::execute() {
     gotopoint->setBallobstacleradius(0.50);
     drawer->draw(Circle2D(target , 0.03) , "magenta" , true);
     drawer->draw(QString("%1").arg(kkk) , target);
-    ROS_INFO_STREAM("DDD " << agent->id());
+//    ROS_INFO_STREAM("DDD " << agent->id());
     agent->action = gotopoint;
 
 

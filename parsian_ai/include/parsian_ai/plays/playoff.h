@@ -264,8 +264,8 @@ struct SExecution {
     int theLastAgent = -1;
     int theLastState = -1;
     int passCount;
-    AgentPoint passer;
-    AgentPoint reciver;
+    QList<AgentPoint> passer;
+    QList<AgentPoint> reciver;
 };
 
 struct SGUI {
@@ -336,6 +336,8 @@ private:
     bool criticalInit;
 
     bool initial;
+
+    bool firstPass;
 
     SPlan* masterPlan;
     EMode masterMode;
@@ -454,6 +456,7 @@ private:
     ////////////////////////////
 
     bool isKickDone(CRolePlayOff*);
+    bool firstKickFailed();
     bool isOneTouchDone(CRolePlayOff*);
     bool isMoveDone(const CRolePlayOff*);
     bool isReceiveDone(const CRolePlayOff*);
