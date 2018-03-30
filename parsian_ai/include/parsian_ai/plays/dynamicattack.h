@@ -205,6 +205,7 @@ private:
     int lastPassPos;
     Segment2D left;
     Vector2D move_fwd_target;
+    Vector2D last_move_fwd_target;
     /////////Intentions
 //    int intenHighProb;
 

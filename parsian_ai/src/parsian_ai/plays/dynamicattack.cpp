@@ -148,13 +148,13 @@ bool CDynamicAttack::evalmovefwd()
         ROS_INFO("kian1: -------" );
         //ROS_INFO_STREAM("debug: 4");
         QList<QPair<Vector2D, double>> result;
-        double angsum{};
+        QList<double> angsum;
         QList<double> nearestoppdist;
         for(int i{}; i<angles.size(); i++)
         {
             QPair<Vector2D, double> tmp;
-            angsum = angleOfTwoSegment(obstacles[0], obstacles[i]);
-            double ang{angsum + angles[i]/2.0};
+            angsum.push_back(angleOfTwoSegment(obstacles[0], obstacles[i]));
+            double ang{angsum[angsum.size()] + angles[i]/2.0};
             //ROS_INFO_STREAM("kian: " << angsum*180/3.14);
             Vector2D tmp1{};
             tmp1.setPolar(1, AngleDeg{-90 + ang*180/3.14});
@@ -188,16 +188,37 @@ bool CDynamicAttack::evalmovefwd()
             }
         }
         //ROS_INFO_STREAM("debug: 7");
+        move_fwd_target = Vector2D{100, 0};
+        last_move_fwd_target = Vector2D{100, 0};
         if(whichres != -1)
         {
             drawer->draw(Segment2D{Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}, result[whichres].first}, QColor(250, 10, 50));
             if(angles[whichres]*180/3.14 > 30 || nearestoppdist[whichres] > 0.6)
             {
-                move_fwd_target = result[whichres].first;
-                return true;
+                if(wm->ball->pos.y + wm->ball->vel.y > 1.4 && angsum[whichres]*180/3.14 > 90 )
+                {
+                    move_fwd_target = result[whichres].first;
+                    last_move_fwd_target = move_fwd_target;
+                    return true;
+                }
+                else if(wm->ball->pos.y + wm->ball->vel.y < -1.4 && angsum[whichres]*180/3.14 < 90 )
+                {
+                    move_fwd_target = result[whichres].first;
+                    last_move_fwd_target = move_fwd_target;
+                    return true;
+                }
+                else if(wm->ball->pos.y + wm->ball->vel.y > -1.2 && wm->ball->pos.y + wm->ball->vel.y < 1.2)
+                {
+                    move_fwd_target = result[whichres].first;
+                    last_move_fwd_target = move_fwd_target;
+                    return true;
+                }
+                else
+                {
+                    move_fwd_target = last_move_fwd_target;
+                }
             }
         }
-        move_fwd_target = Vector2D{100, 0};
         return false;
 
 }
