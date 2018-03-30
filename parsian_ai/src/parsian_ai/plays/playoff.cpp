@@ -251,7 +251,7 @@ void CPlayOff::staticExecute() {
 
             }
 
-            if (isPlanEnd()) {
+            if (isPlanEnd() && false) {
                 playOnFlag = true;
                 ROS_INFO("Playoff Ends");
             }
@@ -1351,7 +1351,7 @@ void CPlayOff::passManager() {
                      QColor(Qt::darkMagenta));
         doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
                  <= masterPlan->common.lastDist;
-        doAfterlife = !Circle2D(lastBallPos, 0.5).contains(wm->ball->pos);
+        doAfterlife = !Circle2D(lastBallPos, 0.4).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
 }
@@ -1407,7 +1407,14 @@ void CPlayOff::checkEndState() {
             roleAgent[i]->setRoleUpdate(false);
             roleAgent[i]->resetTime();
 
-            if (positionAgent[i].stateNumber + 1  < positionAgent[i].positionArg.size()) {
+            POffSkills temp_skill = positionAgent[i].positionArg.at(positionAgent[i].positionArg.size() - 1).staticSkill;
+
+            if (doAfterlife && temp_skill == Position ){
+
+                    positionAgent[i].stateNumber = positionAgent[i].positionArg.size() - 1;
+                    ROS_INFO_STREAM("after_life " << roleAgent[i]->getAgent()->id());
+
+            } else if (positionAgent[i].stateNumber + 1  < positionAgent[i].positionArg.size()) {
                 if (positionAgent[i].getArgs(1).staticSkill == Defense
                         ||  positionAgent[i].getArgs(1).staticSkill == Support
                         ||  positionAgent[i].getArgs(1).staticSkill == Position
