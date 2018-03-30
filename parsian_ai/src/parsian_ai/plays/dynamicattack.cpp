@@ -316,6 +316,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (agentSize > 0) {
         //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
+        ROS_INFO_STREAM("hamid after chooseBestPosForPass");
     }
     ROS_INFO_STREAM("kian: ghable assign task");
     assignTasks();
@@ -449,6 +450,7 @@ void CDynamicAttack::playMake() {
 }
 
 void CDynamicAttack::positioning(QList<Vector2D> _points) {
+    ROS_INFO_STREAM("hamid inside positioning");
     bool check = false;
     int index = 0;
     for (int i = 0 ; i < currentPlan.agentSize; i++) {
@@ -1593,7 +1595,7 @@ void CDynamicAttack::chooseBestPositons_new()
     {
         for(int j{0}; j<3; j++)
         {
-            searchRegions.push_back(regions[i][j].rectangle);
+            searchRegions.append(regions[i][j].rectangle);
         }
     }
     QList<Rect2D> avoidRects;
@@ -1635,9 +1637,11 @@ void CDynamicAttack::chooseBestPositons_new()
                 passRecieverPos.invalidate();
             }
             ROS_INFO_STREAM("hamid pass receiverpos: (" << passRecieverPos.x << ", " << passRecieverPos.y);
-            for(int region_id{0}; region_id<searchRegions.count(); region_id++)
+            for(int region_id{0}; region_id<9; region_id++)
             {
-                Vector2D bestPoint(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+                ROS_INFO_STREAM("hamid said hi ");
+//                Vector2D bestPoint(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+                Vector2D bestPoint(regions[region_id/3][region_id%3].rectangle.center());
                 double maxProbability = 0;
                 for(auto& point : regions[region_id/3][region_id%3].points)
                 {
@@ -1676,12 +1680,15 @@ void CDynamicAttack::chooseBestPositons_new()
 
                     if( prob > maxProbability )
                     {
-                        maxProbability = prob;
-                        bestPoint = point;
+                    maxProbability = prob;
+                    bestPoint = point;
                     }
                 }
                 robotRegionsWeights[passRecieverID][region_id] = maxProbability;
+                ROS_INFO_STREAM("hamid between best assignmets");
                 bestPointForRobotsInRegions[passRecieverID][region_id] = bestPoint;
+                ROS_INFO_STREAM("hamid end of best assignmets");
+
             }
         }
     }
@@ -1731,6 +1738,8 @@ void CDynamicAttack::assignId_new()
             }
         }
     }
+    ROS_INFO_STREAM("hamid after matching semidynamic points");
+    hamidDebug();
 }
 
 
@@ -1995,4 +2004,3 @@ void CDynamicAttack::hamidDebug()
         }
     }
 }
-
