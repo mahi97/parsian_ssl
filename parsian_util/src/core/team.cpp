@@ -43,7 +43,6 @@ int CTeam::activeAgentsCount() {
 }
 
 void CTeam::update() {
-    wmMutex.lock();
     data->activeAgents.clear();
     for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
         if (data->teamMembers[i]->getActive()) {
@@ -51,7 +50,6 @@ void CTeam::update() {
         }
     }
     ROS_INFO_STREAM("ACTs : " << data->activeAgents.size());
-    wmMutex.unlock();
 }
 
 int CTeam::activeAgentID(int i) {
