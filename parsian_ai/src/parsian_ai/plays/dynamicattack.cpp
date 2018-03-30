@@ -609,20 +609,19 @@ void CDynamicAttack::playMake() {
 }
 
 void CDynamicAttack::positioning(QList<Vector2D> _points) {
-    ROS_INFO_STREAM("hamid inside positioning");
+    // hamid pos
+    ROS_INFO_STREAM("hamid inside positioning2");
     bool check = false;
-    int index = 0;
     for (int i = 0 ; i < currentPlan.agentSize; i++) {
         if (mahiAgentsID[i] >= 0) {
-            ROS_INFO_STREAM("kian: too if set shodan : ID:" << agents.at(mahiAgentsID[i])->id() << ", agentID: " << mahiPositionAgents.at(i)->id());
+//            ROS_INFO_STREAM("kian: too if set shodan : ID:" << agents.at(mahiAgentsID[i])->id() << ", agentID: " << mahiPositionAgents.at(i)->id());
             roleAgents[i]->setAgent(mahiPositionAgents.at(i));
             roleAgents[i]->setAvoidPenaltyArea(true);
             if (i < _points.size()) {
-
                 switch (currentPlan.positionAgents[i].skill) {
                 case PositionSkill ::Ready: // Ready For Pass
                     ROS_INFO_STREAM("kian: too switch set : skill: ready");
-                    roleAgents[i]->setTarget(_points.at(index++));
+                    roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
@@ -631,7 +630,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     break;
                 case PositionSkill ::OneTouch: // OneTouch Reflects
                     ROS_INFO_STREAM("kian: too switch set : skill: onetouch");
-                    roleAgents[i]->setWaitPos(_points.at(index++));
+                    roleAgents[i]->setWaitPos(_points.at(i));
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
@@ -646,7 +645,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
-                    roleAgents[i]->setTarget(_points.at(index));
+                    roleAgents[i]->setTarget(_points.at(i));
                     roleAgents[i]->setTargetDir(wm->ball->pos - roleAgents[i]->getAgent()->pos());
                     roleAgents[i]->setSelectedPositionSkill(PositionSkill ::Move);
 
@@ -673,6 +672,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
             DBUG("[dynamicAttack] mahiagent ha eshtebahe chera ?", D_MAHI);
         }
     }
+    ROS_INFO_STREAM("hamid end of positioning");
     //assert(check);
 }
 
@@ -1821,7 +1821,6 @@ void CDynamicAttack::chooseBestPositons_new()
             ROS_INFO_STREAM("hamid pass receiverpos: (" << passRecieverPos.x << ", " << passRecieverPos.y);
             for(int region_id{0}; region_id<9; region_id++)
             {
-                ROS_INFO_STREAM("hamid said hi ");
 //                Vector2D bestPoint(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
                 Vector2D bestPoint(regions[region_id/3][region_id%3].rectangle.center());
                 double maxProbability = 0;
@@ -1845,7 +1844,7 @@ void CDynamicAttack::chooseBestPositons_new()
                     double shootFactor = 0;
 
                     getBestPosToShootToGoal(point, shootFactor, true);
-                    receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID);
+                    receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID, region_id);
                     senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
                     clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
                     oneTouchAngleFactor = calcOneTouchAngleFactor(point, passSenderPos);
@@ -1862,18 +1861,28 @@ void CDynamicAttack::chooseBestPositons_new()
 
                     if( prob > maxProbability )
                     {
-                    maxProbability = prob;
-                    bestPoint = point;
+                        maxProbability = prob;
+                        bestPoint = point;
                     }
                 }
                 robotRegionsWeights[passRecieverID][region_id] = maxProbability;
-                ROS_INFO_STREAM("hamid between best assignmets");
                 bestPointForRobotsInRegions[passRecieverID][region_id] = bestPoint;
-                ROS_INFO_STREAM("hamid end of best assignmets");
-
             }
         }
     }
+}
+
+int CDynamicAttack::getNearestRegionToRobot(Vector2D agentPos)
+{
+    for(int i{0}; i<3; i++)
+    {
+        for(int j{0}; j<3; j++)
+        {
+            if(regions[i][j].rectangle.contains(agentPos))
+                return regions[i][j].id;
+        }
+    }
+    return -1;
 }
 
 void CDynamicAttack::assignId_new()
@@ -1898,7 +1907,10 @@ void CDynamicAttack::assignId_new()
     {
         for(int j{0}; j<9; j++)
         {
-            matcher.setWeight(i, j, robotRegionsWeights[robotIDs[i]][j]);
+//            matcher.setWeight(i, j, robotRegionsWeights[robotIDs[i]][j]);
+            auto agentPos = wm->our[robotIDs[i]]->pos;
+            auto regionIDforRobot = getNearestRegionToRobot(agentPos);
+            matcher.setWeight(i, j, -1*(agentPos - regions[regionIDforRobot/3][regionIDforRobot%3].rectangle.center()).length());
         }
     }
     matcher.findMatching();
@@ -1909,7 +1921,7 @@ void CDynamicAttack::assignId_new()
     //HAMID THERE
     for(int v = 0; v<robotIDs.count(); v++)
     {
-        mahiAgentsID[v] = matcher.getMatch(v);
+        mahiAgentsID[v] = /*matcher.getMatch(v);*/robotIDs[v];
         //matchingIDs.append(robotIDs.at(v)); matchingRegions.append(matcher.getMatch(v));
         semiDynamicPosition.append(bestPointForRobotsInRegions[robotIDs.at(v)][matcher.getMatch(v)]);
         for(auto& agent : agents)
@@ -2084,22 +2096,25 @@ void CDynamicAttack::clearRobotsRegionsWeights()
     }
 }
 
-double CDynamicAttack::calcReceiverDistanceFactor(Vector2D point, int passReceiverID)
+double CDynamicAttack::calcReceiverDistanceFactor(Vector2D point, int passReceiverID, int region_id)
 {
-    int nearestOppID = getNearestOppToPoint(point);
-    if(nearestOppID == -1)
-        return 1;
-    double nearestOppDist = (wm->opp[nearestOppID]->pos - point).length();
-    double receiverDist = (wm->our[passReceiverID]->pos - point).length();
-    if (fabs(receiverDist) < 0.0005 )
-        return 1;
-    double res = nearestOppDist/receiverDist;
-    if(res > 1 )
-        return 0;
-    else if (res < 0.05)
-        return 1;
-    else
-        return 1.0 - res;
+//    int nearestOppID = getNearestOppToPoint(point);
+//    if(nearestOppID == -1)
+//        return 1;
+//    double nearestOppDist = (wm->opp[nearestOppID]->pos - point).length();
+//    double receiverDist = (wm->our[passReceiverID]->pos - point).length();
+//    if (fabs(receiverDist) < 0.0005 )
+//        return 1;
+//    double res = nearestOppDist/receiverDist;
+//    if(res > 1 )
+//        return 1;
+//    else if (res < 0.05)
+//        return 0;
+//    else
+//        return 1.0 - res;
+    return 1.0 - (wm->our[passReceiverID]->pos - point).length()/
+                                   (regions[region_id/3][region_id%3].rectangle.topLeft() - regions[region_id/3][region_id%3].rectangle.bottomRight()).length();
+
 }
 
 double CDynamicAttack::calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point)
