@@ -518,9 +518,11 @@ void CDynamicAttack::playMake() {
         roleAgentPM -> setEmptySpot(false);
         roleAgentPM -> setNoKick(false);
         if (roleAgentPM->getChip()) {
-            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
+//            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
+            roleAgentPM->setChipDist(7);
         } else {
-            roleAgentPM->setKickSpeed(appropriatePassSpeed());
+//            roleAgentPM->setKickSpeed(appropriatePassSpeed());
+            roleAgentPM->setKickSpeed(6);
         }
 
         roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Pass);// Skill Kick
@@ -537,6 +539,8 @@ void CDynamicAttack::playMake() {
             } else {
                 roleAgentPM->setNoKick(true);
             }*/
+//        if(isInpass())
+//            swapPlaymakeInPass();
         break;
 
     case PlayMakeSkill ::Chip:
@@ -1010,25 +1014,35 @@ void CDynamicAttack::chooseBestPositons() {
    */
 }
 
-//void CDynamicAttack::swapPlaymakeInPass()
-//{
-//    if(playmakeIntention.elapsed() <= 1000)
-//    {
-//        playmakeID = /*receiverAgentID*/;
-//        playmake = /*receiverAgent*/;
-//    }
-//}
-//bool CDynamicAttack::isInpass()
-//{
+void CDynamicAttack::swapPlaymakeInPass()
+{
+    if(playmakeIntention.elapsed() <= 1000)
+    {
+//        agents.append(playmake);
+//        playmakeID = receiver->id();
+//        playmake = receiver;
+//        agents.removeOne(receiver);
+    }
+}
+bool CDynamicAttack::isInpass()
+{
+    return false;
 //    Line2D ballpath{wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10};
-//    Circle2D receiverRegion(/*receiverAgentPos*/, 1.3);
-//    if(receiverRegion.intersection(ballpath) && mahiPlayMaker->pos().dist(wm->ball->pos) > 0.7 && wm->ball->vel.length() > 1.2)
+//    for(const auto& agent : agents)
+//    {
+//        if(agent->id() == currentPlan.passID)
+//            receiver = agent;
+//    }
+//    Vector2D *sol1;
+//    Vector2D *sol2;
+//    Circle2D receiverRegion(receiver->pos(), 1.3);
+//    if(receiverRegion.intersection(ballpath, sol1, sol2) && mahiPlayMaker->pos().dist(wm->ball->pos) > 0.7 && wm->ball->vel.length() > 1.2)
 //    {
 //        playmakeIntention.restart();
 //        return true;
 //    }
 //    return false;
-//}
+}
 
 void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     //the new one:
@@ -1097,6 +1111,12 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
         DBUG(QString("%1 %2 ourtopoint %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
         DBUG(QString("end"), D_PARSA);
     }
+//    srand(time(NULL));
+//    int receiverID = mahiPositionAgents[rand()%mahiPositionAgents.count()]->id();
+//    currentPlan.passPos = semiDynamicPosition[receiverID];
+//    currentPlan.passID = receiverID;
+//    ROS_INFO_STREAM("kian bade choose receiver");
+
     currentPlan.passPos = temp[ans];
     lastPassPosLoc = currentPlan.passPos;
     DBUG(QString("pass Pos %1 %2").arg(currentPlan.passPos.x).arg(currentPlan.passPos.y), D_PARSA);
@@ -1603,11 +1623,11 @@ void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
 }
 
 void CDynamicAttack::setPlayMake(Agent* _playMake) {
-    if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
-    {
+//    if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
+//    {
         playmakeID = _playMake->id();
         playmake = _playMake;
-    }
+//    }
 }
 
 void CDynamicAttack::setWeHaveBall(bool _ballPoss) {

@@ -2,6 +2,7 @@
 #define DYNAMICATTACK_H
 
 #include <parsian_ai/plays/masterplay.h>
+#include <ctime>
 
 //#define _MAX_REGION 7
 
@@ -266,6 +267,8 @@ private:
     Segment2D left;
     Vector2D move_fwd_target;
     Vector2D last_move_fwd_target;
+    Agent* receiver;
+
     /////////Intentions
 //    int intenHighProb;
 
