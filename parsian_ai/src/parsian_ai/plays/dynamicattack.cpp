@@ -283,6 +283,19 @@ void CDynamicAttack::makePlan(int agentSize) {
         positionAgent.skill  = PositionSkill::NoSkill;
     }
 
+    if(true)
+    {
+        ROS_INFO_STREAM("kian: nomode");
+        nextPlanA->mode = DynamicMode::NoMode;
+        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
+        for (size_t i = 0; i < agentSize; i++) {
+            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
+            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
+        }
+        currentPlan = *nextPlanA;
+        return;
+    }
+
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
     if (wm->ball->pos.x < 0) {
@@ -464,9 +477,9 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     ROS_INFO_STREAM("kian: ghable assign task");
     assignTasks();
 
-    DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
-    ROS_INFO_STREAM("MODE : " << getString(currentPlan.mode).toStdString());
-    DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
+//    DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
+//    ROS_INFO_STREAM("MODE : " << getString(currentPlan.mode).toStdString());
+//    DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
     for(size_t i = 0;i < currentPlan.agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->execute();
@@ -477,16 +490,16 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
-    for (auto i : semiDynamicPosition) {
-        drawer->draw(i, QColor(Qt::black));
-    }
-
-    for (auto i : dynamicPosition) {
-        drawer->draw(Circle2D(i, 0.2), QColor(Qt::red), false);
-    }
-
-    showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
-    showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
+//    for (auto i : semiDynamicPosition) {
+//        drawer->draw(i, QColor(Qt::black));
+//    }
+//
+//    for (auto i : dynamicPosition) {
+//        drawer->draw(Circle2D(i, 0.2), QColor(Qt::red), false);
+//    }
+//
+//    showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
+//    showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
 
     // TODO : remove this
     if (isPlayMakeChanged()) {
@@ -494,7 +507,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             i = false;
         }
     }
-
+    hamidDebug();
 }
 
 void CDynamicAttack::playMake() {
@@ -596,6 +609,7 @@ void CDynamicAttack::playMake() {
 
 void CDynamicAttack::positioning(QList<Vector2D> _points) {
     bool check = false;
+    int index = 0;
     for (int i = 0 ; i < currentPlan.agentSize; i++) {
         if (mahiAgentsID[i] >= 0) {
             ROS_INFO_STREAM("kian: too if set shodan : ID:" << agents.at(mahiAgentsID[i])->id() << ", agentID: " << mahiPositionAgents.at(i)->id());
@@ -606,7 +620,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                 switch (currentPlan.positionAgents[i].skill) {
                 case PositionSkill ::Ready: // Ready For Pass
                     ROS_INFO_STREAM("kian: too switch set : skill: ready");
-                    roleAgents[i]->setTarget(_points.at(i));
+                    roleAgents[i]->setTarget(_points.at(index++));
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
@@ -615,7 +629,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     break;
                 case PositionSkill ::OneTouch: // OneTouch Reflects
                     ROS_INFO_STREAM("kian: too switch set : skill: onetouch");
-                    roleAgents[i]->setWaitPos(_points.at(i));
+                    roleAgents[i]->setWaitPos(_points.at(index++));
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
@@ -630,7 +644,7 @@ void CDynamicAttack::positioning(QList<Vector2D> _points) {
                     roleAgents[i]->setReceiveRadius(
                                 std::max(0.5, 2 - roleAgents[i]->getAgent()->pos()
                                          .dist(roleAgents[i]->getTarget())));
-                    roleAgents[i]->setTarget(_points.at(i));
+                    roleAgents[i]->setTarget(_points.at(index));
                     roleAgents[i]->setTargetDir(wm->ball->pos - roleAgents[i]->getAgent()->pos());
                     roleAgents[i]->setSelectedPositionSkill(PositionSkill ::Move);
 
@@ -1111,7 +1125,7 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
 }
 
 double CDynamicAttack::getDynamicValue(const Vector2D &_dynamicPos) const {
-    double defMoveAngle, openAngle;
+    double defMoveAngle, openaAngle;
     defMoveAngle = Vector2D::angleOf(wm->ball->pos, wm->field->oppGoal(), _dynamicPos).degree();
     return defMoveAngle;
 }
@@ -1769,6 +1783,7 @@ void CDynamicAttack::chooseBestPositons_new()
 
     // get the pass sender
     int passSenderID{playmakeID};
+    ROS_INFO_STREAM("hamid playkame ID: " << passSenderID);
     Vector2D passSenderPos;
     Vector2D passSenderDir;
     if(passSenderID != -1)
@@ -1801,13 +1816,12 @@ void CDynamicAttack::chooseBestPositons_new()
             {
                 passRecieverPos.invalidate();
             }
-
-            //HAMID THERE
+            ROS_INFO_STREAM("hamid pass receiverpos: (" << passRecieverPos.x << ", " << passRecieverPos.y);
             for(int region_id{0}; region_id<searchRegions.count(); region_id++)
             {
                 Vector2D bestPoint(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
-                double maxProbability;
-                for(auto& point : regions[region_id%3][region_id%3].points)
+                double maxProbability = 0;
+                for(auto& point : regions[region_id/3][region_id%3].points)
                 {
                     for(int i{0}; i<avoidRects.count(); i++)
                     {
@@ -1823,8 +1837,8 @@ void CDynamicAttack::chooseBestPositons_new()
                     double widenessFactor = 0;
 
                     // factors for shoot
-                    double oneTouchAngleFactor; // if the angle to the opp goal is whitin a desird interval
-                    double shootFactor;
+                    double oneTouchAngleFactor = 0; // if the angle to the opp goal is whitin a desird interval
+                    double shootFactor = 0;
 
                     getBestPosToShootToGoal(point, shootFactor, true);
                     receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID);
@@ -1853,7 +1867,6 @@ void CDynamicAttack::chooseBestPositons_new()
             }
         }
     }
-
 }
 
 void CDynamicAttack::assignId_new()
@@ -1862,8 +1875,6 @@ void CDynamicAttack::assignId_new()
     if (playmakeID != -1) {
         mahiPlayMaker = playmake;
     }
-
-    matchingIDs.clear(); matchingRegions.clear();
     QList<int> robotIDs;
     MWBM matcher;
     for(int k{0}; k<11; k++)
@@ -1871,6 +1882,8 @@ void CDynamicAttack::assignId_new()
         if(robotRegionsWeights[k][0] != -1.0)
             robotIDs.append(k);
     }
+    for(int i{0}; i<robotIDs.count(); i++)
+        ROS_INFO_STREAM("hamid robot ids: " << robotIDs[i] << " ");
     if(robotIDs.count() != agents.count())
         ROS_INFO_STREAM("hamid counts are not equal");
     matcher.create(robotIDs.count(), 9);
@@ -1886,7 +1899,7 @@ void CDynamicAttack::assignId_new()
     semiDynamicPosition.clear();
     for(int i{0}; i<8; i++)
     {mahiAgentsID[i] = -1;}
-
+    //HAMID THERE
     for(int v = 0; v<robotIDs.count(); v++)
     {
         mahiAgentsID[v] = matcher.getMatch(v);
@@ -2128,4 +2141,40 @@ double CDynamicAttack::calcWidenessFactor(Vector2D passSenderPos, Vector2D point
     return widenessAngle/180.0;
 }
 
+void CDynamicAttack::hamidDebug()
+{
+    for(int i{0}; i<11; i++)
+    {
+        ROS_INFO_STREAM("hamid weights of row " << i << " : " << robotRegionsWeights[i][0]
+                                                << " " << robotRegionsWeights[i][1] << " " << robotRegionsWeights[i][2] << " "
+                                                << robotRegionsWeights[i][3] << " " << robotRegionsWeights[i][4] << " "
+                                                << robotRegionsWeights[i][5] << " " << robotRegionsWeights[i][6] << " "
+                                                << robotRegionsWeights[i][7] << " " << robotRegionsWeights[i][8]);
+    }
+
+    for(int i{0}; i<11; i++)
+    {
+        ROS_INFO_STREAM("hamid points of row " << i << " : " << bestPointForRobotsInRegions[i][0]
+                                                << " " << bestPointForRobotsInRegions[i][1] << " " << bestPointForRobotsInRegions[i][2] << " "
+                                                << bestPointForRobotsInRegions[i][3] << " " << bestPointForRobotsInRegions[i][4] << " "
+                                                << bestPointForRobotsInRegions[i][5] << " " << bestPointForRobotsInRegions[i][6] << " "
+                                                << bestPointForRobotsInRegions[i][7] << " " << bestPointForRobotsInRegions[i][8]);
+    }
+
+    for(int i{0}; i<semiDynamicPosition.count(); i++)
+    {
+        drawer->draw(Circle2D(semiDynamicPosition[i], 0.1), QColor("yellow"), true);
+    }
+    for(int i{0}; i<3; i++)
+    {
+        for(int j{0}; j<3; j++)
+        {
+            drawer->draw(regions[i][j].rectangle, QColor("red"));
+            for(int k{0}; k<regions[i][j].points.count(); k++)
+            {
+                drawer->draw(Circle2D(regions[i][j].points[k], 0.1), QColor("red"));
+            }
+        }
+    }
+}
 
