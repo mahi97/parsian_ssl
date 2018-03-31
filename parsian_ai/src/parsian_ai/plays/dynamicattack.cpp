@@ -463,7 +463,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
     assignId_new();
     if (agentSize > 0) {
-        chooseBestPosForPass(semiDynamicPosition);
+        chooseReceiverAndBestPosForPass();
     }
     if(isInpass())
     {
@@ -1044,7 +1044,13 @@ bool CDynamicAttack::isInpass()
     return false;
 }
 
-void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
+void CDynamicAttack::chooseReceiverAndBestPosForPass() {
     // hamid working here
 
 
@@ -1054,10 +1060,20 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     optimalPositionsForRecivers.clear();
     for(auto& robotID : matchingIDs)
     {
-        auto robotPos = wm->our[robotID]->pos;
-        auto robotVel = wm->our[robotId]->vel;
-        double searchCircleRadius = 0;
-        double searchCircleCenter = Vector2D(0, 0);
+//        auto robotPos = wm->our[robotID]->pos;
+//        auto robotVel = wm->our[robotId]->vel;
+
+//        auto playmakePos = playmake->pos;
+
+//        double searchCircleRadius = 0;
+//        Vector2D searchCircleCenter = Vector2D(0, 0);
+
+
+
+
+
+
+        drawer->draw(Circle2D(searchCircleCenter, searchCircleRadius), QColor("orange"));
     }
 
 
@@ -1072,82 +1088,11 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
     int receiverID = matchingIDs[rand()%matchingIDs.count()]->id();
     currentPlan.passPos = semiDynamicPosition[receiverID];
     currentPlan.passID = receiverID;
-    ROS_INFO_STREAM("kian bade choose receiver");
-
-
-
-
-    //the new one:
-    QList <Vector2D> temp;
-    int ans = 0;
-    double points[10] = {};
-
-    for (auto _point : _points) {
-        temp.append(_point);
-    }
-
-    //    debug(QString("DIntention %3").arg(dribbleIntention.elapsed()), D_PARSA);
-    //if we are dribbling
-    int a = temp.size();
-    ROS_INFO("build shode 2");
-    if (dribbleIntention.elapsed() < 3000) {
-        currentPlan.passPos =  temp[0];
-        return;
-    }
-    //else
-
-    for (int i = 0; i < temp.size(); i++) {
-        if (lastPassPosLoc == temp[i]) {
-            points[i] += 2;
-        }
-        DBUG(QString("%1 %2 point is %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
-        double M = 100;
-        if (mahiPlayMaker != nullptr) {
-            for (int j = 0; j < wm->opp.activeAgentsCount(); j++) {
-                M = min(M, wm->opp.active(j)->pos.dist(mahiPlayMaker->pos()));
-                M = min(M, (wm->opp.active(j)->pos +
-                            wm->opp.active(j)->vel * 0.5).dist(mahiPlayMaker->pos()));
-            }
-            //if(M < 2)
-            {
-                double e = mahiPlayMaker->dir().angleOf(temp[i], mahiPlayMaker->pos(),
-                                                        mahiPlayMaker->dir().norm() * 1 + mahiPlayMaker->pos()).degree();
-                double p = (e / 30) / (M + 0.001);
-                points[i] -= p;
-                DBUG(QString("angle is %1").arg(mahiPlayMaker->dir().angleOf(temp[i], mahiPlayMaker->pos(),
-                                                                             mahiPlayMaker->dir().norm() * 1 + mahiPlayMaker->pos()).degree()), D_PARSA);
-            }
-        }
-        DBUG(QString("%1 %2 near opp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
-        M = 100;
-        for (int j = 0; j < wm->opp.activeAgentsCount(); j++) {
-            M = min(M, wm->opp.active(j)->pos.dist(temp[i]));
-        }
-        if (M < 2) {
-            points[i] += M;
-        } else {
-            points[i] += 4;
-        }
-        DBUG(QString("%1 %2 opptotemp %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
-        //        points[i] -= ballPos.dist(temp[i]) / 2;
-        M = 100;
-        for (int j = 0; j < wm->our.activeAgentsCount(); j++) {
-            M = min(M, wm->our.active(j)->pos.dist(temp[i]));
-        }
-        if (M > 1) {
-            points[i] -= 5;
-        }
-        if (points[i] > points[ans]) {
-            ans = i;
-        }
-        DBUG(QString("%1 %2 ourtopoint %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
-        DBUG(QString("end"), D_PARSA);
-    }
+    ROS_INFO_STREAM("hamid bade choose receiver");
 
 
 //    currentPlan.passPos = temp[ans];
     lastPassPosLoc = currentPlan.passPos;
-    DBUG(QString("pass Pos %1 %2").arg(currentPlan.passPos.x).arg(currentPlan.passPos.y), D_PARSA);
 }
 
 double CDynamicAttack::getDynamicValue(const Vector2D &_dynamicPos) const {
@@ -1790,7 +1735,9 @@ void CDynamicAttack::createRegions()
     {
         for(int j{0}; j<3; j++)
         {
-            points[i][j].push_back(rectangles[i][j].center());
+//            points[i][j].push_back(rectangles[i][j].center());
+            points[i][j].push_back(rectangles[i][j].center() + Vector2D(rectangles[i][j].size().length()/4, 0));
+            points[i][j].push_back(rectangles[i][j].center() + Vector2D(-rectangles[i][j].size().length()/4, 0));
         }
     }
     // </make eval points>
@@ -1971,7 +1918,6 @@ void CDynamicAttack::assignId_new()
     semiDynamicPosition.clear();
     for(int i{0}; i<8; i++)
     {mahiAgentsID[i] = -1;}
-    //HAMID THERE
     for(int v = 0; v<robotIDs.count(); v++)
     {
         mahiAgentsID[v] = /*matcher.getMatch(v);*/robotIDs[v];
@@ -1986,8 +1932,6 @@ void CDynamicAttack::assignId_new()
             }
         }
     }
-    ROS_INFO_STREAM("hamid after matching semidynamic points");
-    hamidDebug();
 }
 
 
