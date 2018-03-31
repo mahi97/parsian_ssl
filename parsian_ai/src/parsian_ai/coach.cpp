@@ -224,11 +224,11 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
             }
         }
-    } else if (gameState->ourPlayOffKick()) {
-        if (wm->ball->pos.x < -1) {
+    } else if (gameState->ourPlayOffKick()) { //// Choose # of Agents in PlayOff
+        if (wm->ball->pos.x < 0) {
             preferedDefenseCounts = (checkOverdef()) ? 1 : 2;
 
-        } else if (wm->ball->pos.x > -.5) {
+        } else if (wm->ball->pos.x > 0.5) {
             preferedDefenseCounts = 0;
         }
 
@@ -498,7 +498,6 @@ void CCoach::virtualTheirPlayOffState() {
 }
 
 void CCoach::decideDefense(){
-    assignGoalieAgent(preferedGoalieID);
     assignDefenseAgents(preferedDefenseCounts);
     ROS_INFO_STREAM("SD: " << preferedDefenseCounts << " : " << defenseAgents.size());
     if (gameState->theirPenaltyKick()) {
@@ -1010,7 +1009,7 @@ void CCoach::checkTransitionToForceStart() {
 
 void CCoach::execute()
 {
-    findGoalieID();
+    findGoalie();
     choosePlaymakeAndSupporter();
     decidePreferredDefenseAgentsCount();
     decideDefense();
@@ -1483,7 +1482,7 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
     //    }
 }
 
-int CCoach::findGoalieID() {
+int CCoach::findGoalie() {
     if (conf.useGoalieInPlayoff) {
         preferedGoalieID = -1;
 
@@ -1494,6 +1493,7 @@ int CCoach::findGoalieID() {
             preferedGoalieID = wm->our.data->goalieID;
         }
     }
+    assignGoalieAgent(preferedGoalieID);
     return preferedGoalieID;
 }
 

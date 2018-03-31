@@ -69,7 +69,7 @@ public:
 
     void setBehaviorPublisher(ros::Publisher &_behaver_publisher);
 
-    int findGoalieID();
+    int findGoalie();
 
     parsian_msgs::plan_serviceResponse getLastPlan();
 
