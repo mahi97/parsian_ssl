@@ -283,17 +283,6 @@ void CDynamicAttack::makePlan(int agentSize) {
         positionAgent.region = DynamicRegion::NoMatter;
         positionAgent.skill  = PositionSkill::NoSkill;
     }
-    if(true) {
-        ROS_INFO_STREAM("kian: nomode");
-        nextPlanA->mode = DynamicMode::NoMode;
-        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
-        for (size_t i = 0; i < agentSize; i++) {
-            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
-            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
-            }
-        }
-    currentPlan = *nextPlanA;
-    return;
 
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
@@ -404,7 +393,6 @@ void CDynamicAttack::assignId() {
     QList<int> matchedIDList;
     mahiPositionAgents.clear();
     guardIndexList.clear();
-    kianmatchedIDList.clear();
 
     MWBM matcher;
     int n = agents.size();
@@ -419,7 +407,6 @@ void CDynamicAttack::assignId() {
     for (int i = 0; i < n; i++) {
         tempIndex = matcher.getMatch(i);
         matchedIDList.append(tempIndex);
-        kianmatchedIDList.append(agents.at(tempIndex)->id());
         guardIndexList.append(i);
         mahiAgentsID[i] = tempIndex;
         mahiPositionAgents.append(agents.at(tempIndex));
@@ -1016,9 +1003,6 @@ void CDynamicAttack::chooseBestPositons() {
             //        debug(QString(""), D_PARSA);
         }
     }
-    //comment below later
-    for(int i{} ; i < semiDynamicPosition.size(); i++)
-        semiDynamicPosition[i] = Vector2D{i, pow(-1, i)*i};
 
 }
 
