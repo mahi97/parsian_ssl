@@ -235,9 +235,9 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
             }
         }
-    } else if (gameState->ourPlayOffKick()) { //// Choose # of Agents in PlayOff
-        if (wm->ball->pos.x < 0) {
-            preferedDefenseCounts = (checkOverdef()) ? 1 : 2;
+    } else if (gameState->ourPlayOffKick()) {
+        if (wm->ball->pos.x < -1) {
+            preferedDefenseCounts = (selectedPlay->defensePlan.findNeededDefense() == 1) ? 1 : 2;
 
         } else if (wm->ball->pos.x > 0.5) {
             preferedDefenseCounts = 0;
@@ -260,6 +260,13 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
+    }
+    if(conf.StrictFormation){
+        if (conf.Defense > 3){
+            preferedDefenseCounts = 3;
+        } else {
+            preferedDefenseCounts = conf.Defense;
+        }
     }
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
@@ -778,9 +785,8 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     dynamicAttack->setFast(ourAttackState     == FAST);
     dynamicAttack->setCritical(ourAttackState == CRITICAL);
 
-    ////////////////////////////////////////////// assign agents
-    bool overdef;
-    overdef = checkOverdef();
+    //////////////////////////////////////////////assign agents
+    bool overdef =  (selectedPlay->defensePlan.findNeededDefense() == 1) ? true : false;
     int MarkNum = 0;
     switch (ballPState) {
         case BallPossesion::WEHAVETHEBALL:
@@ -1194,19 +1200,6 @@ void CCoach::decideNull(QList<int> &_ourPlayers) {
         ourPlayOff->reset();
         ourPlayOff->deleted = true;
     }
-}
-
-///HMD
-bool CCoach::checkOverdef() {
-    if ((Vector2D::angleOf(wm->ball->pos, wm->field->ourGoal(), wm->field->ourCornerL()).abs() < 20 + overDefThr
-         || Vector2D::angleOf(wm->ball->pos, wm->field->ourGoal(), wm->field->ourCornerR()).abs() < 20 + overDefThr)
-        && !Circle2D((wm->field->ourGoal() - Vector2D(0.2, 0)), 1.60).contains(wm->ball->pos)) {
-        overDefThr = 5;
-        return true;
-    }
-    overDefThr = 0;
-    return false;
-
 }
 
 void CCoach::checkSensorShootFault() {
