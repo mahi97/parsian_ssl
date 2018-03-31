@@ -17,19 +17,19 @@ void AINodelet::onInit() {
     }
     drawer = new Drawer();
 
-    worldModelSub = nh.subscribe("/world_model", 1000, &AINodelet::worldModelCallBack, this);
-    robotStatusSub = nh.subscribe("/robot_status", 1000, &AINodelet::robotStatusCallBack, this);
-    refereeSub = nh.subscribe("/referee", 1000,  &AINodelet::refereeCallBack, this);
-    teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
-    behaviorSub = nh.subscribe("/behavior", 100, &AINodelet::behaviorCb, this);
-    mousePosSub = nh.subscribe("/mousePos", 100, &AINodelet::mousePosCb, this);
+    worldModelSub = nh.subscribe("/world_model", 1, &AINodelet::worldModelCallBack, this);
+    robotStatusSub = nh.subscribe("/robot_status", 1, &AINodelet::robotStatusCallBack, this);
+    refereeSub = nh.subscribe("/referee", 1,  &AINodelet::refereeCallBack, this);
+    teamConfSub = nh.subscribe("/team_config", 1, &AINodelet::teamConfCb, this);
+    behaviorSub = nh.subscribe("/behavior", 1, &AINodelet::behaviorCb, this);
+    mousePosSub = nh.subscribe("/mousePos", 1, &AINodelet::mousePosCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
-    behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 1000);
+    behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 1);
 
     ai->getSoccer()->getCoach()->setPlanClient(plan_client);
     ai->getSoccer()->getCoach()->setBehaviorPublisher(behaviorPub);
@@ -89,5 +89,3 @@ void AINodelet::behaviorCb(const parsian_msgs::parsian_behaviorConstPtr &_behavi
     ROS_INFO_STREAM("behavior " << _behavior->name << " received !");
     soccer->coach->updateBehavior(_behavior);
 }
-
-
