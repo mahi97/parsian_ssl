@@ -163,6 +163,9 @@ public:
     double segmentperpass;
     bool MantoManAllTransientFlag;
     Vector2D dir;
+    /// ALI GAVAHI
+    bool ballIsBounced;
+    Vector2D ballBouncePos, playOffStartBallPos, playOffPassDir,beforeTransientPassDir;
     ///////////////////////////////////
 
 
@@ -183,6 +186,7 @@ private:
     Vector2D posvel(CRobot*, double);
     QList<QPair<Vector2D, double> > sortdangerpassplayon(QList<Vector2D> oppposdanger);
     QList<QPair<Vector2D, double> > sortdangerpassplayoff(QList<Vector2D> oppposdanger);
+    Vector2D getMarkPlayoffPredictWaitPos();
     ////////////////////////////////////////
     rcsc::Circle2D defenseAreaBottomCircle, defenseAreaTopCircle;
     rcsc::Segment2D defenseAreaLine;
@@ -260,6 +264,7 @@ private:
     int f = 0 , counterBallWasBesidePoles = 0;
     bool firstTimeGoalKeeperOneTouch = false;
     Vector2D oneTouchDir;
+    Vector2D playoffMarkPredictPos;
 };
 
 #endif // DEFENSE_H

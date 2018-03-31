@@ -7,6 +7,7 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
+
 QPair<Vector2D , Vector2D> DefensePlan::avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity){
     int skillAgent = 7;
     Rect2D penaltyArea = wm->field->ourBigPenaltyArea(1,0.1,0);
@@ -882,6 +883,7 @@ void DefensePlan::manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsT
     markAngs.clear();
     markRoles.clear();
     /////////////////// Intelligent mark plan ///////////////////////////////
+    ///
     ////////////////////////////////////////////////////////////////////////////
     DBUG(QString("Mark Agents Count : %1").arg(ourMarkAgentsSize) , D_SEPEHR);
     ///////// Make Cirlcles around opponent agents /////////////////////////////
@@ -3430,6 +3432,11 @@ void DefensePlan::fillDefencePositionsTo(Vector2D *poses) {
     }
 }
 
+void DefensePlan::setMarkPlayOffPredictPos(const Vector2D &pos)
+{
+    playoffMarkPredictPos = pos;
+}
+
 Vector2D DefensePlan::NearestDistanceToBallSegment(Vector2D point) {
     //// This function gets us the nearest point of input point in proportion of
     //// the our goal line, if intersection of ball line && our goal line is valid.
@@ -3947,4 +3954,24 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D
     //}
 
     return output;
+}
+
+Vector2D DefensePlan::getMarkPlayoffPredictWaitPos(){
+    if(!know->variables["transientFlag"].toBool())
+        beforeTransientPassDir = wm->opp[know->nearestOppToBall()]->dir;
+    else{
+        vector2D sol1,sol2;
+        if(ballIsBounced){
+             int solNum = wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).
+                                            intersection(Line2D(ballBouncePos,playOffStartBallPos),sol1,sol2);
+        if(solNum == 2)
+           return playOffStartBallPos.dist(sol1) > playOffStartBallPos.dist(sol2) ? sol1 : sol2;
+        }
+        else{
+            int solNum = wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).
+                        intersection(Line2D(playOffStartBallPos,playOffStartBallPos + ((playOffPassDir+beforeTransientPassDir)/2),sol1,sol2));
+        if(solNum == 2)
+            return playOffStartBallPos.dist(sol1) > playOffStartBallPos.dist(sol2) ? sol1 : sol2;
+        }
+    }
 }
