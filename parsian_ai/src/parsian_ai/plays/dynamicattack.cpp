@@ -1653,24 +1653,24 @@ void CDynamicAttack::setPlayMake(Agent* _playMake)
 {
     ROS_INFO_STREAM("playmake1 PMfromCoach: " << PMfromCoach);
 
-    if(PMfromCoach || playmake == nullptr || receiver == nullptr)
-    {
+//    if(PMfromCoach || playmake == nullptr || receiver == nullptr)
+//    {
         playmakeID = _playMake->id();
         playmake = _playMake;
-    }
-    else if(!PMfromCoach)
-    {
-        ROS_INFO_STREAM("swap receivverID: " << receiver->id());
-        QList<Agent*> newposing;
-        newposing.clear();
-        for(const auto& agent : agents)
-            if(agent->id() != receiver->id())
-                newposing.append(agent);
-        newposing.append(playmake);
-        init(newposing);
-        playmakeID = receiver->id();
-        playmake = receiver;
-    }
+//    }
+//    else if(!PMfromCoach)
+//    {
+//        ROS_INFO_STREAM("swap receivverID: " << receiver->id());
+//        QList<Agent*> newposing;
+//        newposing.clear();
+//        for(const auto& agent : agents)
+//            if(agent->id() != receiver->id())
+//                newposing.append(agent);
+//        newposing.append(playmake);
+//        init(newposing);
+//        playmakeID = receiver->id();
+//        playmake = receiver;
+//    }
 }
 
 void CDynamicAttack::setWeHaveBall(bool _ballPoss) {
