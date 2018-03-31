@@ -252,7 +252,7 @@ void CPlayOff::staticExecute() {
 
             }
 
-            if (isPlanEnd() && false) {
+            if (isPlanEnd()) {
                 playOnFlag = true;
                 ROS_INFO("Playofff Ends");
             }

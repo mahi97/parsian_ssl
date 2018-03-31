@@ -60,7 +60,7 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ai->updateWM(_wm);
-    ROS_INFO("wm updated");
+    ROS_INFO("wm");
     ai->execute();
 
     for (int i = 0; i < wm->our.activeAgentsCount(); i++) {

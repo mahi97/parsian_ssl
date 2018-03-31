@@ -297,6 +297,6 @@ private:
     parsian_msgs::parsian_ai_statusPtr fillAIStatus();
 
     void findDefneders(const int &max_number, const int& min_number);
-
+    NoAction* haltAction;
 };
 #endif //PARSIAN_AI_COACH_H

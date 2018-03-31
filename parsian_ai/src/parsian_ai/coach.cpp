@@ -76,12 +76,23 @@ CCoach::CCoach(Agent**_agents)
     }
     firstTime = true;
 
-    selectedBehavior = nullptr;
-    behaviorMahi = new BehaviorMahi();
+    haltAction = new NoAction;
+
 }
 
 CCoach::~CCoach() {
-    delete stopPlay;
+    delete haltAction;
+
+    delete ourPenalty        ;
+    delete theirDirect       ;
+    delete theirKickOff      ;
+    delete theirPenalty      ;
+    delete theirIndirect     ;
+    delete ourBallPlacement  ;
+    delete theirBallPlacement;
+    delete ourPlayOff        ;
+    delete dynamicAttack     ;
+    delete stopPlay          ;
     //    savePostAssignment();
     //    saveLFUReapeatData(LFUList);
 }
@@ -1060,10 +1071,11 @@ void CCoach::decideHalt(QList<int>& _ourPlayers) {
     cyclesWaitAfterballMoved = 0;
     _ourPlayers.clear();
     _ourPlayers.append(wm->our.data->activeAgents);
-    auto * a = new NoAction();
     for (int i = 0 ; i < _ourPlayers.count() ; i++) {
-        //        a->waithere();
-        agents[_ourPlayers[i]]->action =  a; // TODO : Halt Role or No Action
+//        if (timePassed) {
+//
+//        }
+        agents[_ourPlayers[i]]->action = haltAction;
     }
 
     if (!ourPlayOff->deleted) {
@@ -1483,7 +1495,7 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
 }
 
 int CCoach::findGoalie() {
-    if (conf.useGoalieInPlayoff) {
+    if (conf.useGoalieInPlayoff && gameState->ourPlayOffKick() && wm->ball->pos.x > 1) {
         preferedGoalieID = -1;
 
     } else {
