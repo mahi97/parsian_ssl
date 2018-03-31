@@ -631,7 +631,7 @@ double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , dou
     if(bestRadiusForDefenseArea >= upLimit){
         bestRadiusForDefenseArea = upLimit;
     }
-    ROS_INFO(QString("bestRadius: %1").arg(bestRadiusForDefenseArea).toStdString().c_str());
+    ROS_INFO_STREAM("bestRadius: " << bestRadiusForDefenseArea);
     return bestRadiusForDefenseArea;
 }
 
@@ -1941,9 +1941,11 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     findPos(decideNumOfMarks());
     matchPoints.append(markPoses);
     /////////////// Stucking agents ///////////////////////////////////////////
-    while(areAgentsStuckTogether(matchPoints)){
-        agentsStuckTogether(matchPoints , stuckPositions , stuckIndexs);
-        correctingTheAgentsAreStuckTogether(matchPoints , stuckPositions , stuckIndexs);
+    for (int i = 0; i < 4; i++) {
+        if (areAgentsStuckTogether(matchPoints)) {
+            agentsStuckTogether(matchPoints, stuckPositions, stuckIndexs);
+            correctingTheAgentsAreStuckTogether(matchPoints, stuckPositions, stuckIndexs);
+        }
     }
     //////////////// Avoid Penalty Area ///////////////////////
     //////////////////// Added for RC 2017 /////////////////////////////////////
