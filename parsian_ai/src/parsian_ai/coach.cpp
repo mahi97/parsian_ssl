@@ -8,7 +8,7 @@
 CCoach::CCoach(Agent**_agents)
 {
     clearBallVels();
-    averageVel = 0;
+    averageVel = 0;    
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -58,7 +58,7 @@ CCoach::CCoach(Agent**_agents)
 
     defenseTimeForVisionProblem[0].start();
     defenseTimeForVisionProblem[1].start();
-    transientFlag = false;
+    know->variables["transientFlag"].setValue(false);
     trasientTimeOut.start();
     translationTimeOutTime = 4000;
     exeptionPlayMake = nullptr;
@@ -204,7 +204,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
-        if (transientFlag) {
+        if (know->variables["transientFlag"].toBool()) {
             //// Add Playmake after time
             if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = std::max(0, agentsCount - missMatchIds.count() - 1);
@@ -426,6 +426,9 @@ bool CCoach::isBallcollide() {
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
            (innerproduct < .1 && innerproduct >-.1)){
             ROS_INFO("khord ro zamin");
+            getDefense().ballBouncePos = wm->ball->pos;
+            getDefense().ballIsBounced = true;
+            PDEBUGV2D("ball bounce pos",wm->ball->pos,D_ALI);
             removeLastBallVel();
             return false;
         }
@@ -464,53 +467,35 @@ void CCoach::clearBallVels(){
     lastBallVels.reserve(6);
 }
 
-bool CCoach::ballChiped(){
-    if(know->nearestOppToBall() == -1)
-        return false;
-    if(wm->ball == nullptr)
-        return false;
-    Vector2D nearest_dir = wm->opp[know->nearestOppToBall()]->dir;
-    double nearest_dist = wm->opp[know->nearestOppToBall()]->pos.dist(wm->ball->pos);
-    ROS_INFO_STREAM("ALIII2  "<<nearest_dist<<"    "<<lastNearestBallDist);
-    if (lastNearestBallDist < .18 && nearest_dist> .20){
-        if(nearest_dir.norm().innerProduct(wm->ball->dir.norm())<.3) {
-            ROS_INFO_STREAM("ALIII        CHIPPPPP");
-            lastNearestBallDist = nearest_dist;
-            return true;
-        } else
-            ROS_INFO_STREAM("ALIII:       ball kick");
-    }
-    lastNearestBallDist = nearest_dist;
-    return false;
-}
-
 void CCoach::virtualTheirPlayOffState() {
     States currentState;
     currentState = gameState->getState();
     if (lastState == States::TheirDirectKick || lastState == States::TheirIndirectKick /*|| lastState == States::TheirKickOff*/) {
         if (currentState == States::Start) {
-            transientFlag = true;
+            know->variables["transientFlag"].setValue(true);
+            getDefense().ballIsBounced = false;
+            getDefense().playOffStartBallPos = wm->ball->pos;
+            getDefense().playOffPassDir = wm->opp[know->nearestOppToBall()]->dir;
         }
     }
 
-    if (! transientFlag) {
+    if (! know->variables["transientFlag"].toBool()) {
         trasientTimeOut.restart();
     }
 
     if (trasientTimeOut.elapsed() >= translationTimeOutTime) {
-        transientFlag = false;
+        know->variables["transientFlag"].setValue(false);
     }
 
     if (wm->ball->pos.x >= 1) {
-        transientFlag = false;
+        know->variables["transientFlag"].setValue(false);
     }
-    if(transientFlag)
+    if(know->variables["transientFlag"].toBool())
         if (isBallcollide()) {
-            transientFlag = false;
+            know->variables["transientFlag"].setValue(false);
         }
 
-    //    if (ballChiped()); // todo: ali
-    PDEBUG("TS flag:", transientFlag, D_AHZ);
+    PDEBUG("TS flag:", know->variables["transientFlag"].toBool(), D_AHZ);
     lastState  = currentState;
 
 }
@@ -1317,7 +1302,6 @@ void CCoach::checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers) 
 
     qDebug() << "[coach] final Match : " << _plan->matching.common->matchedID;
 }
-
 
 
 NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize) {
