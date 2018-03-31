@@ -1354,7 +1354,7 @@ NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planM
     }
 
     QList< QList<playOffRobot> > agpln;
-    for (int i = 0; i < planMsg.the_plan.agentSize; i++) {
+    for (unsigned int i = 0; i < planMsg.the_plan.agentSize; i++) {
         ROS_INFO_STREAM("agent " << i << " pos " << planMsg.the_plan.agents.at(i).posSize);
         QList<playOffRobot>  ag;
         ag.clear();
