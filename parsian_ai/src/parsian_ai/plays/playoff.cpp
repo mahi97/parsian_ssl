@@ -33,8 +33,8 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     kickOffPos[4] = Vector2D(-0.6,  1.2);
     kickOffPos[5] = Vector2D(-0.6, -1.2);
     // TODO : fill kickoffpos for rest of robots if needed
-//    kickOffPos[6] = Vector2D(-4, 1);
-//    kickOffPos[7] = Vector2D(-4, -1);
+    kickOffPos[6] = Vector2D(-3.4, 1);
+    kickOffPos[7] = Vector2D(-3.4, -1);
 
 
     initial    = true;
@@ -824,7 +824,7 @@ void CPlayOff::firstExecute() {
     }
 
     if (gameState->ourKickoff()) {
-        //        kickOffStopModePlay(masterPlan->common.currentSize);
+                kickOffStopModePlay(masterPlan->common.currentSize);
     } else {
         firstPlayForOppCorner(agents.size());
 
