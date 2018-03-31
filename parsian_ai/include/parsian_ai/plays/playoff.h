@@ -327,6 +327,8 @@ public:
     EMode getMasterMode();
     void reset();
     void setInitial(bool _init);
+
+    void kickoffPositioning(int playersNum);
 private:
 
 

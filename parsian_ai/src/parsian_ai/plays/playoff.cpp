@@ -33,8 +33,8 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     kickOffPos[4] = Vector2D(-0.6,  1.2);
     kickOffPos[5] = Vector2D(-0.6, -1.2);
     // TODO : fill kickoffpos for rest of robots if needed
-    kickOffPos[6] = Vector2D(-3.4, 1);
-    kickOffPos[7] = Vector2D(-3.4, -1);
+    kickOffPos[6] = Vector2D(-0.45, 1.7);
+    kickOffPos[7] = Vector2D(-0.45, -1.7);
 
 
     initial    = true;
@@ -237,12 +237,11 @@ void CPlayOff::staticExecute() {
 
     } else {
 
-        if (!gameState->ourKickoff()) {
+        if (gameState->canKickBall()) {
 
             fillRoleProperties();
             posExecute();
             checkEndState();
-            DBUG(QString("IDD : %1, ST : %2").arg(1).arg(positionAgent[1].stateNumber), D_MAHI);
             ROS_INFO_STREAM("IDD : " << 1 << ", ST : " << positionAgent[1].stateNumber);
 
             if (masterPlan->common.currentSize > 1 && havePassInPlan) {
@@ -257,14 +256,23 @@ void CPlayOff::staticExecute() {
             }
 
         } else {
-            kickOffStopModePlay(masterPlan->common.currentSize);
-            for (int i = 0; i < masterPlan->common.currentSize; i++) {
-                newRoleAgent[i]->execute();
-            }
+//            kickOffStopModePlay(masterPlan->common.currentSize);
+//            for (int i = 0; i < masterPlan->common.currentSize; i++) {
+//                newRoleAgent[i]->execute();
+//            }
+
         }
     }
 }
 
+void CPlayOff::kickoffPositioning(int playersNum) {
+    if (gameState->ourKickoff()){
+        kickOffStopModePlay(playersNum);
+        for (int i = 0; i < playersNum; i++) {
+            newRoleAgent[i]->execute();
+        }
+    }
+}
 
 void CPlayOff::dynamicExecute() {
 
@@ -824,7 +832,7 @@ void CPlayOff::firstExecute() {
     }
 
     if (gameState->ourKickoff()) {
-                kickOffStopModePlay(masterPlan->common.currentSize);
+//                kickOffStopModePlay(masterPlan->common.currentSize);
     } else {
         firstPlayForOppCorner(agents.size());
 
@@ -916,10 +924,10 @@ void CPlayOff::mahiVector(int limit) {
 
 void CPlayOff::kickOffStopModePlay(int tAgentsize) {
 
-    for (int i = 0; i < masterPlan->common.currentSize; i++) {
+    for (int i = 0; i < tAgentsize; i++) {
         if (!newRoleAgent[i]->getRoleUpdate()) {
             newRoleAgent[i]->setUpdated(true);
-            newRoleAgent[i]->setAgent(soccer->agents[masterPlan->common.matchedID.value(i)]);
+            newRoleAgent[i]->setAgent(soccer->agents[i]);
             newRoleAgent[i]->setRoleUpdate(true);
             newRoleAgent[i]->setAvoidBall(true);
             newRoleAgent[i]->setAvoidPenaltyArea(true);
@@ -941,7 +949,6 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
 }
 
 void CPlayOff::firstPlayForOppCorner(int _agentSize) {
-
 
     DBUG(QString("mode :%1").arg(firstStepEnums), D_NADIA);
     for (int i = 0; i < _agentSize; i++) {
