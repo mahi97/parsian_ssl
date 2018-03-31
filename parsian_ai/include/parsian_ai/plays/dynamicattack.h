@@ -271,6 +271,8 @@ private:
     Vector2D last_move_fwd_target;
     Agent* receiver;
 
+    QList<int> kianmatchedIDList;
+    bool PMfromCoach;
     /////////Intentions
 //    int intenHighProb;
 
