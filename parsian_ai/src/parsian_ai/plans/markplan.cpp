@@ -738,6 +738,11 @@ void CMarkPlan::markPosesRefinePlayon() {
 }
 
 QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
+    //// This function produces a point between opponent agents to be mark &&
+    //// ourGoal to block the shot path. Also checks if this point is in the
+    //// penalty area, produces a point that is intersection of penalty area with
+    //// shot path.
+    ///
     Segment2D tempSeg;
     QList<Vector2D> tempQlist;
     Circle2D indirect;
@@ -805,50 +810,33 @@ QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
 }
 
 QList<Vector2D> CMarkPlan::PassBlockRatio(double ratio, Vector2D opp) {
-    Segment2D tempSeg;
-    Segment2D isInPenaltyArea;
-    Vector2D sol;
-    Vector2D sol1[2];
-    for (int i = 0 ; i < 2 ; i++) {
-        sol1[i].invalidate();
-    }
-    QList<Vector2D> tempQlist;
-    tempQlist.clear();
-    tempSeg.assign(wm->ball->pos, wm->ball->pos + (opp - wm->ball->pos) * 20);
-    Vector2D pos = wm->ball->pos + (opp - wm->ball->pos) * ratio;
-    isInPenaltyArea.assign(opp, wm->ball->pos);
-    QList<Vector2D> tempVec;
-    tempVec.clear();
-    if (wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(isInPenaltyArea , &sol1[0] , &sol1[1])) {
-        for (int i = 0 ; i < 2 ; i++) {
-            if (sol1[i].isValid()) {
-                tempVec.append(sol1[i]);
-            }
+    //// This function produces a point that block the pass path.Also if the
+    //// resulted point is in the penalty area, this function generates a suitable
+    //// point.
+    ///
+    QList<Vector2D> passBlocker;
+    Vector2D sol1,sol2,sol3,sol4,sol5,sol6,sol7,sol8;
+    double opponentAgentsCircleR = 0.2;
+    Circle2D opponentAgentsToBeMarkCircle = Circle2D(opp , opponentAgentsCircleR);
+    if(wm->field->ourBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Segment2D(wm->ball->pos , opp) , &sol7,  &sol8)){
+        if(!wm->field->isInOurPenaltyArea(opp)){
+            opponentAgentsToBeMarkCircle.intersection(Segment2D(wm->ball->pos , opp), &sol1 , &sol2);
+            Circle2D(wm->ball->pos , ballCircleR).intersection(Segment2D(wm->ball->pos , opp), &sol3 , &sol4);
+            wm->field->ourBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Segment2D(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2, Segment2D(sol3 , opp).length() < Segment2D(sol4 , opp).length() ? sol3 : sol4) , &sol5 , &sol6);
+            passBlocker.append(know->getPointInDirection(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2 , Segment2D(sol5 , opp).length() < Segment2D(sol6 , opp).length() ? sol5 : sol6 , ratio));
         }
-        if (tempVec.size() == 1) {
-            tempQlist.append(tempVec.first());
-        } else if (tempVec.size() == 2) {
-            if ((tempVec.first() - wm->ball->pos).length() > (tempVec.last() - wm->ball->pos).length()) {
-                sol = tempVec.first();
-            } else if ((tempVec.last() - wm->ball->pos).length() > (tempVec.first() - wm->ball->pos).length()) {
-                sol = tempVec.last();
-            }
-            tempQlist.append(sol);
+        else{
+            wm->field->ourBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Line2D(wm->field->ourGoal() , opp) , &sol1 , &sol2);
+            passBlocker.append(Segment2D(sol1 , opp).length() < Segment2D(sol2 , opp).length() ? sol1 : sol2);
         }
-
-        tempQlist.append(wm->ball->pos - opp);
-
-
-        drawer->draw(tempSeg, "red");
-        DBUG(QString("this is in the penalty area, Block pass Mode"), D_HAMED);
-    } else {
-        tempQlist.clear();
-        tempQlist.append(pos);
-        tempQlist.append(wm->ball->pos - opp);
-        DBUG(QString("sag"), D_HAMED);
-        drawer->draw(tempSeg, "blue");
     }
-    return tempQlist;
+    else{
+        opponentAgentsToBeMarkCircle.intersection(Segment2D(wm->ball->pos , opp), &sol1 , &sol2);
+        Circle2D(wm->ball->pos , ballCircleR).intersection(Segment2D(wm->ball->pos , opp), &sol3 , &sol4);
+        passBlocker.append(know->getPointInDirection(Segment2D(sol1 , wm->ball->pos).length() < Segment2D(sol2 , wm->ball->pos).length() ? sol1 : sol2, Segment2D(sol3 , opp).length() < Segment2D(sol4 , opp).length() ? sol3 : sol4, ratio));
+    }
+    passBlocker.append(wm->ball->pos - passBlocker.first());
+    return passBlocker;
 
 }
 
@@ -867,20 +855,20 @@ void CMarkPlan::execute(){
         else{
             markPoses.clear();
             markAngs.clear();
-            if (agents.count() == oppAgentsToMarkPos.count()) {
+            if(agents.count() == oppAgentsToMarkPos.count()){
                 for (int i = 0; i < oppAgentsToMarkPos.count(); i++) {
                     markPoses.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).first());
                     markAngs.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).last());
                 }
             }
-            else if(agents.count() < oppAgentsToMarkPos.count()) {
+            else if(agents.count() < oppAgentsToMarkPos.count()){
                 QList<QPair<Vector2D, double> >tempQlistQpair = sortdangerpassplayon(oppAgentsToMarkPos);
                 for (int i = 0; i < agents.count(); i++) {
                     markPoses.append(ShootBlockRatio(segmentpershoot, tempQlistQpair[i].first).first());
                     markAngs.append(ShootBlockRatio(segmentpershoot, tempQlistQpair[i].first).last());
                 }
             }
-            else if (agents.count() > oppAgentsToMarkPos.count()) {
+            else if(agents.count() > oppAgentsToMarkPos.count()){
                 QList<QPair<Vector2D, double> >tempQlistQpair = sortdangerpassplayon(oppAgentsToMarkPos);
                 for(int i = 0; i < oppAgentsToMarkPos.count(); i++) {
                     markPoses.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).first());
@@ -891,7 +879,6 @@ void CMarkPlan::execute(){
                     markAngs.append(PassBlockRatio(segmentperpass, tempQlistQpair[i].first).last());
                 }
             }
-
             int count = 0;
             for (int i = 0; i < agents.count(); i++) {
                 if (markPoses.size() < agents.count()) {
