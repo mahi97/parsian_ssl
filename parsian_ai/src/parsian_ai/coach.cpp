@@ -77,7 +77,6 @@ CCoach::CCoach(Agent**_agents)
     firstTime = true;
 
     haltAction = new NoAction;
-
 }
 
 CCoach::~CCoach() {
@@ -739,8 +738,17 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     updateAttackState(); //// Too Bad Conditions will be Handle here
 
     if (0 <= playmakeId && playmakeId <= 11) {
-        dynamicAttack->setPlayMake(agents[playmakeId]);
-        ourPlayers.removeOne(playmakeId);
+        if(dynamicAttack->getPMfromCaoch())
+        {
+            dynamicAttack->setPlayMake(agents[playmakeId]);
+            ourPlayers.removeOne(playmakeId);
+            ROS_INFO_STREAM("PMfromCaoch true");
+        } else
+        {
+            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
+            ourPlayers.removeOne(dynamicAttack->getReceiverID());
+            ROS_INFO_STREAM("PMfromCaoch false");
+        }
     }
 
     dynamicAttack->setDefenseClear(false); // TODO : fix

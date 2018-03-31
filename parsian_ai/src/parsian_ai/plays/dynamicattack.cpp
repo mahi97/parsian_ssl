@@ -4,6 +4,7 @@ CDynamicAttack::CDynamicAttack() {
     // NEW PASS
     createRegions();
     clearRobotsRegionsWeights();
+    PMfromCoach = true;
 
 
     dribbleIntention.start();
@@ -1655,8 +1656,8 @@ void CDynamicAttack::setPlayMake(Agent* _playMake)
 
 //    if(PMfromCoach || playmake == nullptr || receiver == nullptr)
 //    {
-        playmakeID = _playMake->id();
-        playmake = _playMake;
+      playmakeID = _playMake->id();
+      playmake = _playMake;
 //    }
 //    else if(!PMfromCoach)
 //    {
@@ -1688,7 +1689,6 @@ void CDynamicAttack::setCritical(bool _critical) {
 void CDynamicAttack::setBallInOppJaw(bool _ballInOppJaw) {
     ballInOppJaw = _ballInOppJaw;
 }
-
 void CDynamicAttack::setFast(bool _fast) {
     fast = _fast;
 }
