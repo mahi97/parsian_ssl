@@ -8,6 +8,7 @@ CHalftimeLineup::CHalftimeLineup() {
 void CHalftimeLineup::reset(){
     halt = false;
     ready = false;
+    points.clear();
 }
 
 
@@ -40,7 +41,11 @@ void CHalftimeLineup::execute_x() {
     }
 
     for (int i = 0; i < agents.size(); i++) {
-        agents[i]->action = gpa[i];
+        if (points.size() >= agents.size()) {
+            gpa[i]->setTargetpos(points[i]);
+            agents[i]->action = gpa[i];
+
+        }
     }
 }
 
@@ -48,9 +53,10 @@ void CHalftimeLineup::fillPoints() {
     Vector2D startPoint{conf.startPoint_X, conf.startPoint_Y};
     Vector2D endPoint; endPoint.setPolar(agents.count()*0.3, conf.lineDirection); endPoint += startPoint;
     if (wm->field->fieldRect().contains(endPoint)) {
-        for(int i = 0; i < agents.size(); i++) {
+        points.clear();
+        for(double i = 0; i < agents.size(); i++) {
             Vector2D point;
-            points.append(startPoint*(1 - i/agents.size()) + endPoint*(i/agents.size()));
+            points.append(startPoint*(1.0 - i/agents.size()) + endPoint*(i/agents.size()));
         }
     } else {
         DBUG("End Point is Invalid", D_MAHI);

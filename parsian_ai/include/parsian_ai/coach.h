@@ -116,6 +116,7 @@ private:
     CTheirBallPlacement *theirBallPlacement;
     CDynamicAttack *dynamicAttack;
     CStopPlay *stopPlay;
+    CHalftimeLineup *halftimeLineup;
 
     Behavior *selectedBehavior;
 
