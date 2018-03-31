@@ -58,8 +58,6 @@ void CSkillGotoPointAvoid::execute()
     agentPos = agent->pos();
     agentVel = agent->vel();
     double dVx, dVy, dW;
-    diveMode = false;
-    oneTouchMode = false;
     bangBang->setDecMax(conf->DecMax);
     bangBang->setOneTouch(oneTouchMode);
     bangBang->setDiveMode(diveMode);
