@@ -8,8 +8,7 @@
 CCoach::CCoach(Agent**_agents)
 {
     clearBallVels();
-    averageVel = 0;
-    ballIsBounced = false;
+    averageVel = 0;    
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -427,7 +426,7 @@ bool CCoach::isBallcollide() {
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
            (innerproduct < .1 && innerproduct >-.1)){
             ROS_INFO("khord ro zamin");
-            getDefense().ballBouncePos = wm->ball;
+            getDefense().ballBouncePos = wm->ball->pos;
             getDefense().ballIsBounced = true;
             PDEBUGV2D("ball bounce pos",wm->ball->pos,D_ALI);
             removeLastBallVel();
@@ -476,7 +475,7 @@ void CCoach::virtualTheirPlayOffState() {
             know->variables["transientFlag"].setValue(true);
             getDefense().ballIsBounced = false;
             getDefense().playOffStartBallPos = wm->ball->pos;
-            getDefense().playOffPassDir = wm->opp[know->nearestOppToBall();
+            getDefense().playOffPassDir = wm->opp[know->nearestOppToBall()]->dir;
         }
     }
 
