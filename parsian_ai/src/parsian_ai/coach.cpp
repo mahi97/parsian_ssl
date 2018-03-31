@@ -822,8 +822,8 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (isFastPlay() && false) { // TODO : fastPlay should be completed!
         _mode = NGameOff::FastPlay;
 
-    } else if (gameState->ourKickoff()) {
-        _mode = NGameOff::StaticPlay;
+    } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
+        _mode = NGameOff::FirstPlay;
 
     } else if (wm->ball->pos.x < -1) {
         _mode = NGameOff::DynamicPlay;
@@ -845,23 +845,18 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
                              const QList<int>& _ourplayers) {
     switch (_mode) {
     case NGameOff::StaticPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
         initStaticPlay(_gameMode, _ourplayers);
         break;
     case NGameOff::DynamicPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initDynamicPlay");
         initDynamicPlay(_ourplayers);
         break;
     case NGameOff::FastPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initFastPlay");
         initFastPlay(_ourplayers);
         break;
     case NGameOff::FirstPlay:
-        ROS_INFO("HSHM: initPlayOffMode: initFirstPlay");
         initFirstPlay(_ourplayers);
         break;
     default:
-        ROS_INFO("HSHM: initPlayOffMode: initStaticPlay");
         initStaticPlay(_gameMode, _ourplayers);
     }
 }
@@ -928,6 +923,10 @@ void CCoach::initFastPlay(const QList<int> &_ourplayers) {
 }
 
 void CCoach::initFirstPlay(const QList<int> &_ourplayers) {
+
+    if(gameState->ourKickoff()){
+        ourPlayOff->kickoffPositioning(_ourplayers.size());
+    }
 
     double minDist = wm->field->_MAX_DIST;
     int minID = -1;
@@ -1251,8 +1250,6 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
         planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
         break;
     }
-
-    //    planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF; // test
 
     planRequest.plan_req.ballPos.x = wm->ball->pos.x;
     planRequest.plan_req.ballPos.y = wm->ball->pos.y;
