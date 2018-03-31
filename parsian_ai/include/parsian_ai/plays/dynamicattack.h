@@ -151,6 +151,8 @@ private:
     Vector2D bestPointForRobotsInRegions[11][9];
     QList<int> matchingIDs;
     QList<int> matchingRegions;
+    QList<QPair<int, Vector2D>> optimalPositionsForRecivers;
+    int bestReceiver;
     // END NEW PASS ZONE
 
 

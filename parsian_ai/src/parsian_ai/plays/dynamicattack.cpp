@@ -449,14 +449,9 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
     assignId_new();
     if (agentSize > 0) {
-        //    chooseMarkPos();
         chooseBestPosForPass(semiDynamicPosition);
     }
     assignTasks();
-
-    //    DBUG(QString("MODE : %1").arg(getString(currentPlan.mode)),D_MAHI);
-    //    ROS_INFO_STREAM("MODE : " << getString(currentPlan.mode).toStdString());
-    //    DBUG(QString("BALL : %1").arg(isBallInOurField),D_MAHI);
     for(size_t i = 0;i < currentPlan.agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
             roleAgents[i]->execute();
@@ -467,16 +462,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (playmakeID != -1) {
         roleAgentPM->execute();
     }
-    //    for (auto i : semiDynamicPosition) {
-    //        drawer->draw(i, QColor(Qt::black));
-    //    }
-    //
-    //    for (auto i : dynamicPosition) {
-    //        drawer->draw(Circle2D(i, 0.2), QColor(Qt::red), false);
-    //    }
-    //
-    //    showRegions(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::gray));
-    //    showLocations(static_cast<unsigned int>(currentPlan.agentSize), QColor(Qt::red));
 
     // TODO : remove this
     if (isPlayMakeChanged()) {
@@ -484,7 +469,6 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             i = false;
         }
     }
-    //    hamidDebug();
 }
 
 void CDynamicAttack::playMake() {
@@ -1045,6 +1029,38 @@ bool CDynamicAttack::isInpass()
 }
 
 void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
+    // hamid working here
+
+
+    // 1) first find a optimal position for each of the robots to receive the pass
+        // what we have: the optimal waiting pos for each robot
+        // what we need: an optimal position in the robots region, where they can receive the pass
+    optimalPositionsForRecivers.clear();
+    for(auto& robotID : matchingIDs)
+    {
+        auto robotPos = wm->our[robotID]->pos;
+        auto robotVel = wm->our[robotId]->vel;
+        double searchCircleRadius = 0;
+        double searchCircleCenter = Vector2D(0, 0);
+    }
+
+
+
+
+
+    // 2) then determine which robot is to receive the pass
+        // what we have: the optimal positions for robots where they can recieve the pass cominng fromm the playmake
+        // what we need: the id of the optimal robot that can receive the pass better than the others
+
+    srand(time(NULL));
+    int receiverID = matchingIDs[rand()%matchingIDs.count()]->id();
+    currentPlan.passPos = semiDynamicPosition[receiverID];
+    currentPlan.passID = receiverID;
+    ROS_INFO_STREAM("kian bade choose receiver");
+
+
+
+
     //the new one:
     QList <Vector2D> temp;
     int ans = 0;
@@ -1111,13 +1127,9 @@ void CDynamicAttack::chooseBestPosForPass(QList<Vector2D> _points) {
         DBUG(QString("%1 %2 ourtopoint %3").arg(temp.at(i).x).arg(temp.at(i).y).arg(points[i]), D_PARSA);
         DBUG(QString("end"), D_PARSA);
     }
-//    srand(time(NULL));
-//    int receiverID = mahiPositionAgents[rand()%mahiPositionAgents.count()]->id();
-//    currentPlan.passPos = semiDynamicPosition[receiverID];
-//    currentPlan.passID = receiverID;
-//    ROS_INFO_STREAM("kian bade choose receiver");
 
-    currentPlan.passPos = temp[ans];
+
+//    currentPlan.passPos = temp[ans];
     lastPassPosLoc = currentPlan.passPos;
     DBUG(QString("pass Pos %1 %2").arg(currentPlan.passPos.x).arg(currentPlan.passPos.y), D_PARSA);
 }
@@ -1922,6 +1934,7 @@ void CDynamicAttack::assignId_new()
     }
     matcher.findMatching();
     mahiPositionAgents.clear();
+    matchingIDs.clear(); matchingRegions,clear();
     semiDynamicPosition.clear();
     for(int i{0}; i<8; i++)
     {mahiAgentsID[i] = -1;}
@@ -1929,7 +1942,8 @@ void CDynamicAttack::assignId_new()
     for(int v = 0; v<robotIDs.count(); v++)
     {
         mahiAgentsID[v] = /*matcher.getMatch(v);*/robotIDs[v];
-        //matchingIDs.append(robotIDs.at(v)); matchingRegions.append(matcher.getMatch(v));
+        matchingIDs.append(robotIDs.at(v));
+        matchingRegions.append(matcher.getMatch(v));
         semiDynamicPosition.append(bestPointForRobotsInRegions[robotIDs.at(v)][matcher.getMatch(v)]);
         for(auto& agent : agents)
         {
