@@ -1697,11 +1697,15 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
 }
 
 int CCoach::findGoalieID() {
-    if (conf.GoalieFromGUI) {
-        preferedGoalieID = conf.Goalie;
-    }
-    else {
-        preferedGoalieID = wm->our.data->goalieID;
+    if (conf.useGoalieInPlayoff) {
+        preferedGoalieID = -1;
+
+    } else {
+        if (conf.GoalieFromGUI) {
+            preferedGoalieID = conf.Goalie;
+        } else {
+            preferedGoalieID = wm->our.data->goalieID;
+        }
     }
     return preferedGoalieID;
 }

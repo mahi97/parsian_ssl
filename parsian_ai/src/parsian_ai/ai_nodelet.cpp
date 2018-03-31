@@ -13,7 +13,7 @@ void AINodelet::onInit() {
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
         std::string topic(QString("/agent_%1/task").arg(i).toStdString());
-        robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1000);
+        robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 10);
     }
     drawer = new Drawer();
 
@@ -49,10 +49,7 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
-
-     ai->execute();
-
-     drawer->draws.texts.clear();
+    drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
