@@ -1176,7 +1176,7 @@ void CCoach::decideTheirBallPlacement(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideHalfTimeLineUp(QList<int> &_ourPlayers) {
-    //    selectedPlay = halfTimeLineup;
+        selectedPlay = halfTimeLineup;
 }
 
 
