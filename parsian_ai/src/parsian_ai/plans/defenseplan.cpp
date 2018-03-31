@@ -631,7 +631,7 @@ double DefensePlan::findBestRadiusForDefenseArea(Line2D bestLineWithTalles , dou
     if(bestRadiusForDefenseArea >= upLimit){
         bestRadiusForDefenseArea = upLimit;
     }
-    ROS_INFO(QString("bestRadius: %1").arg(bestRadiusForDefenseArea).toStdString().c_str());
+    ROS_INFO_STREAM("bestRadius: " << bestRadiusForDefenseArea);
     return bestRadiusForDefenseArea;
 }
 

@@ -61,6 +61,7 @@ generate_dynamic_reconfigure_options(
 	###	cfg/pass.cfg
 		cfg/direct.cfg
 		cfg/mahi.cfg
+                cfg/move_forward.cfg
 		cfg/ai.cfg
 		cfg/def_test.cfg
 		cfg/behavior_server.cfg
@@ -156,6 +157,7 @@ add_executable(${PROJECT_NAME}_node
 #####include(./pass_CMakeLists.txt)
 include(./direct_CMakeLists.txt)
 include(./mahi_CMakeLists.txt)
+include(./move_forward_CMakeLists.txt)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -231,6 +233,7 @@ target_link_libraries(${PROJECT_NAME}
 		${PROJECT_NAME}_roles
 		${PROJECT_NAME}_util
 		mahi_nodelet
+		direct_nodelet
 		)
 
 target_link_libraries(${PROJECT_NAME}_plays
@@ -256,6 +259,7 @@ target_link_libraries(${PROJECT_NAME}_roles
 		${catkin_LIBRARIES}
 		${QJSON_LIBRARIES}
 		)
+
 
 #############
 ## Install ##
