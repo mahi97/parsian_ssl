@@ -271,8 +271,9 @@ private:
 
     bool isFastPlay();
 
-    ///HMD
-    bool checkOverdef();
+    ///////////////////////// AHZ //////////
+    int findNeededDefense();
+
 
     double overDefThr;
 
