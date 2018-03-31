@@ -1248,7 +1248,7 @@ bool CPlayOff::isTimeOver() {
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
         ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
-        if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
+        if(ros::Time::now().sec - tempStart >= 3*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;
         }
