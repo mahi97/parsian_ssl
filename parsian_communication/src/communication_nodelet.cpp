@@ -21,7 +21,7 @@ void CommunicationNodelet::onInit() {
 
     drawPub    = n.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     statusPub  = n.advertise<parsian_msgs::parsian_robots_status>("/robots_status", 1000);
-    robotPacketSub   = n.subscribe("/packets" , 10, &CommunicationNodelet::callBack, this);
+    robotPacketSub   = n.subscribe("/packets" , 100, &CommunicationNodelet::callBack, this);
     team_config_sub = n.subscribe("/team_config", 10, & CommunicationNodelet::teamConfigCb, this);
 
 

@@ -501,8 +501,10 @@ void CSkillKick::jTurn() {
 
     */
 
+    posPid->error = 0;
     if (movementDir < 20 && movementDir > -20) {
         shift = 0;
+        posPid->error = movementDir;
     } else if (movementDir > 50) {
         shift = 15 + (1 - agentPos.dist(ballPos)) * 61;
     } else if (movementDir < -50) {
@@ -547,7 +549,6 @@ void CSkillKick::jTurn() {
     double dirReduce = (fabs(movementDir) / 70) * (fabs(movementDir) / 70);
 
     speedPid->error = targetForJturnSpeed.dist(agentPos);
-    posPid->error = 0;//targetForJturnPos.dist(agentPos);
 
     ////////////set Active adaptive PIDs
 
@@ -601,10 +602,8 @@ void CSkillKick::jTurn() {
         agentPos.dist(ballPos) < 0.25) {
         dirReduce -= 4;
     }
-
-    if (wm->ball->vel.length() < 0.2) {
-        posPid->kp = 0;
-    }
+    drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
+    posPid->kp = 0.02;
     speedPid->kp = 5.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
                    max(wm->ball->vel.length() * 2, 0);
 
@@ -621,8 +620,8 @@ void CSkillKick::jTurn() {
 
     angPid->kp = 5;
 
-    double vx = movementThSpeed.x * speedPid->PID_OUT() + movementThPos.x * posPid->PID_OUT();
-    double vy = movementThSpeed.y * speedPid->PID_OUT() + movementThPos.y * posPid->PID_OUT();
+    double vx = movementThSpeed.x * speedPid->PID_OUT() + posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
+    double vy = movementThSpeed.y * speedPid->PID_OUT() + posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);
     angPid->error = (kickFinalDir - agentDir.th()).radian();
     agent->setRobotAbsVel(wm->ball->vel.x + vx, wm->ball->vel.y + vy, angPid->PID_OUT());
     speedPid->pError = speedPid->error;

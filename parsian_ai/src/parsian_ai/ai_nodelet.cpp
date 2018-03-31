@@ -17,12 +17,12 @@ void AINodelet::onInit() {
     }
     drawer = new Drawer();
 
-    worldModelSub = nh.subscribe("/world_model", 1, &AINodelet::worldModelCallBack, this);
-    robotStatusSub = nh.subscribe("/robot_status", 1, &AINodelet::robotStatusCallBack, this);
-    refereeSub = nh.subscribe("/referee", 1,  &AINodelet::refereeCallBack, this);
-    teamConfSub = nh.subscribe("/team_config", 1, &AINodelet::teamConfCb, this);
-    behaviorSub = nh.subscribe("/behavior", 1, &AINodelet::behaviorCb, this);
-    mousePosSub = nh.subscribe("/mousePos", 1, &AINodelet::mousePosCb, this);
+    worldModelSub = nh.subscribe("/world_model", 10, &AINodelet::worldModelCallBack, this);
+    robotStatusSub = nh.subscribe("/robot_status", 100, &AINodelet::robotStatusCallBack, this);
+    refereeSub = nh.subscribe("/referee", 100,  &AINodelet::refereeCallBack, this);
+    teamConfSub = nh.subscribe("/team_config", 100, &AINodelet::teamConfCb, this);
+    behaviorSub = nh.subscribe("/behavior", 100, &AINodelet::behaviorCb, this);
+    mousePosSub = nh.subscribe("/mousePos", 100, &AINodelet::mousePosCb, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
@@ -59,16 +59,17 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-    ai->updateWM(_wm);
-    ROS_INFO("wm");
-    ai->execute();
-
-    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
-        robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
-    }
-
-    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
-    ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
+//    ai->updateWM(_wm);
+//    ROS_INFO("wm");
+//    ai->execute();
+//
+//    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
+        parsian_msgs::parsian_robot_taskPtr a{new parsian_msgs::parsian_robot_task};
+        robTask[0].publish(a);
+//    }
+//
+//    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+//    ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
 
 }
 
