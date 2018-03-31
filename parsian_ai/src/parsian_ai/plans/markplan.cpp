@@ -940,7 +940,7 @@ void CMarkPlan::execute(){
         }
     }
     else if(gameState->theirKickoff()) {
-        segmentpershoot = 0.3;
+        segmentpershoot = 0.7;
         markPoses.clear();
         markAngs.clear();
         DBUG(QString("Its TheirKickoff"), D_MAHI);
