@@ -82,6 +82,7 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
 }
 
 void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
+    ROS_INFO("MAHICALLING BACK");
     conf = config;
 }
 
