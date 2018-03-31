@@ -459,12 +459,12 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     }
     if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
     {
-        ROS_INFO_STREAM("ispassed" << playmakeIntention.elapsed());
         PMfromCoach = true;
     }
     if(playmakeIntention.elapsed() <= 1000 && playmake != nullptr)
     {
-        PMfromCoach = true;//change to false later
+        PMfromCoach = false;//change to false later
+        ROS_INFO_STREAM("playmake PMfromCoach is false");
     }
     ROS_INFO_STREAM("kian: ghable assign task");
     assignTasks();
@@ -485,6 +485,8 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             i = false;
         }
     }
+
+    hamidDebug();
 }
 
 void CDynamicAttack::playMake() {
@@ -1057,8 +1059,8 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
 
 
 
-        drawer->draw(Circle2D(searchCircleCenter, searchCircleRadius), QColor("orange"));
-    }
+        //        drawer->draw(Circle2D(searchCircleCenter, searchCircleRadius), QColor("orange"));
+//    }
 
 
 
@@ -1068,14 +1070,42 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
         // what we have: the optimal positions for robots where they can recieve the pass cominng fromm the playmake
         // what we need: the id of the optimal robot that can receive the pass better than the others
 
-    srand(time(NULL));
-    int receiverID = matchingIDs[rand()%matchingIDs.count()]->id();
-    currentPlan.passPos = semiDynamicPosition[receiverID];
-    currentPlan.passID = receiverID;
-    ROS_INFO_STREAM("hamid bade choose receiver");
+    if(semiDynamicPosition.isEmpty() || matchingIDs.isEmpty())
+    {
+        currentPlan.passPos = wm->field->oppGoal();
+        receiver = nullptr;
+        ROS_INFO_STREAM("playmake1 receiver is null");
+        return;
+    }
 
 
-//    currentPlan.passPos = temp[ans];
+    int lastReceiver = -1;
+    double minDist = 1000;
+    for(auto& id : matchingIDs)
+    {
+        double tempDist = wm->our[id]->pos.dist(wm->our[playmakeID]->pos);
+        if(tempDist < minDist)
+        {
+            minDist = tempDist;
+            lastReceiver = id;
+        }
+    }
+    if(lastReceiver == -1)
+    {
+        receiver = nullptr;
+        currentPlan.passPos = /*semiDynamicPosition[0]*/wm->field->oppGoal();
+        return;
+    }
+    currentPlan.passID = lastReceiver;
+    for(auto& agent : agents)
+    {
+        if(agent->id() == currentPlan.passID)
+        {
+            receiver = agent;
+            ROS_INFO_STREAM("playmake1 receiver is set to " << receiver->id());
+        }
+    }
+    currentPlan.passPos = semiDynamicPosition[lastReceiver];
     lastPassPosLoc = currentPlan.passPos;
 }
 
@@ -1579,28 +1609,27 @@ void CDynamicAttack::setPositions(QList<int> _positioningRegion) {
     }
 }
 
-void CDynamicAttack::setPlayMake(Agent* _playMake) {
-    if(PMfromCoach || playmake == nullptr)
+void CDynamicAttack::setPlayMake(Agent* _playMake)
+{
+    ROS_INFO_STREAM("playmake1 PMfromCoach: " << PMfromCoach);
+
+    if(PMfromCoach || playmake == nullptr || receiver == nullptr)
     {
         playmakeID = _playMake->id();
         playmake = _playMake;
     }
-    else
+    else if(!PMfromCoach)
     {
-        for(int i{}; i < agents.size();i++)
-        if(agents[i]->id() == 3)
-        {
-            QList<Agent*> newposing;
-            newposing.clear();
-            for(const auto& agent : agents)
-                if(agent->id() != 3)
-                    newposing.append(agent);
-            newposing.append(playmake);
-            playmakeID = agents[i]->id();
-            playmake = agents[i];
-            init(newposing);
-        }
-
+        ROS_INFO_STREAM("playmake1 receivverID: " << receiver->id());
+        QList<Agent*> newposing;
+        newposing.clear();
+        for(const auto& agent : agents)
+            if(agent->id() != receiver->id())
+                newposing.append(agent);
+        newposing.append(playmake);
+        playmakeID = receiver->id();
+        playmake = receiver;
+        init(newposing);
     }
 }
 
@@ -1898,7 +1927,7 @@ void CDynamicAttack::assignId_new()
     }
     matcher.findMatching();
     mahiPositionAgents.clear();
-    matchingIDs.clear(); matchingRegions,clear();
+    matchingIDs.clear(); matchingRegions.clear();
     semiDynamicPosition.clear();
     for(int i{0}; i<8; i++)
     {mahiAgentsID[i] = -1;}
@@ -2169,7 +2198,7 @@ void CDynamicAttack::hamidDebug()
 
     for(int i{0}; i<semiDynamicPosition.count(); i++)
     {
-        drawer->draw(Circle2D(semiDynamicPosition[i], 0.1), QColor("yellow"), true);
+        drawer->draw(Circle2D(semiDynamicPosition[i], 0.1), QColor("cyan"), true);
     }
     for(int i{0}; i<3; i++)
     {

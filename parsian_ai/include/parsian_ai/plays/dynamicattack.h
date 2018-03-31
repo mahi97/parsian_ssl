@@ -75,7 +75,7 @@ struct SDynamicPlan {
     void set(const int& _agentSize,
              const DynamicMode& _mode,
              const PlayMakeSkill& _pm,
-             const DynamicRegion &_pmreg,
+             const DynamicRegion& _pmreg,
              const PositionSkill& _ps,
              const DynamicRegion& _reg) {
         agentSize = _agentSize;
@@ -213,7 +213,7 @@ private:
     void assignLocations_6();
     bool isRightTimeToPass();
     int farGuardFromPoint(const int& _guardIndex, const Vector2D& _point);
-    void chooseBestPosForPass();
+    void chooseReceiverAndBestPosForPass();
     void chooseBestPositons();
     void chooseMarkPos();
     double getDynamicValue(const Vector2D& _dynamicPos) const;
