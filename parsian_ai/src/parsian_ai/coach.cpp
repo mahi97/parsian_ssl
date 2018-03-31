@@ -545,7 +545,8 @@ void CCoach::updateAttackState() {
 
 void CCoach::choosePlaymakeAndSupporter()
 {
-    playmakeId = -1;
+    playmakeId = 10;
+    return;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);

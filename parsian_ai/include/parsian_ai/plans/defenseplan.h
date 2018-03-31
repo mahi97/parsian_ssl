@@ -64,6 +64,7 @@ protected:
     QList<Vector2D> twoDefenseFormationForRectangularPositioning(double downLimit , double upLimit);
     QList<Vector2D> twoDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<Vector2D> threeDefenseFormationForRecatangularPositioning(double downLimit , double upLimit);
+    QList<Vector2D> threeDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<int> detectOpponentPassOwners(double downEdge , double upEdge);
     Vector2D oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit);
     Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
@@ -108,7 +109,7 @@ protected:
     ///////////////////////////////////////////////////
     void executeGoalKeeper();
     Vector2D strictFollowBall(Vector2D _ballPos);
-    QPair<Vector2D , Vector2D> avoidCircularPenaltyAreaByArash(Agent* agent, const Vector2D& point);
+    Vector2D avoidCircularPenaltyAreaByArash(Agent* agent, const Vector2D& point);
     int decideNumOfMarks();
     kkDefPos tempDefPos;
     void matchingDefPos(int _defenseNum);
