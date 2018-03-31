@@ -284,6 +284,34 @@ void CDynamicAttack::makePlan(int agentSize) {
         positionAgent.skill  = PositionSkill::NoSkill;
     }
 
+
+
+
+    if(true) {
+        ROS_INFO_STREAM("kian: nomode");
+        nextPlanA->mode = DynamicMode::NoMode;
+        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
+        for (size_t i = 0; i < agentSize; i++) {
+            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
+            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
+        }
+        currentPlan = *nextPlanA;
+        return;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
     if (wm->ball->pos.x < 0) {
@@ -1074,38 +1102,50 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
     {
         currentPlan.passPos = wm->field->oppGoal();
         receiver = nullptr;
-        ROS_INFO_STREAM("playmake1 receiver is null");
+        ROS_INFO_STREAM("segment receiver is null");
         return;
     }
 
 
     int lastReceiver = -1;
-    double minDist = 1000;
+    double maxDist = -1000;
     for(auto& id : matchingIDs)
     {
         double tempDist = wm->our[id]->pos.dist(wm->our[playmakeID]->pos);
-        if(tempDist < minDist)
+        if(tempDist > maxDist)
         {
-            minDist = tempDist;
+            maxDist = tempDist;
             lastReceiver = id;
         }
     }
     if(lastReceiver == -1)
     {
         receiver = nullptr;
-        currentPlan.passPos = /*semiDynamicPosition[0]*/wm->field->oppGoal();
+        ROS_INFO_STREAM("segment lastReceiver -1");
+        currentPlan.passPos = /*semiDynamicPosition[0]*/wm->field->ourGoal();
         return;
     }
     currentPlan.passID = lastReceiver;
+    ROS_INFO_STREAM("segment passID is " << lastReceiver);
     for(auto& agent : agents)
     {
+        ROS_INFO_STREAM("segment inside for");
         if(agent->id() == currentPlan.passID)
         {
             receiver = agent;
-            ROS_INFO_STREAM("playmake1 receiver is set to " << receiver->id());
+            ROS_INFO_STREAM("segment receiver is set to " << receiver->id());
         }
     }
-    currentPlan.passPos = semiDynamicPosition[lastReceiver];
+    ROS_INFO_STREAM("segment bala");
+    int index;
+    for(int i{0}; i<matchingIDs.count(); i++)
+    {
+        if(matchingIDs[i] == lastReceiver)
+            index = i;
+    }
+    currentPlan.passPos = semiDynamicPosition[index];
+    ROS_INFO_STREAM("segment paeen");
+
     lastPassPosLoc = currentPlan.passPos;
 }
 
@@ -1620,16 +1660,16 @@ void CDynamicAttack::setPlayMake(Agent* _playMake)
     }
     else if(!PMfromCoach)
     {
-        ROS_INFO_STREAM("playmake1 receivverID: " << receiver->id());
+        ROS_INFO_STREAM("swap receivverID: " << receiver->id());
         QList<Agent*> newposing;
         newposing.clear();
         for(const auto& agent : agents)
             if(agent->id() != receiver->id())
                 newposing.append(agent);
         newposing.append(playmake);
+        init(newposing);
         playmakeID = receiver->id();
         playmake = receiver;
-        init(newposing);
     }
 }
 
