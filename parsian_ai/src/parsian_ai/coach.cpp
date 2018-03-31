@@ -8,7 +8,7 @@
 CCoach::CCoach(Agent**_agents)
 {
     clearBallVels();
-    averageVel = 0;
+    averageVel = 0;    
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -58,7 +58,7 @@ CCoach::CCoach(Agent**_agents)
 
     defenseTimeForVisionProblem[0].start();
     defenseTimeForVisionProblem[1].start();
-    transientFlag = false;
+    know->variables["transientFlag"].setValue(false);
     trasientTimeOut.start();
     translationTimeOutTime = 4000;
     exeptionPlayMake = nullptr;
@@ -204,7 +204,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
-        if (transientFlag) {
+        if (know->variables["transientFlag"].toBool()) {
             //// Add Playmake after time
             if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
                 preferedDefenseCounts = std::max(0, agentsCount - missMatchIds.count() - 1);
@@ -235,9 +235,9 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
             }
         }
-    } else if (gameState->ourPlayOffKick()) { //// Choose # of Agents in PlayOff
-        if (wm->ball->pos.x < 0) {
-            preferedDefenseCounts = (checkOverdef()) ? 1 : 2;
+    } else if (gameState->ourPlayOffKick()) {
+        if (wm->ball->pos.x < -1) {
+            preferedDefenseCounts = (selectedPlay->defensePlan.findNeededDefense() == 1) ? 1 : 2;
 
         } else if (wm->ball->pos.x > 0.5) {
             preferedDefenseCounts = 0;
@@ -260,6 +260,13 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
     if (gameState->penaltyShootout()) {
         preferedDefenseCounts = 0;
+    }
+    if(conf.StrictFormation){
+        if (conf.Defense > 3){
+            preferedDefenseCounts = 3;
+        } else {
+            preferedDefenseCounts = conf.Defense;
+        }
     }
     lastPreferredDefenseCounts = preferedDefenseCounts;
 }
@@ -419,6 +426,9 @@ bool CCoach::isBallcollide() {
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
            (innerproduct < .1 && innerproduct >-.1)){
             ROS_INFO("khord ro zamin");
+            getDefense().ballBouncePos = wm->ball->pos;
+            getDefense().ballIsBounced = true;
+            PDEBUGV2D("ball bounce pos",wm->ball->pos,D_ALI);
             removeLastBallVel();
             return false;
         }
@@ -457,53 +467,35 @@ void CCoach::clearBallVels(){
     lastBallVels.reserve(6);
 }
 
-bool CCoach::ballChiped(){
-    if(know->nearestOppToBall() == -1)
-        return false;
-    if(wm->ball == nullptr)
-        return false;
-    Vector2D nearest_dir = wm->opp[know->nearestOppToBall()]->dir;
-    double nearest_dist = wm->opp[know->nearestOppToBall()]->pos.dist(wm->ball->pos);
-    ROS_INFO_STREAM("ALIII2  "<<nearest_dist<<"    "<<lastNearestBallDist);
-    if (lastNearestBallDist < .18 && nearest_dist> .20){
-        if(nearest_dir.norm().innerProduct(wm->ball->dir.norm())<.3) {
-            ROS_INFO_STREAM("ALIII        CHIPPPPP");
-            lastNearestBallDist = nearest_dist;
-            return true;
-        } else
-            ROS_INFO_STREAM("ALIII:       ball kick");
-    }
-    lastNearestBallDist = nearest_dist;
-    return false;
-}
-
 void CCoach::virtualTheirPlayOffState() {
     States currentState;
     currentState = gameState->getState();
     if (lastState == States::TheirDirectKick || lastState == States::TheirIndirectKick /*|| lastState == States::TheirKickOff*/) {
         if (currentState == States::Start) {
-            transientFlag = true;
+            know->variables["transientFlag"].setValue(true);
+            getDefense().ballIsBounced = false;
+            getDefense().playOffStartBallPos = wm->ball->pos;
+            getDefense().playOffPassDir = wm->opp[know->nearestOppToBall()]->dir;
         }
     }
 
-    if (! transientFlag) {
+    if (! know->variables["transientFlag"].toBool()) {
         trasientTimeOut.restart();
     }
 
     if (trasientTimeOut.elapsed() >= translationTimeOutTime) {
-        transientFlag = false;
+        know->variables["transientFlag"].setValue(false);
     }
 
     if (wm->ball->pos.x >= 1) {
-        transientFlag = false;
+        know->variables["transientFlag"].setValue(false);
     }
-    if(transientFlag)
+    if(know->variables["transientFlag"].toBool())
         if (isBallcollide()) {
-            transientFlag = false;
+            know->variables["transientFlag"].setValue(false);
         }
 
-    //    if (ballChiped()); // todo: ali
-    PDEBUG("TS flag:", transientFlag, D_AHZ);
+    PDEBUG("TS flag:", know->variables["transientFlag"].toBool(), D_AHZ);
     lastState  = currentState;
 
 }
@@ -778,9 +770,8 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     dynamicAttack->setFast(ourAttackState     == FAST);
     dynamicAttack->setCritical(ourAttackState == CRITICAL);
 
-    ////////////////////////////////////////////// assign agents
-    bool overdef;
-    overdef = checkOverdef();
+    //////////////////////////////////////////////assign agents
+    bool overdef =  (selectedPlay->defensePlan.findNeededDefense() == 1) ? true : false;
     int MarkNum = 0;
     switch (ballPState) {
         case BallPossesion::WEHAVETHEBALL:
@@ -1196,19 +1187,6 @@ void CCoach::decideNull(QList<int> &_ourPlayers) {
     }
 }
 
-///HMD
-bool CCoach::checkOverdef() {
-    if ((Vector2D::angleOf(wm->ball->pos, wm->field->ourGoal(), wm->field->ourCornerL()).abs() < 20 + overDefThr
-         || Vector2D::angleOf(wm->ball->pos, wm->field->ourGoal(), wm->field->ourCornerR()).abs() < 20 + overDefThr)
-        && !Circle2D((wm->field->ourGoal() - Vector2D(0.2, 0)), 1.60).contains(wm->ball->pos)) {
-        overDefThr = 5;
-        return true;
-    }
-    overDefThr = 0;
-    return false;
-
-}
-
 void CCoach::checkSensorShootFault() {
     QList<int> ourPlayers = wm->our.data->activeAgents;
     for (int i = 0; i < _NUM_PLAYERS; i++) {
@@ -1324,7 +1302,6 @@ void CCoach::checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers) 
 
     qDebug() << "[coach] final Match : " << _plan->matching.common->matchedID;
 }
-
 
 
 NGameOff::SPlan* CCoach::planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize) {

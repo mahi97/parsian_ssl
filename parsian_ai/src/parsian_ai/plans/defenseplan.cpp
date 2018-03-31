@@ -7,6 +7,7 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
+
 QPair<Vector2D , Vector2D> DefensePlan::avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity){
     int skillAgent = 7;
     Rect2D penaltyArea = wm->field->ourBigPenaltyArea(1,0.1,0);
@@ -882,6 +883,7 @@ void DefensePlan::manToManMarkBlockPassInPlayOff(QList<Vector2D> opponentAgentsT
     markAngs.clear();
     markRoles.clear();
     /////////////////// Intelligent mark plan ///////////////////////////////
+    ///
     ////////////////////////////////////////////////////////////////////////////
     DBUG(QString("Mark Agents Count : %1").arg(ourMarkAgentsSize) , D_SEPEHR);
     ///////// Make Cirlcles around opponent agents /////////////////////////////
@@ -1168,6 +1170,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
     markRoles.clear();
     markAngs.clear();
     /////////////////// Intelligent mark plan ///////////////////////////////
+    PDEBUGV2D("ALi's prediction mode",getMarkPlayoffPredictWaitPos(),D_ALI);
     //////////////////////////////////////////////////////
     if(_markAgentSize == oppAgentsToMarkPos.count()){
         for (int i = 0; i < oppAgentsToMarkPos.count(); i++) {
@@ -1248,7 +1251,6 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
         drawer->draw(markRoles.at(i) , markPoses.at(i) - Vector2D(0, 0.4) , "white");
     }
 }
-
 
 void DefensePlan::setGoalKeeperState(){
     //// In this function,we determine the specific states that goalkeeper must
@@ -3204,7 +3206,6 @@ void DefensePlan::findOppAgentsToMark(){
     }
 }
 
-
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
     //// This function predicts the opponent agent with considering the position
     //// && velocity of the opponent agent.
@@ -3231,7 +3232,6 @@ Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
         return opp->pos + VelReliabiity * opp->vel;
     }
 }
-
 
 void DefensePlan::findPos(int _markAgentSize){
     //// In this function, we choose the different plans of the mark in different
@@ -3950,4 +3950,25 @@ QList<QPair<Vector2D, double> > DefensePlan::sortdangerpassplayon(QList<Vector2D
     //}
 
     return output;
+}
+
+Vector2D DefensePlan::getMarkPlayoffPredictWaitPos(){
+    if(!know->variables["transientFlag"].toBool())
+        beforeTransientPassDir = wm->opp[know->nearestOppToBall()]->dir;
+    else{
+        Vector2D sol1,sol2;
+        if(ballIsBounced){
+             int solNum = wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).
+                                            intersection(Line2D(ballBouncePos,playOffStartBallPos),&sol1,&sol2);
+        if(solNum == 2)
+           return playOffStartBallPos.dist(sol1) > playOffStartBallPos.dist(sol2) ? sol1 : sol2;
+        }
+        else{
+            int solNum = wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).
+                        intersection(Line2D(playOffStartBallPos,playOffStartBallPos + ((playOffPassDir+beforeTransientPassDir)/2)),&sol1,&sol2);
+        if(solNum == 2)
+            return playOffStartBallPos.dist(sol1) > playOffStartBallPos.dist(sol2) ? sol1 : sol2;
+        }
+        return Vector2D(5000,5000);
+    }
 }
