@@ -59,17 +59,17 @@ void AINodelet::timerCb(const ros::TimerEvent& event){
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
-//    ai->updateWM(_wm);
-//    ROS_INFO("wm");
-//    ai->execute();
+    ai->updateWM(_wm);
+    ROS_INFO("wm");
+    ai->execute();
 //
-//    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
-        parsian_msgs::parsian_robot_taskPtr a{new parsian_msgs::parsian_robot_task};
-        robTask[0].publish(a);
-//    }
+    for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
+        robTask[wm->our.activeAgentID(i)].publish(ai->getTask(wm->our.activeAgentID(i)));
+
+    }
 //
-//    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
-//    ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
+   parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+    ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
 
 }
 

@@ -131,6 +131,7 @@ kckMode CSkillKick::decideMode() {
     robotKickArea.addVertex(agentPos + agent->dir().norm() * 0.35 + agent->dir().rotate(90).norm()*distCoef);
     robotKickArea.addVertex(agentPos + agent->dir().norm() * 0.35 - agent->dir().rotate(90).norm()*distCoef);
     robotKickArea.addVertex(agentPos + agent->dir().norm() * 0.01 - agent->dir().rotate(90).norm()*distCoef);
+    kickWithCenterOfDribbler = false;
     if ( (passProfiler || kickWithCenterOfDribbler)) {
         kickerOn = dribblerArea.contains(ballPos) && robotKickArea.contains(ballPos);
     } else {
@@ -279,7 +280,7 @@ void CSkillKick::waitAndKick() {
 void CSkillKick::kDontKick() {
 
     Vector2D finalPos;
-    gpa->setSlowmode(true);
+    gpa->setSlowmode(false);
     finalPos = ballPos - (target - ballPos).norm() * 0.23;
     gpa->setBallobstacleradius(0.4);
     if (fabs((kickFinalDir - agentDir.th()).degree()) < 10) {
@@ -507,7 +508,7 @@ void CSkillKick::jTurn() {
         shift = 0;
         if (wm->ball->vel.length() < 0.2) {
         posPid->error = movementDir;
-        posPid->kd = 0.01x;
+        posPid->kd = 0.01;
         }
     } else if (movementDir > 50) {
         shift = 25 + (1 - agentPos.dist(ballPos)) * 80;
@@ -563,7 +564,7 @@ void CSkillKick::jTurn() {
         dirReduce -= 5;
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
-    posPid->kp = 0.005;
+    posPid->kp = 0.001;
     speedPid->kp = 5.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
                    max(wm->ball->vel.length() * 2, 0);
 
@@ -602,7 +603,7 @@ void CSkillKick::turnForKick() {
     double angReduce = 1;
 
     if (isPlayoff) {
-        if (fabs((agentDir.th() - kickFinalDir).degree()) < 80) {
+        if (fabs((agentDir.th() - kickFinalDir).degree()) < 70) {
             angReduce = 0.5;
         }
         if ((agentDir.th() - kickFinalDir).degree()  < - 10) {
@@ -1035,7 +1036,7 @@ void CSkillKick::execute() {
     }
 
     else {
-        if (kickerOn && fabs((agentDir.th() - kickTargetDir).degree()) < tolerance || kickerOn && fabs((agentDir.th() - kickTargetDir).degree()) < 1) {
+        if (kickerOn && fabs((agentDir.th() - kickTargetDir).degree()) < tolerance || kickerOn && fabs((agentDir.th() - kickTargetDir).degree()) < 3) {
 
             if (chip) {
                 agent->setChip(kickSpeed);
