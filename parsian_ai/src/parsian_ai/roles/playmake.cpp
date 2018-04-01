@@ -327,7 +327,7 @@ void CRolePlayMake::executeOurPenalty() {
     Vector2D shift;
     Vector2D position;
 
-    if (gameState->isStop()/*knowledge->getGameMode()==CKnowledge::Stop || knowledge->getGameState()==CKnowledge::Stop*/) {
+    if (gameState->isStop()) {
         cyclesExecuted--;
         srand(static_cast<unsigned int>(time(nullptr)));
         stopBehindBall(true);

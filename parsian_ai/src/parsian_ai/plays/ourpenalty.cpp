@@ -12,30 +12,33 @@ void COurPenalty::reset() {
 void COurPenalty::init(const QList<Agent*>& _agents) {
     setAgentsID(_agents);
     initMaster();
-
-    // TODO : Last Play seems important!
-//  if( knowledge->getLastPlayExecuted() != OurPenaltyPlay ){
-//    reset();
-//  }
-//  knowledge->setLastPlayExecuted(OurPenaltyPlay);
 }
 
-void COurPenalty::penaltyKick() {
-    executedCycles++;
-    if (gameState->penaltyShootout()) {
-        playOnFlag = false;
-    }
-    choosePlayMaker();
+void COurPenalty::setPlaymake(Agent* _playmakeAgent)
+{
+    playMakeAgent = _playmakeAgent;
+    playmakeRole->assign(playMakeAgent);
+}
 
-    appendRemainingsAgents(positionAgents);
+void COurPenalty::executeShootoutPositioning()
+{
 
-    setFormation("OurP");
+}
+
+void COurPenalty::executeNormalPositioning()
+{
 
 }
 
 void COurPenalty::execute_x() {
-    if (agents.empty()) {
+    if (playMakeAgent == nullptr || (playMakeAgent->id() == -1)) {
         return;
     }
-    penaltyKick();
+    isPenaltyShootOut = gameState->ourPenaltyShootout();
+    playmakeRole->execute();
+    if(isPenaltyShootOut)
+        executeShootoutPositioning();
+    else
+        executeNormalPositioning();
 }
+
