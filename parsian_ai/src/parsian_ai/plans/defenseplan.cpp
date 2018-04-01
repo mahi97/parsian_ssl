@@ -67,12 +67,18 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         } else if (neededDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
+        else{
+            defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
+        }
     }
     else if (neededDefenseAgents < allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
             defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
         } else if (neededDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
+        }
+        else{
+            defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
         for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
             defensePosiotion.append(Vector2D(0, i));
@@ -83,6 +89,9 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
             defensePosiotion.append(oneDefenseFormationForCircularPositioning(downLimit , upLimit));
         } else if (allOfDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
+        }
+        else{
+            defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
     }
     return defensePosiotion;
@@ -175,13 +184,14 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double 
     Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
     Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
     Vector2D anotherIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
-    int numberOfDefenseAgents = 2;
+    Vector2D tempVector;
+    int numberOfDefenseAgents = 3;
     Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
     defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , anIntesection) , &sol[0] , &sol[1]);
     defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
     defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
-
+    /////////////////// Az chizaki bar sikhaki malideh im :) ///////////////////////////////
     if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
         double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
         double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
@@ -224,7 +234,9 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double 
             defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
         }
     }
-
+    tempVector = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(Segment2D(defensePosition.at(0) , defensePosition.at(1)));
+    defensePosition.append(know->getPointInDirection(tempVector , ballPosition , 0.1));
+    return defensePosition;
 }
 
 QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
@@ -2115,7 +2127,7 @@ void DefensePlan::execute(){
                 }
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 2.7),
+                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 3),
                                                     defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                     matchingDefPos(realDefSize);
                 }
