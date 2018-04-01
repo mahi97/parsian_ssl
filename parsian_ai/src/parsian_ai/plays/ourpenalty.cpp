@@ -5,6 +5,7 @@ COurPenalty::COurPenalty() : CMasterPlay()
     initMaster();
     playmakeRole = new CRolePlayMake(nullptr);
     PMgotopoint = new GotopointavoidAction();
+    PMkick = new KickAction();
 }
 
 COurPenalty::~COurPenalty() = default;
@@ -52,7 +53,7 @@ void COurPenalty::execute_x() {
     }
     isPenaltyShootOut = gameState->ourPenaltyShootout();
     //playmakeRole->execute();
-    if(state == PenaltyState::Positioning)
+    if(penaltyState == PenaltyState::Positioning)
     {
         if(isPenaltyShootOut)
         {
@@ -66,6 +67,11 @@ void COurPenalty::execute_x() {
         }
 
         playmakePositioning();
+    }
+    if(penaltyState == PenaltyState::Kicking)
+    {
+        ROS_INFO_STREAM("penalty: in kicking state");
+        playmakeKick();
     }
 }
 
@@ -129,6 +135,8 @@ void COurPenalty::assignSkills()
         moveSkills.append(new GotopointavoidAction());
         moveSkills[i]->setTargetpos(positions[i]);
         moveSkills[i]->setTargetdir(wm->field->oppGoal());
+        moveSkills[i]->setSlowmode(true);
+        moveSkills[i]->setBallobstacleradius(0.1);
         agents[i]->action = moveSkills[i];
     }
 }
@@ -136,20 +144,90 @@ void COurPenalty::assignSkills()
 void COurPenalty::playmakePositioning()
 {
     Vector2D direction, position;
-
     direction = wm->ball->pos - playMakeAgent->pos();
     direction.y *= 1.2;
     position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).norm() * (0.13);
     PMgotopoint->setTargetpos(position);
     PMgotopoint->setTargetdir(direction);
-
     PMgotopoint->setSlowmode(true);
     PMgotopoint->setNoavoid(false);
     PMgotopoint->setPenaltykick(true);
     PMgotopoint->setAvoidpenaltyarea(false);
     PMgotopoint->setAvoidcentercircle(false);
-
     PMgotopoint->setBallobstacleradius(0.2);
+    changeDirPenaltyStrikerTime.restart();
+    timerStartFlag = true;
     playMakeAgent->action = PMgotopoint;
 }
 
+void COurPenalty::playmakeKick()
+{
+    Vector2D shift;
+    Vector2D position;
+    penaltyTarget = know->getEmptyPosOnGoalForPenalty(1.0 / 8.0, true, 0.03); //////// tune
+    PMgotopoint->setRoller(1);
+    ////////////// change robot direction before kicking //////////////
+    if (timerStartFlag) {
+        if (changeDirPenaltyStrikerTime.elapsed() < 2500) {
+            if (penaltyTarget.y * wm->field->oppGoalL().y < 0 && penaltyTarget.dist(wm->field->oppGoal()) > 0.25) {
+                penaltyTarget.y = wm->field->oppGoalR().y * 2;
+                shift = Vector2D(0, 0.3);
+            } else {
+                penaltyTarget.y = wm->field->oppGoalL().y * 2;
+                shift = Vector2D(0, -0.3);
+            }
+            position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + shift).norm() * (0.13);
+            PMgotopoint->setTargetdir(penaltyTarget);
+            PMgotopoint->setTargetpos(position);
+            PMgotopoint->setLookat(wm->ball->pos);
+        } else {
+            timerStartFlag = false;
+        }
+    }
+    PMgotopoint->setDivemode(true);
+    PMgotopoint->setSlowmode(false);
+    PMkick->setSpin(1);
+    PMkick->setTarget(penaltyTarget);
+    PMkick->setKickspeed(6);
+    PMkick->setPenaltykick(true);
+    PMkick->setInterceptmode(false);
+    PMkick->setSpin(false);
+    PMkick->setChip(false);
+    PMkick->setVeryfine(false);
+    PMkick->setAvoidopppenaltyarea(false);
+    PMkick->setTolerance(20);
+    PMkick->setChip(false);
+    if (timerStartFlag) {
+        ROS_INFO_STREAM("penalty: assign gotopointAction");
+        playMakeAgent->action = PMgotopoint;
+    } else {
+        ROS_INFO_STREAM("penalty: assign kickAction");
+        playMakeAgent->action = PMkick;
+    }
+}
+
+
+
+
+
+
+//    Vector2D kickTarget;
+//    Vector2D trickTarget;
+//    if(kickState == KickState::Trick)
+//    {
+//        trickTarget = Vector2D{wm->field->oppGoalR()};
+//        PMkick->setTarget(kickTarget);
+//        PMkick->setDontkick(true);
+//        PMkick->setSlow(true);
+//        playMakeAgent->action = PMkick;
+//        double trickAngle = angleOfTwoSegment(Segment2D(playMakeAgent->dir(), ))
+//        if(wm->our[playMakeAgent->id()]->dir == trickTarget)
+//   }
+
+double COurPenalty::angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp)
+{
+    double theta1 = std::atan2(xp.a().y-xp.b().y,xp.a().x-xp.b().x);
+    double theta2 = std::atan2(yp.a().y-yp.b().y,yp.a().x-yp.b().x);
+    double diff = fabs(theta1-theta2);
+    return diff;
+}

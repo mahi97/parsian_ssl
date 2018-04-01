@@ -1249,10 +1249,17 @@ void CCoach::decideTheirIndirect(QList<int> &_ourPlayers) {
 void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
     ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = ourPenalty;
-    ourPenalty->setState(PenaltyState::Positioning);
     if (0 <= playmakeId && playmakeId <= 11) {
         ourPenalty->setPlaymake(agents[playmakeId]);
         _ourPlayers.removeOne(playmakeId);
+    }
+    if(!gameState->ready())
+        ourPenalty->setState(PenaltyState::Positioning);
+
+    else if(gameState->ready())
+    {
+        ROS_INFO_STREAM("kian: normal start -> penalty");
+        ourPenalty->setState(PenaltyState::Kicking);
     }
     DBUG("penalty", D_MHMMD);
     firstTime = true;
@@ -1264,14 +1271,10 @@ void CCoach::decideTheirPenalty(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideStart(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("kian: in start mode");
     if (gameState->theirPenaltyShootout()) {
         selectedPlay = theirPenalty;
         return;
-    }
-    else if(gameState->ourPenaltyKick())
-    {
-        selectedPlay = ourPenalty;
-        ourPenalty->setState(PenaltyState::Kicking);
     }
     selectedPlay = dynamicAttack;
     decidePlayOn(_ourPlayers, lastPlayers);
