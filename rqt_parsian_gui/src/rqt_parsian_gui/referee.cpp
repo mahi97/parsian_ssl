@@ -25,6 +25,7 @@ namespace rqt_parsian_gui
     void Referee::shutdownPlugin() {
         n.shutdown();
         n_private.shutdown();
+        refereeWidget->timer.stop();
     }
 
 }

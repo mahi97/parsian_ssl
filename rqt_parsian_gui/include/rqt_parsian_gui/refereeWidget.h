@@ -29,6 +29,7 @@ namespace rqt_parsian_gui
         explicit RefereeWidget(ros::NodeHandle & n);
         virtual ~RefereeWidget();
         void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
+        ros::Timer timer;
         ros::Subscriber teamConfSub;
     public slots:
         void SetManualGS(int);
@@ -40,7 +41,6 @@ namespace rqt_parsian_gui
         QHBoxLayout *mainLayout;
         QPushButton *btnRefs[14];
         QStringList strRefNames , strRefCommands;
-        ros::Timer timer;
         ros::Publisher refereePub;
         void timerCb(const ros::TimerEvent& _timer);
         parsian_msgs::parsian_team_config teamConfig;
