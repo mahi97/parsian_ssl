@@ -2392,6 +2392,10 @@ void DefensePlan::penaltyMode() {
     targetDir.setDir(AngleDeg(0));
     targetDir.setLength(1);
 
+    //check
+    target.x = -5.92;
+
+
     drawer->draw(target, "blue");
 
     assignSkill(goalKeeperAgent , gpa[goalKeeperAgent->id()]);
