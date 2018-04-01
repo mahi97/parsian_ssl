@@ -23,12 +23,12 @@ void AgentNodelet::onInit() {
     common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 10, &AgentNodelet::commonConfigCb, this);
     world_model_sub   = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
     robot_task_sub    = private_nh.subscribe("task", 10, &AgentNodelet::rtCb, this);
-    planner_sub       = nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
+    planner_sub       = nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 10, &AgentNodelet::plannerCb, this);
 
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
 
-    parsian_robot_command_pub = private_nh.advertise<parsian_msgs::parsian_robot_command>("command", 1);
-    agent->planner_pub = private_nh.advertise<parsian_msgs::parsian_get_plan>("plan", 5);
+    parsian_robot_command_pub = private_nh.advertise<parsian_msgs::parsian_robot_command>("command", 10);
+    agent->planner_pub = private_nh.advertise<parsian_msgs::parsian_get_plan>("plan", 10);
 
     timer_ = nh.createTimer(ros::Duration(0.01), &AgentNodelet::timerCb, this);
     watchdog = 0;

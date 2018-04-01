@@ -29,7 +29,7 @@ void AINodelet::onInit() {
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
-    behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 1);
+    behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 10);
 
     ai->getSoccer()->getCoach()->setPlanClient(plan_client);
     ai->getSoccer()->getCoach()->setBehaviorPublisher(behaviorPub);

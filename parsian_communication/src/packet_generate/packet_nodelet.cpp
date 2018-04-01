@@ -22,10 +22,10 @@ void PacketNodelet::onInit() {
     packetPub  = n.advertise<parsian_msgs::parsian_packets>("packets", 1000);
 
     for (int i = 0 ; i < _MAX_ROBOT_NUM; i++) {
-        robotPacketSub[i]   = n.subscribe(QString("/agent_%1/command").arg(i).toStdString(), 10, &PacketNodelet::callBack, this);
+        robotPacketSub[i]   = n.subscribe(QString("/agent_%1/command").arg(i).toStdString(), 100, &PacketNodelet::callBack, this);
     }
 
-    visinSub  = n.subscribe("world_model" , 10, &PacketNodelet::syncData, this);
+    wmSub  = n.subscribe("world_model" , 100, &PacketNodelet::syncData, this);
 
     for (auto &robotPacket : robotPackets) {
         for (unsigned char &j : robotPacket) {
