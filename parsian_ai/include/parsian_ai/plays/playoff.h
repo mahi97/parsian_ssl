@@ -413,7 +413,7 @@ private:
     bool isFinalShotDone();
 
     Vector2D lastBallPos;
-    long lastTime;
+    unsigned int lastTime;
     bool decidePlan;
     int kkAgentsID[_NUM_PLAYERS];
 
