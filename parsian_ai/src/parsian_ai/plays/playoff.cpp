@@ -938,6 +938,7 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
             newRoleAgent[i]->setAvoidBall(true);
             newRoleAgent[i]->setAvoidPenaltyArea(true);
             newRoleAgent[i]->setSelectedSkill(RoleSkill::GotopointAvoid);
+            newRoleAgent[i]->setAvoidBall(true);
 
         }
     }
@@ -945,12 +946,10 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
     if (tAgentsize > 0) {
         newRoleAgent[0]->setTarget(kickOffPos[0]);
         newRoleAgent[0]->setTargetDir(-newRoleAgent[0]->getAgent()->pos() + wm->ball->pos);
-        newRoleAgent[0]->setAvoidBall(true);
 
         for (int i = 1; i < tAgentsize; i++) {
             newRoleAgent[i]->setTarget(kickOffPos[i]);
             newRoleAgent[i]->setTargetDir(-newRoleAgent[i]->getAgent()->pos() + wm->field->oppGoal());
-            newRoleAgent[i]->setAvoidBall(true);
         }
     }
 
