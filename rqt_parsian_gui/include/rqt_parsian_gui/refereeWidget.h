@@ -16,6 +16,10 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVariant>
+#include <QCheckBox>
+#include <parsian_msgs/ssl_refree_wrapper.h>
+#include <parsian_msgs/parsian_team_config.h>
+
 namespace rqt_parsian_gui
 {
 
@@ -24,20 +28,24 @@ namespace rqt_parsian_gui
     public:
         explicit RefereeWidget(ros::NodeHandle & n);
         virtual ~RefereeWidget();
-
+        void teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _conf);
+        ros::Subscriber teamConfSub;
     public slots:
-//        void setTask(QAction*);
-//        void setID(QAction * );
+        void SetManualGS(int);
+        void SetEnable(int);
     protected:
 
     private:
+        int enable,id;
+        unsigned ctr;
         QHBoxLayout *mainLayout;
         QPushButton *btnRefs[14];
         QStringList strRefNames , strRefCommands;
         ros::Timer timer;
         ros::Publisher refereePub;
         void timerCb(const ros::TimerEvent& _timer);
-
+        parsian_msgs::parsian_team_config teamConfig;
+        parsian_msgs::ssl_refree_wrapperPtr refree_wrapper;
     };
 }
 
