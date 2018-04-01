@@ -1249,7 +1249,7 @@ void CCoach::decideTheirIndirect(QList<int> &_ourPlayers) {
 void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
     selectedPlay = ourPenalty;
     if (0 <= playmakeId && playmakeId <= 11) {
-        dynamicAttack->setPlayMake(agents[playmakeId]);
+        ourPenalty->setPlaymake(agents[playmakeId]);
         _ourPlayers.removeOne(playmakeId);
     }
     DBUG("penalty", D_MHMMD);

@@ -14,11 +14,14 @@ public:
     void setPlaymake(Agent* _playmakeAgent);
     void executeShootoutPositioning();
     void executeNormalPositioning();
+    Vector2D getEmptyTarget(Vector2D _position, double _radius);
+
 
 private:
     void reset();
     bool isPenaltyShootOut;
     CRolePlayMake* playmakeRole;
+    GotopointavoidAction* moveSkill[8];
 };
 
 #endif // OURPENALTY_H
