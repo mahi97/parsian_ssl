@@ -288,3 +288,30 @@ catkin_install_python(PROGRAMS script/parsian_profiler/motion_profiler_node.py
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+add_library(${PROJECT_NAME}_auto_decider_nodelet
+  src/auto_decider/auto_decider_nodelet.cpp
+)
+target_link_libraries(${PROJECT_NAME}_auto_decider_nodelet
+        ${catkin_LIBRARIES}
+        )
+
+# dependencies
+
+add_dependencies(${PROJECT_NAME}_auto_decider_nodelet
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
+add_executable(${PROJECT_NAME}_auto_decider_node
+  src/auto_decider/auto_decider_node.cpp
+  )
+target_link_libraries(${PROJECT_NAME}_auto_decider_node
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_auto_decider_nodelet
+        )
+
+# dependencies
+
+add_dependencies(${PROJECT_NAME}
+        ${PROJECT_NAME}_auto_decider_nodelet
+        ${catkin_EXPORTED_TARGETS}
+        )
