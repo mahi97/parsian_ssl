@@ -14,7 +14,7 @@ enum class PenaltyShootoutState{
     Goaling
 };
 
-enum class ShootoutKickState{
+enum class ShootOutState{
     Trick,
     Shoot
 };
@@ -32,17 +32,18 @@ public:
     Vector2D getEmptyTarget(Vector2D _position, double _radius);
     void assignSkills();
     void playmakeInitialPositioning();
-private:
+    void runShootOut();
 
+private:
     void reset();
     QList<GotopointavoidAction*> moveSkills;
     GotopointavoidAction* PMgotopoint;
     KickAction* PMkick;
-    QTime changeDirPenaltyStrikerTime;
-    bool timerStartFlag;
+    QTime shootoutTimer;
+    bool timerFlag;
     QList<Vector2D> positions;
     PenaltyShootoutState penaltyState;
-    CRolePlayMake* playMakeRole;
+    ShootOutState shootoutState;
 };
 
 #endif // OURPENALTYSHOOTOUT_H

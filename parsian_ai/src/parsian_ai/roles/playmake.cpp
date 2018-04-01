@@ -278,13 +278,10 @@ void CRolePlayMake::executeOurPenaltyShootout() {
 
     // working here
     bool chipchip = false;
-
     DBUG("penalty Shootout : ", D_NADIA);
     if (fabs(wm->ball->pos.x) > fabs(wm->field->oppGoal().x - 0.1)) { //penalty finished
         firstKick = true;
     }
-
-
     if (gameState->ourPenaltyShootout() && !gameState->ready()/*knowledge->getGameMode()==CKnowledge::Stop*/) {
         //stop behind ball
         cyclesExecuted--;

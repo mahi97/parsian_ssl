@@ -3,8 +3,8 @@
 COurPenaltyShootout::COurPenaltyShootout() : CMasterPlay()
 {
     initMaster();
-    PMgotopoint    = new GotopointavoidAction();
-    playMakeRole   = new CRolePlayMake(nullptr);
+    PMgotopoint  =   new GotopointavoidAction();
+    PMkick       =   new KickAction();
 }
 
 COurPenaltyShootout::~COurPenaltyShootout() = default;
@@ -24,7 +24,6 @@ void COurPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
     if(_playmakeAgent != nullptr)
     {
         playMakeAgent = _playmakeAgent;
-        playMakeRole->assign(playMakeAgent);
     }
     ROS_INFO_STREAM("penalty: set playmake to: " << playMakeAgent->id());
 }
@@ -41,11 +40,10 @@ void COurPenaltyShootout::execute_x() {
     {
         generatePositions();
         assignSkills();
-        playMakeRole->execute();
     }
     else
     {
-        playMakeRole->execute();
+        runShootOut();
     }
 }
 
