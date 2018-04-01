@@ -206,24 +206,6 @@ void COurPenalty::playmakeKick()
     }
 }
 
-
-
-
-
-
-//    Vector2D kickTarget;
-//    Vector2D trickTarget;
-//    if(kickState == KickState::Trick)
-//    {
-//        trickTarget = Vector2D{wm->field->oppGoalR()};
-//        PMkick->setTarget(kickTarget);
-//        PMkick->setDontkick(true);
-//        PMkick->setSlow(true);
-//        playMakeAgent->action = PMkick;
-//        double trickAngle = angleOfTwoSegment(Segment2D(playMakeAgent->dir(), ))
-//        if(wm->our[playMakeAgent->id()]->dir == trickTarget)
-//   }
-
 double COurPenalty::angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp)
 {
     double theta1 = std::atan2(xp.a().y-xp.b().y,xp.a().x-xp.b().x);

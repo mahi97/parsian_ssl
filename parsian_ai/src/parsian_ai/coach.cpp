@@ -1597,17 +1597,29 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
 }
 
 int CCoach::findGoalie() {
-    if (conf.useGoalieInPlayoff && gameState->ourPlayOffKick() && wm->ball->pos.x > 1) {
+    if (conf.useGoalieInPlayoff && gameState->ourPlayOffKick() && wm->ball->pos.x > 1 && !gameState->penaltyKick())
+    {
         preferedGoalieID = -1;
+        ROS_INFO_STREAM("check goaliID first : " << preferedGoalieID);
 
-    } else {
-        if (conf.GoalieFromGUI) {
+    } else
+    {
+        if (conf.GoalieFromGUI)
+        {
             preferedGoalieID = conf.Goalie;
-        } else {
+        } else
+        {
             preferedGoalieID = wm->our.data->goalieID;
+            ROS_INFO_STREAM("check goaliID from wm : " << preferedGoalieID);
+
         }
     }
-    if (gameState->timeOut() || gameState->halfTime()) preferedGoalieID = -1;
+    if (gameState->timeOut() || gameState->halfTime())
+    {
+        preferedGoalieID = -1;
+        ROS_INFO_STREAM("check goaliID timeout : " << preferedGoalieID);
+
+    }
     assignGoalieAgent(preferedGoalieID);
     return preferedGoalieID;
 }
