@@ -20,9 +20,9 @@ void AgentNodelet::onInit() {
     oneTouch = new CSkillKickOneTouch(agent.get());
     receivePass = new CSkillReceivePass(agent.get());
 
-    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 1, &AgentNodelet::commonConfigCb, this);
-    world_model_sub   = nh.subscribe("world_model", 1, &AgentNodelet::wmCb, this);
-    robot_task_sub    = private_nh.subscribe("task", 1, &AgentNodelet::rtCb, this);
+    common_config_sub = nh.subscribe("/commonconfig/parameter_updates", 10, &AgentNodelet::commonConfigCb, this);
+    world_model_sub   = nh.subscribe("world_model", 10, &AgentNodelet::wmCb, this);
+    robot_task_sub    = private_nh.subscribe("task", 10, &AgentNodelet::rtCb, this);
     planner_sub       = nh.subscribe(QString("planner_%1/path").arg(agent->id()).toStdString(), 5, &AgentNodelet::plannerCb, this);
 
     draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);

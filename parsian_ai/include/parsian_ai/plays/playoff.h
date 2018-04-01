@@ -354,7 +354,7 @@ private:
     SPositioningAgent positionAgent[_NUM_PLAYERS];
 
     int agentSize;
-    Vector2D getEmptyTarget(Vector2D _position, double _radius);
+    Vector2D getEmptyTarget(const Vector2D& _position, const double& _radius);
     QList<POOwnerReceive> ownerReceiveList;
 
     /////////////////////////////////////////////////////////////////////
@@ -502,7 +502,7 @@ private:
     int dynamicAgentSize;
     bool ready, pass, shot;
     int dynamicState;
-    long dynamicStartTime;
+    unsigned int dynamicStartTime;
 
 ////////////First
 public:

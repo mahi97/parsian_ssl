@@ -9,8 +9,36 @@ CRoleStopInfo::CRoleStopInfo(QString _roleName)
     //  inCorner = -1;
 }
 
-void CRoleStopInfo::findPositions() {
+Vector2D CRoleStopInfo::getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D tempTarget, finalTarget;
+    bool opp;
+    finalTarget = _position;
+    for (double dist = 0.2 ; dist <= _radius ; dist += 0.2) {
+        for (double ang = -180.0 ; ang <= 180.0 ; ang += 18.0/dist) {
+            opp = false;
+            tempTarget = _position + Vector2D::polar2vector(dist, ang);
+            for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
+                if (Circle2D(wm->opp.active(i)->pos, 0.25).contains(tempTarget)
+                    || !wm->field->isInField(tempTarget)
+                    || wm->field->isInOppPenaltyArea(tempTarget)
+                    || wm->field->isInOurPenaltyArea(tempTarget)) {
+                    opp = true;
+                    break;
+                }
 
+            }
+            if (!opp) {
+                finalTarget = tempTarget;
+                dist = _radius*2; // to break upper loop
+                break;
+            }
+        }
+    }
+
+    return finalTarget;
+}
+
+void CRoleStopInfo::findPositions() {
     double sRadius = StopRadius;
     Vector2D c = wm->ball->pos;
     const double radius = 1.8 + 2.0 * Robot::robot_radius_new;
@@ -34,7 +62,7 @@ void CRoleStopInfo::findPositions() {
     Vector2D startPos{0, -wm->field->_FIELD_WIDTH/2 + 1};
     Vector2D endPos  {0,  wm->field->_FIELD_WIDTH/2 - 1};
     for (int i = 1; i < count(); i++) {
-        Ps.append(startPos*(1.0 - (double)(i)/count()) + endPos*((double)(i)/count()));
+        Ps.append(getEmptyTarget(startPos*(1.0 - (double)(i)/count()) + endPos*((double)(i)/count()), 1));
     }
 
     MWBM matcher;
