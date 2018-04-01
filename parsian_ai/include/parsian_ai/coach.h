@@ -83,6 +83,8 @@ public:
     QList<int> workingIDs;
     void replacefaultedrobots();
     CRoleFault *faultRoles[_MAX_NUM_PLAYERS];
+    void resetnonVisibleAgents();
+
 
 
 

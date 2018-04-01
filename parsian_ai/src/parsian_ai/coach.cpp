@@ -1046,8 +1046,8 @@ void CCoach::generateWorkingRobotIds()
                 }
             }
         }
-        for(int i{}; i<workingIDs.count(); i++)
-            ROS_INFO_STREAM("kian: " << workingIDs[i]);
+//        for(int i{}; i<workingIDs.count(); i++)
+//            ROS_INFO_STREAM("kian: " << workingIDs[i]);
 }
 
 void CCoach::replacefaultedrobots()
@@ -1064,7 +1064,7 @@ void CCoach::replacefaultedrobots()
                 if(ourPlayers.contains(agents[i]->id()))
                 {
                     faultPlayers.push_back(agents[i]->id());
-                    ROS_INFO_STREAM("kian:assign to faultPlayers " << agents[i]->id());
+                    //ROS_INFO_STREAM("kian:assign to faultPlayers " << agents[i]->id());
                 }
             }
         }
@@ -1080,8 +1080,33 @@ void CCoach::replacefaultedrobots()
     }
 }
 
+void CCoach::resetnonVisibleAgents()
+{
+//    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+//        ROS_INFO_STREAM("kian: agentID: " << agents[i]->id());
+//    for(int j{}; j < wm->our.activeAgentsCount(); j++)
+//        ROS_INFO_STREAM("kian: wmID: " << wm->our.activeAgentID(j));
+    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+    {
+        if(agents[i] != nullptr)
+        {
+            bool isvisible{false};
+            for(int j{}; j < wm->our.activeAgentsCount(); j++)
+                if(agents[i]->id() == wm->our.activeAgentID(j))
+                    isvisible = true;
+            if(!isvisible)
+            {
+                ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
+                agents[i]->fault = false;
+                agents[i]->faultstate = Agent::FaultState::HEALTHY;
+            }
+        }
+    }
+}
+
 void CCoach::execute()
 {
+    resetnonVisibleAgents();
     generateWorkingRobotIds();
     if(gameState->isStop())
         replacefaultedrobots();
