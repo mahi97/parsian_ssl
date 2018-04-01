@@ -78,7 +78,7 @@ void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr &
     ai->updateReferee(_ref);
 }
 
-void AINodelet::forceRefereeCallBack(const parsian_msgs::ssl_refree_commandConstPtr & _command){
+void AINodelet::forceRefereeCallBack(const parsian_msgs::ssl_force_refereeConstPtr & _command){
     ai->forceUpdateReferee(_command);
 }
 

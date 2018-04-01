@@ -83,9 +83,9 @@ void AI::updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     wm->updateRef(_ref);
 }
 
-void AI::forceUpdateReferee(const parsian_msgs::ssl_refree_commandConstPtr & _command){
+void AI::forceUpdateReferee(const parsian_msgs::ssl_force_refereeConstPtr & _command){
     States state;
-    switch (_command->command){
+    switch (_command->command.command){
         case ssl_refree_command::BALL_PLACEMENT_US:
             state = States::OurBallPlacement;
             break;
@@ -132,6 +132,7 @@ void AI::forceUpdateReferee(const parsian_msgs::ssl_refree_commandConstPtr & _co
             return;
     }
     gameState->setState(state);
+    wm->setBallplacementPoin(_command->ballPlacementPos);
 }
 
 CSoccer* AI::getSoccer() {
