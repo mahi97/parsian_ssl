@@ -1517,7 +1517,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             goalKeeperPredictionModeInPlayOff = false;
             goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal() , ballPrediction(true) , 1);
             if(wm->field->isInOurPenaltyArea(goalKeeperTarget))
-                return;
+                return ;
             goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal() , ballPrediction(true) , 0.5);
             drawer->draw(Segment2D(goalKeeperTarget , wm->field->ourGoal()) , "blue");
             if (!wm->field->isInOurPenaltyArea(goalKeeperTarget)) {
@@ -2611,7 +2611,7 @@ void DefensePlan::executeGoalKeeper() {
             } else {
                 ROS_INFO_STREAM("5");
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
-                gpa[goalKeeperAgent->id()]->setTargetdir(ballPrediction(true) - wm->field->ourGoal());
+                gpa[goalKeeperAgent->id()]->setTargetdir(ballPrediction(true) - wm->ball->pos);//
             }
             goalKeeperAgent->action = gpa[goalKeeperAgent->id()];
         }
