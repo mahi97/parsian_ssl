@@ -77,7 +77,6 @@ CCoach::CCoach(Agent**_agents)
     firstTime = true;
 
     haltAction = new NoAction;
-
 }
 
 CCoach::~CCoach() {
@@ -155,7 +154,6 @@ void CCoach::checkGoalieInsight() {
 
 
 void CCoach::decidePreferredDefenseAgentsCount() {
-
 
     missMatchIds.clear();
     if (gameState->getState() == States::Stop || gameState->getState() == States::Halt || first) {
@@ -622,68 +620,62 @@ void CCoach::decideAttack() {
 
     switch (gameState->getState()) { // GAMESTATE
 
-        case States::Halt:
-            decideHalt(ourPlayersID);
-            return;
-            break;
-        case States::Stop:
-            decideStop(ourPlayersID);
-            return;
-            break;
+    case States::Halt:
+        decideHalt(ourPlayersID);
+        return;
+        break;
+    case States::Stop:
+        decideStop(ourPlayersID);
+        return;
+        break;
 
-        case States::OurKickOff:
-            decideOurKickOff(ourPlayersID);
-            break;
+    case States::OurKickOff:
+        decideOurKickOff(ourPlayersID);
+        break;
 
-        case States::TheirKickOff:
-            decideTheirKickOff(ourPlayersID);
-            break;
+    case States::TheirKickOff:
+        decideTheirKickOff(ourPlayersID);
+        break;
 
-        case States::OurDirectKick:
-            decideOurDirect(ourPlayersID);
-            break;
+    case States::OurDirectKick:
+        decideOurDirect(ourPlayersID);
+        break;
 
-        case States::TheirDirectKick:
-            decideTheirDirect(ourPlayersID);
-            break;
+    case States::TheirDirectKick:
+        decideTheirDirect(ourPlayersID);
+        break;
 
-        case States::OurIndirectKick:
-            decideOurIndirect(ourPlayersID);
-            break;
+    case States::OurIndirectKick:
+        decideOurIndirect(ourPlayersID);
+        break;
 
-        case States::TheirIndirectKick:
-            decideTheirIndirect(ourPlayersID);
-            break;
+    case States::TheirIndirectKick:
+        decideTheirIndirect(ourPlayersID);
+        break;
 
-        case States::OurPenaltyKick:
-            decideOurPenalty(ourPlayersID);
-            break;
+    case States::OurPenaltyKick:
+        decideOurPenalty(ourPlayersID);
+        break;
 
-        case States::TheirPenaltyKick:
-            decideTheirPenalty(ourPlayersID);
-            break;
-        case States::Start:
-            decideStart(ourPlayersID);
-            break;
-        case States::OurBallPlacement:
-            decideOurBallPlacement(ourPlayersID);
-            break;
-        case States::TheirBallPlacement:
-            decideStop(ourPlayersID);
-            break;
-        case States::HalfTime:
-            decideHalfTimeLineUp(ourPlayersID);
-            break;
-        case States::TheirTimeOut:
-            decideHalfTimeLineUp(ourPlayersID);
-            break;
-        case States::OurTimeOut:
-            decideHalfTimeLineUp(ourPlayersID);
-            break;
-        default:
-            decideNull(ourPlayersID);
-            return;
-            break;
+    case States::TheirPenaltyKick:
+        decideTheirPenalty(ourPlayersID);
+        break;
+    case States::Start:
+        decideStart(ourPlayersID);
+        break;
+    case States::OurBallPlacement:
+        decideOurBallPlacement(ourPlayersID);
+        break;
+    case States::TheirBallPlacement:
+        decideStop(ourPlayersID);
+        break;
+    case States::HalfTime:
+        decideHalfTimeLineUp(ourPlayersID);
+        break;
+    default:
+        decideNull(ourPlayersID);
+        return;
+        break;
     }
 
     QList<Agent*> ourAgents;
@@ -740,8 +732,17 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     updateAttackState(); //// Too Bad Conditions will be Handle here
 
     if (0 <= playmakeId && playmakeId <= 11) {
-        dynamicAttack->setPlayMake(agents[playmakeId]);
-        ourPlayers.removeOne(playmakeId);
+        if(dynamicAttack->getPMfromCaoch())
+        {
+            dynamicAttack->setPlayMake(agents[playmakeId]);
+            ourPlayers.removeOne(playmakeId);
+            ROS_INFO_STREAM("PMfromCaoch true");
+        } else
+        {
+            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
+            ourPlayers.removeOne(dynamicAttack->getReceiverID());
+            ROS_INFO_STREAM("PMfromCaoch false");
+        }
     }
 
     dynamicAttack->setDefenseClear(false); // TODO : fix
@@ -763,7 +764,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
         }
-
     }
 
     dynamicAttack->setWeHaveBall(ballPState   == BallPossesion::WEHAVETHEBALL);
@@ -787,7 +787,6 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             MarkNum = 3;
             break;
     }
-
     MarkNum = std::min(MarkNum, ourPlayers.count());
     MarkNum = 0;
     selectedPlay->markAgents.clear();
@@ -803,13 +802,10 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         for (int i = 0; i < MarkNum; i++) {
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
             ourPlayers.removeFirst();
-
         }
-
     }
     lastBallPossesionState = ballPState;
 }
-
 
 void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     ROS_INFO_STREAM("HSHM: agentSize: " << agentSize);

@@ -50,7 +50,7 @@ protected:
     void agentsStuckTogether(const QList<Vector2D> &agentsPosition , QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);
     void correctingTheAgentsAreStuckTogether(QList<Vector2D> &agentsPosition, QList<Vector2D> &stuckPositions , QList<int> &stuckIndexs);
 
-    bool isInIndirectArea(Vector2D);    
+    bool isInIndirectArea(Vector2D);
     int defenseNumber();
     double findBestOffsetForDefenseArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
     double findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit);
@@ -158,7 +158,7 @@ public:
     //////////////////HMD/////////////////
     QList<Vector2D> markPoses;
     QList<Vector2D> markAngs;
-    double markRadius;    
+    double markRadius; 
     double segmentpershoot;
     double segmentperpass;
     bool MantoManAllTransientFlag;
