@@ -1109,9 +1109,7 @@ bool CPlayOff::isPlanEnd() {
             DBUG("rePlaning", D_MAHI);
             return false;
         }
-        return true;
     }
-
     return false;
 }
 
