@@ -3102,14 +3102,14 @@ void DefensePlan::runDefenseExeptions() {
     }
 }
 
-int DefensePlan::decideNumOfMarks() {
+int DefensePlan::decideNumOfMarks(){
     //// This function returns the "defenseCount" in all states, except when ball
     //// is near the corners , returns the 1.
 
     playOnMode = gameState->isStart();
     playOffMode = gameState->theirDirectKick() || gameState->theirIndirectKick();
     if (defenseCount > 0){
-        if (gameState->isStop()) {
+        if (gameState->isStop()){
             return defenseCount - defenseNumber();
         }
         if (playOffMode) {
@@ -3288,7 +3288,7 @@ void DefensePlan::findPos(int _markAgentSize){
     //// conditions && states.Some flags are used to stay in previous state && for
     //// not switching between PlayOff && PlayOn.
 
-    bool playOff = ((gameState->theirDirectKick())/*|| (knowledge->getGameState() == CKnowledge::TheirKickOff)*/ || (gameState->theirIndirectKick()));
+    bool playOff = (gameState->theirDirectKick()|| (gameState->theirIndirectKick()));
     bool MantoManAllTransientFlag = conf.ManToManAllTransiant;
     xLimitForblockingPass = 0;
     manToManMarkBlockPassFlag = conf.PlayOffManToMan;
@@ -3296,30 +3296,30 @@ void DefensePlan::findPos(int _markAgentSize){
     markPoses.clear();
     markAngs.clear();
     ///////////////// Man To Man AllTransiant Mode for Mark ////////////////////
-    DBUG(know->variables["lastStateForMark"].toString() , D_AHZ);
-    DBUG(know->variables["stateForMark"].toString() , D_AHZ);
-    if (MantoManAllTransientFlag) {
-        if (know->variables["transientFlag"].toBool()) {
-            segmentpershoot = 0.1;
-        } else {
-            segmentpershoot = conf.ShootRatioBlock / 100;
+    if (MantoManAllTransientFlag){
+        if (know->variables["transientFlag"].toBool()){
+            segmentperpass = 0.1;
+            segmentpershoot = 0.8;
         }
-        segmentperpass = conf.PassRatioBlock / 100;
+        else{
+            segmentperpass = conf.PassRatioBlock / 100;
+            segmentpershoot = conf.ShootRatioBlock / 100;
+        }        
     }
     else {
         segmentpershoot = conf.ShootRatioBlock / 100;
         segmentperpass = conf.PassRatioBlock / 100;
     }
     //////////////// Determine the plan of mark from GUI ////////////////////
-    if (manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass) {
-        if (playOff || stopMode) {
+    if(manToManMarkBlockPassFlag || wm->ball->pos.x > xLimitForblockingPass){
+        if(playOff || stopMode){
             know->variables["stateForMark"] = QString("BlockPass");
-            manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , conf.PassRatioBlock / 100);
+            manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , segmentperpass);
         }
-        else if (know->variables["transientFlag"].toBool()) {
-            if (know->variables["lastStateForMark"] == QString("BlockPass")) {
+        else if(know->variables["transientFlag"].toBool()){
+            if(know->variables["lastStateForMark"] == QString("BlockPass")){
                 know->variables["stateForMark"] = QString("BlockPass");
-                manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , conf.PassRatioBlock / 100);
+                manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , segmentperpass);
             }
             else {
                 know->variables["stateForMark"] = QString("BlockShot");
@@ -3339,7 +3339,7 @@ void DefensePlan::findPos(int _markAgentSize){
             }
             else {
                 know->variables["stateForMark"] = QString("BlockPass");
-                manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , conf.PassRatioBlock / 100);
+                manToManMarkBlockPassInPlayOff(oppAgentsToMarkPos, _markAgentSize , segmentperpass);
             }
         }
     }
