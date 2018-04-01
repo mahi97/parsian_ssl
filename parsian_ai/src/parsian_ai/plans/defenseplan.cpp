@@ -7,7 +7,6 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA 1.697056275 + Robot::robot_radius_new
 
-
 QPair<Vector2D , Vector2D> DefensePlan::avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity){
     int skillAgent = 7;
     Rect2D penaltyArea = wm->field->ourBigPenaltyArea(1,0.1,0);
@@ -99,7 +98,7 @@ double DefensePlan::timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList
 
 }
 
-QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){    
+QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
     if((wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)) || defenseArea.contains(wm->ball->pos)){
@@ -1977,7 +1976,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         }
     }
     ////////////////////////////////////////////////////////////////////////////
-    know->Matching(ourAgents, matchPoints, matchResult);    
+    know->Matching(ourAgents, matchPoints, matchResult);
     for (int i = 0 ; i < defenseCount && i < matchPoints.size(); i++) {
         defensePoints[i] = matchPoints[i];
     }
@@ -1991,7 +1990,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             }
         }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
-        drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);        
+        drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
 //        if(wm->field->ourBigPenaltyArea(1,0.4,0).contains(matchPoints.at(matchResult.at(i)))){
             ahzMatchPoints.append(avoidRectangularPenaltyAreaByMhmmd(matchPoints.at(matchResult.at(i))
                                              , ourAgents.at(i)->pos()
@@ -2994,7 +2993,7 @@ QPair<Vector2D , Vector2D> DefensePlan::avoidCircularPenaltyAreaByArash(Agent* a
     if (dist > 1) {
         retPoint = retPoint + vecDiff.setLength(dist * 2);
     }
-    drawer->draw(Circle2D(retPoint , 0.02) , 0 , 360 , "blue" , true);    
+    drawer->draw(Circle2D(retPoint , 0.02) , 0 , 360 , "blue" , true);
     temp.first = retPoint;
     temp.second = agent->pos() - wm->field->ourGoal();
     return temp;
