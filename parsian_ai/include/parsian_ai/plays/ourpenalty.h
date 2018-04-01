@@ -7,12 +7,12 @@
 #include <parsian_util/geom/geom.h>
 #include <parsian_ai/util/knowledge.h>
 
-enum PenaltyState{
+enum class PenaltyState{
     Positioning,
     Kicking
 };
 
-enum KickState{
+enum class KickState{
     Trick,
     Shoot
 };

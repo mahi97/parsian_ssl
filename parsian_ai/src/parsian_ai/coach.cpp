@@ -34,6 +34,7 @@ CCoach::CCoach(Agent**_agents)
 
     // Old Plays
     ourPenalty          = new COurPenalty;
+    ourPenaltyShootout  = new COurPenaltyShootout;
     theirDirect         = new CTheirDirect;
     theirKickOff        = new CTheirKickOff;
     theirPenalty        = new CTheirPenalty;
@@ -664,6 +665,14 @@ void CCoach::decideAttack() {
         decideOurPenalty(ourPlayersID);
         break;
 
+    case States::OurPenaltyShootOut:
+        decideOurPenaltyshootout(ourActivePlayersID);
+        break;
+
+    case States::TheirPenaltyShootOut:
+        decideTheirPenaltyshootout(ourActivePlayersID);
+        break;
+
     case States::TheirPenaltyKick:
         decideTheirPenalty(ourPlayersID);
         break;
@@ -1271,6 +1280,33 @@ void CCoach::decideTheirPenalty(QList<int> &_ourPlayers) {
     firstTime = true;
 }
 
+void CCoach::decideOurPenaltyshootout(QList<int>& _ourPlayers)
+{
+    ROS_INFO_STREAM("shootout: decideourpenalty");
+    selectedPlay = ourPenaltyShootout;
+    if (0 <= playmakeId && playmakeId <= 11) {
+        ourPenaltyShootout->setPlaymake(agents[playmakeId]);
+        _ourPlayers.removeOne(playmakeId);
+    }
+    if(!gameState->ready())
+        ourPenaltyShootout->setState(PenaltyShootoutState::Positioning);
+
+    else if(gameState->ready())
+    {
+        ROS_INFO_STREAM("shootout: normal start -> penalty");
+        ourPenaltyShootout->setState(PenaltyShootoutState::Kicking);
+    }
+    DBUG("penalty", D_MHMMD);
+    firstTime = true;
+}
+
+void CCoach::decideTheirPenaltyshootout(QList<int> &)
+{
+    ROS_INFO_STREAM("penalty: decideourpenalty");
+    selectedPlay = theirPenalty;
+    firstTime = true;
+}
+
 void CCoach::decideStart(QList<int> &_ourPlayers) {
     ROS_INFO_STREAM("kian: in start mode");
     if (gameState->theirPenaltyShootout()) {
@@ -1597,7 +1633,11 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
 }
 
 int CCoach::findGoalie() {
-    if (conf.useGoalieInPlayoff && gameState->ourPlayOffKick() && wm->ball->pos.x > 1 && !gameState->penaltyKick())
+        if (conf.useGoalieInPlayoff
+            && gameState->ourPlayOffKick()
+            && wm->ball->pos.x > 1
+            && !gameState->penaltyKick()
+            && !gameState->penaltyShootout())
     {
         preferedGoalieID = -1;
         ROS_INFO_STREAM("check goaliID first : " << preferedGoalieID);

@@ -116,6 +116,8 @@ add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/theirballplacement.cpp
 		src/parsian_ai/plays/stopplay.cpp
 		src/parsian_ai/plays/halftimelineup.cpp
+		src/parsian_ai/plays/ourpenaltyshootout.cpp
+                #src/parsian_ai/plays/theirpenaltyshootout.cpp
 		)
 
 add_library(${PROJECT_NAME}_plans
