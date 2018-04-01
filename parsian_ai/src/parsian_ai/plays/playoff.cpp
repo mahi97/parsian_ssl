@@ -77,9 +77,10 @@ void CPlayOff::globalExecute() {
     if (masterMode == NGameOff::StaticPlay) {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (ros::Time::now().sec - lastTime > 1000 && !initial && lastBallPos.dist(wm->ball->pos) > 0.06) {
+        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
             //             TODO : write critical play here
             if (criticalPlay()) {
+                ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
             }
             return;
@@ -253,7 +254,7 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd()) {
                 playOnFlag = true;
-                ROS_INFO("Playofff Ends");
+                ROS_INFO("Playoff Ends");
             }
 
         } else {
@@ -944,10 +945,12 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
     if (tAgentsize > 0) {
         newRoleAgent[0]->setTarget(kickOffPos[0]);
         newRoleAgent[0]->setTargetDir(-newRoleAgent[0]->getAgent()->pos() + wm->ball->pos);
+        newRoleAgent[0]->setAvoidBall(true);
 
         for (int i = 1; i < tAgentsize; i++) {
             newRoleAgent[i]->setTarget(kickOffPos[i]);
             newRoleAgent[i]->setTargetDir(-newRoleAgent[i]->getAgent()->pos() + wm->field->oppGoal());
+            newRoleAgent[i]->setAvoidBall(true);
         }
     }
 
@@ -1099,7 +1102,7 @@ bool CPlayOff::isPlanEnd() {
         DBUG("Plan Succeded", D_MAHI);
         return true;
 
-    } else if (isPlanFaild()) {
+    } else if (isPlanFailed()) {
         if (lastBallPos.dist(wm->ball->pos) > 0.06) {
             DBUG("Plan Fully Failed", D_MAHI);
             return true;
@@ -1107,6 +1110,7 @@ bool CPlayOff::isPlanEnd() {
             DBUG("rePlaning", D_MAHI);
             return false;
         }
+        return true;
     }
 
     return false;
@@ -1137,7 +1141,7 @@ bool CPlayOff::isPlanDone() {
 }
 
 
-bool CPlayOff::isPlanFaild() {
+bool CPlayOff::isPlanFailed() {
     SFail fail = isAnyTaskFaild();
     if (isTimeOver()) {
         DBUG("Faild By Time Over", D_MAHI);
@@ -1251,6 +1255,7 @@ bool CPlayOff::isTimeOver() {
             return true;
         }
     }
+
     return false;
 }
 
