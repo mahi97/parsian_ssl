@@ -2057,12 +2057,17 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByArash(ourAgents[i], matchPoints[matchResult[i]]);
 //        }
 
-        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
+//        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
             matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByArash(ourAgents[i], matchPoints[matchResult[i]]);
-        }
+//        }
         DEBUG(QString("Matchpoint size: %1 %2").arg(matchPoints.size()).arg(ourAgents.size()) , D_AHZ);
         PDEBUGV2D("matchpoint ahz",matchPoints.at(matchResult.at(i)) , D_AHZ);
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
+        gpa[ourAgents[i]->id()]->setNoavoid(true);
+        gpa[ourAgents[i]->id()]->setSlowmode(false);
+        gpa[ourAgents[i]->id()]->setDivemode(false);
+        gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
+        gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
         if(gameState->theirIndirectKick()){
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
@@ -3017,7 +3022,7 @@ Vector2D DefensePlan::avoidCircularPenaltyAreaByArash(Agent* agent, const Vector
     Circle2D defenseArea(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA + Robot::robot_radius_new);
     Vector2D retPoint;
     double distFromGoal = RADIUS_FOR_CRITICAL_DEFENSE_AREA + Robot::robot_radius_new;
-    if (agentPos.dist(wm->field->ourGoal()) < distFromGoal) {
+    if (agentPos.dist(wm->field->ourGoal()) < distFromGoal && !defenseArea.contains(wm->ball->pos)) {
         agentPos = wm->field->ourGoal() + Vector2D().setPolar(distFromGoal, (agentPos - wm->field->ourGoal()).th().degree());
         defenseArea.intersection(Line2D(agentPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
         Vector2D inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? sol[0] : sol[1];
