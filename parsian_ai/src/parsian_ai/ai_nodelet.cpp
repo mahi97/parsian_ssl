@@ -69,7 +69,7 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
 
     }
 //
-   parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
+    parsian_msgs::plan_serviceResponse lastPlan = ai->getSoccer()->getCoach()->getLastPlan();
     ROS_INFO_STREAM("HSHM: last plan name: " << lastPlan.the_plan.planFile);
 
 }
