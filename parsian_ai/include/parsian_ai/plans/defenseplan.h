@@ -69,8 +69,7 @@ protected:
     Vector2D oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit);
     Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<Vector2D> defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions);
-    double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);
-    QPair<Vector2D, Vector2D> avoidRectangularPenaltyAreaByMhmmd(Vector2D finalPosition , Vector2D agentPosition , Vector2D agentDirection , Vector2D agentVelocity);
+    double timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList <int> _ourRelax, QList <int> _oppRelax , bool avoidPenalty, double ballObstacleReduce, bool _noAvoid);    
     //atousa
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;
@@ -109,7 +108,7 @@ protected:
     ///////////////////////////////////////////////////
     void executeGoalKeeper();
     Vector2D strictFollowBall(Vector2D _ballPos);
-    Vector2D avoidCircularPenaltyAreaByArash(Agent* agent, const Vector2D& point);
+    Vector2D avoidCircularPenaltyAreaByMasoud(Agent* agent, const Vector2D& point);
     int decideNumOfMarks();
     kkDefPos tempDefPos;
     void matchingDefPos(int _defenseNum);
