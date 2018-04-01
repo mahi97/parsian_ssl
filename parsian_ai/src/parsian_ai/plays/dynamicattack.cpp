@@ -406,7 +406,6 @@ void CDynamicAttack::assignId() {
     QList<int> matchedIDList;
     mahiPositionAgents.clear();
     guardIndexList.clear();
-
     MWBM matcher;
     int n = agents.size();
     matcher.create(n, n);

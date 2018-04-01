@@ -9,31 +9,29 @@ COurPenaltyShootout::COurPenaltyShootout() : CMasterPlay()
 
 COurPenaltyShootout::~COurPenaltyShootout() = default;
 
-void COurPenaltyShootout::reset() {
+void COurPenaltyShootout::reset()
+{
     positioningPlan.reset();
     executedCycles = 0;
 }
 
-void COurPenaltyShootout::init(const QList<Agent*>& _agents) {
+void COurPenaltyShootout::init(const QList<Agent*>& _agents)
+{
     setAgentsID(_agents);
 }
 
 void COurPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
 {
-    ROS_INFO_STREAM("penalty:  before set playmake to: ");
     if(_playmakeAgent != nullptr)
     {
         playMakeAgent = _playmakeAgent;
     }
-    ROS_INFO_STREAM("penalty: set playmake to: " << playMakeAgent->id());
 }
 
-
-
-void COurPenaltyShootout::execute_x() {
-    ROS_INFO_STREAM("penalty: execute_x");
-    if (playMakeAgent == nullptr || (playMakeAgent->id() == -1)) {
-        ROS_INFO_STREAM("penalty: playmakeagent is null");
+void COurPenaltyShootout::execute_x()
+{
+    if (playMakeAgent == nullptr || (playMakeAgent->id() == -1))
+    {
         return;
     }
     if(penaltyState == PenaltyShootoutState::Positioning)
@@ -49,7 +47,6 @@ void COurPenaltyShootout::execute_x() {
 
 void COurPenaltyShootout::generatePositions()
 {
-    ROS_INFO_STREAM("penalty: generate positions");
     positions.clear();
     double penaltyPositioningOffset = 0.9;
     double maximum_x_width = wm->field->ourGoal().x + (wm->field->_PENALTY_DEPTH + penaltyPositioningOffset);
@@ -58,7 +55,6 @@ void COurPenaltyShootout::generatePositions()
         positions.append(getEmptyTarget(Vector2D{maximum_x_width, pow(-1, i)* i/2}, penaltyPositioningOffset));
     }
 }
-
 
 Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
 {
@@ -72,7 +68,6 @@ Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
     for (double dist = 0.0 ; dist <= 0.5 ; dist += 0.2) {
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
-            ////should check
             if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
                 continue;
             }
@@ -92,13 +87,11 @@ Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
             break;
         }
     }
-
     return finalTarget;
 }
 
 void COurPenaltyShootout::assignSkills()
 {
-    ROS_INFO_STREAM("penalty: assign skills");
     moveSkills.clear();
     for(int i{0}; i<agents.count(); i++)
     {
@@ -125,7 +118,12 @@ void COurPenaltyShootout::playmakeInitialPositioning()
     PMgotopoint->setAvoidpenaltyarea(false);
     PMgotopoint->setAvoidcentercircle(false);
     PMgotopoint->setBallobstacleradius(0.2);
-    changeDirPenaltyStrikerTime.restart();
-    timerStartFlag = true;
+    shootoutTimer.restart();
+    timerFlag = true;
     playMakeAgent->action = PMgotopoint;
+}
+
+void COurPenaltyShootout::runShootOut()
+{
+
 }
