@@ -2,9 +2,8 @@
 
 COurPenalty::COurPenalty() : CMasterPlay()
 {
+    initMaster();
     playmakeRole = new CRolePlayMake(nullptr);
-    for(int i{0}; i<8; i++)
-        moveSkill[i] = new GotopointavoidAction();
 }
 
 COurPenalty::~COurPenalty() = default;
@@ -16,7 +15,6 @@ void COurPenalty::reset() {
 
 void COurPenalty::init(const QList<Agent*>& _agents) {
     setAgentsID(_agents);
-    //initMaster();
     ROS_INFO_STREAM("penalty: init our agents");
 }
 
@@ -65,7 +63,22 @@ void COurPenalty::execute_x() {
     }
 }
 
-Vector2D COurPenalty::getEmptyTarget(Vector2D _position, double _radius) {
+void COurPenalty::generatePositions()
+{
+    ROS_INFO_STREAM("penalty: generate positions");
+    positions.clear();
+    double penaltyPositioningOffset = 0.4;
+    double penaltyRuleOffset = 0.4;
+    double maximum_x_width = wm->field->oppGoalL().x - (wm->field->_PENALTY_DEPTH + penaltyRuleOffset + penaltyPositioningOffset);
+    for(int i{}; i < agents.size(); i++)
+    {
+        positions.append(getEmptyTarget(Vector2D{maximum_x_width, pow(-1, i)* i/2}, penaltyPositioningOffset));
+    }
+}
+
+
+Vector2D COurPenalty::getEmptyTarget(Vector2D _position, double _radius)
+{
     Vector2D tempTarget, finalTarget, position;
     double escapeRad;
     int oppCnt = 0;
@@ -99,5 +112,18 @@ Vector2D COurPenalty::getEmptyTarget(Vector2D _position, double _radius) {
     }
 
     return finalTarget;
+}
+
+void COurPenalty::assignSkills()
+{
+    ROS_INFO_STREAM("penalty: assign skills");
+    moveSkills.clear();
+    for(int i{0}; i<agents.count(); i++)
+    {
+        moveSkills.append(new GotopointavoidAction());
+        moveSkills[i]->setTargetpos(positions[i]);
+        moveSkills[i]->setTargetdir(wm->field->oppGoal());
+        agents[i]->action = moveSkills[i];
+    }
 }
 

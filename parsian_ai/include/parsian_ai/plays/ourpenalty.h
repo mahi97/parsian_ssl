@@ -15,13 +15,16 @@ public:
     void executeShootoutPositioning();
     void executeNormalPositioning();
     Vector2D getEmptyTarget(Vector2D _position, double _radius);
+    void assignSkills();
 
 
 private:
     void reset();
     bool isPenaltyShootOut;
     CRolePlayMake* playmakeRole;
-    GotopointavoidAction* moveSkill[8];
+    QList<GotopointavoidAction*> moveSkills;
+    void generatePositions();
+    QList<Vector2D> positions;
 };
 
 #endif // OURPENALTY_H
