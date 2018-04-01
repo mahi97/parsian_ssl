@@ -182,7 +182,6 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double do
             defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
         }
     }
-<<<<<<< HEAD
 
     return defensePosition;
 }
@@ -250,68 +249,6 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double 
     tempVector = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(Segment2D(defensePosition.at(0) , defensePosition.at(1)));
     defensePosition.append(know->getPointInDirection(tempVector , ballPosition , 0.1));
     return defensePosition;
-}
-
-QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double downLimit , double upLimit){
-    QList<Vector2D> defensePosition;
-    Vector2D sol[4];
-    double robotRadius = Robot::robot_radius_new;
-    Vector2D ourGoalLeft = wm->field->ourGoalL();
-    Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = ballPrediction(false);
-    Segment2D ourGoalLine = Segment2D(ourGoalLeft , ourGoalRight);
-    Vector2D anIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
-    Vector2D anotherIntesection = getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight).intersection(ourGoalLine);
-    int numberOfDefenseAgents = 2;
-    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
-    defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , anIntesection) , &sol[0] , &sol[1]);
-    defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
-    defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
-    defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
-
-    if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
-        double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
-        double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
-        if(distanceFromYalForFirstPosition > robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
-            defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-        }
-        else if(distanceFromYalForFirstPosition <= robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
-            defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-        }
-
-        if(distanceFromYalForSecondPosition > robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
-            defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-        }
-        else if(distanceFromYalForSecondPosition <= robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
-            defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-        }
-    }
-    else{
-        double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(0));
-        double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(1));
-        if(distanceFromYalForFirstPosition > robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
-            defensePosition[0] += Vector2D(anotherIntesection - defensePosition.at(0)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-        }
-        else if(distanceFromYalForFirstPosition <= robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(0));
-            defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-        }
-
-        if(distanceFromYalForSecondPosition > robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
-            defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
-        }
-        else if(distanceFromYalForSecondPosition <= robotRadius){
-            anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(1));
-            defensePosition[1] += Vector2D(defensePosition.at(1) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-        }
-    }
-
 }
 
 QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double upEdgeLength){
@@ -2051,9 +1988,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             agentsStuckTogether(matchPoints, stuckPositions, stuckIndexs);
             correctingTheAgentsAreStuckTogether(matchPoints, stuckPositions, stuckIndexs);
         }
-    }
-    //////////////// Avoid Penalty Area ///////////////////////
-
+    }   
     //////////////////// Added for RC 2017 /////////////////////////////////////
     Vector2D tempMatchPoints[matchPoints.size()];
     if (ourAgents.size() > matchPoints.size()) {
@@ -2091,13 +2026,15 @@ void DefensePlan::matchingDefPos(int _defenseNum){
 
         for (int j = 0; j < ourAgents.size(); j++) {
             if (j != i) {
-                gpa[ourAgents[i]->id()]->addOurrelax(ourAgents[j]->id());//TODO: gotopiontaction
+                gpa[ourAgents[i]->id()]->addOurrelax(ourAgents[j]->id());
             }
         }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
-        if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
-            matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByMasoud(ourAgents[i], matchPoints[matchResult[i]]);
-        }
+         //////////////// Avoid Penalty Area ///////////////////////
+//        if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
+//            matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByMasoud(ourAgents[i], matchPoints[matchResult[i]]);
+//        }
+        //////////////////////////////////////////////////////////////
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
         gpa[ourAgents[i]->id()]->setNoavoid(true);
         gpa[ourAgents[i]->id()]->setSlowmode(false);
@@ -3279,7 +3216,7 @@ void DefensePlan::findOppAgentsToMark(){
             oppAgentsToMark.append(wm->opp.active(i));
         }
     }
-    if(gameState->theirIndirectKick() || gameState->isStop()) {
+    if(gameState->theirIndirectKick() || gameState->isStop()){
         int nearestToBall = -1;
         double nearestToBallDist = 100000;
         for(int i = 0 ; i < oppAgentsToMark.count() ; i++){
@@ -3290,6 +3227,12 @@ void DefensePlan::findOppAgentsToMark(){
         }
         if(nearestToBall != -1){
             oppAgentsToMark.removeOne(oppAgentsToMark[nearestToBall]);
+        }
+        for(size_t i = 0 ; i < oppAgentsToMark.size() ; i++){
+            if(Circle2D(wm->ball->pos , ballCircleR).contains(oppAgentsToMark.at(i)->pos)){
+                oppAgentsToMark.removeAt(i);
+                i--;
+            }
         }
     }
     if(gameState->theirKickoff()){
@@ -3327,14 +3270,14 @@ Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
     Vector2D solutions[2];
     Vector2D desiredSolution;
     Vector2D temppos = opp->pos + VelReliabiity * opp->vel;
-    tempseg.assign(opp->pos, opp->pos + VelReliabiity * opp->vel);
+    tempseg.assign(opp->pos, opp->pos + opp->vel);
     drawer->draw(tempseg, QColor(Qt::yellow));
-    wm->field->ourBigPenaltyArea(1, 0.3, 0).intersection(tempseg , &solutions[0] , &solutions[1]);
+    wm->field->ourBigPenaltyArea(1, 0.1, 0).intersection(tempseg , &solutions[0] , &solutions[1]);
     desiredSolution = solutions[0].dist(opp->pos) < solutions[1].dist(opp->pos) ? solutions[0] : solutions[1];
     if (wm->field->isInField(desiredSolution) && desiredSolution.isValid() && tempseg.length() != 0) {
         return desiredSolution;
-    } else if (temppos.x < -4.4) {
-        return Vector2D(-4.4, (opp->pos + VelReliabiity * opp->vel).y) ;
+    } else if (temppos.x < (-wm->field->_FIELD_WIDTH / 2)){
+        return Vector2D((-wm->field->_FIELD_WIDTH / 2), (opp->pos + VelReliabiity * opp->vel).y) ;
     } else {
         return opp->pos + VelReliabiity * opp->vel;
     }
