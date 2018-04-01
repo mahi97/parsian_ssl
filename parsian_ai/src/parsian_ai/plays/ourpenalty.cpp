@@ -4,6 +4,7 @@ COurPenalty::COurPenalty() : CMasterPlay()
 {
     initMaster();
     playmakeRole = new CRolePlayMake(nullptr);
+    PMgotopoint = new GotopointavoidAction();
 }
 
 COurPenalty::~COurPenalty() = default;
@@ -51,15 +52,20 @@ void COurPenalty::execute_x() {
     }
     isPenaltyShootOut = gameState->ourPenaltyShootout();
     //playmakeRole->execute();
-    if(isPenaltyShootOut)
+    if(state == PenaltyState::Positioning)
     {
-        ROS_INFO_STREAM("penalty: shootout");
-        executeShootoutPositioning();
-    }
-    else
-    {
-        ROS_INFO_STREAM("penalty: norma");
-        executeNormalPositioning();
+        if(isPenaltyShootOut)
+        {
+            ROS_INFO_STREAM("penalty: shootout");
+            executeShootoutPositioning();
+        }
+        else
+        {
+            ROS_INFO_STREAM("penalty: norma");
+            executeNormalPositioning();
+        }
+
+        playmakePositioning();
     }
 }
 
@@ -125,5 +131,25 @@ void COurPenalty::assignSkills()
         moveSkills[i]->setTargetdir(wm->field->oppGoal());
         agents[i]->action = moveSkills[i];
     }
+}
+
+void COurPenalty::playmakePositioning()
+{
+    Vector2D direction, position;
+
+    direction = wm->ball->pos - playMakeAgent->pos();
+    direction.y *= 1.2;
+    position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).norm() * (0.13);
+    PMgotopoint->setTargetpos(position);
+    PMgotopoint->setTargetdir(direction);
+
+    PMgotopoint->setSlowmode(true);
+    PMgotopoint->setNoavoid(false);
+    PMgotopoint->setPenaltykick(true);
+    PMgotopoint->setAvoidpenaltyarea(false);
+    PMgotopoint->setAvoidcentercircle(false);
+
+    PMgotopoint->setBallobstacleradius(0.2);
+    playMakeAgent->action = PMgotopoint;
 }
 

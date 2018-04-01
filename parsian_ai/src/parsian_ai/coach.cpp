@@ -1249,6 +1249,7 @@ void CCoach::decideTheirIndirect(QList<int> &_ourPlayers) {
 void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
     ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = ourPenalty;
+    ourPenalty->setState(PenaltyState::Positioning);
     if (0 <= playmakeId && playmakeId <= 11) {
         ourPenalty->setPlaymake(agents[playmakeId]);
         _ourPlayers.removeOne(playmakeId);
@@ -1266,6 +1267,11 @@ void CCoach::decideStart(QList<int> &_ourPlayers) {
     if (gameState->theirPenaltyShootout()) {
         selectedPlay = theirPenalty;
         return;
+    }
+    else if(gameState->ourPenaltyKick())
+    {
+        selectedPlay = ourPenalty;
+        ourPenalty->setState(PenaltyState::Kicking);
     }
     selectedPlay = dynamicAttack;
     decidePlayOn(_ourPlayers, lastPlayers);
