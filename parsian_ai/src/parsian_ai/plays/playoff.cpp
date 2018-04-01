@@ -277,9 +277,11 @@ void CPlayOff::kickoffPositioning(int playersNum) {
 
 void CPlayOff::dynamicExecute() {
 
-
     if (dynamicSelect == CHIP && false) {
-        dynamicPlayChipToGoal();
+        dynamicPlayChipToGoal(true);
+        checkEndChipToGoal();
+    } else if(dynamicSelect == KICK){
+        dynamicPlayChipToGoal(false);
         checkEndChipToGoal();
     } else if (dynamicSelect == KHAFAN || 1) {
         dynamicPlayKhafan();
@@ -308,7 +310,7 @@ void CPlayOff::dynamicAssignID() {
     }
 }
 
-void CPlayOff::dynamicPlayChipToGoal() {
+void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
     if (initial) {
         dynamicAssignID();
         ready = true;
@@ -316,7 +318,7 @@ void CPlayOff::dynamicPlayChipToGoal() {
     } else if (ready) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
-        roleAgent[0] -> setChip(true);
+        roleAgent[0] -> setChip(isChip);
         double speed = 8;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
@@ -586,16 +588,18 @@ Vector2D CPlayOff::getDynamicTarget(int i) {
     first.y += 0.3;
 
     switch (i) {
-    case 1:
-        return first;
-    case 2:
-        return Vector2D{3.2, 0.3};
-    case 3:
-        return Vector2D{3.2,  -0.3};
-    case 4:
-        return Vector2D{0,  0};
-    default:
-        return Vector2D::INVALIDATED;
+        case 1:
+            return first;
+        case 2:
+            return Vector2D{3.2, 0.7};
+        case 3:
+            return Vector2D{3.2, -0.7};
+        case 4:
+            return Vector2D{3, 1.5};
+        case 5:
+            return Vector2D{3, -1.5};
+        default:
+            return Vector2D::INVALIDATED;
     }
 }
 

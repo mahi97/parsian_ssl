@@ -68,7 +68,8 @@ enum DynamicSelect {
     NOSELECT = 0,
     KHAFAN = 1,
     CHIP = 2,
-    BLOCKER = 3
+    KICK = 3,
+    BLOCKER = 4
 };
 
 struct STuneParams {
@@ -492,7 +493,7 @@ private:
     void dynamicAssignID();
     void dynamicPlayKhafan();
     void dynamicPlayBlocker();
-    void dynamicPlayChipToGoal();
+    void dynamicPlayChipToGoal(bool isChip);
 
     void checkEndKhafan();
     void checkEndBlocker();

@@ -77,6 +77,8 @@ CCoach::CCoach(Agent**_agents)
     firstTime = true;
 
     haltAction = new NoAction;
+
+    gotplan = true;
 }
 
 CCoach::~CCoach() {
@@ -700,6 +702,9 @@ void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
         NGameOff::EMode tempMode;
         selectPlayOffMode(_ourPlayers.size(), tempMode);
         initPlayOffMode(tempMode, _mode, _ourPlayers);
+        if(!gotplan){
+            return;
+        }
         ourPlayOff->setMasterMode(tempMode);
         if (tempMode == NGameOff::FirstPlay) {
             if (firstPlay && !firstIsFinished) {
@@ -818,7 +823,7 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
         _mode = NGameOff::FirstPlay;
 
-    } else if (wm->ball->pos.x < -1) {
+    } else if (wm->ball->pos.x < -1 || !gotplan) {
         _mode = NGameOff::DynamicPlay;
 
     } else if (!firstIsFinished && conf.UseFirstPlay) {
@@ -841,6 +846,7 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
         initStaticPlay(_gameMode, _ourplayers);
         break;
     case NGameOff::DynamicPlay:
+        ROS_INFO("HSHM_: DynamicPlay");
         initDynamicPlay(_ourplayers);
         break;
     case NGameOff::FastPlay:
@@ -884,6 +890,9 @@ void CCoach::initDynamicPlay(const QList<int> &_ourplayers) {
     }
     if (_ourplayers.size() < 2) {
         ourPlayOff->dynamicSelect = CHIP;
+    } else if (!gotplan){
+        gotplan = true;
+        ourPlayOff->dynamicSelect = KICK;
     } else {
         ourPlayOff->dynamicSelect = KHAFAN;
     }
@@ -1264,11 +1273,14 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
         //        lastPlan = thePlan;
         //        debug(QString("chosen plan is %1").arg(lastPlan->gui.index[3]), D_MAHI);
 
+        gotplan = true;
 
         ROS_INFO_STREAM("initStaticPlay: Done :) response: %s" << str);
-    } else {
-        ROS_INFO("initStaticPlay: ERROR");
+        return;
+
     }
+
+    gotplan = false;
 
 }
 

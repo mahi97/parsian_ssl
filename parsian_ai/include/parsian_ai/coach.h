@@ -65,6 +65,8 @@ public:
     ros::Publisher *ai_status_pub;
     ros::ServiceClient plan_client;
 
+    bool gotplan;
+
     void setPlanClient(const ros::ServiceClient &_plan_client);
 
     void setBehaviorPublisher(ros::Publisher &_behaver_publisher);
