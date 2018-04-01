@@ -32,6 +32,7 @@ struct Fault {
 class CSkill;
 class Agent {
 public:
+    bool fault = false;
     class Abilities {
     public:
         Abilities();
@@ -89,6 +90,7 @@ public:
     void setVisibility(const double &inSight);
     bool isVisible();
     bool notVisible();
+
 
     void setOnOffState(bool state);
     void setCommandID(int ID);

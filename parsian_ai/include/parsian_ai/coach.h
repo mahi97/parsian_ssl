@@ -28,6 +28,8 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
+#include <parsian_ai/roles/fault.h>
+
 
 
 enum class BallPossesion {
@@ -76,6 +78,13 @@ public:
     parsian_msgs::plan_serviceResponse getLastPlan();
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
+
+    void generateWorkingRobotIds();
+    QList<int> workingIDs;
+    void replacefaultedrobots();
+    CRoleFault *faultRoles[_MAX_NUM_PLAYERS];
+
+
 
 private:
     /////////////////////transition to force start
