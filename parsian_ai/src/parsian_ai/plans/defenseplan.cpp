@@ -51,8 +51,7 @@ double DefensePlan::timeNeeded(Agent *_agentT, Vector2D posT, double vMax, QList
 QList<Vector2D> DefensePlan::defenseFormation(QList<Vector2D> circularPositions, QList<Vector2D> rectangularPositions){
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     Circle2D defenseArea(wm->field->ourGoal() , suitableRadius);
-    if((wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)) || defenseArea.contains(wm->ball->pos)){
-        drawer->draw("oomad" , Vector2D(0,0) , 40);
+    if((wm->field->ourBigPenaltyArea(1,0.2,0).contains(wm->ball->pos) && defenseArea.contains(wm->ball->pos)) || defenseArea.contains(wm->ball->pos)){        
         return rectangularPositions;
     }
     return circularPositions;
@@ -184,7 +183,6 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double do
         }
     }
 
-    ROS_INFO_STREAM("AYA injas");
     return defensePosition;
 }
 
@@ -351,7 +349,7 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForRectangularPositioning(double
     wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTallesForRecatngularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                 getBisectorSegment(anIntesection , ballPosition , ourGoalRight) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
-    defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
+    defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);    
     return defensePosition;
 }
 
@@ -389,11 +387,7 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForRecatangularPositioning(dou
             downIntersection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y <= ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
                         ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
             upIntesection = ourGoalLine.intersection(Line2D(ballPosition , sol[2])).y >= ourGoalLine.intersection(Line2D(ballPosition , sol[3])).y ?
-                        ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));
-            //            ROS_INFO(QString("down: %1").arg(downIntersection.y).toStdString().c_str());
-            //            ROS_INFO(QString("up: %1").arg(upIntesection.y).toStdString().c_str());
-            //            ROS_INFO(QString("sol2: %1").arg(sol[2].y).toStdString().c_str());
-            //            ROS_INFO(QString("sol3: %1").arg(sol[3].y).toStdString().c_str());
+                        ourGoalLine.intersection(Line2D(ballPosition , sol[2])) : ourGoalLine.intersection(Line2D(ballPosition , sol[3]));           
             if (upIntesection.isValid()) {
                 wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTallesForRecatngularPositioning(1 , upIntesection , ballPosition , ourGoalLeft) , downLimit , upLimit), 0).intersection(
                             getBisectorSegment(ourGoalLeft , ballPosition , upIntesection) , &sol[4] , &sol[5]);
@@ -419,13 +413,7 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForRecatangularPositioning(dou
 
 QList<Vector2D> DefensePlan::defenseFormationForRectangularPositioning(int neededDefenseAgents, int allOfDefenseAgents , double downLimit , double upLimit) {
     QList<Vector2D> defensePosiotion;
-    Vector2D ourGoalLeft = wm->field->ourGoalL();
-    Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D ballPosition = ballPrediction(false);
     defensePosiotion.clear();
-    //    ROS_INFO(QString("allOfDefenseAgents: %1").arg(allOfDefenseAgents).toStdString().c_str());
-    double temp = findBestOffsetForDefenseArea(getBestLineWithTallesForRecatngularPositioning(neededDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit);
-    //    ROS_INFO(QString("Best Offset for penalty area: %1").arg(temp).toStdString().c_str());
     if (neededDefenseAgents == allOfDefenseAgents) {
         if (neededDefenseAgents == 1) {
             defensePosiotion.append(oneDefenseFormationForRecatngularPositioning(downLimit , upLimit));
@@ -2155,7 +2143,7 @@ void DefensePlan::execute(){
                 }
                 if(defenseCount > 0){
                     realDefSize = defenseCount - decideNumOfMarks();
-                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , RADIUS_FOR_CRITICAL_DEFENSE_AREA , 3),
+                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , conf.DownLimit , conf.UpLimit),
                                                     defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                     matchingDefPos(realDefSize);
                 }
