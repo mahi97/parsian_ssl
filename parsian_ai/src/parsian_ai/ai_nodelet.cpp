@@ -13,10 +13,9 @@ void AINodelet::onInit() {
     robTask = new ros::Publisher[_MAX_NUM_PLAYERS];
     for (int i = 0; i < _MAX_NUM_PLAYERS; ++i) {
         std::string topic(QString("/agent_%1/task").arg(i).toStdString());
-        robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 1);
+        robTask[i] = nh.advertise<parsian_msgs::parsian_robot_task>(topic, 10);
     }
     drawer = new Drawer();
-    debugger = new Debugger();
 
     worldModelSub = nh.subscribe("/world_model", 1, &AINodelet::worldModelCallBack, this);
     robotStatusSub = nh.subscribe("/robot_status", 1, &AINodelet::robotStatusCallBack, this);
@@ -25,8 +24,7 @@ void AINodelet::onInit() {
     behaviorSub = nh.subscribe("/behavior", 1, &AINodelet::behaviorCb, this);
     mousePosSub = nh.subscribe("/mousePos", 1, &AINodelet::mousePosCb, this);
 
-    drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1);
-    debugPub = nh.advertise<parsian_msgs::parsian_debugs>("/debugs", 1);
+    drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
 
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
@@ -51,20 +49,18 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
-     drawer->draws.texts.clear();
+    drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
-    if (debugger != nullptr) debugPub.publish(debugger->debugs);
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.polygons.clear();
     drawer->draws.rects.clear();
     drawer->draws.vectors.clear();
-    debugger->debugs.debugs.clear();
 }
 
 void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstPtr &_wm) {
     ai->updateWM(_wm);
-    ROS_INFO("wm updated");
+    ROS_INFO("wm");
     ai->execute();
 
     for (int i = 0; i < wm->our.activeAgentsCount(); i++) {
@@ -86,6 +82,7 @@ void AINodelet::robotStatusCallBack(const parsian_msgs::parsian_robotConstPtr & 
 }
 
 void AINodelet::ConfigServerCallBack(const ai_config::aiConfig &config, uint32_t level) {
+    ROS_INFO("MAHICALLING BACK");
     conf = config;
 }
 

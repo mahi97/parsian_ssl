@@ -2,6 +2,7 @@
 #define DYNAMICATTACK_H
 
 #include <parsian_ai/plays/masterplay.h>
+#include <ctime>
 
 //#define _MAX_REGION 7
 
@@ -74,7 +75,7 @@ struct SDynamicPlan {
     void set(const int& _agentSize,
              const DynamicMode& _mode,
              const PlayMakeSkill& _pm,
-             const DynamicRegion &_pmreg,
+             const DynamicRegion& _pmreg,
              const PositionSkill& _ps,
              const DynamicRegion& _reg) {
         agentSize = _agentSize;
@@ -99,6 +100,8 @@ public:
     void assignId_new();
     void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
     void assignTasks_new();
+    bool getPMfromCaoch(){return PMfromCoach;};
+    int getReceiverID(){return receiver->id();};
 
 
     void createRegions(); // splits the opp field into a grid of regions
@@ -133,6 +136,8 @@ public:
     void setCritical(bool _critical);
     void setBallInOppJaw(bool _ballInOppJaw);
     void choosePlan();
+    void swapPlaymakeInPass();
+    bool isInpass();
 
     SDynamicPlan currentPlan;
     SDynamicPlan* nextPlanA;
@@ -148,6 +153,8 @@ private:
     Vector2D bestPointForRobotsInRegions[11][9];
     QList<int> matchingIDs;
     QList<int> matchingRegions;
+    QList<QPair<int, Vector2D>> optimalPositionsForRecivers;
+    int bestReceiver;
     // END NEW PASS ZONE
 
 
@@ -160,6 +167,7 @@ private:
     int guardSize;
     QTime positioningIntention;
     QTime dribbleIntention;
+    QTime playmakeIntention;
     double positioningIntentionInterval;
     bool shotInPass;
 
@@ -172,6 +180,12 @@ private:
     void assignId();
     void assignTasks();
     ///////////////////////30em 2015
+
+    bool evalmovefwd();
+    void swap(Segment2D *xp, Segment2D *yp);
+    void sortobstacles(QList<Segment2D> &obstacles);
+    double angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp);
+    double findmax(const QList<double> &list);
 
     //[RegionCount][RegionIndex]
     Rect2D* guards[7];
@@ -201,7 +215,7 @@ private:
     void assignLocations_6();
     bool isRightTimeToPass();
     int farGuardFromPoint(const int& _guardIndex, const Vector2D& _point);
-    void chooseBestPosForPass(QList<Vector2D>);
+    void chooseReceiverAndBestPosForPass();
     void chooseBestPositons();
     void chooseMarkPos();
     double getDynamicValue(const Vector2D& _dynamicPos) const;
@@ -254,6 +268,13 @@ private:
     bool isPlanDone();
     bool isPlanFailed();
     int lastPassPos;
+    Segment2D left;
+    Vector2D move_fwd_target;
+    Vector2D last_move_fwd_target;
+    Agent* receiver;
+
+    QList<int> kianmatchedIDList;
+    bool PMfromCoach;
     /////////Intentions
 //    int intenHighProb;
 

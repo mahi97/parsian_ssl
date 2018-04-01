@@ -11,7 +11,6 @@ void PlannerNodelet::onInit() {
     nh = getNodeHandle();
     private_nh = getPrivateNodeHandle();
 
-    debugger = new Debugger;
     drawer   = new Drawer;
     wm = new CWorldModel;
 
@@ -23,10 +22,8 @@ void PlannerNodelet::onInit() {
     world_model_sub   = nh.subscribe("world_model", 1, &PlannerNodelet::wmCb, this);
     planner_sub       = nh.subscribe(QString("agent_%1/plan").arg(planner->getID()).toStdString(), 1, &PlannerNodelet::plannerCb, this);
 
-    debug_pub = nh.advertise<parsian_msgs::parsian_debugs>("debugs", 100);
-    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 100);
-    planner->path_pub = private_nh.advertise<parsian_msgs::parsian_path>("path", 1);
-
+    draw_pub  = nh.advertise<parsian_msgs::parsian_draw>("draws", 1000);
+    planner->path_pub = private_nh.advertise<parsian_msgs::parsian_path>("path", 5);
 
     timer_ = nh.createTimer(ros::Duration(0.1), &PlannerNodelet::timerCb, this);
 }
@@ -41,9 +38,6 @@ void PlannerNodelet::wmCb(const parsian_msgs::parsian_world_modelConstPtr& _wm) 
 }
 
 void PlannerNodelet::timerCb(const ros::TimerEvent& event) {
-    if (debugger != nullptr) {
-        debug_pub.publish(debugger->debugs);
-    }
     if (drawer   != nullptr) {
         draw_pub.publish(drawer->draws);
         cleanDraws();

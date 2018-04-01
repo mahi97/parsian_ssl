@@ -128,7 +128,7 @@ void GrsimNodelet::onInit() {
     f = boost::bind(& GrsimNodelet::conf, this, _1, _2);
     server->setCallback(f);
 
-    vision_sub = n.subscribe("/world_model", 3, &GrsimNodelet::visionCB, this);
+    vision_sub = n.subscribe("/world_model", 10, &GrsimNodelet::visionCB, this);
 
 }
 

@@ -327,6 +327,8 @@ public:
     EMode getMasterMode();
     void reset();
     void setInitial(bool _init);
+
+    void kickoffPositioning(int playersNum);
 private:
 
 
@@ -456,6 +458,7 @@ private:
     ////////////////////////////
 
     bool isKickDone(CRolePlayOff*);
+    bool firstKickFailed();
     bool isOneTouchDone(CRolePlayOff*);
     bool isMoveDone(const CRolePlayOff*);
     bool isReceiveDone(const CRolePlayOff*);
