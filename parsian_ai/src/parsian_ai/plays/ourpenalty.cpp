@@ -165,10 +165,12 @@ void COurPenalty::playmakeKick()
     Vector2D shift;
     Vector2D position;
     penaltyTarget = know->getEmptyPosOnGoalForPenalty(1.0 / 8.0, true, 0.03); //////// tune
+    ROS_INFO_STREAM("kian: penalty target" << penaltyTarget);
     PMgotopoint->setRoller(1);
     ////////////// change robot direction before kicking //////////////
     if (timerStartFlag) {
-        if (changeDirPenaltyStrikerTime.elapsed() < 2500) {
+        if (changeDirPenaltyStrikerTime.elapsed() < 2500)
+        {
             if (penaltyTarget.y * wm->field->oppGoalL().y < 0 && penaltyTarget.dist(wm->field->oppGoal()) > 0.25) {
                 penaltyTarget.y = wm->field->oppGoalR().y * 2;
                 shift = Vector2D(0, 0.3);
