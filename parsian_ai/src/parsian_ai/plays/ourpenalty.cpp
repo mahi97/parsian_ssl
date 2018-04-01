@@ -2,6 +2,7 @@
 
 COurPenalty::COurPenalty() : CMasterPlay()
 {
+    playmakeRole = new CRolePlayMake(nullptr);
     for(int i{0}; i<8; i++)
         moveSkill[i] = new GotopointavoidAction();
 }
@@ -15,13 +16,19 @@ void COurPenalty::reset() {
 
 void COurPenalty::init(const QList<Agent*>& _agents) {
     setAgentsID(_agents);
-    initMaster();
+    //initMaster();
+    ROS_INFO_STREAM("penalty: init our agents");
 }
 
 void COurPenalty::setPlaymake(Agent* _playmakeAgent)
 {
-    playMakeAgent = _playmakeAgent;
-    playmakeRole->assign(playMakeAgent);
+    ROS_INFO_STREAM("penalty:  before set playmake to: ");
+    if(_playmakeAgent != nullptr)
+    {
+        playMakeAgent = _playmakeAgent;
+        playmakeRole->assign(playMakeAgent);
+    }
+    ROS_INFO_STREAM("penalty: set playmake to: " << playMakeAgent->id());
 }
 
 void COurPenalty::executeShootoutPositioning()
@@ -31,24 +38,31 @@ void COurPenalty::executeShootoutPositioning()
 
 void COurPenalty::executeNormalPositioning()
 {
-//    generatePositions();
-//    assignSkills();
+    ROS_INFO_STREAM("penalty: normal positioning");
     if(agents.isEmpty())
         return;
-    moveSkill[0]->setTargetpos(Vector2D(0, 0));
-    agents[0]->action = moveSkill[0];
+    generatePositions();
+    assignSkills();
 }
 
 void COurPenalty::execute_x() {
+    ROS_INFO_STREAM("penalty: execute_x");
     if (playMakeAgent == nullptr || (playMakeAgent->id() == -1)) {
+        ROS_INFO_STREAM("penalty: playmakeagent is null");
         return;
     }
     isPenaltyShootOut = gameState->ourPenaltyShootout();
     //playmakeRole->execute();
     if(isPenaltyShootOut)
+    {
+        ROS_INFO_STREAM("penalty: shootout");
         executeShootoutPositioning();
+    }
     else
+    {
+        ROS_INFO_STREAM("penalty: norma");
         executeNormalPositioning();
+    }
 }
 
 Vector2D COurPenalty::getEmptyTarget(Vector2D _position, double _radius) {

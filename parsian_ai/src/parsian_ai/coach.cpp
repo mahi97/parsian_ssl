@@ -1247,6 +1247,7 @@ void CCoach::decideTheirIndirect(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = ourPenalty;
     if (0 <= playmakeId && playmakeId <= 11) {
         ourPenalty->setPlaymake(agents[playmakeId]);
