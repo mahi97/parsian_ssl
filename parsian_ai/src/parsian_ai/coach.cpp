@@ -1266,6 +1266,7 @@ void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideTheirPenalty(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = theirPenalty;
     firstTime = true;
 }
