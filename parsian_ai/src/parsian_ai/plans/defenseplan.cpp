@@ -3349,12 +3349,12 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     if (BallVel.x > 0 && BallPos.x > 0) {
         return BallPos;
     }
-    wm->opp.update();
+//    wm->opp.update();
     if(wm->opp.activeAgentsCount() > 0) {
-        ROS_INFO_STREAM("raft!");
+        PDEBUG("Elham:" , wm->opp.activeAgentsCount() , D_AHZ);
         for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
             Circle2D oppCircle(wm->opp.active(i)->pos, 0.1);
-            if (oppCircle.intersection(ballPosVel, &solu[0], &solu[1]) > 0 && BallVel.length() > 0.5) {
+            if (oppCircle.intersection(ballPosVel, &solu[0], &solu[1]) > 0) {
                 if (wm->opp.active(i)->pos.dist(BallPos) < dist2Ball) {
                     dist2Ball = wm->opp.active(i)->pos.dist(BallPos);
                     predictedBall = wm->opp.active(i)->pos;
@@ -3369,6 +3369,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         drawer->draw(predictedBall);
         if(_isGoalie)
             ROS_INFO_STREAM("ED: E");
+        drawer->draw(Circle2D(predictedBall , 0.5) , 0 , 360 , "black");
         return predictedBall;
     }
    /* else if (wm->field->isInOurPenaltyArea(BallPos + wm->ball->) && BallVel.length() > 0.5) {//////////Lhum
@@ -3383,11 +3384,11 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
         return predictedBall;
     }*/
-    else if (BallVel.length() > 0.5) {
+    else if (_isGoalie) {
         wm->field->ourPenaltyRect().intersection(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100 ), &solu[0], &solu[1]);/////////////////Lhum
         drawer->draw(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100)  , "black");
         if(solu[0].isValid() && solu[1].isValid()) {
-            if (BallVel.x <= 0 || _isGoalie) {
+            if (_isGoalie) {
                 predictedBall = (BallPos.dist(solu[0]) < BallPos.dist(solu[1])) ? (solu[1]) : (solu[0]);
             } else {
                 drawer->draw(QString("Def Predicted Level 2"), Vector2D(0, 2), "red");
@@ -3405,11 +3406,6 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         }
         drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
         return predictedBall;
-    } else {
-        predictedBall = BallPos;
-        drawer->draw(QString("Def follow"), Vector2D(0, 2), "red");
-        drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
-        return predictedBall;///Lhum
     }
 
     if(!_isGoalie){
