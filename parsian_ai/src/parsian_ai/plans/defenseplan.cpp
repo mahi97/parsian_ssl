@@ -467,10 +467,6 @@ QList<Vector2D> DefensePlan::defenseFormationForRectangularPositioning(int neede
     return defensePosiotion;
 }
 
-QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double downLimit , double upLimit){
-
-}
-
 QList<Segment2D> DefensePlan::getLinesOfBallTriangle(){
     QList<Segment2D> linesOfBallTriangle;
     Vector2D ballPos = ballPrediction(false);
@@ -2057,32 +2053,14 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             }
         }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
-<<<<<<< HEAD
-        drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
-//        if(wm->field->ourBigPenaltyArea(1,0.4,0).contains(matchPoints.at(matchResult.at(i)))){
-            ahzMatchPoints.append(avoidRectangularPenaltyAreaByMhmmd(matchPoints.at(matchResult.at(i))
-                                             , ourAgents.at(i)->pos()
-                                             , ourAgents.at(i)->dir()
-                                             , ourAgents.at(i)->vel()).first);
-            ahzMatchDirections.append(avoidRectangularPenaltyAreaByMhmmd(matchPoints.at(matchResult.at(i))
-                                             , ourAgents.at(i)->pos()
-                                             , ourAgents.at(i)->dir()
-                                             , ourAgents.at(i)->vel()).second);
-//        }
-//        else{
-//            ahzMatchPoints.append(avoidCircularPenaltyAreaByArash(ourAgents.at(i) , matchPoints.at(matchResult.at(i))).first);
-//            ahzMatchDirections.append(avoidCircularPenaltyAreaByArash(ourAgents.at(i) , matchPoints.at(matchResult.at(i))).second);
-=======
 //        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
             matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByArash(ourAgents[i], matchPoints[matchResult[i]]);
->>>>>>> Avoid PArea test
 //        }
+
+        if(ourAgents[i]->pos().dist(matchPoints[matchResult[i]]) > 0.35){
+            matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByArash(ourAgents[i], matchPoints[matchResult[i]]);
+        }
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
-        gpa[ourAgents[i]->id()]->setNoavoid(true);
-        gpa[ourAgents[i]->id()]->setSlowmode(false);
-        gpa[ourAgents[i]->id()]->setDivemode(false);
-        gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
-        gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
         if(gameState->theirIndirectKick()){
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
@@ -2106,12 +2084,12 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         }
         //////////// Go To Point Avoid for defense agents //////////////////
         if(i < _defenseNum){
-            gpa[ourAgents[i]->id()]->setTargetpos(matchPoints.at(matchResult.at(i))); //HINT : gpa->init
+            gpa[ourAgents[i]->id()]->setTargetpos(matchPoints.at(matchResult.at(i)));
             gpa[ourAgents[i]->id()]->setTargetdir(matchPoints.at(matchResult.at(i)) - wm->field->ourGoal());
         }
         ///////// Go To Point Avoid for mark agents ////////////////////
         else{
-            gpa[ourAgents[i]->id()]->setTargetpos(matchPoints.at(matchResult.at(i))); //HINT : gpa->init
+            gpa[ourAgents[i]->id()]->setTargetpos(matchPoints.at(matchResult.at(i)));
             gpa[ourAgents[i]->id()]->setTargetdir(markAngs.at(i - _defenseNum));
 
         }
@@ -3033,43 +3011,46 @@ void DefensePlan::checkDefenseExeptions() {
 
 Vector2D DefensePlan::avoidCircularPenaltyAreaByArash(Agent* agent, const Vector2D& point) {
     Vector2D agentPos = agent->pos();
-    Vector2D temp;
     Vector2D sol[2];
+    Circle2D defenseArea(wm->field->ourGoal() , RADIUS_FOR_CRITICAL_DEFENSE_AREA);
+    Vector2D retPoint;
     double distFromGoal = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     if (agentPos.dist(wm->field->ourGoal()) < distFromGoal) {
         agentPos = wm->field->ourGoal() + Vector2D().setPolar(distFromGoal, (agentPos - wm->field->ourGoal()).th().degree());
-//        wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(Segment2D(agentPos, wm->field->ourGoal()),&sol[0],&sol[1]);
-//        Vector2D* inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? &sol[0] : &sol[1];
-                Vector2D* inter = getIntersectWithDefenseArea(Segment2D(agentPos, wm->field->ourGoal()), agentPos);
-        if (inter != nullptr && inter->isValid()) {
-            agentPos = wm->field->ourGoal() + Vector2D().setPolar(inter->dist(wm->field->ourGoal()) + 0.1, (agentPos - wm->field->ourGoal()).th().degree());
-            delete inter;
-        }
+        //Vector2D* inter = getIntersectWithDefenseArea(Segment2D(agentPos, wm->field->ourGoal()), agentPos);
+        defenseArea.intersection(Line2D(agentPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
+        Vector2D inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? sol[0] : sol[1];
+        agentPos = wm->field->ourGoal() + Vector2D().setPolar(inter.dist(wm->field->ourGoal()) + 0.1, (agentPos - wm->field->ourGoal()).th().degree());
+        //  DEBUG(QString("vec : %1,%2").arg(inter->x).arg(inter->y),D_AHZ);
+
     }
     drawer->draw(Circle2D(agentPos , 0.02) , 0 , 360 , "brown" , true);
-//    wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(Segment2D(agentPos, point),&sol[0],&sol[1]);
-//    Vector2D* inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? &sol[0] : &sol[1];
-    Vector2D* inter = getIntersectWithDefenseArea(Segment2D(agentPos, point), agentPos);
-    if (inter == nullptr || agentPos.dist(*inter) < 0.1) {
-        temp = point;
-        return temp;
+    //    retPoint = mousePos;
+    //     return retPoint;
+
+    //    Vector2D* inter = getIntersectWithDefenseArea(Segment2D(agentPos, point), agentPos);
+    defenseArea.intersection(Segment2D(agentPos, point) , &sol[0] , &sol[1]);
+    Vector2D inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? sol[0] : sol[1];
+
+    if (!inter.isValid() || agentPos.dist(inter) < 0.1) {
+        return point;
     }
-    drawer->draw(Circle2D(*inter , 0.02) , 0 , 360 , "pink" , true);
-    Vector2D crossPoint = *inter;
-    delete inter;
+    drawer->draw(Circle2D(inter , 0.02) , 0 , 360 , "pink" , true);
+    Vector2D crossPoint = inter;
+    //    delete inter;
     AngleDeg deg = (crossPoint - wm->field->ourGoal()).th();
     AngleDeg mainDeg = (point - wm->field->ourGoal()).th();
     AngleDeg diff = mainDeg - deg;
     double s = min(10.0, fabs(diff.degree()));
     double finalDeg = deg.degree() + s * sign(diff.degree());
     Vector2D finalPos = wm->field->ourGoal() + Vector2D().setPolar(100, finalDeg);
-//    wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(Segment2D(finalPos, wm->field->ourGoal()),&sol[0],&sol[1]);
-//    inter = sol[0].isValid() && sol[0].dist(finalPos) < sol[1].dist(finalPos) ? &sol[0] : &sol[1];
-    inter = getIntersectWithDefenseArea(Segment2D(finalPos, wm->field->ourGoal()), finalPos);
-    Vector2D retPoint;
-    if (inter != nullptr) {
-        retPoint = *inter;
-        delete inter;
+
+    //    inter = getIntersectWithDefenseArea(Segment2D(finalPos, wm->field->ourGoal()), finalPos);
+    defenseArea.intersection(Segment2D(finalPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
+    inter = sol[0].isValid() && sol[0].dist(finalPos) < sol[1].dist(finalPos) ? sol[0] : sol[1];
+    if (inter.isValid()) {
+        retPoint = inter;
+        //        delete inter;
     } else {
         retPoint.invalidate();
     }
@@ -3080,13 +3061,7 @@ Vector2D DefensePlan::avoidCircularPenaltyAreaByArash(Agent* agent, const Vector
         retPoint = retPoint + vecDiff.setLength(dist * 2);
     }
     drawer->draw(Circle2D(retPoint , 0.02) , 0 , 360 , "blue" , true);
-<<<<<<< HEAD
-    temp.first = retPoint;
-    temp.second = agent->pos() - wm->field->ourGoal();
-=======
-    temp = retPoint;
->>>>>>> Avoid PArea test
-    return temp;
+    return retPoint;
 }
 
 Vector2D DefensePlan::runDefenseOneTouch() {
