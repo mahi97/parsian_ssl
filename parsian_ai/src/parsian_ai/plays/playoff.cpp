@@ -1360,6 +1360,7 @@ void CPlayOff::passManager() {
         doAfterlife = !Circle2D(lastBallPos, 0.4).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
+
 }
 
 /**
@@ -1466,8 +1467,17 @@ void CPlayOff::fillRoleProperties() {
                     if (x.id == i) {
                         if (i > 0 && masterPlan->execution.reciver.at(i - 1).id == x.id) {
                             if (positionAgent[i].getArgs().staticSkill == ReceivePassSkill) {
-                                positionAgent[i].stateNumber++;
-                                firstPass = false;
+                                Agent* next_passer =
+                                        soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.reciver.at(0).id)];
+                                Vector2D pass_target =
+                                        positionAgent[positionAgent[i].getArgs().PassToId].getAbsArgs(positionAgent[i].getArgs().PassToState).staticPos;
+                                Vector2D v1 = wm->ball->pos - next_passer->pos();
+                                Vector2D v2 = pass_target - next_passer->pos();
+                                float onetouchAngle = (float)(v1.th() - v2.th()).degree();
+                                if(onetouchAngle < conf.OnetouchAngle) {
+                                    positionAgent[i].stateNumber++;
+                                    firstPass = false;
+                                }
                             }
                             if (positionAgent[i].getArgs().staticSkill == PassSkill) {
 
