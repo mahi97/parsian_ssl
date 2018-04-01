@@ -1181,7 +1181,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
     markRoles.clear();
     markAngs.clear();
     /////////////////// Intelligent mark plan ///////////////////////////////
-    PDEBUGV2D("ALi's prediction mode",getMarkPlayoffPredictWaitPos(),D_ALI);
+//    PDEBUGV2D("ALi's prediction mode",getMarkPlayoffPredictWaitPos(),D_ALI);
     //////////////////////////////////////////////////////
     if(_markAgentSize == oppAgentsToMarkPos.count()){
         for (int i = 0; i < oppAgentsToMarkPos.count(); i++) {
@@ -2007,8 +2007,6 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
             matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByMasoud(ourAgents[i], matchPoints[matchResult[i]]);
         }
-        DEBUG(QString("Matchpoint size: %1 %2").arg(matchPoints.size()).arg(ourAgents.size()) , D_AHZ);
-        PDEBUGV2D("matchpoint ahz",matchPoints.at(matchResult.at(i)) , D_AHZ);
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
         gpa[ourAgents[i]->id()]->setNoavoid(true);
         gpa[ourAgents[i]->id()]->setSlowmode(false);
@@ -2991,7 +2989,7 @@ Vector2D DefensePlan::avoidCircularPenaltyAreaByMasoud(Agent* agent, const Vecto
     AngleDeg diff = mainDeg - deg;
     double s = min(10.0, fabs(diff.degree()));
     double finalDeg = deg.degree() + s * sign(diff.degree());
-    Vector2D finalPos = wm->field->ourGoal() + Vector2D().setPolar(200, finalDeg);
+    Vector2D finalPos = wm->field->ourGoal() + Vector2D().setPolar(100, finalDeg);
     defenseArea.intersection(Segment2D(finalPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
     inter = sol[0].isValid() && sol[0].dist(finalPos) < sol[1].dist(finalPos) ? sol[0] : sol[1];
     if (inter.isValid()) {
@@ -3106,7 +3104,12 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     //// consider the intersection point for the locaiton of the ball.
 
     Vector2D BallPos = wm->ball->pos;
-    Vector2D BallVel = wm->ball->vel  * 0.25;
+    Vector2D BallVel;
+    if(wm->ball->vel.length() < 1){
+         BallVel = wm->ball->vel * 0.7;
+    } else{
+      BallVel = wm->ball->vel.norm();
+    }
     Segment2D ballPosVel(BallPos, BallPos + (BallVel));
     Vector2D predictedBall = BallPos;
     Vector2D solu[6];
