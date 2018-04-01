@@ -25,6 +25,7 @@ public:
     SkillProperty(OnetouchAction, bool, Chip, chip);
     SkillProperty(OnetouchAction, bool, Iskickdischargetime, iskickdischargetime);
     SkillProperty(OnetouchAction, double, Kickspeed, kickSpeed);
+    SkillProperty(OnetouchAction, double, Chipdist, chipdist);
     SkillProperty(OnetouchAction, double, Kickdischargetime, kickdischargetime);
     SkillProperty(OnetouchAction, bool, Shottoemptyspot, shotToEmptySpot);
     SkillProperty(OnetouchAction, bool, Fastestpoint, fastestPoint);
