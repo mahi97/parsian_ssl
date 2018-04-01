@@ -1291,10 +1291,11 @@ void CCoach::decideOurPenaltyshootout(QList<int>& _ourPlayers)
     if(!gameState->ready())
         ourPenaltyShootout->setState(PenaltyShootoutState::Positioning);
 
+
     else if(gameState->ready())
     {
         ROS_INFO_STREAM("shootout: normal start -> penalty");
-        ourPenaltyShootout->setState(PenaltyShootoutState::Kicking);
+        ourPenaltyShootout->setState(PenaltyShootoutState::Goaling);
     }
     DBUG("penalty", D_MHMMD);
     firstTime = true;

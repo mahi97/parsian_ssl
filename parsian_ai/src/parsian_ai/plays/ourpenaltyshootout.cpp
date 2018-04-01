@@ -3,6 +3,8 @@
 COurPenaltyShootout::COurPenaltyShootout() : CMasterPlay()
 {
     initMaster();
+    PMgotopoint    = new GotopointavoidAction();
+    playMakeRole   = new CRolePlayMake(nullptr);
 }
 
 COurPenaltyShootout::~COurPenaltyShootout() = default;
@@ -22,6 +24,7 @@ void COurPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
     if(_playmakeAgent != nullptr)
     {
         playMakeAgent = _playmakeAgent;
+        playMakeRole->assign(playMakeAgent);
     }
     ROS_INFO_STREAM("penalty: set playmake to: " << playMakeAgent->id());
 }
@@ -34,16 +37,24 @@ void COurPenaltyShootout::execute_x() {
         ROS_INFO_STREAM("penalty: playmakeagent is null");
         return;
     }
-
+    if(penaltyState == PenaltyShootoutState::Positioning)
+    {
+        generatePositions();
+        assignSkills();
+        playMakeRole->execute();
+    }
+    else
+    {
+        playMakeRole->execute();
+    }
 }
 
 void COurPenaltyShootout::generatePositions()
 {
     ROS_INFO_STREAM("penalty: generate positions");
     positions.clear();
-    double penaltyPositioningOffset = 0.4;
-    double penaltyRuleOffset = 0.4;
-    double maximum_x_width = wm->field->oppGoalL().x - (wm->field->_PENALTY_DEPTH + penaltyRuleOffset + penaltyPositioningOffset);
+    double penaltyPositioningOffset = 0.9;
+    double maximum_x_width = wm->field->ourGoal().x + (wm->field->_PENALTY_DEPTH + penaltyPositioningOffset);
     for(int i{}; i < agents.size(); i++)
     {
         positions.append(getEmptyTarget(Vector2D{maximum_x_width, pow(-1, i)* i/2}, penaltyPositioningOffset));
@@ -72,7 +83,6 @@ Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
                     oppCnt = 1;
                     break;
                 }
-
             }
             if (!oppCnt) {
                 finalTarget = tempTarget;

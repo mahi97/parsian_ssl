@@ -6,6 +6,7 @@
 #include <parsian_ai/gamestate.h>
 #include <parsian_util/geom/geom.h>
 #include <parsian_ai/util/knowledge.h>
+#include <parsian_ai/roles/playmake.h>
 
 
 enum class PenaltyShootoutState{
@@ -41,6 +42,7 @@ private:
     bool timerStartFlag;
     QList<Vector2D> positions;
     PenaltyShootoutState penaltyState;
+    CRolePlayMake* playMakeRole;
 };
 
 #endif // OURPENALTYSHOOTOUT_H
