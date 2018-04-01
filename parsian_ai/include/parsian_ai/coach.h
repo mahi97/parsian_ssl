@@ -75,7 +75,6 @@ public:
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
-    bool ballChiped();
 private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
@@ -116,6 +115,7 @@ private:
     CTheirBallPlacement *theirBallPlacement;
     CDynamicAttack *dynamicAttack;
     CStopPlay *stopPlay;
+    CHalftimeLineup *halftimeLineup;
 
     Behavior *selectedBehavior;
 
@@ -167,7 +167,6 @@ private:
 
     void virtualTheirPlayOffState();
 
-    bool transientFlag;
     QTime trasientTimeOut;
     int translationTimeOutTime;
 
@@ -232,9 +231,11 @@ private:
     double lastNearestBallDist;
     double averageVel;
     QList<Vector2D> lastBallVels;
+    Vector2D startTransientBallPos;
 
     void removeLastBallVel();
     void clearBallVels();
+
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);
@@ -272,8 +273,9 @@ private:
 
     bool isFastPlay();
 
-    ///HMD
-    bool checkOverdef();
+    ///////////////////////// AHZ //////////
+    int findNeededDefense();
+
 
     double overDefThr;
 

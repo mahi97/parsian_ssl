@@ -37,7 +37,7 @@
 #define MONITOR_V2D(prefix,var,type) \
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);\
     ROS_DEBUG_STREAM(std::string(ROSCONSOLE_NAME_PREFIX) + "::" +QString("%1::").arg(type).toStdString()<<\
-                            (prefix), " = x:"<<var.x()<<"  y:"<<var.y());\
+                            (prefix)<< " = x:"<<var.x<<"  y:"<<var.y);\
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
 
 #define MONITOR(prefix,var,type) \
