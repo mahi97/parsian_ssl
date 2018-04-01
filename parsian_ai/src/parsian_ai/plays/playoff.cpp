@@ -1308,36 +1308,29 @@ bool CPlayOff::isFinalShotDone() {
     return false;
 }
 
-Vector2D CPlayOff::getEmptyTarget(Vector2D _position, double _radius) {
-    Vector2D tempTarget, finalTarget, position;
-    double escapeRad;
-    int oppCnt = 0;
-    bool posFound;
-    escapeRad = _radius;
-    position  = _position;
-    finalTarget = position;
-    for (double dist = 0.0 ; dist <= 0.5 ; dist += 0.2) {
-        for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
-            tempTarget = position + Vector2D::polar2vector(dist, ang);
-            ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
-                continue;
-            }
+Vector2D CPlayOff::getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D tempTarget, finalTarget;
+    bool opp;
+    finalTarget = _position;
+    for (double dist = 0.2 ; dist <= _radius ; dist += 0.2) {
+        for (double ang = -180.0 ; ang <= 180.0 ; ang += 18.0/dist) {
+            opp = false;
+            tempTarget = _position + Vector2D::polar2vector(dist, ang);
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-                if (Circle2D(wm->opp.active(i)->pos, 0.07).contains(tempTarget)) {
-                    oppCnt = 1;
+                if (Circle2D(wm->opp.active(i)->pos, 0.25).contains(tempTarget)
+                    || !wm->field->isInField(tempTarget)
+                    || wm->field->isInOppPenaltyArea(tempTarget)
+                    || wm->field->isInOurPenaltyArea(tempTarget)) {
+                    opp = true;
                     break;
                 }
 
             }
-            if (!oppCnt) {
+            if (!opp) {
                 finalTarget = tempTarget;
-                posFound = true;
+                dist = _radius*2; // to break upper loop
                 break;
             }
-        }
-        if (posFound) {
-            break;
         }
     }
 
@@ -1679,7 +1672,7 @@ void CPlayOff::assignSupport(CRolePlayOff * _roleAgent,
     _roleAgent->setAvoidBall(false);
     _roleAgent->setSlow(false);
     _roleAgent->setTargetDir(_roleAgent->getAgent()->pos() - wm->ball->pos);
-    _roleAgent->setTarget(getEmptyTarget(tempTarget, .4));
+    _roleAgent->setTarget(getEmptyTarget(tempTarget, .5));
     _roleAgent->setSelectedSkill(RoleSkill::GotopointAvoid); //GotoPointAvoid
 }
 
