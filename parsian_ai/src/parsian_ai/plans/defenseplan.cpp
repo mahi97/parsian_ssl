@@ -67,7 +67,7 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         } else if (neededDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
-        else{
+        else if (neededDefenseAgents == 3){
             defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
     }
@@ -77,7 +77,7 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         } else if (neededDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
-        else{
+        else if (neededDefenseAgents == 3){
             defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
         for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
@@ -90,7 +90,7 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         } else if (allOfDefenseAgents == 2) {
             defensePosiotion = twoDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
-        else{
+        else if(allOfDefenseAgents == 3){
             defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
     }
@@ -110,6 +110,7 @@ Vector2D DefensePlan::oneDefenseFormationForCircularPositioning(double downLimit
     Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit));
     defenseArea.intersection(getBisectorLine(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
     defensePosition = sol[0].isValid() && sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1];
+    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
     biggestLineOfBallTriangle = getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length() ? getLinesOfBallTriangle().at(0) : getLinesOfBallTriangle().at(1);
     double distanceFromYalForFirstPosition = biggestLineOfBallTriangle.dist(defensePosition);
     if(distanceFromYalForFirstPosition > robotRadius){
@@ -140,7 +141,7 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double do
     defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
     defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
-    /////////////////// Az chizaki bar sikhaki malideh im :) ///////////////////////////////
+    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
     if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
         double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
         double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
@@ -152,7 +153,6 @@ QList<Vector2D> DefensePlan::twoDefenseFormationForCircularPositioning(double do
             anotherIntesection = getLinesOfBallTriangle().at(0).nearestPoint(defensePosition.at(0));
             defensePosition[0] += Vector2D(defensePosition.at(0) - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
         }
-
         if(distanceFromYalForSecondPosition > robotRadius){
             anotherIntesection = getLinesOfBallTriangle().at(1).nearestPoint(defensePosition.at(1));
             defensePosition[1] += Vector2D(anotherIntesection - defensePosition.at(1)).norm()*(distanceFromYalForFirstPosition - robotRadius);
@@ -205,7 +205,7 @@ QList<Vector2D> DefensePlan::threeDefenseFormationForCircularPositioning(double 
     defenseArea.intersection(getBisectorLine(ourGoalRight , ballPosition , anIntesection) , &sol[2] , &sol[3]);
     defensePosition.append(sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1]);
     defensePosition.append(sol[2].dist(ballPosition) < sol[3].dist(ballPosition) ? sol[2] : sol[3]);
-    /////////////////// Az chizaki bar sikhaki malideh im :) ///////////////////////////////
+    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
     if(getLinesOfBallTriangle().at(0).dist(defensePosition.at(0)) < getLinesOfBallTriangle().at(1).dist(defensePosition.at(0))){
         double distanceFromYalForFirstPosition = getLinesOfBallTriangle().at(0).dist(defensePosition.at(0));
         double distanceFromYalForSecondPosition = getLinesOfBallTriangle().at(1).dist(defensePosition.at(1));
@@ -316,10 +316,24 @@ Vector2D DefensePlan::oneDefenseFormationForRecatngularPositioning(double downLi
     Vector2D ourGoalLeft = wm->field->ourGoalL();
     Vector2D ourGoalRight = wm->field->ourGoalR();
     Vector2D ballPosition = ballPrediction(false);
+    Vector2D anotherIntesection;
+    Segment2D biggestLineOfBallTriangle;
     int numberOfDefenseAgents = 1;
+    double robotRadius = Robot::robot_radius_new;
     wm->field->ourBigPenaltyArea(1, findBestOffsetForDefenseArea(getBestLineWithTallesForRecatngularPositioning(numberOfDefenseAgents , ourGoalLeft , ballPosition , ourGoalRight) , downLimit , upLimit), 0).intersection(
                 getBisectorSegment(ourGoalLeft , ballPosition , ourGoalRight) , &sol[0] , &sol[1]);
     defensePosition = sol[0].dist(ballPosition) < sol[1].dist(ballPosition) ? sol[0] : sol[1];
+    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
+    biggestLineOfBallTriangle = getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length() ? getLinesOfBallTriangle().at(0) : getLinesOfBallTriangle().at(1);
+    double distanceFromYalForFirstPosition = biggestLineOfBallTriangle.dist(defensePosition);
+    if(distanceFromYalForFirstPosition > robotRadius){
+        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(defensePosition);
+        defensePosition += Vector2D(anotherIntesection - defensePosition).norm()*(distanceFromYalForFirstPosition - robotRadius);
+    }
+    else if(distanceFromYalForFirstPosition <= robotRadius){
+        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(defensePosition);
+        defensePosition += Vector2D(defensePosition - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+    }
     return defensePosition;
 }
 
