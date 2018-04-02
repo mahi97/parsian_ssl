@@ -87,7 +87,7 @@ CRoleFault::~CRoleFault()
 
 void CRoleFault::execute()
 {
-    //ROS_INFO_STREAM("kian: "<< agent->id()); //ok
+    ROS_INFO_STREAM("kian: "<< agent->id()); //ok
     Vector2D target;
     int kkk = 0;
     info()->findPositions();
@@ -99,8 +99,8 @@ void CRoleFault::execute()
             kkk = k;
         }
     }
-    target.x = -1;
-    target.y = 0;
+    target.x = -0.5;
+    target.y = 4;
 
     gotopoint->setSlowmode(true);
     if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {

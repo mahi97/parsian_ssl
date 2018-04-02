@@ -162,30 +162,30 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
     missMatchIds.clear();
     if (gameState->getState() == States::Stop || gameState->getState() == States::Halt || first) {
-        if (workingIDs.size() != 0u) {
+        if (wm->our.activeAgentsCount() != 0u) {
             robotsIdHist.clear();
-            for (int i = 0 ; i < workingIDs.size() ; i++) {
-                robotsIdHist.append(workingIDs[i]);
+            for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
+                robotsIdHist.append(wm->our.active(i)->id);
             }
         }
         first = false;
     }
 
-    if (workingIDs.size() > _NUM_PLAYERS) {
+    if (wm->our.activeAgentsCount() > _NUM_PLAYERS) {
         missMatchIds.clear();
-        for (int i = 0 ; i < workingIDs.size() ; i++) {
+        for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
             for (int k = 0 ; k < robotsIdHist.count() ; k++) {
-                if (robotsIdHist.at(k) == workingIDs[i]) {
+                if (robotsIdHist.at(k) == wm->our.active(i)->id) {
                     break;
                 }
                 if (k == robotsIdHist.count() - 1) {
-                    missMatchIds.append(workingIDs[i]);
+                    missMatchIds.append(wm->our.active(i)->id);
                 }
             }
         }
     }
 
-    int agentsCount = workingIDs.size() - missMatchIds.count();
+    int agentsCount = wm->our.data->activeAgents.count() - missMatchIds.count();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -276,7 +276,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
 void CCoach::calcDesiredMarkCounts(){
 
-    int agentsCount = workingIDs.size();
+    int agentsCount = wm->our.data->activeAgents.count();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -334,7 +334,7 @@ void CCoach::calcDesiredMarkCounts(){
 
 
 void CCoach::assignGoalieAgent(int goalieID) {
-    QList<int> ids = workingIDs;
+    QList<int> ids = wm->our.data->activeAgents;
     goalieAgent = nullptr;
     if (ids.contains(goalieID)) {
         goalieAgent = agents[goalieID];
@@ -378,7 +378,7 @@ void CCoach::assignDefenseAgents(int defenseCount) {
         return;
     }
 
-    QList<int> ids = workingIDs;
+    QList<int> ids = wm->our.data->activeAgents;
     if (goalieAgent != nullptr) {
         ids.removeOne(goalieAgent->id());
     }
@@ -528,8 +528,8 @@ double CCoach::findMostPossible(Vector2D agentPos) {
         obstacles.append(Circle2D(wm->opp.active(i)->pos, 0.1));
     }
 
-    for (int i = 0 ; i < workingIDs.size() ; i++) {
-        if (workingIDs[i] != playmakeId) {
+    for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
+        if (wm->our.active(i)->id != playmakeId) {
             obstacles.append(Circle2D(wm->our.active(i)->pos, 0.1));
         }
     }
@@ -549,7 +549,7 @@ void CCoach::updateAttackState() {
 void CCoach::choosePlaymakeAndSupporter()
 {
     playmakeId = -1;
-    QList<int> ourPlayers = workingIDs;
+    QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
     }
@@ -613,7 +613,7 @@ void CCoach::choosePlaymakeAndSupporter()
 
 void CCoach::decideAttack() {
     // find unused agents!
-    QList<int> ourPlayersID = workingIDs;
+    QList<int> ourPlayersID = wm->our.data->activeAgents;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
     }
@@ -1096,7 +1096,7 @@ void CCoach::resetnonVisibleAgents()
                     isvisible = true;
             if(!isvisible)
             {
-                ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
+                //ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
                 agents[i]->fault = false;
                 agents[i]->faultstate = Agent::FaultState::HEALTHY;
             }
