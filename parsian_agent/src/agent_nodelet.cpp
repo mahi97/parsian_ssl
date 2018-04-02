@@ -129,7 +129,7 @@ CSkill* AgentNodelet::getSkill(const parsian_msgs::parsian_robot_taskConstPtr &_
                 oneTouch->setKickspeed(_task->oneTouchTask.kickdischargetime);
             }
         }
-        else
+        if(_task->oneTouchTask.chip)
         {
             if (!_task->oneTouchTask.iskickdischargetime)
                 oneTouch->setKickspeed(agent->chipDistanceValue(_task->oneTouchTask.chipdist, 0));
