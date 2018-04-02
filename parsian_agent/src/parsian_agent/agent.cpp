@@ -798,12 +798,13 @@ int Agent::kickValueForDistance(double dist, double finalVel) {
     return static_cast<int>(kickSpeedValue(vel, false));
 }
 
-
+//TODO : get speed from profiler
 Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection) {
     Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
                            pos() - wm->ball->pos, wm->field->oppGoal(),
                            conf->Landa,
-                           conf->Gamma));
+                           conf->Gamma,
+                           6.5));
     Vector2D q;
     q.invalidate();
     bool oneTouchKick = false;
