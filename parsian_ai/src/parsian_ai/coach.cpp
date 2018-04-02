@@ -211,7 +211,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
         if (know->variables["transientFlag"].toBool())
         {
             //// Add Playmake after time
-            if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
+            if (trasientTimeOut.elapsed() > 800 && !wm->field->ourBigPenaltyArea(1,0.1,0).contains(wm->ball->pos)) {
                 preferedDefenseCounts = std::max(0, agentsCount - missMatchIds.count() - 1);
 
             } else {
@@ -548,10 +548,9 @@ void CCoach::updateAttackState() {
     return;
 }
 
-void CCoach::choosePlaymakeAndSupporter()
-{
-    playmakeId = -1;
-    QList<int> ourPlayers = workingIDs;
+void CCoach::choosePlaymakeAndSupporter(){
+    playmakeId = -1;        
+    QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
     }

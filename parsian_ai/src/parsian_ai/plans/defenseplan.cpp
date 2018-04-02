@@ -2017,6 +2017,8 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     }
     ////////////////////////////////////////////////////////////////////////////
     know->MatchingMinTheMax(ourAgents, matchPoints, matchResult);
+    DBUG(QString("mark: %1").arg(decideNumOfMarks()) , D_AHZ);
+    DBUG(QString("defense: %1").arg(defenseCount) , D_AHZ);
     for (int i = 0 ; i < defenseCount && i < matchPoints.size(); i++) {
         defensePoints[i] = matchPoints[i];
     }
