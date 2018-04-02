@@ -101,7 +101,7 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
 		src/${PROJECT_NAME}/coach.cpp
-		)
+        include/parsian_ai/mahi.h)
 
 add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/dynamicattack.cpp
@@ -130,6 +130,7 @@ add_library(${PROJECT_NAME}_roles
 		src/parsian_ai/roles/block.cpp
 		src/parsian_ai/roles/playoffrole.cpp
 		src/parsian_ai/roles/stop.cpp
+                src/parsian_ai/roles/fault.cpp
 		src/parsian_ai/roles/dynamicrole.cpp
 		src/parsian_ai/roles/playmake.cpp
 		)
