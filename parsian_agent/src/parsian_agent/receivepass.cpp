@@ -96,8 +96,10 @@ void CSkillReceivePass::execute() {
         Vector2D kickerPoint = agent->pos();
         double agentTime = 0;
         Vector2D dummy;
+            gotopointavoid->setOnetouchmode(false);
         if (Circle2D(agentPos, 0.15).intersection(Segment2D(wm->ball->pos, wm->ball->getPosInFuture(0.5)), &dummy, &dummy)) {
             intersectPos = ballPath.nearestPoint(kickerPoint);
+
         } else {
             bool posFound  = false;
             for (double i = 0 ; i < 5 ; i += 0.1) {
@@ -112,9 +114,18 @@ void CSkillReceivePass::execute() {
                     break;
                 }
             }
+            Vector2D s1,s2;
+            if (posFound == false || !wm->field->isInField(intersectPos )) {
 
-            if (posFound == false /*||*/ /*intersectPos.dist(ballPos) > ballPath.nearestPoint(kickerPoint).dist(ballPos) ||*/ /*!wm->field->isInField(intersectPos )*/) {
-                intersectPos = ballPath.nearestPoint(kickerPoint);
+                if (wm->field->fieldRect().intersection(ballPath,&s1,&s2)) {
+                    if(s1.isValid()) {
+                        intersectPos = s1;
+                    } else {
+                        intersectPos = s2;
+                    }
+                } else {
+                    intersectPos = ballPath.nearestPoint(agentPos);
+                }
             }
         }
 
@@ -125,10 +136,14 @@ void CSkillReceivePass::execute() {
             }
             intersectPos = sol1;
         }
-        gotopointavoid->init(intersectPos, oneTouchDir);
-        gotopointavoid->setSlowmode(false);
-        gotopointavoid->setOnetouchmode(false);
-        gotopointavoid->execute();
+            if(agentPos.dist(intersectPos) < 0.5) {
+                gotopointavoid->setOnetouchmode(true);
+            }
+            agent->setRoller(1);
+            oneTouchDir = ballPos - intersectPos;
+            gotopointavoid->init(intersectPos, oneTouchDir);
+            gotopointavoid->setSlowmode(false);
+            gotopointavoid->execute();
         break;
 
     }
