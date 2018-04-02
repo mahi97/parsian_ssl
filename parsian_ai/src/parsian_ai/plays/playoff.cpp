@@ -40,6 +40,7 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     initial    = true;
     playOnFlag = false;
     firstPass  = true;
+    isOnetouch = false;
     havePassInPlan    = false;
     playoff_badPasserID = -1;
 
@@ -77,9 +78,10 @@ void CPlayOff::globalExecute() {
     if (masterMode == NGameOff::StaticPlay) {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (ros::Time::now().sec - lastTime > 1000 && !initial && lastBallPos.dist(wm->ball->pos) > 0.06) {
+        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
             //             TODO : write critical play here
             if (criticalPlay()) {
+                ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
             }
             return;
@@ -253,7 +255,7 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd()) {
                 playOnFlag = true;
-                ROS_INFO("Playofff Ends");
+                ROS_INFO("Playoff Ends");
             }
 
         } else {
@@ -277,9 +279,11 @@ void CPlayOff::kickoffPositioning(int playersNum) {
 
 void CPlayOff::dynamicExecute() {
 
-
     if (dynamicSelect == CHIP && false) {
-        dynamicPlayChipToGoal();
+        dynamicPlayChipToGoal(true);
+        checkEndChipToGoal();
+    } else if(dynamicSelect == KICK){
+        dynamicPlayChipToGoal(false);
         checkEndChipToGoal();
     } else if (dynamicSelect == KHAFAN || 1) {
         dynamicPlayKhafan();
@@ -308,7 +312,7 @@ void CPlayOff::dynamicAssignID() {
     }
 }
 
-void CPlayOff::dynamicPlayChipToGoal() {
+void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
     if (initial) {
         dynamicAssignID();
         ready = true;
@@ -316,7 +320,7 @@ void CPlayOff::dynamicPlayChipToGoal() {
     } else if (ready) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
-        roleAgent[0] -> setChip(true);
+        roleAgent[0] -> setChip(isChip);
         double speed = 8;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
@@ -586,16 +590,18 @@ Vector2D CPlayOff::getDynamicTarget(int i) {
     first.y += 0.3;
 
     switch (i) {
-    case 1:
-        return first;
-    case 2:
-        return Vector2D{3.2, 0.3};
-    case 3:
-        return Vector2D{3.2,  -0.3};
-    case 4:
-        return Vector2D{0,  0};
-    default:
-        return Vector2D::INVALIDATED;
+        case 1:
+            return first;
+        case 2:
+            return Vector2D{3.2, 0.7};
+        case 3:
+            return Vector2D{3.2, -0.7};
+        case 4:
+            return Vector2D{3, 1.5};
+        case 5:
+            return Vector2D{3, -1.5};
+        default:
+            return Vector2D::INVALIDATED;
     }
 }
 
@@ -933,6 +939,7 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
             newRoleAgent[i]->setAvoidBall(true);
             newRoleAgent[i]->setAvoidPenaltyArea(true);
             newRoleAgent[i]->setSelectedSkill(RoleSkill::GotopointAvoid);
+            newRoleAgent[i]->setAvoidBall(true);
 
         }
     }
@@ -1095,7 +1102,7 @@ bool CPlayOff::isPlanEnd() {
         DBUG("Plan Succeded", D_MAHI);
         return true;
 
-    } else if (isPlanFaild()) {
+    } else if (isPlanFailed()) {
         if (lastBallPos.dist(wm->ball->pos) > 0.06) {
             DBUG("Plan Fully Failed", D_MAHI);
             return true;
@@ -1104,7 +1111,6 @@ bool CPlayOff::isPlanEnd() {
             return false;
         }
     }
-
     return false;
 }
 
@@ -1133,7 +1139,7 @@ bool CPlayOff::isPlanDone() {
 }
 
 
-bool CPlayOff::isPlanFaild() {
+bool CPlayOff::isPlanFailed() {
     SFail fail = isAnyTaskFaild();
     if (isTimeOver()) {
         DBUG("Faild By Time Over", D_MAHI);
@@ -1247,6 +1253,7 @@ bool CPlayOff::isTimeOver() {
             return true;
         }
     }
+
     return false;
 }
 
@@ -1308,36 +1315,29 @@ bool CPlayOff::isFinalShotDone() {
     return false;
 }
 
-Vector2D CPlayOff::getEmptyTarget(Vector2D _position, double _radius) {
-    Vector2D tempTarget, finalTarget, position;
-    double escapeRad;
-    int oppCnt = 0;
-    bool posFound;
-    escapeRad = _radius;
-    position  = _position;
-    finalTarget = position;
-    for (double dist = 0.0 ; dist <= 0.5 ; dist += 0.2) {
-        for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
-            tempTarget = position + Vector2D::polar2vector(dist, ang);
-            ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
-                continue;
-            }
+Vector2D CPlayOff::getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D tempTarget, finalTarget;
+    bool opp;
+    finalTarget = _position;
+    for (double dist = 0.2 ; dist <= _radius ; dist += 0.2) {
+        for (double ang = -180.0 ; ang <= 180.0 ; ang += 18.0/dist) {
+            opp = false;
+            tempTarget = _position + Vector2D::polar2vector(dist, ang);
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-                if (Circle2D(wm->opp.active(i)->pos, 0.07).contains(tempTarget)) {
-                    oppCnt = 1;
+                if (Circle2D(wm->opp.active(i)->pos, 0.25).contains(tempTarget)
+                    || !wm->field->isInField(tempTarget)
+                    || wm->field->isInOppPenaltyArea(tempTarget)
+                    || wm->field->isInOurPenaltyArea(tempTarget)) {
+                    opp = true;
                     break;
                 }
 
             }
-            if (!oppCnt) {
+            if (!opp) {
                 finalTarget = tempTarget;
-                posFound = true;
+                dist = _radius*2; // to break upper loop
                 break;
             }
-        }
-        if (posFound) {
-            break;
         }
     }
 
@@ -1361,6 +1361,7 @@ void CPlayOff::passManager() {
         doAfterlife = !Circle2D(lastBallPos, 0.4).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
+
 }
 
 /**
@@ -1467,11 +1468,30 @@ void CPlayOff::fillRoleProperties() {
                     if (x.id == i) {
                         if (i > 0 && masterPlan->execution.reciver.at(i - 1).id == x.id) {
                             if (positionAgent[i].getArgs().staticSkill == ReceivePassSkill) {
-                                positionAgent[i].stateNumber++;
-                                firstPass = false;
-                            }
-                            if (positionAgent[i].getArgs().staticSkill == PassSkill) {
+                                int index = -1;
+                                for (int j = 1;
+                                     j < positionAgent[i].positionArg.size() - positionAgent[i].stateNumber; j++) {
+                                    if (positionAgent[i].getArgs(j).staticSkill == PassSkill) {
+                                        index = j;
+                                        break;
+                                    }
+                                }
+                                if (index != -1) {
+                                    Vector2D pass_target =
+                                            positionAgent[positionAgent[i].getArgs(index).PassToId].getAbsArgs(
+                                                    positionAgent[i].getArgs(index).PassToState).staticPos;
 
+                                    Vector2D v1 = wm->ball->pos - positionAgent[i].getArgs(index).staticPos;
+                                    Vector2D v2 = pass_target - positionAgent[i].getArgs(index).staticPos;
+                                    float onetouchAngle = (float) (v1.th() - v2.th()).degree();
+                                    ROS_INFO_STREAM("onetouchAngle " << onetouchAngle << " max OnetouchAngle"
+                                                                     << conf.MaxOnetouchAngle);
+                                    if (onetouchAngle < conf.MaxOnetouchAngle) {
+                                        positionAgent[i].stateNumber++;
+                                        firstPass = false;
+                                        isOnetouch = true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -1563,7 +1583,7 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setDoPass(doPass);
     _roleAgent->setIntercept(false);
     _roleAgent->setTargetDir(_posAgent.getArgs().staticAng);
-    if(firstPass) {
+    if(firstPass || !isOnetouch) {
         _roleAgent->setSelectedSkill(RoleSkill::Kick);
     } else {
         _roleAgent->setSelectedSkill(RoleSkill::OneTouch);
@@ -1679,7 +1699,7 @@ void CPlayOff::assignSupport(CRolePlayOff * _roleAgent,
     _roleAgent->setAvoidBall(false);
     _roleAgent->setSlow(false);
     _roleAgent->setTargetDir(_roleAgent->getAgent()->pos() - wm->ball->pos);
-    _roleAgent->setTarget(getEmptyTarget(tempTarget, .4));
+    _roleAgent->setTarget(getEmptyTarget(tempTarget, .5));
     _roleAgent->setSelectedSkill(RoleSkill::GotopointAvoid); //GotoPointAvoid
 }
 
@@ -1991,6 +2011,7 @@ void CPlayOff::reset() {
     blockerStep = S0;
 
     firstPass = true;
+    isOnetouch = false;
     playoff_badPasserID = -1;
 
     DBUG(QString("reset Plan"), D_MAHI);

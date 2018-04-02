@@ -32,7 +32,7 @@ private:
     ros::Subscriber robotPacketSub[_MAX_ROBOT_NUM];
 
 
-    ros::Subscriber visinSub;
+    ros::Subscriber wmSub;
     void callBack(const parsian_msgs::parsian_robot_commandConstPtr& _packet);
     void syncData(const parsian_msgs::parsian_world_modelConstPtr& _packet);
 

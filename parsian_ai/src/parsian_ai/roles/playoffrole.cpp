@@ -48,7 +48,7 @@ void CRolePlayOff::update() {
         gotoPointAvoidSkill->setAvoidpenaltyarea(avoidPenaltyArea);
         gotoPointAvoidSkill->setMaxvelocity(maxVelocity);
         gotoPointAvoidSkill->setNoavoid(noAvoid);
-        gotoPointAvoidSkill->setBallobstacleradius(1);
+        gotoPointAvoidSkill->setBallobstacleradius(0.18);
 
         updated = false;
         break;
@@ -78,9 +78,9 @@ void CRolePlayOff::update() {
         oneTouchSkill->setChip(false);
         oneTouchSkill->setShottoemptyspot(false);
 //            if (wm->getIsSimulMode())
-        oneTouchSkill->setKickspeed(8);
+//        oneTouchSkill->setKickspeed(8);
 //            else
-        oneTouchSkill->setKickspeed(1023);
+        oneTouchSkill->setKickspeed(kickSpeed);
         updated = false;
         break;
     case RoleSkill::ReceivePass:
