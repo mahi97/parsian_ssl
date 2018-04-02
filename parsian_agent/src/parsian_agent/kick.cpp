@@ -505,7 +505,7 @@ void CSkillKick::jTurn() {
     posPid->kd = 0;
     if (movementDir < 20 && movementDir > -20) {
         shift = 0;
-        if (wm->ball->vel.length() < 0.2) {
+        if (0 &&wm->ball->vel.length() < 0.2) {
         posPid->error = movementDir;
         posPid->kd = 0.01;
         }
@@ -795,8 +795,10 @@ void CSkillKick::findPosToGo() {
     Vector2D addVec = agentDir.norm() * 0.08;
     gpa->setOnetouchmode(false);
 
-    if (wm->ball->vel.length() > 1.5 - distThr) {
+    if (wm->ball->vel.length() > 1.5 - distThr || (isKhafan && (wm->ball->vel.length() > 0.5 - distThr)) ) {
         distThr = 1.45;
+        if(isKhafan)
+            distThr = 0.45;
         if (Circle2D(agentPos, 0.1).intersection(Segment2D(ballPos, wm->ball->getPosInFuture(0.5)), &dummy, &dummy)) {
             gpa->setOnetouchmode(true);
             finalPos = ballPath.nearestPoint(kickerPoint);

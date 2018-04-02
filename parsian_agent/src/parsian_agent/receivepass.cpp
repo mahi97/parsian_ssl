@@ -99,7 +99,7 @@ void CSkillReceivePass::execute() {
             gotopointavoid->setOnetouchmode(false);
         if (Circle2D(agentPos, 0.15).intersection(Segment2D(wm->ball->pos, wm->ball->getPosInFuture(0.5)), &dummy, &dummy)) {
             intersectPos = ballPath.nearestPoint(kickerPoint);
-            gotopointavoid->setOnetouchmode(true);
+
         } else {
             bool posFound  = false;
             for (double i = 0 ; i < 5 ; i += 0.1) {
@@ -136,6 +136,9 @@ void CSkillReceivePass::execute() {
             }
             intersectPos = sol1;
         }
+            if(agentPos.dist(intersectPos) < 0.5) {
+                gotopointavoid->setOnetouchmode(true);
+            }
             agent->setRoller(1);
             oneTouchDir = ballPos - intersectPos;
             gotopointavoid->init(intersectPos, oneTouchDir);
