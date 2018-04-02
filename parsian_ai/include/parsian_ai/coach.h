@@ -21,12 +21,15 @@
 #include <parsian_ai/plays/plays.h>
 #include <parsian_ai/roles/stop.h>
 #include <behavior/mahi/mahi.h>
+#include <behavior/direct/direct.h>
 #include <parsian_msgs/plan_service.h>
 #include <parsian_msgs/parsian_ai_status.h>
 #include <parsian_msgs/parsian_pair_roles.h>
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
+#include <parsian_ai/roles/fault.h>
+
 
 
 enum class BallPossesion {
@@ -64,17 +67,27 @@ public:
     ros::Publisher *ai_status_pub;
     ros::ServiceClient plan_client;
 
+    bool gotplan;
+
     void setPlanClient(const ros::ServiceClient &_plan_client);
 
     void setBehaviorPublisher(ros::Publisher &_behaver_publisher);
 
-    int findGoalieID();
+    int findGoalie();
 
     parsian_msgs::plan_serviceResponse getLastPlan();
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
-    bool ballChiped();
+    void generateWorkingRobotIds();
+    QList<int> workingIDs;
+    void replacefaultedrobots();
+    CRoleFault *faultRoles[_MAX_NUM_PLAYERS];
+    void resetnonVisibleAgents();
+
+
+
+
 private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
@@ -115,6 +128,7 @@ private:
     CTheirBallPlacement *theirBallPlacement;
     CDynamicAttack *dynamicAttack;
     CStopPlay *stopPlay;
+    CHalftimeLineup *halftimeLineup;
 
     Behavior *selectedBehavior;
 
@@ -151,7 +165,7 @@ private:
 
     void checkGoalieInsight();
 
-    void decidePreferredDefenseAgentsCountAndGoalieAgent();
+    void decidePreferredDefenseAgentsCount();
 
     void decideAttack();
 
@@ -166,7 +180,6 @@ private:
 
     void virtualTheirPlayOffState();
 
-    bool transientFlag;
     QTime trasientTimeOut;
     int translationTimeOutTime;
 
@@ -229,7 +242,13 @@ private:
 
     //////////////////////////////////// ALI GAVAHI
     double lastNearestBallDist;
+    double averageVel;
     QList<Vector2D> lastBallVels;
+    Vector2D startTransientBallPos;
+
+    void removeLastBallVel();
+    void clearBallVels();
+
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);
@@ -267,8 +286,9 @@ private:
 
     bool isFastPlay();
 
-    ///HMD
-    bool checkOverdef();
+    ///////////////////////// AHZ //////////
+    int findNeededDefense();
+
 
     double overDefThr;
 
@@ -292,6 +312,6 @@ private:
     parsian_msgs::parsian_ai_statusPtr fillAIStatus();
 
     void findDefneders(const int &max_number, const int& min_number);
-
+    NoAction* haltAction;
 };
 #endif //PARSIAN_AI_COACH_H
