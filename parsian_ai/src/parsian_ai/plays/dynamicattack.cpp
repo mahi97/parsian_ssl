@@ -2189,5 +2189,4 @@ void CDynamicAttack::validateSegment(Segment2D& seg) {
         seg.assign(seg.a(), t);
         mid = (seg.a() + seg.b())/2;
     }
-
 }
