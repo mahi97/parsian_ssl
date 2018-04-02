@@ -2057,7 +2057,7 @@ double CDynamicAttack::caclClearPathFactor(Vector2D point, Vector2D passSenderPo
         return 0.0;
 }
 
-double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passSenderPos)
+double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 {
     auto ballPos = wm->ball->pos;
     Line2D ballToPointLine(robotPos, ballPos);
@@ -2068,7 +2068,7 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passS
     auto robotBallDir = (ballPos - robotPos).norm();
     double oneTouchAngle = 60;
 
-    if(robotDir.x <= 0 )
+    if(robotBallDir.x <= 0 )
         return 0;
 
     auto forwardRotatedDir = robotBallDir.rotate(oneTouchAngle);
@@ -2087,8 +2087,8 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passS
     double penaltyOffset = 0.3;
     auto extendedWidth = penaltyWidth + 2*penaltyOffset;
 
-    auto resultRatio = ((effectiveHigh > penaltyWidth/2)?penaltyWidth/2:effectiveHigh
-                                                               - (effectiveLow<-penaltyWidth/2)?-penaltyWidth:effectiveLow)/extendedWidth;
+    auto resultRatio = ((effectiveHigh > extendedWidth/2)?extendedWidth/2:effectiveHigh
+                                                               - (effectiveLow<-extendedWidth/2)?-extendedWidth:effectiveLow)/extendedWidth;
     return resultRatio;
 }
 
