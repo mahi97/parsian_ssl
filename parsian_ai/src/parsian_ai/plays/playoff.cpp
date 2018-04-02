@@ -1477,16 +1477,12 @@ void CPlayOff::fillRoleProperties() {
                                     }
                                 }
                                 if (index != -1) {
-                                    Agent *next_passer =
-                                            soccer->agents[masterPlan->common.matchedID.value(
-                                                    masterPlan->execution.reciver.at(i - 1).id)];
-
                                     Vector2D pass_target =
                                             positionAgent[positionAgent[i].getArgs(index).PassToId].getAbsArgs(
                                                     positionAgent[i].getArgs(index).PassToState).staticPos;
 
-                                    Vector2D v1 = wm->ball->pos - next_passer->pos();
-                                    Vector2D v2 = pass_target - next_passer->pos();
+                                    Vector2D v1 = wm->ball->pos - positionAgent[i].getArgs(index).staticPos;
+                                    Vector2D v2 = pass_target - positionAgent[i].getArgs(index).staticPos;
                                     float onetouchAngle = (float) (v1.th() - v2.th()).degree();
                                     ROS_INFO_STREAM("onetouchAngle " << onetouchAngle << " max OnetouchAngle"
                                                                      << conf.MaxOnetouchAngle);
