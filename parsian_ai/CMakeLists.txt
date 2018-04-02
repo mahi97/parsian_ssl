@@ -36,8 +36,6 @@ qt4_wrap_cpp(QT_MOC_HPP ${QT_MOC})
 
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
-find_package(QJSON REQUIRED)
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -61,7 +59,7 @@ generate_dynamic_reconfigure_options(
 	###	cfg/pass.cfg
 		cfg/direct.cfg
 		cfg/mahi.cfg
-                cfg/move_forward.cfg
+		cfg/move_forward.cfg
 		cfg/ai.cfg
 		cfg/def_test.cfg
 		cfg/behavior_server.cfg
@@ -138,11 +136,9 @@ add_library(${PROJECT_NAME}_roles
 		)
 
 add_library(${PROJECT_NAME}_util
-		 src/parsian_ai/util/defpos.cpp
+		src/parsian_ai/util/defpos.cpp
 		src/parsian_ai/util/knowledge.cpp
 		src/parsian_ai/util/worldmodel.cpp
-		#		src/parsian_ai/util/planloader.cpp
-		#		src/parsian_ai/util/loadplayoffjson.cpp
 		src/parsian_ai/util/agent.cpp)
 
 add_library(${PROJECT_NAME}_nodelet
@@ -159,9 +155,9 @@ add_executable(${PROJECT_NAME}_node
 
 ### BEHAVIORS ### DO NOT REMOVE THIS LINE, IT'S FOR AUTO-GENERATION
 #####include(./pass_CMakeLists.txt)
-include(./direct_CMakeLists.txt)
-include(./mahi_CMakeLists.txt)
-include(./move_forward_CMakeLists.txt)
+#include(./direct_CMakeLists.txt)
+#include(./mahi_CMakeLists.txt)
+#include(./move_forward_CMakeLists.txt)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -193,25 +189,10 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 		)
 target_link_libraries(${PROJECT_NAME}_node
 		${catkin_LIBRARIES}
-		${PROJECT_NAME}
-		${PROJECT_NAME}_nodelet
 		${QT_LIBRARIES}
-		mahi
 		)
 
 add_dependencies(${PROJECT_NAME}
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-		${PROJECT_NAME}_gencfg
-		)
-
-add_dependencies(${PROJECT_NAME}_plans
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-		${PROJECT_NAME}_gencfg
-		)
-
-add_dependencies(${PROJECT_NAME}_plays
 		${${PROJECT_NAME}_EXPORTED_TARGETS}
 		${catkin_EXPORTED_TARGETS}
 		${PROJECT_NAME}_gencfg
@@ -223,45 +204,15 @@ add_dependencies(${PROJECT_NAME}_util
 		${PROJECT_NAME}_gencfg
 		)
 
-add_dependencies(${PROJECT_NAME}_roles
-		${${PROJECT_NAME}_EXPORTED_TARGETS}
-		${catkin_EXPORTED_TARGETS}
-		${PROJECT_NAME}_gencfg
-		)
-
 target_link_libraries(${PROJECT_NAME}
 		${catkin_LIBRARIES}
 		${QT_LIBRARIES}
-		${PROJECT_NAME}_plays
-		${PROJECT_NAME}_plans
-		${PROJECT_NAME}_roles
-		${PROJECT_NAME}_util
-		mahi_nodelet
-		direct_nodelet
-		)
-
-target_link_libraries(${PROJECT_NAME}_plays
-		${QT_LIBRARIES}
-		${catkin_LIBRARIES}
-		${PROJECT_NAME}_util
-		)
-
-target_link_libraries(${PROJECT_NAME}_plans
-		${QT_LIBRARIES}
-		${catkin_LIBRARIES}
 		${PROJECT_NAME}_util
 		)
 
 target_link_libraries(${PROJECT_NAME}_util
 		${QT_LIBRARIES}
 		${catkin_LIBRARIES}
-		${QJSON_LIBRARIES}
-		)
-
-target_link_libraries(${PROJECT_NAME}_roles
-		${QT_LIBRARIES}
-		${catkin_LIBRARIES}
-		${QJSON_LIBRARIES}
 		)
 
 
@@ -281,7 +232,7 @@ install(PROGRAMS
 		)
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node mahi_node
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_nodelet ${PROJECT_NAME}_node
 		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

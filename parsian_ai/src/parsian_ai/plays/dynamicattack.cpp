@@ -540,9 +540,26 @@ void CDynamicAttack::playMake() {
                 } else {
                     roleAgentPM->setNoKick(true);
                 }*/
+<<<<<<< 81406a893e63df10769114fc32345cc5505dd455
 //        if(isInpass())
 //            swapPlaymakeInPass();
             break;
+=======
+            //        if(isInpass())
+            //            swapPlaymakeInPass();
+            break;
+
+        case PlayMakeSkill ::Chip:
+            ROS_INFO_STREAM("chip");
+            roleAgentPM->setNoKick(false);
+            if (currentPlan.playmake.region == DynamicRegion ::Goal) {
+                roleAgentPM ->setTarget(wm->field->oppGoal());
+                roleAgentPM->setChip(true);
+                if (wm->ball->pos.x < -2) {
+                    roleAgentPM ->setChipDist(conf.HighDistChip);
+                } else {
+                    roleAgentPM ->setChipDist(conf.MediumDistChip);
+>>>>>>> fix it at least
 
         case PlayMakeSkill ::Chip:
             ROS_INFO_STREAM("chip");
@@ -571,7 +588,7 @@ void CDynamicAttack::playMake() {
             roleAgentPM->setChip(false);
             roleAgentPM->setNoKick(false);
             roleAgentPM->setTarget(wm->field->oppGoal());
-            roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
+            roleAgentPM->setKickSpeed(conf.HighSpeedPass); // TODO : 8m/s by profiller
             roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
             break;
         }
@@ -582,7 +599,11 @@ void CDynamicAttack::playMake() {
             roleAgentPM->setNoKick(false);
             roleAgentPM->setTarget(wm->field->oppGoal());
             // Parsa : ino hamintory avaz kardam kar kard...
+<<<<<<< 81406a893e63df10769114fc32345cc5505dd455
             roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
+=======
+            roleAgentPM->setKickSpeed(conf.MediumSpeedPass); // TODO : 8m/s by profiller
+>>>>>>> fix it at least
             roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
             break;
     }
@@ -1065,7 +1086,7 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
         validateSegment(recieveSegment);
         double angle = 0, biggestAngle = 0, prob = 0;
 
-        getEmptyAngle2(playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
+        CKnowledge::getEmptyAngle(*wm->field, playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
         points.append(recieveSegment.intersection(Line2D(playmake->pos(), angle)));
         probs.append(prob);
 
@@ -1783,7 +1804,7 @@ void CDynamicAttack::chooseBestPositons_new()
                 receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID, region_id);
                 senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
                 clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
-                oneTouchAngleFactor = calcOneTouchAngleFactor(point, passSenderPos);
+                oneTouchAngleFactor = calcOneTouchAngleFactor(point);
                 widenessFactor = calcWidenessFactor(passSenderPos, point);
 
                 double f = 1.0;
@@ -2088,7 +2109,7 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
     auto extendedWidth = penaltyWidth + 2*penaltyOffset;
 
     auto resultRatio = ((effectiveHigh > extendedWidth/2)?extendedWidth/2:effectiveHigh
-                                                               - (effectiveLow<-extendedWidth/2)?-extendedWidth:effectiveLow)/extendedWidth;
+                                                                          - (effectiveLow<-extendedWidth/2)?-extendedWidth:effectiveLow)/extendedWidth;
     return resultRatio;
 }
 
@@ -2107,10 +2128,10 @@ void CDynamicAttack::hamidDebug()
     for(int i{0}; i<11; i++)
     {
         ROS_INFO_STREAM("hamid weights of row " << i << " : " << robotRegionsWeights[i][0]
-                << " " << robotRegionsWeights[i][1] << " " << robotRegionsWeights[i][2] << " "
-                << robotRegionsWeights[i][3] << " " << robotRegionsWeights[i][4] << " "
-                << robotRegionsWeights[i][5] << " " << robotRegionsWeights[i][6] << " "
-                << robotRegionsWeights[i][7] << " " << robotRegionsWeights[i][8]);
+                                                << " " << robotRegionsWeights[i][1] << " " << robotRegionsWeights[i][2] << " "
+                                                << robotRegionsWeights[i][3] << " " << robotRegionsWeights[i][4] << " "
+                                                << robotRegionsWeights[i][5] << " " << robotRegionsWeights[i][6] << " "
+                                                << robotRegionsWeights[i][7] << " " << robotRegionsWeights[i][8]);
     }
 
     for(int i{0}; i<11; i++)
@@ -2142,51 +2163,63 @@ void CDynamicAttack::hamidDebug()
 
 void CDynamicAttack::validateSegment(Segment2D& seg) {
     Vector2D sol1, sol2;
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     Vector2D mid;
-    mid = (seg.a() + seg.b())/2;
+    mid = (seg.a() + seg.b()) / 2;
     if (wm->field->fieldRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
         seg.assign((sol1.isValid()) ? sol2 : sol1, seg.b());
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     if (wm->field->fieldRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
         seg.assign(seg.a(), (sol1.isValid()) ? sol2 : sol1);
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
         Vector2D t = (sol1.isValid()) ? sol2 : (sol2.isValid()) ? sol1 : (sol1.x < sol2.x) ? sol1 : sol2;
         seg.assign(t, seg.b());
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
         Vector2D t = (sol1.isValid()) ? sol2 : (sol2.isValid()) ? sol1 : (sol1.x < sol2.x) ? sol1 : sol2;
         seg.assign(seg.a(), t);
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
         Vector2D t = (sol1.isValid()) ? sol2 : (sol2.isValid()) ? sol1 : (sol1.x < sol2.x) ? sol1 : sol2;
         seg.assign(t, seg.b());
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
         Vector2D t = (sol1.isValid()) ? sol2 : (sol2.isValid()) ? sol1 : (sol1.x < sol2.x) ? sol1 : sol2;
         seg.assign(seg.a(), t);
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
+    sol1.invalidate();
+    sol2.invalidate();
     Vector2D t;
-    if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH/2), Vector2D(0, -wm->field->_FIELD_WIDTH/2)).intersection(Segment2D(seg.a(), mid)), t.isValid()) {
+    if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH / 2),
+                      Vector2D(0, -wm->field->_FIELD_WIDTH / 2)).intersection(
+            Segment2D(seg.a(), mid)), t.isValid()) {
         seg.assign(t, seg.b());
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
-    sol1.invalidate(); sol2.invalidate();
-    if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH/2), Vector2D(0, -wm->field->_FIELD_WIDTH/2)).intersection(Segment2D(mid, seg.b())), t.isValid()) {
+    sol1.invalidate();
+    sol2.invalidate();
+    if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH / 2),
+                      Vector2D(0, -wm->field->_FIELD_WIDTH / 2)).intersection(
+            Segment2D(mid, seg.b())), t.isValid()) {
         seg.assign(seg.a(), t);
-        mid = (seg.a() + seg.b())/2;
+        mid = (seg.a() + seg.b()) / 2;
     }
 }
