@@ -83,7 +83,7 @@ void AINodelet::faultdetectionCallBack(const parsian_msgs::parsian_robot_fault &
     ai->updateRobotFaults(_rs);
 }
 
-void AINodelet::forceRefereeCallBack(const parsian_msgs::ssl_refree_commandConstPtr & _command){
+void AINodelet::forceRefereeCallBack(const parsian_msgs::ssl_force_refereeConstPtr & _command){
     ai->forceUpdateReferee(_command);
 }
 
