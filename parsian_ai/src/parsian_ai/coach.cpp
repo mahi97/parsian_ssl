@@ -29,7 +29,6 @@ CCoach::CCoach(Agent**_agents)
     possessionIntentionInterval = 200;
     playOnTime = 2000;
     playMakeIntentionInterval = 300;
-    playMakeTh = 0.3;
 
 
     // Old Plays
@@ -537,7 +536,7 @@ double CCoach::findMostPossible(Vector2D agentPos) {
     }
     double prob, angle, biggestAngle;
 
-    CKnowledge::getEmptyAngle(*wm->field, agentPos - (wm->field->oppGoal() - agentPos).norm() * 0.15, wm->field->oppGoalL(), wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    getEmptyAngle(agentPos - (wm->field->oppGoal() - agentPos).norm() * 0.15, wm->field->oppGoalL(), wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
 
 
     return prob;
@@ -558,58 +557,62 @@ void CCoach::choosePlaymakeAndSupporter(){
     if (ourPlayers.empty()) {
         playmakeId = -1;
         lastPlayMake = -1;
+        supporterId = -1;
+        lastSupporterId = -1;
         return;
     }
 
+    if (false) {
+//        playmakeId = swapPlaymake;
+    } else {
 
-    ////////////////////first we choose our playmake
-    double ballVel = wm->ball->vel.length();
-    Vector2D ballPos = wm->ball->pos;
-    if (ballVel < 0.3) {
-        double maxD = -1000.1;
-        for (int ourPlayer : ourPlayers) {
-            if(selectedPlay->playoff_badPasserID != -1){
-                if(ourPlayer == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
-                    ROS_INFO_STREAM("playofff: skipped: "<<ourPlayer);
+        ////////////////////first we choose our playmake
+        double ballVel = wm->ball->vel.length();
+        Vector2D ballPos = wm->ball->pos;
+        if (ballVel < 0.3) {
+            double maxD = -1000.1;
+            for (const auto& player : ourPlayers) {
+                if(player == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
+                    ROS_INFO_STREAM("playofff: skipped: "<<player);
                     continue;
                 }
+                double o = -1 * agents[player]->pos().dist(ballPos) ;
+                if (player == lastPlayMake) {
+                    o += conf.playMakeStopThr;
+                }
+                if (o > maxD) {
+                    maxD = o;
+                    playmakeId = player;
+                }
             }
-            double o = -1 * agents[ourPlayer]->pos().dist(ballPos) ;
-            if (ourPlayer == lastPlayMake) {
-                o += conf.playMakeStopThr;
+        } else {
+            if (playMakeIntention.elapsed() < conf.playMakeIntention) { // TODO : fix config
+                playmakeId = lastPlayMake;
+                return;
             }
-            if (o > maxD) {
-                maxD = o;
-                playmakeId = ourPlayer;
-            }
-        }
-        ROS_INFO_STREAM("op :" << ballPos.x << "  " << agents[ourPlayers[0]]->pos().x);
-        lastPlayMake = playmakeId;
-    } else {
-        if (playMakeIntention.elapsed() < playMakeIntentionInterval) { // TODO : fix config
-            playmakeId = lastPlayMake;
-            return;
 
             playMakeIntention.restart();
             double nearest[10] = {};
-            for (int ourPlayer : ourPlayers) {
-                nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
-                                                                    4, 3, 2,
-                                                                    2); // TODO : read from common config agents
+            for (const auto& ourPlayer : ourPlayers) {
+                nearest[ourPlayer] = agents[ourPlayer]->pos().dist(wm->ball->pos + wm->ball->vel) ;
+//            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
+//                                                                4, 3, 2,
+//                                                                2); // TODO : read from common config agents
             }
-            if (lastPlayMake >= 0 && lastPlayMake <= 9) {
+            if (lastPlayMake >= 0 && lastPlayMake <= 11) {
                 nearest[lastPlayMake] -= conf.playMakeMoveThr;
             }
             double minT = 1e8; // 10 ^ 8
-            for (int ourPlayer : ourPlayers) {
-                if (nearest[ourPlayer] < minT) {
-                    minT = nearest[ourPlayer];
-                    playmakeId = ourPlayer;
+            for (const auto& player : ourPlayers) {
+                if (nearest[player] < minT) {
+                    minT = nearest[player];
+                    playmakeId = player;
                 }
             }
-            lastPlayMake = playmakeId;
         }
     }
+
+    lastPlayMake = playmakeId;
 }
 
 void CCoach::decideAttack() {
@@ -855,21 +858,21 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
                              const POMODE _gameMode,
                              const QList<int>& _ourplayers) {
     switch (_mode) {
-    case NGameOff::StaticPlay:
-        initStaticPlay(_gameMode, _ourplayers);
-        break;
-    case NGameOff::DynamicPlay:
-        ROS_INFO("HSHM_: DynamicPlay");
-        initDynamicPlay(_ourplayers);
-        break;
-    case NGameOff::FastPlay:
-        initFastPlay(_ourplayers);
-        break;
-    case NGameOff::FirstPlay:
-        initFirstPlay(_ourplayers);
-        break;
-    default:
-        initStaticPlay(_gameMode, _ourplayers);
+        case NGameOff::StaticPlay:
+            initStaticPlay(_gameMode, _ourplayers);
+            break;
+        case NGameOff::DynamicPlay:
+            ROS_INFO("HSHM_: DynamicPlay");
+            initDynamicPlay(_ourplayers);
+            break;
+        case NGameOff::FastPlay:
+            initFastPlay(_ourplayers);
+            break;
+        case NGameOff::FirstPlay:
+            initFirstPlay(_ourplayers);
+            break;
+        default:
+            initStaticPlay(_gameMode, _ourplayers);
     }
 }
 

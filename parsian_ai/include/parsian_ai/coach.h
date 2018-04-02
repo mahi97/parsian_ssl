@@ -191,7 +191,7 @@ private:
     ///////////////////////new play make and supporter chooser
     int playmakeId;
     int supporterId;
-    double playMakeTh;
+    int lastSupporterId;
     int lastPlayMake;
 
     void choosePlaymakeAndSupporter();
