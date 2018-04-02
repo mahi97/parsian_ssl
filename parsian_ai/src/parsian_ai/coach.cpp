@@ -8,7 +8,7 @@
 CCoach::CCoach(Agent**_agents)
 {
     clearBallVels();
-    averageVel = 0;    
+    averageVel = 0;
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -162,30 +162,30 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
     missMatchIds.clear();
     if (gameState->getState() == States::Stop || gameState->getState() == States::Halt || first) {
-        if (wm->our.activeAgentsCount() != 0u) {
+        if (workingIDs.size() != 0u) {
             robotsIdHist.clear();
-            for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-                robotsIdHist.append(wm->our.active(i)->id);
+            for (int i = 0 ; i < workingIDs.size() ; i++) {
+                robotsIdHist.append(workingIDs[i]);
             }
         }
         first = false;
     }
 
-    if (wm->our.activeAgentsCount() > _NUM_PLAYERS) {
+    if (workingIDs.size() > _NUM_PLAYERS) {
         missMatchIds.clear();
-        for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
+        for (int i = 0 ; i < workingIDs.size() ; i++) {
             for (int k = 0 ; k < robotsIdHist.count() ; k++) {
-                if (robotsIdHist.at(k) == wm->our.active(i)->id) {
+                if (robotsIdHist.at(k) == workingIDs[i]) {
                     break;
                 }
                 if (k == robotsIdHist.count() - 1) {
-                    missMatchIds.append(wm->our.active(i)->id);
+                    missMatchIds.append(workingIDs[i]);
                 }
             }
         }
     }
 
-    int agentsCount = wm->our.data->activeAgents.count() - missMatchIds.count();
+    int agentsCount = workingIDs.size() - missMatchIds.count();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -276,7 +276,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
 void CCoach::calcDesiredMarkCounts(){
 
-    int agentsCount = wm->our.data->activeAgents.count();
+    int agentsCount = workingIDs.size();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -334,7 +334,7 @@ void CCoach::calcDesiredMarkCounts(){
 
 
 void CCoach::assignGoalieAgent(int goalieID) {
-    QList<int> ids = wm->our.data->activeAgents;
+    QList<int> ids = workingIDs;
     goalieAgent = nullptr;
     if (ids.contains(goalieID)) {
         goalieAgent = agents[goalieID];
@@ -378,7 +378,7 @@ void CCoach::assignDefenseAgents(int defenseCount) {
         return;
     }
 
-    QList<int> ids = wm->our.data->activeAgents;
+    QList<int> ids = workingIDs;
     if (goalieAgent != nullptr) {
         ids.removeOne(goalieAgent->id());
     }
@@ -528,8 +528,8 @@ double CCoach::findMostPossible(Vector2D agentPos) {
         obstacles.append(Circle2D(wm->opp.active(i)->pos, 0.1));
     }
 
-    for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-        if (wm->our.active(i)->id != playmakeId) {
+    for (int i = 0 ; i < workingIDs.size() ; i++) {
+        if (workingIDs[i] != playmakeId) {
             obstacles.append(Circle2D(wm->our.active(i)->pos, 0.1));
         }
     }
@@ -549,7 +549,7 @@ void CCoach::updateAttackState() {
 void CCoach::choosePlaymakeAndSupporter()
 {
     playmakeId = -1;
-    QList<int> ourPlayers = wm->our.data->activeAgents;
+    QList<int> ourPlayers = workingIDs;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
     }
@@ -613,7 +613,7 @@ void CCoach::choosePlaymakeAndSupporter()
 
 void CCoach::decideAttack() {
     // find unused agents!
-    QList<int> ourPlayersID = wm->our.data->activeAgents;
+    QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
     }
@@ -1096,7 +1096,7 @@ void CCoach::resetnonVisibleAgents()
                     isvisible = true;
             if(!isvisible)
             {
-                //ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
+                ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
                 agents[i]->fault = false;
                 agents[i]->faultstate = Agent::FaultState::HEALTHY;
             }

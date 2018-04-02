@@ -7,7 +7,7 @@
 #include <parsian_util/geom/vector_2d.h>
 #include <parsian_msgs/parsian_robot_fault.h>
 #include <parsian_util/tools/blackboard.h>
-
+#include <QList>
 
 using namespace rcsc;
 # define buffer_size  200
@@ -21,6 +21,7 @@ using namespace rcsc;
 namespace auto_decider {
     class Decider : public nodelet::Nodelet {
     public:
+        parsian_msgs::parsian_robot_faultPtr res;
         ros::Publisher pub;
         ros::Subscriber robo_sub,wm_sub;
         bool shootSensors[12];
@@ -44,12 +45,14 @@ namespace auto_decider {
         void wmCb(const parsian_msgs::parsian_world_model msg) {
             for (int i = 0; i < 12; i++)
                 isNear[i] = Vector2D(msg.our[i].pos).dist(msg.ball.pos) < threshold;
+            faultdetect();
         }
 
         void faultdetect() {
-            parsian_msgs::parsian_robot_faultPtr res;
+
 
             for (int i = 0; i < 12; i++) {
+                res.reset(new parsian_msgs::parsian_robot_fault);
                 res->robot_id=i;
                 faults[i].append(!isNear[i] && shootSensors[i]);
 
@@ -60,13 +63,14 @@ namespace auto_decider {
                 for (auto fault : faults[i])
                     sum+= fault;
 
-                PDEBUG("faults",sum,D_ALI);
 
                 if(sum > faults[i].size() * .7)
                     res->select = 2;
                 else
                     res->select = 0;
 
+                PDEBUG(QString("faults %1 = ").arg(i).toStdString(),sum,D_ALI);
+                PDEBUG(QString("select %2 = ").arg(i).toStdString(),res->select,D_ALI);
                 pub.publish(res);
             }
         }
