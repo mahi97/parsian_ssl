@@ -3362,7 +3362,7 @@ QList<Vector2D> DefensePlan::ShootBlockRatio(double ratio, Vector2D opp) {
     Vector2D pos = know->getPointInDirection(wm->field->ourGoal() , opp , ratio);
     if(wm->field->isInOurPenaltyArea(opp)){
         wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempSeg, &solutions[0] , &solutions[1]);
-        tempQlist.append(solutions[0].isValid() && solutions[0].dist(opp) < solutions[1].dist(opp) ? solutions[0] : solutions[1]);
+        tempQlist.append(solutions[0].isValid() && solutions[0].x > solutions[1].x ? solutions[0] : solutions[1]);
         tempQlist.append(tempQlist.first() - intersectionWithOurGoalLine);
     }
     else{
