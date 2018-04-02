@@ -385,7 +385,7 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
 //         agentStopTime.restart();
 //         timerReset = true;
 //     }
-    if(vel().length() < 0.5  && diveMode) {
+    if(vel().length() < 0.3  && diveMode) {
         return;
     }
     double lastV, commandV;
