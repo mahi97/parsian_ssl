@@ -771,12 +771,12 @@ QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
         else{
             if(wm->field->isInOurPenaltyArea(opp)){
                 wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempLine, &solutions[0] , &solutions[1]);
-                tempQlist.append(solutions[0].isValid() && solutions[0].dist(opp) < solutions[1].dist(opp) ? solutions[0] : solutions[1]);
+                tempQlist.append(solutions[0].isValid() && solutions[0].x > solutions[1].x ? solutions[0] : solutions[1]);
                 tempQlist.append(tempQlist.first() - intersectionWithOurGoalLine);
             }
             else if(wm->field->isInOppPenaltyArea(opp)){
                 wm->field->oppBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempLine, &solutions[0] , &solutions[1]);
-                tempQlist.append(solutions[0].isValid() && solutions[0].dist(opp) < solutions[1].dist(opp) ? solutions[0] : solutions[1]);
+                tempQlist.append(solutions[0].isValid() && solutions[0].x < solutions[1].x ? solutions[0] : solutions[1]);
                 tempQlist.append(intersectionWithOppGoalLine - tempQlist.first());
             }
             else{
@@ -800,12 +800,12 @@ QList<Vector2D> CMarkPlan::ShootBlockRatio(double ratio, Vector2D opp) {
     else{
         if(wm->field->isInOurPenaltyArea(opp)){
             wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempLine, &solutions[0] , &solutions[1]);
-            tempQlist.append(solutions[0].isValid() && solutions[0].dist(opp) < solutions[1].dist(opp) ? solutions[0] : solutions[1]);
+            tempQlist.append(solutions[0].isValid() && solutions[0].x > solutions[1].x ? solutions[0] : solutions[1]);
             tempQlist.append(tempQlist.first() - intersectionWithOurGoalLine);
         }
         else if(wm->field->isInOppPenaltyArea(opp)){
             wm->field->oppBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempLine, &solutions[0] , &solutions[1]);
-            tempQlist.append(solutions[0].isValid() && solutions[0].dist(opp) < solutions[1].dist(opp) ? solutions[0] : solutions[1]);
+            tempQlist.append(solutions[0].isValid() && solutions[0].x < solutions[1].x ? solutions[0] : solutions[1]);
             tempQlist.append(intersectionWithOppGoalLine - tempQlist.first());
         }
         else{
@@ -847,7 +847,7 @@ QList<Vector2D> CMarkPlan::PassBlockRatio(double ratio, Vector2D opp) {
         }
         else{
             wm->field->ourBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Line2D(wm->field->ourGoal() , opp) , &sol1 , &sol2);
-            passBlocker.append(Segment2D(sol1 , opp).length() < Segment2D(sol2 , opp).length() ? sol1 : sol2);
+            passBlocker.append(sol1.x > sol2.x ? sol1 : sol2);
         }
     }
     else if(wm->field->oppBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Segment2D(wm->ball->pos , opp) , &sol7,  &sol8)){
@@ -859,7 +859,7 @@ QList<Vector2D> CMarkPlan::PassBlockRatio(double ratio, Vector2D opp) {
         }
         else{
             wm->field->oppBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Line2D(wm->field->oppGoal() , opp) , &sol1 , &sol2);
-            passBlocker.append(Segment2D(sol1 , opp).length() < Segment2D(sol2 , opp).length() ? sol1 : sol2);
+            passBlocker.append(sol1.x < sol2.x ? sol1 : sol2);
         }
     }
     else{

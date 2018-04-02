@@ -59,8 +59,8 @@ void CRoleStopInfo::findPositions() {
     if (count() > 0) {
         Ps.append(c + baseDirVec * (sRadius + Robot::robot_radius_new));
     }
-    Vector2D startPos{0, -wm->field->_FIELD_WIDTH/2 + 1};
-    Vector2D endPos  {0,  wm->field->_FIELD_WIDTH/2 - 1};
+    Vector2D startPos{0.5, -wm->field->_FIELD_WIDTH/2 + 1};
+    Vector2D endPos  {0.5,  wm->field->_FIELD_WIDTH/2 - 1};
     for (int i = 1; i < count(); i++) {
         Ps.append(getEmptyTarget(startPos*(1.0 - (double)(i)/count()) + endPos*((double)(i)/count()), 1));
     }
