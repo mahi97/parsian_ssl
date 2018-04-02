@@ -3357,11 +3357,12 @@ QList<Vector2D> DefensePlan::ShootBlockRatio(double ratio, Vector2D opp) {
     QList<Vector2D> tempQlist;
     tempQlist.clear();
     Segment2D tempSeg = getBisectorSegment(wm->field->ourGoalL() , opp , wm->field->ourGoalR());
+    Line2D tempLine = getBisectorLine(wm->field->ourGoalL() , opp , wm->field->ourGoalR());
     Vector2D intersectionWithOurGoalLine = tempSeg.intersection(Segment2D(wm->field->ourGoalL() , wm->field->ourGoalR()));
     drawer->draw(tempSeg , "black");
     Vector2D pos = know->getPointInDirection(wm->field->ourGoal() , opp , ratio);
     if(wm->field->isInOurPenaltyArea(opp)){
-        wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempSeg, &solutions[0] , &solutions[1]);
+        wm->field->ourBigPenaltyArea(1,Robot::robot_radius_new,0).intersection(tempLine, &solutions[0] , &solutions[1]);
         tempQlist.append(solutions[0].isValid() && solutions[0].x > solutions[1].x ? solutions[0] : solutions[1]);
         tempQlist.append(tempQlist.first() - intersectionWithOurGoalLine);
     }
@@ -3463,7 +3464,7 @@ QList<Vector2D> DefensePlan::PassBlockRatio(double ratio, Vector2D opp) {
         }
         else{
             wm->field->ourBigPenaltyArea(1, Robot::robot_radius_new, 0).intersection(Line2D(wm->field->ourGoal() , opp) , &sol1 , &sol2);
-            passBlocker.append(Segment2D(sol1 , opp).length() < Segment2D(sol2 , opp).length() ? sol1 : sol2);
+            passBlocker.append(sol1.x > sol2.x ? sol1 : sol2);
         }
     }
     else{
