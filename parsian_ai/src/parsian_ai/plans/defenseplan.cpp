@@ -2006,6 +2006,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                 lastStateForGoalKeeper = QString("noBesidePoleMode");
                 DBUG(QString("strict follow"), D_AHZ);
                 predictedBall = ballPrediction(true);
+                drawer->draw(Circle2D(predictedBall , 0.7) , "red");
                 if (predictedBall.x - 0.02 < goalKeeperAgent->pos().x) {
                     Segment2D ball2PredictedBall(ballPos, predictedBall);
                     Line2D robotPrGoalLine(goalKeeperAgent->pos(), Vector2D(goalKeeperAgent->pos().x, (goalKeeperAgent->pos().y + 0.01)));
@@ -2721,7 +2722,7 @@ void DefensePlan::executeGoalKeeper() {
 
     playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick();
     playOnMode = gameState->isStart();
-    stopMode = ggitameState->isStop();
+    stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
     ROS_INFO_STREAM("_________________");
@@ -3356,29 +3357,60 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         return BallPos;
     }
 //    wm->opp.update();
+    QList<int> temp;
     if(wm->opp.activeAgentsCount() > 0) {
-        PDEBUG("Elham:" , wm->opp.activeAgentsCount() , D_AHZ);
+        ROS_INFO_STREAM("ED: raft");
+        temp = detectOpponentPassOwners(1 , 100);//taghir kone
+        Segment2D ballSegment = Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100);
+        Line2D ballLine = Line2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm());
+        drawer->draw(ballSegment , "red");
         for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
-            Circle2D oppCircle(wm->opp.active(i)->pos, 0.1);
-            if (oppCircle.intersection(ballPosVel, &solu[0], &solu[1]) > 0) {
-                if (wm->opp.active(i)->pos.dist(BallPos) < dist2Ball) {
-                    dist2Ball = wm->opp.active(i)->pos.dist(BallPos);
-                    predictedBall = wm->opp.active(i)->pos;
+            for(int j = 0 ; j < temp.size() ; j++){
+                if(wm->opp.activeAgentID(i) == temp[j]){
+                    Circle2D oppCircle(wm->opp.active(i)->pos, 1);
+                    drawer->draw(oppCircle , "red");
+                    if(oppCircle.intersection(ballSegment , &solu[0] , &solu[1]) > 0){
+                        if(solu[0].isValid() && solu[1].isValid()){
+                            if(dist2Ball != min(dist2Ball , solu[1].dist(wm->ball->pos))) {
+                                dist2Ball = min(dist2Ball, solu[1].dist(wm->ball->pos));
+                                predictedBall = solu[1];
+                            }
+                            if(dist2Ball != min(dist2Ball , solu[0].dist(wm->ball->pos))) {
+                                dist2Ball = min(dist2Ball, solu[0].dist(wm->ball->pos));
+                                predictedBall = solu[0];
+                            }
+                        }
+                        else if(solu[0].isValid()){
+                            if(dist2Ball != min(dist2Ball , solu[0].dist(wm->ball->pos))) {
+                                dist2Ball = min(dist2Ball, solu[0].dist(wm->ball->pos));
+                                predictedBall = solu[0];
+                            }
+                            if(oppCircle.intersection(ballLine , &solu[3] , &solu[4]) > 1) {
+                                drawer->draw(Circle2D(wm->ball->pos , 0.2) , "cyan");
+                                return wm->ball->pos;
+                            }
+
+                        }
+                        else if(solu[1].isValid()){//Lhum!!!
+                            if(dist2Ball != min(dist2Ball , solu[1].dist(wm->ball->pos))) {
+                                dist2Ball = min(dist2Ball, solu[1].dist(wm->ball->pos));
+                                predictedBall = solu[1];
+                            }
+                            if(oppCircle.intersection(ballLine , &solu[3] , &solu[4]) > 1) {
+                                drawer->draw(Circle2D(wm->ball->pos , 0.2) , "cyan");
+                                return wm->ball->pos;
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-    if(_isGoalie)
-        ROS_INFO_STREAM("ED: Shoroa");
     if (dist2Ball != 1000) {
-        drawer->draw(QString("Def Predicted Level 1"), Vector2D(0, 2), "red");
-        drawer->draw(predictedBall);
-        if(_isGoalie)
-            ROS_INFO_STREAM("ED: E");
-        drawer->draw(Circle2D(predictedBall , 0.5) , "blue");
+        drawer->draw(Circle2D(predictedBall , 0.3) , "blue");
         return predictedBall;
     }
-   /* else if (wm->field->isInOurPenaltyArea(BallPos + wm->ball->) && BallVel.length() > 0.5) {//////////Lhum
+   /* else if (wm->field->isInOurPenaltyArea(BallPos + wm->ball->) && BallVel.length() > 0.5) {
         if ((BallVel.x <= 0.2 || _isGoalie))
             predictedBall = BallPos + BallVel;
         }
