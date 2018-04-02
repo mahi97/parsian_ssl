@@ -503,58 +503,58 @@ void CDynamicAttack::playMake() {
 
     Vector2D og = wm->ball->pos - wm->field->ourGoal();
     switch (currentPlan.playmake.skill) {
-        case PlayMakeSkill ::Dribble:
-            ROS_INFO_STREAM("kian: drrible");//<< currentPlan.playmake.skill);
-            ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
-            roleAgentPM -> setTargetDir(currentPlan.passPos);
-            roleAgentPM -> setTarget(oppRob);
-            roleAgentPM -> setChip(false);
-            roleAgentPM -> setNoKick(true);
-            roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Dribble); // skill Dribble
-            break;
-        case PlayMakeSkill ::Pass:
-            ROS_INFO_STREAM("kian: pass");
-            ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
-            roleAgentPM -> setChip(chipOrNot(currentPlan.passPos, 0.5, 0.1));
-            roleAgentPM -> setTarget(currentPlan.passPos);
-            roleAgentPM -> setEmptySpot(false);
-            roleAgentPM -> setNoKick(false);
-            if (roleAgentPM->getChip()) {
-//            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
-                roleAgentPM->setChipDist(7);
+    case PlayMakeSkill ::Dribble:
+        ROS_INFO_STREAM("kian: drrible");//<< currentPlan.playmake.skill);
+        ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
+        roleAgentPM -> setTargetDir(currentPlan.passPos);
+        roleAgentPM -> setTarget(oppRob);
+        roleAgentPM -> setChip(false);
+        roleAgentPM -> setNoKick(true);
+        roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Dribble); // skill Dribble
+        break;
+    case PlayMakeSkill ::Pass:
+        ROS_INFO_STREAM("kian: pass");
+        ROS_INFO_STREAM("kian: passpos: " << currentPlan.passPos.x << ", " << currentPlan.passPos.y << "//////////////////");
+        roleAgentPM -> setChip(chipOrNot(currentPlan.passPos, 0.5, 0.1));
+        roleAgentPM -> setTarget(currentPlan.passPos);
+        roleAgentPM -> setEmptySpot(false);
+        roleAgentPM -> setNoKick(false);
+        if (roleAgentPM->getChip()) {
+            //            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
+            roleAgentPM->setChipDist(7);
+        } else {
+            //            roleAgentPM->setKickSpeed(appropriatePassSpeed());
+            roleAgentPM->setKickSpeed(6);
+        }
+
+        roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Pass);// Skill Kick
+
+        /////////////////////////////// I HATE PARSA
+        //        for(int i = 0; i < wm->opp.activeAgentsCount(); i++)
+        //            if(ballPos.dist(wm->field->oppGoal()) < 0.7 && Circle2D(wm->opp[wm->opp.activeAgentID(i)]->pos + wm->opp[wm->opp.activeAgentID(i)]->dir.norm()*0.08,0.07).contains(ballPos))
+        //                roleAgentPM -> setSelectedSkill(DynamicEnums::Dribble); // skill Dribble
+        //            else
+        //                roleAgentPM -> setSelectedSkill(DynamicEnums::Pass);// Skill Kick
+        // TODO : fix this dastan
+        /*if(isRightTimeToPass()) {
+                roleAgentPM->setNoKick(false); //TEST
             } else {
-//            roleAgentPM->setKickSpeed(appropriatePassSpeed());
-                roleAgentPM->setKickSpeed(6);
-            }
+                roleAgentPM->setNoKick(true);
+            }*/
+        //        if(isInpass())
+        //            swapPlaymakeInPass();
+        break;
 
-            roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Pass);// Skill Kick
-
-            /////////////////////////////// I HATE PARSA
-            //        for(int i = 0; i < wm->opp.activeAgentsCount(); i++)
-            //            if(ballPos.dist(wm->field->oppGoal()) < 0.7 && Circle2D(wm->opp[wm->opp.activeAgentID(i)]->pos + wm->opp[wm->opp.activeAgentID(i)]->dir.norm()*0.08,0.07).contains(ballPos))
-            //                roleAgentPM -> setSelectedSkill(DynamicEnums::Dribble); // skill Dribble
-            //            else
-            //                roleAgentPM -> setSelectedSkill(DynamicEnums::Pass);// Skill Kick
-            // TODO : fix this dastan
-            /*if(isRightTimeToPass()) {
-                    roleAgentPM->setNoKick(false); //TEST
-                } else {
-                    roleAgentPM->setNoKick(true);
-                }*/
-//        if(isInpass())
-//            swapPlaymakeInPass();
-            break;
-
-        case PlayMakeSkill ::Chip:
-            ROS_INFO_STREAM("chip");
-            roleAgentPM->setNoKick(false);
-            if (currentPlan.playmake.region == DynamicRegion ::Goal) {
-                roleAgentPM ->setTarget(wm->field->oppGoal());
-                roleAgentPM->setChip(true);
-                if (wm->ball->pos.x < -2) {
-                    roleAgentPM ->setChipDist(conf.HighDistChip);
-                } else {
-                    roleAgentPM ->setChipDist(conf.MediumDistChip);
+    case PlayMakeSkill ::Chip:
+        ROS_INFO_STREAM("chip");
+        roleAgentPM->setNoKick(false);
+        if (currentPlan.playmake.region == DynamicRegion ::Goal) {
+            roleAgentPM ->setTarget(wm->field->oppGoal());
+            roleAgentPM->setChip(true);
+            if (wm->ball->pos.x < -2) {
+                roleAgentPM ->setChipDist(conf.HighDistChip);
+            } else {
+                roleAgentPM ->setChipDist(conf.MediumDistChip);
 
                 }
             } else if (currentPlan.playmake.region == DynamicRegion ::Forward) {
@@ -1011,10 +1011,10 @@ void CDynamicAttack::swapPlaymakeInPass()
 {
     if(playmakeIntention.elapsed() <= 1000)
     {
-//        agents.append(playmake);
-//        playmakeID = receiver->id();
-//        playmake = receiver;
-//        agents.removeOne(receiver);
+        //        agents.append(playmake);
+        //        playmakeID = receiver->id();
+        //        playmake = receiver;
+        //        agents.removeOne(receiver);
     }
 }
 
@@ -2059,23 +2059,39 @@ double CDynamicAttack::caclClearPathFactor(Vector2D point, Vector2D passSenderPo
         return 0.0;
 }
 
-double CDynamicAttack::calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos)
+double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 {
-    double oneTouchAngleFactor;
-    double oneTouchAng = fabs((passSenderPos - point).th().degree() - (wm->field->oppGoal() - point).th().degree());
-    if(oneTouchAng <= 45)
-    {
-        oneTouchAngleFactor = 0.9*(oneTouchAng/45.0);
-    }
-    else if(oneTouchAng <= 90)
-    {
-        oneTouchAngleFactor = 0.9 + 0.1*(90-oneTouchAng)/45;
-    }
-    else
-    {
-        oneTouchAngleFactor = 0;
-    }
-    return oneTouchAngleFactor;
+    auto ballPos = wm->ball->pos;
+    Line2D ballToPointLine(robotPos, ballPos);
+
+    auto fieldWidth = wm->field->_FIELD_WIDTH;
+    auto penaltyWidth = wm->field->_PENALTY_WIDTH;
+
+    auto robotBallDir = (ballPos - robotPos).norm();
+    double oneTouchAngle = 60;
+
+    if(robotBallDir.x <= 0 )
+        return 0;
+
+    auto forwardRotatedDir = robotBallDir.rotate(oneTouchAngle);
+    auto backwardRotatedDir = robotBallDir.rotate(-oneTouchAngle);
+
+    double alpha = 0.1;
+    Line2D leftLine(robotPos, forwardRotatedDir*alpha);
+    Line2D rightLine(robotPos, backwardRotatedDir*alpha);
+
+    double highIntersect = leftLine.getY(wm->field->oppGoal().x);
+    double lowIntersect = rightLine.getY(wm->field->oppGoal().x);
+
+    auto effectiveHigh = highIntersect > fieldWidth/2 ? fieldWidth/2 : highIntersect;
+    auto effectiveLow = lowIntersect < -(fieldWidth/2) ? -(fieldWidth/2) : lowIntersect;
+
+    double penaltyOffset = 0.3;
+    auto extendedWidth = penaltyWidth + 2*penaltyOffset;
+
+    auto resultRatio = ((effectiveHigh > extendedWidth/2)?extendedWidth/2:effectiveHigh
+                                                               - (effectiveLow<-extendedWidth/2)?-extendedWidth:effectiveLow)/extendedWidth;
+    return resultRatio;
 }
 
 double CDynamicAttack::calcWidenessFactor(Vector2D passSenderPos, Vector2D point)
@@ -2093,10 +2109,10 @@ void CDynamicAttack::hamidDebug()
     for(int i{0}; i<11; i++)
     {
         ROS_INFO_STREAM("hamid weights of row " << i << " : " << robotRegionsWeights[i][0]
-                                                << " " << robotRegionsWeights[i][1] << " " << robotRegionsWeights[i][2] << " "
-                                                << robotRegionsWeights[i][3] << " " << robotRegionsWeights[i][4] << " "
-                                                << robotRegionsWeights[i][5] << " " << robotRegionsWeights[i][6] << " "
-                                                << robotRegionsWeights[i][7] << " " << robotRegionsWeights[i][8]);
+                << " " << robotRegionsWeights[i][1] << " " << robotRegionsWeights[i][2] << " "
+                << robotRegionsWeights[i][3] << " " << robotRegionsWeights[i][4] << " "
+                << robotRegionsWeights[i][5] << " " << robotRegionsWeights[i][6] << " "
+                << robotRegionsWeights[i][7] << " " << robotRegionsWeights[i][8]);
     }
 
     for(int i{0}; i<11; i++)

@@ -28,11 +28,11 @@ class getPlan:
         if len(received) > 0:
             print ("response to gui...... update plans")
             self.response.allPlans = self.__w.update_master_active(received, req.index, req.isMaster, req.isActive)
-            return self.response
         else:
             print ("response to gui...... return all plans")
             self.response.allPlans = self.__w.get_all_plans()
-            return self.response
+        self.response.allPlans = sorted(self.response.allPlans, key=lambda x: x.planFile)
+        return self.response
 
     def handle_plan_request(self, req):
         # type: (plan_serviceRequest) -> req

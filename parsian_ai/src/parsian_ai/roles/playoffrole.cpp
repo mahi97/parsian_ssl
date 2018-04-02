@@ -48,7 +48,7 @@ void CRolePlayOff::update() {
         gotoPointAvoidSkill->setAvoidpenaltyarea(avoidPenaltyArea);
         gotoPointAvoidSkill->setMaxvelocity(maxVelocity);
         gotoPointAvoidSkill->setNoavoid(noAvoid);
-        gotoPointAvoidSkill->setBallobstacleradius(1);
+        gotoPointAvoidSkill->setBallobstacleradius(0.18);
 
         updated = false;
         break;
