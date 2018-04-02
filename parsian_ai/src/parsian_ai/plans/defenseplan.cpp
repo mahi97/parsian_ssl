@@ -2722,7 +2722,7 @@ void DefensePlan::executeGoalKeeper() {
 
     playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick();
     playOnMode = gameState->isStart();
-    stopMode = ggitameState->isStop();
+    stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
     ROS_INFO_STREAM("_________________");
