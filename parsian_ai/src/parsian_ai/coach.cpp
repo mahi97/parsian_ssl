@@ -1419,48 +1419,47 @@ POffSkills CCoach::strToEnum(const std::string& _str) {
 
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     MWBM matcher;
-    matcher.create(_plan->common.currentSize-1, _ourplayers.size()-1);
+    matcher.create(_plan->common.currentSize - 1, _ourplayers.size() - 1);
 
-    int matchedID=-1;
-    double weight=0;
-    double minweight=100;
+    int matchedID = -1;
+    double weight = 0;
+    double minweight = 100;
 
-    if(_plan->common.currentSize>2) {
-        for (int j = 0; j < _ourplayers.size(); j++) {
+    for (int j = 0; j < _ourplayers.size(); j++) {
 
-            weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
-            if(weight < minweight) {
-                minweight = weight;
-                matchedID = j;
-            }
+        weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
+        if (weight < minweight) {
+            minweight = weight;
+            matchedID = j;
         }
-        ROS_INFO_STREAM("nanapasser:"<<_ourplayers.at(matchedID)<<"__"<<matchedID);
-        if(matchedID!=-1) {
-            _plan->common.matchedID.insert(0, _ourplayers.at(matchedID));
-        }
-        for (int i = 1; i < _plan->common.currentSize; i++) {
-            for (int j = 0; j < _ourplayers.size(); j++) {
-                if (j != matchedID) {
-                    double weight;
-                    weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
-                    matcher.setWeight(i-1, j, -(weight));
-                    ROS_INFO_STREAM("nanaa:"<<j);
-
-                }
-            }
-        }
-        int nmatchedID=-1;
-        qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
-        for (size_t i = 1; i < _plan->common.currentSize; i++) {
-            nmatchedID = matcher.getMatch(i-1);
-            if(nmatchedID>=matchedID)
-                nmatchedID++;
-            _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
-            ROS_INFO_STREAM("nana:"<<_ourplayers.at(nmatchedID)<<"__"<<i<<"__"<<nmatchedID);
-
-        }
-        qDebug() << "[Coach] matched by" << _plan->common.matchedID;
     }
+    ROS_INFO_STREAM("nanapasser:" << _ourplayers.at(matchedID) << "__" << matchedID);
+    if (matchedID != -1) {
+        _plan->common.matchedID.insert(0, _ourplayers.at(matchedID));
+    }
+    for (int i = 1; i < _plan->common.currentSize; i++) {
+        for (int j = 0; j < _ourplayers.size(); j++) {
+            if (j != matchedID) {
+                double weight;
+                weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
+                matcher.setWeight(i - 1, j, -(weight));
+                ROS_INFO_STREAM("nanaa:" << j);
+
+            }
+        }
+    }
+    int nmatchedID = -1;
+    qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
+    for (size_t i = 1; i < _plan->common.currentSize; i++) {
+        nmatchedID = matcher.getMatch(i - 1);
+        if (nmatchedID >= matchedID)
+            nmatchedID++;
+        _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
+        ROS_INFO_STREAM("nana:" << _ourplayers.at(nmatchedID) << "__" << i << "__" << nmatchedID);
+
+    }
+    qDebug() << "[Coach] matched by" << _plan->common.matchedID;
+
 }
 
 
