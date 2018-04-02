@@ -277,6 +277,7 @@ private:
 
     QList<int> kianmatchedIDList;
     bool PMfromCoach;
+    Vector2D getEmptyTarget(const Vector2D& _position, const double& _radius) {
     /////////Intentions
 //    int intenHighProb;
 

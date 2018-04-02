@@ -520,11 +520,11 @@ void CDynamicAttack::playMake() {
         roleAgentPM -> setEmptySpot(false);
         roleAgentPM -> setNoKick(false);
         if (roleAgentPM->getChip()) {
-            //            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
-            roleAgentPM->setChipDist(7);
+//            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
+            roleAgentPM->setChipDist(conf.MediumDistChip);
         } else {
-            //            roleAgentPM->setKickSpeed(appropriatePassSpeed());
-            roleAgentPM->setKickSpeed(6);
+//            roleAgentPM->setKickSpeed(appropriatePassSpeed());
+            roleAgentPM->setKickSpeed(conf.MediumSpeedPass);
         }
 
         roleAgentPM -> setSelectedPlayMakeSkill(PlayMakeSkill ::Pass);// Skill Kick
@@ -577,16 +577,27 @@ void CDynamicAttack::playMake() {
             roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
             break;
         }
-        default:
-            ROS_INFO_STREAM("default");
-            roleAgentPM->setEmptySpot(true);
-            roleAgentPM->setChip(false);
-            roleAgentPM->setNoKick(false);
-            roleAgentPM->setTarget(wm->field->oppGoal());
-            // Parsa : ino hamintory avaz kardam kar kard...
-            roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
-            roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
-            break;
+        roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Chip);// Skill Chip
+        break;
+    case PlayMakeSkill ::Shot: {
+        roleAgentPM->setEmptySpot(true);
+        roleAgentPM->setChip(false);
+        roleAgentPM->setNoKick(false);
+        roleAgentPM->setTarget(wm->field->oppGoal());
+        roleAgentPM->setKickSpeed(conf.HighSpeedPass); // TODO : 8m/s by profiller
+        roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
+        break;
+    }
+    default:
+        ROS_INFO_STREAM("default");
+        roleAgentPM->setEmptySpot(true);
+        roleAgentPM->setChip(false);
+        roleAgentPM->setNoKick(false);
+        roleAgentPM->setTarget(wm->field->oppGoal());
+        // Parsa : ino hamintory avaz kardam kar kard...
+        roleAgentPM->setKickSpeed(conf.MediumSpeedPass); // TODO : 8m/s by profiller
+        roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
+        break;
     }
 }
 
@@ -2140,6 +2151,61 @@ void CDynamicAttack::hamidDebug()
         }
     }
 }
+
+QList<Vector2D> CDynamicAttack::getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D tempTarget;
+    QList<Vector2D> finalTargets;
+    Vector2D optimalTarget{6, 0};
+    finalTargets.clear();
+    bool opp{false};
+    finalTarget = _position;
+    for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
+        if (Circle2D(wm->opp.active(i)->pos, 0.6).contains(_position)
+            || !wm->field->isInField(_position)
+            || wm->field->isInOppPenaltyArea(_position)
+            || wm->field->isInOurPenaltyArea(_position)) {
+            opp = true;
+            break;
+        }
+    }
+    if (!opp)
+        finalTargets.append(tempTarget);
+    for (double dist = 0.2 ; dist <= _radius ; dist += 0.2) {
+        for (double ang = -180.0 ; ang <= 180.0 ; ang += 18.0/dist) {
+            opp = false;
+            tempTarget = _position + Vector2D::polar2vector(dist, ang);
+            for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
+                if (Circle2D(wm->opp.active(i)->pos, 0.6).contains(tempTarget)
+                    || !wm->field->isInField(tempTarget)
+                    || wm->field->isInOppPenaltyArea(tempTarget)
+                    || wm->field->isInOurPenaltyArea(tempTarget)) {
+                    opp = true;
+                    break;
+                }
+
+            }
+            if (!opp) {
+                finalTargets.append(tempTarget);
+            }
+        }
+    }
+    double optimalmindist = 10000;
+    for(const auto& target : finalTarget)
+    {
+        double mindist{10000};
+        for (int i = 0; i < wm->opp.activeAgentsCount(); i++)
+        {
+            dist = wm->opp.active(i)->pos.dist(target);
+            if(dist < mindist)
+                mindist = dist;
+        }
+        if(mindist < optimalmindist)
+            optimalTarget = target;
+
+    }
+
+
+    return optimalTarget;
 
 void CDynamicAttack::validateSegment(Segment2D& seg) {
     Vector2D sol1, sol2;
