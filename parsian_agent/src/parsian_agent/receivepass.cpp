@@ -143,6 +143,21 @@ void CSkillReceivePass::execute() {
                             sol1 = sol2;
                         }
                     }
+                    if(sol1.x == wm->field->oppGoal().x)
+                        sol1 = sol2;
+                    intersectPos = sol1;
+                }
+            }
+            if(intersectPos.x < -1 * wm->field->_FIELD_WIDTH/2 +  wm->field->_PENALTY_DEPTH + 0.1 && fabs(intersectPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+                if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+                   drawer->draw(wm->field->ourBigPenaltyArea(1,0.1,0),QColor(Qt::red),true);
+                    if(sol1.dist(intersectPos) > sol2.dist(intersectPos)) {
+                        if(sol2.x >= -1 * wm->field->_FIELD_WIDTH/2 + 0.02) {
+                            sol1 = sol2;
+                        }
+                    }
+                    if(sol1.x == wm->field->ourGoal().x)
+                        sol1 = sol2;
                     intersectPos = sol1;
                 }
             }
