@@ -77,9 +77,10 @@ void CPlayOff::globalExecute() {
     if (masterMode == NGameOff::StaticPlay) {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (ros::Time::now().sec - lastTime > 1000 && !initial && lastBallPos.dist(wm->ball->pos) > 0.06) {
+        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
             //             TODO : write critical play here
             if (criticalPlay()) {
+                ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
             }
             return;
@@ -253,7 +254,7 @@ void CPlayOff::staticExecute() {
 
             if (isPlanEnd() && false) {
                 playOnFlag = true;
-                ROS_INFO("Playofff Ends");
+                ROS_INFO("Playoff Ends");
             }
 
         } else {
@@ -277,9 +278,11 @@ void CPlayOff::kickoffPositioning(int playersNum) {
 
 void CPlayOff::dynamicExecute() {
 
-
     if (dynamicSelect == CHIP && false) {
-        dynamicPlayChipToGoal();
+        dynamicPlayChipToGoal(true);
+        checkEndChipToGoal();
+    } else if(dynamicSelect == KICK){
+        dynamicPlayChipToGoal(false);
         checkEndChipToGoal();
     } else if (dynamicSelect == KHAFAN || 1) {
         dynamicPlayKhafan();
@@ -308,7 +311,7 @@ void CPlayOff::dynamicAssignID() {
     }
 }
 
-void CPlayOff::dynamicPlayChipToGoal() {
+void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
     if (initial) {
         dynamicAssignID();
         ready = true;
@@ -316,7 +319,7 @@ void CPlayOff::dynamicPlayChipToGoal() {
     } else if (ready) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
-        roleAgent[0] -> setChip(true);
+        roleAgent[0] -> setChip(isChip);
         double speed = 8;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
@@ -586,16 +589,18 @@ Vector2D CPlayOff::getDynamicTarget(int i) {
     first.y += 0.3;
 
     switch (i) {
-    case 1:
-        return first;
-    case 2:
-        return Vector2D{3.2, 0.3};
-    case 3:
-        return Vector2D{3.2,  -0.3};
-    case 4:
-        return Vector2D{0,  0};
-    default:
-        return Vector2D::INVALIDATED;
+        case 1:
+            return first;
+        case 2:
+            return Vector2D{3.2, 0.7};
+        case 3:
+            return Vector2D{3.2, -0.7};
+        case 4:
+            return Vector2D{3, 1.5};
+        case 5:
+            return Vector2D{3, -1.5};
+        default:
+            return Vector2D::INVALIDATED;
     }
 }
 
@@ -933,6 +938,7 @@ void CPlayOff::kickOffStopModePlay(int tAgentsize) {
             newRoleAgent[i]->setAvoidBall(true);
             newRoleAgent[i]->setAvoidPenaltyArea(true);
             newRoleAgent[i]->setSelectedSkill(RoleSkill::GotopointAvoid);
+            newRoleAgent[i]->setAvoidBall(true);
 
         }
     }
@@ -1095,7 +1101,7 @@ bool CPlayOff::isPlanEnd() {
         DBUG("Plan Succeded", D_MAHI);
         return true;
 
-    } else if (isPlanFaild()) {
+    } else if (isPlanFailed()) {
         if (lastBallPos.dist(wm->ball->pos) > 0.06) {
             DBUG("Plan Fully Failed", D_MAHI);
             return true;
@@ -1104,7 +1110,6 @@ bool CPlayOff::isPlanEnd() {
             return false;
         }
     }
-
     return false;
 }
 
@@ -1133,7 +1138,7 @@ bool CPlayOff::isPlanDone() {
 }
 
 
-bool CPlayOff::isPlanFaild() {
+bool CPlayOff::isPlanFailed() {
     SFail fail = isAnyTaskFaild();
     if (isTimeOver()) {
         DBUG("Faild By Time Over", D_MAHI);
@@ -1247,6 +1252,7 @@ bool CPlayOff::isTimeOver() {
             return true;
         }
     }
+
     return false;
 }
 
@@ -1308,36 +1314,29 @@ bool CPlayOff::isFinalShotDone() {
     return false;
 }
 
-Vector2D CPlayOff::getEmptyTarget(Vector2D _position, double _radius) {
-    Vector2D tempTarget, finalTarget, position;
-    double escapeRad;
-    int oppCnt = 0;
-    bool posFound;
-    escapeRad = _radius;
-    position  = _position;
-    finalTarget = position;
-    for (double dist = 0.0 ; dist <= 0.5 ; dist += 0.2) {
-        for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
-            tempTarget = position + Vector2D::polar2vector(dist, ang);
-            ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
-                continue;
-            }
+Vector2D CPlayOff::getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D tempTarget, finalTarget;
+    bool opp;
+    finalTarget = _position;
+    for (double dist = 0.2 ; dist <= _radius ; dist += 0.2) {
+        for (double ang = -180.0 ; ang <= 180.0 ; ang += 18.0/dist) {
+            opp = false;
+            tempTarget = _position + Vector2D::polar2vector(dist, ang);
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-                if (Circle2D(wm->opp.active(i)->pos, 0.07).contains(tempTarget)) {
-                    oppCnt = 1;
+                if (Circle2D(wm->opp.active(i)->pos, 0.25).contains(tempTarget)
+                    || !wm->field->isInField(tempTarget)
+                    || wm->field->isInOppPenaltyArea(tempTarget)
+                    || wm->field->isInOurPenaltyArea(tempTarget)) {
+                    opp = true;
                     break;
                 }
 
             }
-            if (!oppCnt) {
+            if (!opp) {
                 finalTarget = tempTarget;
-                posFound = true;
+                dist = _radius*2; // to break upper loop
                 break;
             }
-        }
-        if (posFound) {
-            break;
         }
     }
 
@@ -1679,7 +1678,7 @@ void CPlayOff::assignSupport(CRolePlayOff * _roleAgent,
     _roleAgent->setAvoidBall(false);
     _roleAgent->setSlow(false);
     _roleAgent->setTargetDir(_roleAgent->getAgent()->pos() - wm->ball->pos);
-    _roleAgent->setTarget(getEmptyTarget(tempTarget, .4));
+    _roleAgent->setTarget(getEmptyTarget(tempTarget, .5));
     _roleAgent->setSelectedSkill(RoleSkill::GotopointAvoid); //GotoPointAvoid
 }
 

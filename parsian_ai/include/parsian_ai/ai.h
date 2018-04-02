@@ -8,6 +8,7 @@
 #include <parsian_msgs/parsian_team_config.h>
 #include <parsian_ai/util/worldmodel.h>
 #include <parsian_msgs/ssl_refree_wrapper.h>
+#include <parsian_msgs/ssl_force_referee.h>
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_util/core/worldmodel.h>
 #include <parsian_util/core/knowledge.h>
@@ -26,9 +27,10 @@ public:
     void updateWM(const parsian_msgs::parsian_world_modelConstPtr&);
     void updateRobotStatus(const parsian_msgs::parsian_robotConstPtr&);
     void updateReferee(const parsian_msgs::ssl_refree_wrapperConstPtr&);
+    void forceUpdateReferee(const parsian_msgs::ssl_force_refereeConstPtr & _command);
     CSoccer* getSoccer();
 
-    parsian_msgs::parsian_draw   getDraw() {
+    parsian_msgs::parsian_draw getDraw() {
         return drawer->draws;
     }
 

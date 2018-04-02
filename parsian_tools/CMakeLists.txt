@@ -64,7 +64,7 @@ catkin_package(
         INCLUDE_DIRS
         include
         LIBRARIES ${PROJECT_NAME}_nodelet
-        CATKIN_DEPENDS nodelet parsian_msgs roscpp rospy 
+        CATKIN_DEPENDS nodelet parsian_msgs roscpp rospy
         #  DEPENDS
 )
 

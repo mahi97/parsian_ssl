@@ -65,6 +65,8 @@ public:
     ros::Publisher *ai_status_pub;
     ros::ServiceClient plan_client;
 
+    bool gotplan;
+
     void setPlanClient(const ros::ServiceClient &_plan_client);
 
     void setBehaviorPublisher(ros::Publisher &_behaver_publisher);
@@ -75,7 +77,6 @@ public:
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
-    bool ballChiped();
 private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
@@ -168,7 +169,6 @@ private:
 
     void virtualTheirPlayOffState();
 
-    bool transientFlag;
     QTime trasientTimeOut;
     int translationTimeOutTime;
 
@@ -233,9 +233,11 @@ private:
     double lastNearestBallDist;
     double averageVel;
     QList<Vector2D> lastBallVels;
+    Vector2D startTransientBallPos;
 
     void removeLastBallVel();
     void clearBallVels();
+
     //////////////Decide Attack functions
 
     void decideHalt(QList<int> &);
