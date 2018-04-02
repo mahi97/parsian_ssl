@@ -1859,13 +1859,13 @@ void CDynamicAttack::chooseBestPositons_new()
                     double widenessFactor = 0;
 
                     // factors for shoot
-                    double oneTouchAngleFactor = 0; // if the angle to the opp goal is whitin a desird interval
+//                    double oneTouchAngleFactor = 0; // if the angle to the opp goal is whitin a desird interval
                     double shootFactor = 0;
 
                     receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID, region_id);
                     senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
                     clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
-                    oneTouchAngleFactor = calcOneTouchAngleFactor(point, passSenderPos);
+//                    oneTouchAngleFactor = calcOneTouchAngleFactor(point, passSenderPos);
                     widenessFactor = calcWidenessFactor(passSenderPos, point);
 
                     double f = 1.0;
@@ -1873,7 +1873,7 @@ void CDynamicAttack::chooseBestPositons_new()
                     prob += f1(receiverDistanceFactor,2.0*f);
                     prob += f1(senderDistanceFactor,0.1*f);
                     prob += f1(clearPathFactor,1.0*f);
-                    prob += f1(oneTouchAngleFactor,0.1*f);
+//                    prob += f1(oneTouchAngleFactor,0.1*f);
                     prob  = fm1(prob,5.2*f);
 
                     if( prob > maxProbability )
@@ -2142,7 +2142,7 @@ double CDynamicAttack::caclClearPathFactor(Vector2D point, Vector2D passSenderPo
         return 0.0;
 }
 
-double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passSenderPos)
+double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 {
     auto ballPos = wm->ball->pos;
     Line2D ballToPointLine(robotPos, ballPos);
@@ -2153,7 +2153,7 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passS
     auto robotBallDir = (ballPos - robotPos).norm();
     double oneTouchAngle = 60;
 
-    if(robotDir.x <= 0 )
+    if(robotBallDir.x <= 0 )
         return 0;
 
     auto forwardRotatedDir = robotBallDir.rotate(oneTouchAngle);
@@ -2172,8 +2172,8 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos, Vector2D passS
     double penaltyOffset = 0.3;
     auto extendedWidth = penaltyWidth + 2*penaltyOffset;
 
-    auto resultRatio = ((effectiveHigh > penaltyWidth/2)?penaltyWidth/2:effectiveHigh
-                                                               - (effectiveLow<-penaltyWidth/2)?-penaltyWidth:effectiveLow)/extendedWidth;
+    auto resultRatio = ((effectiveHigh > extendedWidth/2)?extendedWidth/2:effectiveHigh
+                                                               - (effectiveLow<-extendedWidth/2)?-extendedWidth:effectiveLow)/extendedWidth;
     return resultRatio;
 }
 
