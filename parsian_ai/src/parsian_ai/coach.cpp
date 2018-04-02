@@ -617,11 +617,11 @@ void CCoach::decideAttack() {
     // find unused agents!
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
-        ourActivePlayersID.removeOne(goalieAgent->id());
+        ourPlayersID.removeOne(goalieAgent->id());
     }
     for (auto defenseAgent : defenseAgents) {
-        if (ourActivePlayersID.contains(defenseAgent->id())) {
-            ourActivePlayersID.removeOne(defenseAgent->id());
+        if (ourPlayersID.contains(defenseAgent->id())) {
+            ourPlayersID.removeOne(defenseAgent->id());
         }
     }
 
@@ -666,11 +666,11 @@ void CCoach::decideAttack() {
         break;
 
     case States::OurPenaltyShootOut:
-        decideOurPenaltyshootout(ourActivePlayersID);
+        decideOurPenaltyshootout(ourPlayersID);
         break;
 
     case States::TheirPenaltyShootOut:
-        decideTheirPenaltyshootout(ourActivePlayersID);
+        decideTheirPenaltyshootout(ourPlayersID);
         break;
 
     case States::TheirPenaltyKick:
@@ -695,7 +695,7 @@ void CCoach::decideAttack() {
     }
 
     QList<Agent*> ourAgents;
-    for (auto& ourPlayer : ourActivePlayersID) {
+    for (auto& ourPlayer : ourPlayersID) {
         ourAgents.append(agents[ourPlayer]);
     }
 
@@ -703,7 +703,7 @@ void CCoach::decideAttack() {
     selectedPlay->execute();
 
     lastPlayers.clear();
-    lastPlayers.append(ourActivePlayersID);
+    lastPlayers.append(ourPlayersID);
 }
 
 void CCoach::decidePlayOff(QList<int>& _ourPlayers, POMODE _mode) {
