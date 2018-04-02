@@ -536,7 +536,8 @@ double CCoach::findMostPossible(Vector2D agentPos) {
     }
     double prob, angle, biggestAngle;
 
-    getEmptyAngle(agentPos - (wm->field->oppGoal() - agentPos).norm() * 0.15, wm->field->oppGoalL(), wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    getEmptyAngle2(agentPos - (wm->field->oppGoal() - agentPos).norm() * 0.15, wm->field->oppGoalL(),
+                   wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
 
 
     return prob;

@@ -5,6 +5,7 @@
 #ifndef PARSIAN_AI_MAHI_H
 #define PARSIAN_AI_MAHI_H
 
+#include <parsian_util/geom/geom.h>
 
 inline double getangle(double x1, double y1, double x2, double y2) {
     return atan2(y2 - y1, x2 - x1);
@@ -55,7 +56,8 @@ inline double normalangabs(double dir) {
     return dir;
 }
 
-double getEmptyAngle(const Vector2D& p, const Vector2D& p1, const Vector2D& p2, const QList<Circle2D>& obs, double &percent, double &mostOpenAngle, double &biggestAngle) {
+double getEmptyAngle2(const Vector2D &p, const Vector2D &p1, const Vector2D &p2, const QList<Circle2D> &obs,
+                      double &percent, double &mostOpenAngle, double &biggestAngle) {
 
     double gx1 = p1.x;
     double gy1 = p1.y;

@@ -1065,7 +1065,7 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
         validateSegment(recieveSegment);
         double angle = 0, biggestAngle = 0, prob = 0;
 
-        getEmptyAngle(playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
+        getEmptyAngle2(playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
         points.append(recieveSegment.intersection(Line2D(playmake->pos(), angle)));
         probs.append(prob);
 
