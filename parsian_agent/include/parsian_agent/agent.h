@@ -32,7 +32,6 @@ struct Fault {
 class CSkill;
 class Agent {
 public:
-    bool fault = false;
     class Abilities {
     public:
         Abilities();
