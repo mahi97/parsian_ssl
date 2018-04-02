@@ -630,6 +630,7 @@ void CCoach::decideAttack() {
         return;
         break;
     case States::Stop:
+        ourBallPlacement->first = true;
         decideStop(ourPlayersID);
         return;
         break;
