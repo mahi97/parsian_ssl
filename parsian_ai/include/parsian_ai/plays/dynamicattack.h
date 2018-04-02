@@ -277,14 +277,13 @@ private:
 
     QList<int> kianmatchedIDList;
     bool PMfromCoach;
-    Vector2D getEmptyTarget(const Vector2D& _position, const double& _radius) {
+    Vector2D getEmptyTarget(const Vector2D& _position, const double& _radius);
     /////////Intentions
 //    int intenHighProb;
 
     //// MAHI STUFF
     int lastAgentCount;
     void validateSegment(Segment2D& segment);
-
 
 protected:
     void reset() override;
