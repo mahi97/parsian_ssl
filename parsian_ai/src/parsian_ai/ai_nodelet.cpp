@@ -24,6 +24,7 @@ void AINodelet::onInit() {
     behaviorSub = nh.subscribe("/behavior", 100, &AINodelet::behaviorCb, this);
     mousePosSub = nh.subscribe("/mousePos", 100, &AINodelet::mousePosCb, this);
     forceRefereeSub = nh.subscribe("/force_referee", 100, &AINodelet::forceRefereeCallBack, this);
+    robotfaultSub = nh.subscribe("/autofault", 100, &AINodelet::faultdetectionCallBack, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
     timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
@@ -75,6 +76,10 @@ void AINodelet::worldModelCallBack(const parsian_msgs::parsian_world_modelConstP
 
 void AINodelet::refereeCallBack(const parsian_msgs::ssl_refree_wrapperConstPtr & _ref) {
     ai->updateReferee(_ref);
+}
+
+void AINodelet::faultdetectionCallBack(const parsian_msgs::parsian_robot_fault & _rs) {
+    ai->updateRobotFaults(_rs);
 }
 
 void AINodelet::forceRefereeCallBack(const parsian_msgs::ssl_force_refereeConstPtr & _command){

@@ -40,6 +40,7 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     initial    = true;
     playOnFlag = false;
     firstPass  = true;
+    isOnetouch = false;
     havePassInPlan    = false;
     playoff_badPasserID = -1;
 
@@ -1247,7 +1248,7 @@ bool CPlayOff::isTimeOver() {
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
         ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
-        if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
+        if(ros::Time::now().sec - tempStart >= 3*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;
         }
@@ -1360,6 +1361,7 @@ void CPlayOff::passManager() {
         doAfterlife = !Circle2D(lastBallPos, 0.4).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
+
 }
 
 /**
@@ -1466,11 +1468,30 @@ void CPlayOff::fillRoleProperties() {
                     if (x.id == i) {
                         if (i > 0 && masterPlan->execution.reciver.at(i - 1).id == x.id) {
                             if (positionAgent[i].getArgs().staticSkill == ReceivePassSkill) {
-                                positionAgent[i].stateNumber++;
-                                firstPass = false;
-                            }
-                            if (positionAgent[i].getArgs().staticSkill == PassSkill) {
+                                int index = -1;
+                                for (int j = 1;
+                                     j < positionAgent[i].positionArg.size() - positionAgent[i].stateNumber; j++) {
+                                    if (positionAgent[i].getArgs(j).staticSkill == PassSkill) {
+                                        index = j;
+                                        break;
+                                    }
+                                }
+                                if (index != -1) {
+                                    Vector2D pass_target =
+                                            positionAgent[positionAgent[i].getArgs(index).PassToId].getAbsArgs(
+                                                    positionAgent[i].getArgs(index).PassToState).staticPos;
 
+                                    Vector2D v1 = wm->ball->pos - positionAgent[i].getArgs(index).staticPos;
+                                    Vector2D v2 = pass_target - positionAgent[i].getArgs(index).staticPos;
+                                    float onetouchAngle = (float) (v1.th() - v2.th()).degree();
+                                    ROS_INFO_STREAM("onetouchAngle " << onetouchAngle << " max OnetouchAngle"
+                                                                     << conf.MaxOnetouchAngle);
+                                    if (onetouchAngle < conf.MaxOnetouchAngle) {
+                                        positionAgent[i].stateNumber++;
+                                        firstPass = false;
+                                        isOnetouch = true;
+                                    }
+                                }
                             }
                         }
                     }
@@ -1562,7 +1583,7 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setDoPass(doPass);
     _roleAgent->setIntercept(false);
     _roleAgent->setTargetDir(_posAgent.getArgs().staticAng);
-    if(firstPass) {
+    if(firstPass || !isOnetouch) {
         _roleAgent->setSelectedSkill(RoleSkill::Kick);
     } else {
         _roleAgent->setSelectedSkill(RoleSkill::OneTouch);
@@ -1990,6 +2011,7 @@ void CPlayOff::reset() {
     blockerStep = S0;
 
     firstPass = true;
+    isOnetouch = false;
     playoff_badPasserID = -1;
 
     DBUG(QString("reset Plan"), D_MAHI);

@@ -1,26 +1,26 @@
-#include <parsian_ai/plays/theirpenaltyshootout.h>
+#include <parsian_ai/plays/ourpenaltyshootout.h>
 
-CTheirPenaltyShootout::CTheirPenaltyShootout() : CMasterPlay()
+COurPenaltyShootout::COurPenaltyShootout() : CMasterPlay()
 {
     initMaster();
     PMgotopoint  =   new GotopointavoidAction();
     PMkick       =   new KickAction();
 }
 
-CTheirPenaltyShootout::~CTheirPenaltyShootout() = default;
+COurPenaltyShootout::~COurPenaltyShootout() = default;
 
-void CTheirPenaltyShootout::reset()
+void COurPenaltyShootout::reset()
 {
     positioningPlan.reset();
     executedCycles = 0;
 }
 
-void CTheirPenaltyShootout::init(const QList<Agent*>& _agents)
+void COurPenaltyShootout::init(const QList<Agent*>& _agents)
 {
     setAgentsID(_agents);
 }
 
-void CTheirPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
+void COurPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
 {
     if(_playmakeAgent != nullptr)
     {
@@ -28,7 +28,7 @@ void CTheirPenaltyShootout::setPlaymake(Agent* _playmakeAgent)
     }
 }
 
-void CTheirPenaltyShootout::execute_x()
+void COurPenaltyShootout::execute_x()
 {
     if (playMakeAgent == nullptr || (playMakeAgent->id() == -1))
     {
@@ -45,7 +45,7 @@ void CTheirPenaltyShootout::execute_x()
     }
 }
 
-void CTheirPenaltyShootout::generatePositions()
+void COurPenaltyShootout::generatePositions()
 {
     positions.clear();
     double penaltyPositioningOffset = 0.9;
@@ -56,7 +56,7 @@ void CTheirPenaltyShootout::generatePositions()
     }
 }
 
-Vector2D CTheirPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
+Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
 {
     Vector2D tempTarget, finalTarget, position;
     double escapeRad;
@@ -90,7 +90,7 @@ Vector2D CTheirPenaltyShootout::getEmptyTarget(Vector2D _position, double _radiu
     return finalTarget;
 }
 
-void CTheirPenaltyShootout::assignSkills()
+void COurPenaltyShootout::assignSkills()
 {
     moveSkills.clear();
     for(int i{0}; i<agents.count(); i++)
@@ -104,7 +104,7 @@ void CTheirPenaltyShootout::assignSkills()
     }
 }
 
-void CTheirPenaltyShootout::playmakeInitialPositioning()
+void COurPenaltyShootout::playmakeInitialPositioning()
 {
     Vector2D direction, position;
     direction = wm->ball->pos - playMakeAgent->pos();
@@ -121,4 +121,9 @@ void CTheirPenaltyShootout::playmakeInitialPositioning()
     shootoutTimer.restart();
     timerFlag = true;
     playMakeAgent->action = PMgotopoint;
+}
+
+void COurPenaltyShootout::runShootOut()
+{
+
 }

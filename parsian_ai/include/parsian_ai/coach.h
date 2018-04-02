@@ -28,6 +28,8 @@
 #include <parsian_msgs/parsian_robot_task.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
+#include <parsian_ai/roles/fault.h>
+
 
 
 enum class BallPossesion {
@@ -77,6 +79,15 @@ public:
 
     void updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav);
 
+    void generateWorkingRobotIds();
+    QList<int> workingIDs;
+    void replacefaultedrobots();
+    CRoleFault *faultRoles[_MAX_NUM_PLAYERS];
+    void resetnonVisibleAgents();
+
+
+
+
 private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
@@ -109,6 +120,7 @@ private:
 
     CPlayOff *ourPlayOff;
     COurPenalty *ourPenalty;
+    COurPenaltyShootout* ourPenaltyShootout;
     COurBallPlacement *ourBallPlacement;
     CTheirDirect *theirDirect;
     CTheirPenalty *theirPenalty;
@@ -163,6 +175,7 @@ private:
     void decidePlayOff(QList<int> &_ourPlayers, POMODE _mode = INDIRECT);
 
     void decidePlayOn(QList<int> &ourPlayers, QList<int> &lastPlayers);
+
 
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr;
@@ -259,6 +272,10 @@ private:
     void decideOurPenalty(QList<int> &);
 
     void decideTheirPenalty(QList<int> &);
+
+    void decideOurPenaltyshootout(QList<int> &);
+
+    void decideTheirPenaltyshootout(QList<int> &);
 
     void decideStart(QList<int> &);
 
