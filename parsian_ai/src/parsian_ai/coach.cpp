@@ -8,7 +8,7 @@
 CCoach::CCoach(Agent**_agents)
 {
     clearBallVels();
-    averageVel = 0;    
+    averageVel = 0;
     goalieTrappedUnderGoalNet = false;
     inited = false;
     agents = _agents;
@@ -34,6 +34,7 @@ CCoach::CCoach(Agent**_agents)
 
     // Old Plays
     ourPenalty          = new COurPenalty;
+    ourPenaltyShootout  = new COurPenaltyShootout;
     theirDirect         = new CTheirDirect;
     theirKickOff        = new CTheirKickOff;
     theirPenalty        = new CTheirPenalty;
@@ -53,7 +54,10 @@ CCoach::CCoach(Agent**_agents)
     for (auto &stopRole : stopRoles) {
         stopRole = new CRoleStop(nullptr);
     }
-
+    //fault
+    for (auto &faultRole : faultRoles) {
+        faultRole = new CRoleFault(nullptr);
+}
     lastDefenseAgents.clear();
 
     defenseTimeForVisionProblem[0].start();
@@ -159,30 +163,30 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
     missMatchIds.clear();
     if (gameState->getState() == States::Stop || gameState->getState() == States::Halt || first) {
-        if (wm->our.activeAgentsCount() != 0u) {
+        if (workingIDs.size() != 0u) {
             robotsIdHist.clear();
-            for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-                robotsIdHist.append(wm->our.active(i)->id);
+            for (int i = 0 ; i < workingIDs.size() ; i++) {
+                robotsIdHist.append(workingIDs[i]);
             }
         }
         first = false;
     }
 
-    if (wm->our.activeAgentsCount() > _NUM_PLAYERS) {
+    if (workingIDs.size() > _NUM_PLAYERS) {
         missMatchIds.clear();
-        for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
+        for (int i = 0 ; i < workingIDs.size() ; i++) {
             for (int k = 0 ; k < robotsIdHist.count() ; k++) {
-                if (robotsIdHist.at(k) == wm->our.active(i)->id) {
+                if (robotsIdHist.at(k) == workingIDs[i]) {
                     break;
                 }
                 if (k == robotsIdHist.count() - 1) {
-                    missMatchIds.append(wm->our.active(i)->id);
+                    missMatchIds.append(workingIDs[i]);
                 }
             }
         }
     }
 
-    int agentsCount = wm->our.data->activeAgents.count() - missMatchIds.count();
+    int agentsCount = workingIDs.size() - missMatchIds.count();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -204,9 +208,10 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
-        if (know->variables["transientFlag"].toBool()) {
+        if (know->variables["transientFlag"].toBool())
+        {
             //// Add Playmake after time
-            if (trasientTimeOut.elapsed() > 800 && !wm->field->isInOurPenaltyArea(wm->ball->pos)) {
+            if (trasientTimeOut.elapsed() > 800 && !wm->field->ourBigPenaltyArea(1,0.1,0).contains(wm->ball->pos)) {
                 preferedDefenseCounts = std::max(0, agentsCount - missMatchIds.count() - 1);
 
             } else {
@@ -258,7 +263,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
         preferedDefenseCounts = 0;
     }
 
-    if (gameState->penaltyShootout()) {
+    if (gameState->penaltyShootout() || gameState->penaltyKick()) {
         preferedDefenseCounts = 0;
     }
     if(conf.StrictFormation){
@@ -273,7 +278,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
 void CCoach::calcDesiredMarkCounts(){
 
-    int agentsCount = wm->our.data->activeAgents.count();
+    int agentsCount = workingIDs.size();
     if (goalieAgent != nullptr) {
         if (goalieAgent->isVisible()) {
             agentsCount--;
@@ -331,7 +336,7 @@ void CCoach::calcDesiredMarkCounts(){
 
 
 void CCoach::assignGoalieAgent(int goalieID) {
-    QList<int> ids = wm->our.data->activeAgents;
+    QList<int> ids = workingIDs;
     goalieAgent = nullptr;
     if (ids.contains(goalieID)) {
         goalieAgent = agents[goalieID];
@@ -351,12 +356,12 @@ BallPossesion CCoach::isBallOurs() {
     }
 
     if (wm->field->isInOurPenaltyArea(wm->ball->pos)
-        &&  wm->ball->vel.length() < 0.1) {
+            &&  wm->ball->vel.length() < 0.1) {
         decidePState = BallPossesion::SOSOTHEIR;
     }
 
     if (wm->field->isInOppPenaltyArea(wm->ball->pos)
-        && wm->ball->vel.length() < 0.1) {
+            && wm->ball->vel.length() < 0.1) {
         decidePState = BallPossesion::SOSOOUR;
     }
 
@@ -375,7 +380,7 @@ void CCoach::assignDefenseAgents(int defenseCount) {
         return;
     }
 
-    QList<int> ids = wm->our.data->activeAgents;
+    QList<int> ids = workingIDs;
     if (goalieAgent != nullptr) {
         ids.removeOne(goalieAgent->id());
     }
@@ -424,7 +429,7 @@ bool CCoach::isBallcollide() {
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
 
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
-           (innerproduct < .1 && innerproduct >-.1)){
+                (innerproduct < .1 && innerproduct >-.1)){
             ROS_INFO("khord ro zamin");
             getDefense().ballBouncePos = wm->ball->pos;
             getDefense().ballIsBounced = true;
@@ -525,8 +530,8 @@ double CCoach::findMostPossible(Vector2D agentPos) {
         obstacles.append(Circle2D(wm->opp.active(i)->pos, 0.1));
     }
 
-    for (int i = 0 ; i < wm->our.activeAgentsCount() ; i++) {
-        if (wm->our.active(i)->id != playmakeId) {
+    for (int i = 0 ; i < workingIDs.size() ; i++) {
+        if (workingIDs[i] != playmakeId) {
             obstacles.append(Circle2D(wm->our.active(i)->pos, 0.1));
         }
     }
@@ -543,9 +548,8 @@ void CCoach::updateAttackState() {
     return;
 }
 
-void CCoach::choosePlaymakeAndSupporter()
-{
-    playmakeId = -1;
+void CCoach::choosePlaymakeAndSupporter(){
+    playmakeId = -1;        
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
@@ -610,7 +614,7 @@ void CCoach::choosePlaymakeAndSupporter()
 
 void CCoach::decideAttack() {
     // find unused agents!
-    QList<int> ourPlayersID = wm->our.data->activeAgents;
+    QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
     }
@@ -627,6 +631,7 @@ void CCoach::decideAttack() {
         return;
         break;
     case States::Stop:
+        ourBallPlacement->first = true;
         decideStop(ourPlayersID);
         return;
         break;
@@ -657,6 +662,14 @@ void CCoach::decideAttack() {
 
     case States::OurPenaltyKick:
         decideOurPenalty(ourPlayersID);
+        break;
+
+    case States::OurPenaltyShootOut:
+        decideOurPenaltyshootout(ourPlayersID);
+        break;
+
+    case States::TheirPenaltyShootOut:
+        decideTheirPenaltyshootout(ourPlayersID);
         break;
 
     case States::TheirPenaltyKick:
@@ -779,25 +792,25 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     bool overdef =  (selectedPlay->defensePlan.findNeededDefense() == 1) ? true : false;
     int MarkNum = 0;
     switch (ballPState) {
-        case BallPossesion::WEHAVETHEBALL:
-            MarkNum = 0;
-            break;
-        case BallPossesion::WEDONTHAVETHEBALL:
-            MarkNum = (overdef) ? 4 : 3;
-            break;
-        case BallPossesion::SOSOOUR:
-            MarkNum = 2;
-            break;
-        case BallPossesion::SOSOTHEIR:
-            MarkNum = 3;
-            break;
+    case BallPossesion::WEHAVETHEBALL:
+        MarkNum = 0;
+        break;
+    case BallPossesion::WEDONTHAVETHEBALL:
+        MarkNum = (overdef) ? 4 : 3;
+        break;
+    case BallPossesion::SOSOOUR:
+        MarkNum = 2;
+        break;
+    case BallPossesion::SOSOTHEIR:
+        MarkNum = 3;
+        break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
     MarkNum = 0;
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
-       && selectedPlay->lockAgents
-       && lastPlayers.count() == ourPlayers.count()) {
+            && selectedPlay->lockAgents
+            && lastPlayers.count() == ourPlayers.count()) {
         ourPlayers.clear();
         ourPlayers = lastPlayers;
 
@@ -862,20 +875,20 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
 
 void CCoach::setPlayOff(NGameOff::EMode _mode) {
     switch (_mode) {
-        case NGameOff::StaticPlay:
-            setStaticPlay();
-            break;
-        case NGameOff::DynamicPlay:
-            setDynamicPlay();
-            break;
-        case NGameOff::FastPlay:
-            setFastPlay();
-            break;
-        case NGameOff::FirstPlay:
-            setFirstPlay();
-            break;
-        default:
-            setStaticPlay();
+    case NGameOff::StaticPlay:
+        setStaticPlay();
+        break;
+    case NGameOff::DynamicPlay:
+        setDynamicPlay();
+        break;
+    case NGameOff::FastPlay:
+        setFastPlay();
+        break;
+    case NGameOff::FirstPlay:
+        setFirstPlay();
+        break;
+    default:
+        setStaticPlay();
     }
 }
 
@@ -1019,33 +1032,125 @@ void CCoach::checkTransitionToForceStart() {
     }
 }
 
+void CCoach::generateWorkingRobotIds()
+{
+    workingIDs.clear();
+        workingIDs = wm->our.data->activeAgents;
+        for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+        {
+            if(agents[i] != nullptr)
+            {
+                if(agents[i]->fault && agents[i]->faultstate == Agent::FaultState::DESTROYED)
+                {
+                    if(workingIDs.contains(agents[i]->id()))
+                    {
+                        workingIDs.removeOne(agents[i]->id());
+                    }
+                }
+                if(gameState->isStop() && agents[i]->fault && agents[i]->faultstate == Agent::FaultState::DAMEGED)
+                {
+                    if(workingIDs.contains(agents[i]->id()))
+                    {
+                        workingIDs.removeOne(agents[i]->id());
+                    }
+                }
+            }
+        }
+//        for(int i{}; i<workingIDs.count(); i++)
+//            ROS_INFO_STREAM("kian: " << workingIDs[i]);
+}
+
+void CCoach::replacefaultedrobots()
+{
+    //faulted robots replacement
+    QList<int> ourPlayers = wm->our.data->activeAgents;
+    QList<int> faultPlayers;
+    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+    {
+        if(agents[i] != nullptr)
+        {
+            if(agents[i]->fault && agents[i]->faultstate == Agent::FaultState::DAMEGED)
+            {
+                if(ourPlayers.contains(agents[i]->id()))
+                {
+                    faultPlayers.push_back(agents[i]->id());
+                    //ROS_INFO_STREAM("kian:assign to faultPlayers " << agents[i]->id());
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < faultPlayers.size(); i++) {
+        faultRoles[i]->assign(agents[faultPlayers.at(i)]);
+    }
+    for (auto &faultRole : faultRoles) {
+        if (faultRole->agent != nullptr) {
+            faultRole->execute();
+        }
+    }
+}
+
+void CCoach::resetnonVisibleAgents()
+{
+//    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+//        ROS_INFO_STREAM("kian: agentID: " << agents[i]->id());
+//    for(int j{}; j < wm->our.activeAgentsCount(); j++)
+//        ROS_INFO_STREAM("kian: wmID: " << wm->our.activeAgentID(j));
+    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
+    {
+        if(agents[i] != nullptr)
+        {
+            bool isvisible{false};
+            for(int j{}; j < wm->our.activeAgentsCount(); j++)
+                if(agents[i]->id() == wm->our.activeAgentID(j))
+                    isvisible = true;
+            if(!isvisible)
+            {
+                ROS_INFO_STREAM("kian: reset: " << agents[i]->id());
+                agents[i]->fault = false;
+                agents[i]->faultstate = Agent::FaultState::HEALTHY;
+            }
+        }
+    }
+}
+
 void CCoach::execute()
 {
+    resetnonVisibleAgents();
+    generateWorkingRobotIds();
+    if(gameState->isStop())
+        replacefaultedrobots();
     findGoalie();
+
+    // choose playmake agent
     choosePlaymakeAndSupporter();
+
+    /* determine how many agents are needed for defense, with minimum 0 for penalty
+     and maximum of 3
+     */
     decidePreferredDefenseAgentsCount();
+
+    // decide the whole strategy for defense agents, including Goalie, defense and Mark
     decideDefense();
 
-    checkTransitionToForceStart();
 
+    checkTransitionToForceStart();
     virtualTheirPlayOffState();
-    ROS_INFO_STREAM("PM :" << playmakeId);
+    ROS_INFO_STREAM("PlayMake ID :" << playmakeId);
     ROS_INFO_STREAM("GAME STATE : " << static_cast<int>(gameState->getState()));
     ////////////////////////////////////////////
     //// Handle Roles Here
     CRoleStop::info()->reset();
+    CRoleFault::info()->reset();
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
-
     decideAttack();
-
     for (auto &stopRole : stopRoles) {
         if (stopRole->agent != nullptr) {
             stopRole->execute();
         }
     }
-
 }
 
 void CCoach::setFastPlay() {
@@ -1073,9 +1178,9 @@ void CCoach::decideHalt(QList<int>& _ourPlayers) {
     _ourPlayers.clear();
     _ourPlayers.append(wm->our.data->activeAgents);
     for (int i = 0 ; i < _ourPlayers.count() ; i++) {
-//        if (timePassed) {
-//
-//        }
+        //        if (timePassed) {
+        //
+        //        }
         agents[_ourPlayers[i]]->action = haltAction;
     }
 
@@ -1097,7 +1202,8 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     }
 
     for (int i = 0; i < _ourPlayers.size(); i++) {
-        stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
+        if(!agents[_ourPlayers.at(i)]->fault)
+            stopRoles[i]->assign(agents[_ourPlayers.at(i)]);
     }
     _ourPlayers.clear();
 }
@@ -1149,18 +1255,61 @@ void CCoach::decideTheirIndirect(QList<int> &_ourPlayers) {
 }
 
 void CCoach::decideOurPenalty(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = ourPenalty;
+    if (0 <= playmakeId && playmakeId <= 11) {
+        ourPenalty->setPlaymake(agents[playmakeId]);
+        _ourPlayers.removeOne(playmakeId);
+    }
+    if(!gameState->ready())
+        ourPenalty->setState(PenaltyState::Positioning);
+
+    else if(gameState->ready())
+    {
+        ROS_INFO_STREAM("kian: normal start -> penalty");
+        ourPenalty->setState(PenaltyState::Kicking);
+    }
     DBUG("penalty", D_MHMMD);
     firstTime = true;
 }
 
 void CCoach::decideTheirPenalty(QList<int> &_ourPlayers) {
+    ROS_INFO_STREAM("penalty: decideourpenalty");
+    selectedPlay = theirPenalty;
+    firstTime = true;
+}
+
+void CCoach::decideOurPenaltyshootout(QList<int>& _ourPlayers)
+{
+    ROS_INFO_STREAM("shootout: decideourpenalty");
+    selectedPlay = ourPenaltyShootout;
+    if (0 <= playmakeId && playmakeId <= 11) {
+        ourPenaltyShootout->setPlaymake(agents[playmakeId]);
+        _ourPlayers.removeOne(playmakeId);
+    }
+    if(!gameState->ready())
+        ourPenaltyShootout->setState(PenaltyShootoutState::Positioning);
+
+
+    else if(gameState->ready())
+    {
+        ROS_INFO_STREAM("shootout: normal start -> penalty");
+        ourPenaltyShootout->setState(PenaltyShootoutState::Goaling);
+    }
+    DBUG("penalty", D_MHMMD);
+    firstTime = true;
+}
+
+void CCoach::decideTheirPenaltyshootout(QList<int> &)
+{
+    ROS_INFO_STREAM("penalty: decideourpenalty");
     selectedPlay = theirPenalty;
     firstTime = true;
 }
 
 void CCoach::decideStart(QList<int> &_ourPlayers) {
-    if (gameState->penaltyShootout()) {
+    ROS_INFO_STREAM("kian: in start mode");
+    if (gameState->theirPenaltyShootout()) {
         selectedPlay = theirPenalty;
         return;
     }
@@ -1198,7 +1347,7 @@ void CCoach::checkSensorShootFault() {
         if (ourPlayers.contains(i) != nullptr) {
             Agent* tempAgent = agents[i];
             if (tempAgent->shootSensor
-                &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm() * 0.08) > 0.2) {
+                    &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm() * 0.08) > 0.2) {
                 faultDetectionCounter[i]++;
 
             } else {
@@ -1231,15 +1380,15 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
     ROS_INFO("initStaticPlay: request");
 
     switch (_mode) {
-        case POMODE::INDIRECT:
-            planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
-            break;
-        case POMODE::DIRECT:
-            planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
-            break;
-        case POMODE::KICKOFF:
-            planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
-            break;
+    case POMODE::INDIRECT:
+        planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
+        break;
+    case POMODE::DIRECT:
+        planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
+        break;
+    case POMODE::KICKOFF:
+        planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;
+        break;
     }
 
     planRequest.plan_req.ballPos.x = wm->ball->pos.x;
@@ -1297,7 +1446,7 @@ void CCoach::checkGUItoRefineMatch(SPlan *_plan, const QList<int>& _ourplayers) 
     }
 
     if (conf.IDBaseOneToucher
-        && _ourplayers.contains(conf.OneToucherID)) {
+            && _ourplayers.contains(conf.OneToucherID)) {
         int temp = _plan -> matching.common -> matchedID.value(1);
         _plan -> matching.common -> matchedID[1] = conf.OneToucherID;
         for (int i = 2; i < _plan->matching.common->matchedID.size(); i++) {
@@ -1418,48 +1567,47 @@ POffSkills CCoach::strToEnum(const std::string& _str) {
 
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     MWBM matcher;
-    matcher.create(_plan->common.currentSize-1, _ourplayers.size()-1);
+    matcher.create(_plan->common.currentSize - 1, _ourplayers.size() - 1);
 
-    int matchedID=-1;
-    double weight=0;
-    double minweight=100;
+    int matchedID = -1;
+    double weight = 0;
+    double minweight = 100;
 
-    if(_plan->common.currentSize>2) {
-        for (int j = 0; j < _ourplayers.size(); j++) {
+    for (int j = 0; j < _ourplayers.size(); j++) {
 
-            weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
-            if(weight < minweight) {
-                minweight = weight;
-                matchedID = j;
-            }
+        weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
+        if (weight < minweight) {
+            minweight = weight;
+            matchedID = j;
         }
-        ROS_INFO_STREAM("nanapasser:"<<_ourplayers.at(matchedID)<<"__"<<matchedID);
-        if(matchedID!=-1) {
-            _plan->common.matchedID.insert(0, _ourplayers.at(matchedID));
-        }
-        for (int i = 1; i < _plan->common.currentSize; i++) {
-            for (int j = 0; j < _ourplayers.size(); j++) {
-                if (j != matchedID) {
-                    double weight;
-                    weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
-                    matcher.setWeight(i-1, j, -(weight));
-                    ROS_INFO_STREAM("nanaa:"<<j);
-
-                }
-            }
-        }
-        int nmatchedID=-1;
-        qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
-        for (size_t i = 1; i < _plan->common.currentSize; i++) {
-            nmatchedID = matcher.getMatch(i-1);
-            if(nmatchedID>=matchedID)
-                nmatchedID++;
-            _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
-            ROS_INFO_STREAM("nana:"<<_ourplayers.at(nmatchedID)<<"__"<<i<<"__"<<nmatchedID);
-
-        }
-        qDebug() << "[Coach] matched by" << _plan->common.matchedID;
     }
+    ROS_INFO_STREAM("nanapasser:" << _ourplayers.at(matchedID) << "__" << matchedID);
+    if (matchedID != -1) {
+        _plan->common.matchedID.insert(0, _ourplayers.at(matchedID));
+    }
+    for (int i = 1; i < _plan->common.currentSize; i++) {
+        for (int j = 0; j < _ourplayers.size(); j++) {
+            if (j != matchedID) {
+                double weight;
+                weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
+                matcher.setWeight(i - 1, j, -(weight));
+                ROS_INFO_STREAM("nanaa:" << j);
+
+            }
+        }
+    }
+    int nmatchedID = -1;
+    qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
+    for (size_t i = 1; i < _plan->common.currentSize; i++) {
+        nmatchedID = matcher.getMatch(i - 1);
+        if (nmatchedID >= matchedID)
+            nmatchedID++;
+        _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
+        ROS_INFO_STREAM("nana:" << _ourplayers.at(nmatchedID) << "__" << i << "__" << nmatchedID);
+
+    }
+    qDebug() << "[Coach] matched by" << _plan->common.matchedID;
+
 }
 
 
@@ -1485,17 +1633,33 @@ void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav)
 }
 
 int CCoach::findGoalie() {
-    if (conf.useGoalieInPlayoff && gameState->ourPlayOffKick() && wm->ball->pos.x > 1) {
+        if (conf.useGoalieInPlayoff
+            && gameState->ourPlayOffKick()
+            && wm->ball->pos.x > 1
+            && !gameState->penaltyKick()
+            && !gameState->penaltyShootout())
+    {
         preferedGoalieID = -1;
+        ROS_INFO_STREAM("check goaliID first : " << preferedGoalieID);
 
-    } else {
-        if (conf.GoalieFromGUI) {
+    } else
+    {
+        if (conf.GoalieFromGUI)
+        {
             preferedGoalieID = conf.Goalie;
-        } else {
+        } else
+        {
             preferedGoalieID = wm->our.data->goalieID;
+            ROS_INFO_STREAM("check goaliID from wm : " << preferedGoalieID);
+
         }
     }
-    if (gameState->timeOut() || gameState->halfTime()) preferedGoalieID = -1;
+    if (gameState->timeOut() || gameState->halfTime())
+    {
+        preferedGoalieID = -1;
+        ROS_INFO_STREAM("check goaliID timeout : " << preferedGoalieID);
+
+    }
     assignGoalieAgent(preferedGoalieID);
     return preferedGoalieID;
 }
@@ -1514,154 +1678,152 @@ parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
     ai_status->supporter_id = supporterId;
 
     int _max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts},
-            _min{conf.numberOfDefenseEval <= 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts};
+                _min{conf.numberOfDefenseEval <= 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts};
 
 
-    for (int i {_min}; i < _max+ 1; i++)
-    {
-        parsian_msgs::parsian_pair_roles prs;
-        ai_status->states.push_back(prs);
-        for (int j = 0; j < i; j++)
-        {
-            parsian_msgs::parsian_pair_role pr;
-            pr.id = defenseMatched[0][i][j].first;
-            pr.task = defenseMatched[0][i][j].second;
-            pr.role = parsian_msgs::parsian_pair_role::DEFENSE;
-            ai_status->states[i - _min].roles.push_back(pr);
-        }
-    }
-    return ai_status;
-}
+                     for (int i {_min}; i < _max+ 1; i++)
+                     {
+                         parsian_msgs::parsian_pair_roles prs;
+                         ai_status->states.push_back(prs);
+                         for (int j = 0; j < i; j++)
+                         {
+                             parsian_msgs::parsian_pair_role pr;
+                             pr.id = defenseMatched[0][i][j].first;
+                             pr.task = defenseMatched[0][i][j].second;
+                             pr.role = parsian_msgs::parsian_pair_role::DEFENSE;
+                             ai_status->states[i - _min].roles.push_back(pr);
+                         }
+                     }
+                              return ai_status;
+                    }
 
-void CCoach::findDefneders(const int& max_number, const int& min_number) {
-    //    ROS_INFO_STREAM("hamid: finaldef: " << max_number << ", "<< min_number);
-    defenseMatched[0] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
-    for (int i{ min_number }; i < max_number +1; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
-    for (int i{min_number}; i < max_number + 1; i++) {
-        assignDefenseAgents(i);
-        assignGoalieAgent(preferedGoalieID);
-        selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
-        selectedPlay->defensePlan.initDefense(defenseAgents);
-        selectedPlay->defensePlan.execute();
-        for (int j = 0; j < defenseAgents.size(); j++ )
-        {
-            defenseMatched[0][i][j].first = defenseAgents[j]->id();
+             void CCoach::findDefneders(const int& max_number, const int& min_number) {
+                 defenseMatched[0] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
+                 for (int i{ min_number }; i < max_number +1; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
+                 for (int i{min_number}; i < max_number + 1; i++) {
+                     assignDefenseAgents(i);
+                     assignGoalieAgent(preferedGoalieID);
+                     selectedPlay->defensePlan.initGoalKeeper(goalieAgent);
+                     selectedPlay->defensePlan.initDefense(defenseAgents);
+                     selectedPlay->defensePlan.execute();
+                     for (int j = 0; j < defenseAgents.size(); j++ )
+                     {
+                         defenseMatched[0][i][j].first = defenseAgents[j]->id();
 
-            parsian_msgs::parsian_robot_task task;
-            auto task_name = defenseAgents[j]->action->getActionName().toStdString();
-            //            ROS_INFO_STREAM("hamid: r " << task_name);
+                         parsian_msgs::parsian_robot_task task;
+                         auto task_name = defenseAgents[j]->action->getActionName().toStdString();
 
-            if (task_name == "GotopointavoidAction")
-            {
-                task.select = task.GOTOPOINTAVOID;
-                task.gotoPointAvoidTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPointAvoid*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
-            else if(task_name == "GotopointAction")
-            {
-                task.select = task.GOTOPOINT;
-                task.gotoPointTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPoint*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
+                         if (task_name == "GotopointavoidAction")
+                         {
+                             task.select = task.GOTOPOINTAVOID;
+                             task.gotoPointAvoidTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPointAvoid*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
+                         else if(task_name == "GotopointAction")
+                         {
+                             task.select = task.GOTOPOINT;
+                             task.gotoPointTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPoint*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
 
-            else if(task_name == "OnetouchAction")
-            {
-                task.select = task.ONETOUCH;
-                task.oneTouchTask = *reinterpret_cast<parsian_msgs::parsian_skill_oneTouch*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
+                         else if(task_name == "OnetouchAction")
+                         {
+                             task.select = task.ONETOUCH;
+                             task.oneTouchTask = *reinterpret_cast<parsian_msgs::parsian_skill_oneTouch*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
 
-            else if(task_name == "KickAction")
-            {
-                task.select = task.KICK;
-                task.kickTask = *reinterpret_cast<parsian_msgs::parsian_skill_kick*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
+                         else if(task_name == "KickAction")
+                         {
+                             task.select = task.KICK;
+                             task.kickTask = *reinterpret_cast<parsian_msgs::parsian_skill_kick*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
 
-            else if(task_name == "ReceivepassAction")
-            {
-                task.select = task.RECIVEPASS;
-                task.receivePassTask = *reinterpret_cast<parsian_msgs::parsian_skill_receivePass*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
+                         else if(task_name == "ReceivepassAction")
+                         {
+                             task.select = task.RECIVEPASS;
+                             task.receivePassTask = *reinterpret_cast<parsian_msgs::parsian_skill_receivePass*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
 
 
-            else if(task_name == "NoAction")
-            {
-                task.select = task.NOTASK;
-                task.noTask = *reinterpret_cast<parsian_msgs::parsian_skill_no*>(defenseAgents[j]->action->getMessage());
-                defenseMatched[0][i][j].second = task;
-            }
+                         else if(task_name == "NoAction")
+                         {
+                             task.select = task.NOTASK;
+                             task.noTask = *reinterpret_cast<parsian_msgs::parsian_skill_no*>(defenseAgents[j]->action->getMessage());
+                             defenseMatched[0][i][j].second = task;
+                         }
 
-        }
-    }
-
-
-    //    defenseMatched[1] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
-    //    for (int i = min_number; i <= max_number; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
-
-    //    for (int i = min_number; i <= max_number; i++) {
-    //        assignDefenseAgents(i);
-    //        assignGoalieAgent(-1);
-    //        selectedPlay->defensePlan.initGoalKeeper(nullptr);
-    //        selectedPlay->defensePlan.initDefense(defenseAgents);
-    //        selectedPlay->defensePlan.execute();
-    //        for (int j = 0; j < defenseAgents.size(); j++ )
-    //        {
-    //            defenseMatched[0][i][j].first = defenseAgents[j]->id();
-
-    //            parsian_msgs::parsian_robot_task task;
-    //            auto task_name = defenseAgents[j]->action->getActionName().toStdString();
-
-    //            if (task_name == "GotopointavoidAction")
-    //            {
-    //                task.select = task.GOTOPOINTAVOID;
-    //                task.gotoPointAvoidTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPointAvoid*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
-    //            else if(task_name == "GotopointAction")
-    //            {
-    //                task.select = task.GOTOPOINT;
-    //                task.gotoPointTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPoint*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
-
-    //            else if(task_name == "OnetouchAction")
-    //            {
-    //                task.select = task.ONETOUCH;
-    //                task.oneTouchTask = *reinterpret_cast<parsian_msgs::parsian_skill_oneTouch*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
-
-    //            else if(task_name == "KickAction")
-    //            {
-    //                task.select = task.KICK;
-    //                task.kickTask = *reinterpret_cast<parsian_msgs::parsian_skill_kick*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
-
-    //            else if(task_name == "ReceivepassAction")
-    //            {
-    //                task.select = task.RECIVEPASS;
-    //                task.receivePassTask = *reinterpret_cast<parsian_msgs::parsian_skill_receivePass*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
+                     }
+                 }
 
 
-    //            else if(task_name == "NoAction")
-    //            {
-    //                task.select = task.NOTASK;
-    //                task.noTask = *reinterpret_cast<parsian_msgs::parsian_skill_no*>(defenseAgents[j]->action->getMessage());
-    //                defenseMatched[0][i][j].second = task;
-    //            }
+                 //    defenseMatched[1] = new QPair<int, parsian_msgs::parsian_robot_task>* [max_number + 1];
+                 //    for (int i = min_number; i <= max_number; i++) defenseMatched[0][i] = new QPair<int, parsian_msgs::parsian_robot_task>[i];
 
-    //        }
-    //    }
+                 //    for (int i = min_number; i <= max_number; i++) {
+                 //        assignDefenseAgents(i);
+                 //        assignGoalieAgent(-1);
+                 //        selectedPlay->defensePlan.initGoalKeeper(nullptr);
+                 //        selectedPlay->defensePlan.initDefense(defenseAgents);
+                 //        selectedPlay->defensePlan.execute();
+                 //        for (int j = 0; j < defenseAgents.size(); j++ )
+                 //        {
+                 //            defenseMatched[0][i][j].first = defenseAgents[j]->id();
 
-}
+                 //            parsian_msgs::parsian_robot_task task;
+                 //            auto task_name = defenseAgents[j]->action->getActionName().toStdString();
 
-bool CCoach::isFastPlay() {
-    if (conf.UseFastPlay) {
-        return true; // TODO : fix this by considering that opp agents
-    }
-}
+                 //            if (task_name == "GotopointavoidAction")
+                 //            {
+                 //                task.select = task.GOTOPOINTAVOID;
+                 //                task.gotoPointAvoidTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPointAvoid*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+                 //            else if(task_name == "GotopointAction")
+                 //            {
+                 //                task.select = task.GOTOPOINT;
+                 //                task.gotoPointTask = *reinterpret_cast<parsian_msgs::parsian_skill_gotoPoint*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+
+                 //            else if(task_name == "OnetouchAction")
+                 //            {
+                 //                task.select = task.ONETOUCH;
+                 //                task.oneTouchTask = *reinterpret_cast<parsian_msgs::parsian_skill_oneTouch*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+
+                 //            else if(task_name == "KickAction")
+                 //            {
+                 //                task.select = task.KICK;
+                 //                task.kickTask = *reinterpret_cast<parsian_msgs::parsian_skill_kick*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+
+                 //            else if(task_name == "ReceivepassAction")
+                 //            {
+                 //                task.select = task.RECIVEPASS;
+                 //                task.receivePassTask = *reinterpret_cast<parsian_msgs::parsian_skill_receivePass*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+
+
+                 //            else if(task_name == "NoAction")
+                 //            {
+                 //                task.select = task.NOTASK;
+                 //                task.noTask = *reinterpret_cast<parsian_msgs::parsian_skill_no*>(defenseAgents[j]->action->getMessage());
+                 //                defenseMatched[0][i][j].second = task;
+                 //            }
+
+                 //        }
+                 //    }
+
+             }
+
+                  bool CCoach::isFastPlay() {
+                      if (conf.UseFastPlay) {
+                          return true; // TODO : fix this by considering that opp agents
+                      }
+                  }

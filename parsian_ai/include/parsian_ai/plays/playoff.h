@@ -341,6 +341,7 @@ private:
     bool initial;
 
     bool firstPass;
+    bool isOnetouch;
 
     SPlan* masterPlan;
     EMode masterMode;
@@ -453,7 +454,7 @@ private:
     SFail isAnyTaskFaild();
     bool isAllTasksDone();
     bool isPlanDone();
-    bool isPlanFaild();
+    bool isPlanFailed();
     bool setTimer;
     unsigned int tempStart;
     ////////////////////////////

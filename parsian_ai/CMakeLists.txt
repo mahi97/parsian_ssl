@@ -116,6 +116,8 @@ add_library(${PROJECT_NAME}_plays
 		src/parsian_ai/plays/theirballplacement.cpp
 		src/parsian_ai/plays/stopplay.cpp
 		src/parsian_ai/plays/halftimelineup.cpp
+		src/parsian_ai/plays/ourpenaltyshootout.cpp
+                src/parsian_ai/plays/theirpenaltyshootout.cpp
 		)
 
 add_library(${PROJECT_NAME}_plans
@@ -130,6 +132,7 @@ add_library(${PROJECT_NAME}_roles
 		src/parsian_ai/roles/block.cpp
 		src/parsian_ai/roles/playoffrole.cpp
 		src/parsian_ai/roles/stop.cpp
+                src/parsian_ai/roles/fault.cpp
 		src/parsian_ai/roles/dynamicrole.cpp
 		src/parsian_ai/roles/playmake.cpp
 		)
