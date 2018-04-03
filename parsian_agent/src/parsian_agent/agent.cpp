@@ -373,19 +373,21 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     //        lastVn = velnorm;
     //    }
 
-    /* if(vel().length() > 0.2)
-     {
-         agentStopTime.restart();
-         timerReset = false;
-     }
-     if(agentStopTime.elapsed() > 100 && ! timerReset)
-     {
-         lastVn = velnorm;
-         lastVf = veltan;
-         agentStopTime.restart();
-         timerReset = true;
-     }
-    */
+//    if(vel().length() > 0.2)
+//     {
+//         agentStopTime.restart();
+//         timerReset = false;
+//     }
+//     if(agentStopTime.elapsed() > 100 && ! timerReset)
+//     {
+//         lastVn = velnorm;
+//         lastVf = veltan;
+//         agentStopTime.restart();
+//         timerReset = true;
+//     }
+    if(vel().length() < 0.3  && diveMode) {
+        return;
+    }
     double lastV, commandV;
     double vCoef = 1;
     double tempVf = vforward , tempVn = vnormal;
@@ -468,6 +470,7 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     if (vforward - lastVf < - 1) {
         vforward = lastVf - 0.085;
     }
+
 
 
     lastVf = vforward;
@@ -795,12 +798,13 @@ int Agent::kickValueForDistance(double dist, double finalVel) {
     return static_cast<int>(kickSpeedValue(vel, false));
 }
 
-
+//TODO : get speed from profiler
 Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection) {
     Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
                            pos() - wm->ball->pos, wm->field->oppGoal(),
                            conf->Landa,
-                           conf->Gamma));
+                           conf->Gamma,
+                           6.5));
     Vector2D q;
     q.invalidate();
     bool oneTouchKick = false;
