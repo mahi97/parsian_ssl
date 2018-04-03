@@ -1735,7 +1735,8 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             /*if(goalKeeperTarget.dist(goalKeeperAgent->pos()) < 0.2)
                 goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
             else*/
-            goalKeeperTarget = ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , 0), wm->field->ourGoalL() + Vector2D(0.1 , 0)));
+                drawer->draw(wm->field->ourGoalR() + Vector2D(0.1 , -0.1) , QColor(Qt :: red));
+                goalKeeperTarget = ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , -0.1), wm->field->ourGoalL() + Vector2D(0.1 , 0.1)));
             //Segment2D segment= Segment2D(ballLine.intersection(Segment2D(wm->field->ourGoalR(), wm->field->ourGoalL())), ballPos);
             //else{
             //    goalKeeperTarget = ballPos;
@@ -1925,7 +1926,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     }
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)
                         goalKeeperTarget = downBallRectanglePoint - Vector2D(0.25, 0);
-                    else if(wm->ball->pos.y < wm->field->ourGoalL().y )
+                    else if(wm->ball->pos.y < wm->field->ourGoalL().y)
                         goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                     else
                         goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
@@ -2493,7 +2494,6 @@ void DefensePlan::penaltyShootOutMode() {
 
     case shootOutClear:
         assignSkill(goalKeeperAgent, kickSkill);
-        kickSkill->setKickspeed(6.5);
         kickSkill->setTolerance(50);
         kickSkill->setDontkick(false);
         kickSkill->setSlow(false);
@@ -2501,6 +2501,7 @@ void DefensePlan::penaltyShootOutMode() {
         kickSkill->setAvoidpenaltyarea(false);
         kickSkill->setGoaliemode(false);
         kickSkill->setChip(true);
+        kickSkill->setChipdist(4.5);
         kickSkill->setTarget(wm->field->oppGoal());
         kickSkill->setSagmode(true);
 
@@ -2721,6 +2722,9 @@ void DefensePlan::executeGoalKeeper() {
     tempSol.clear();
     ROS_INFO_STREAM("_________________");
     ROS_INFO_STREAM(f);
+
+    Segment2D ballLine(ballPos, ballPos + wm->ball->vel.norm() * 50);
+    drawer->draw(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , -0.1), wm->field->ourGoalL() + Vector2D(0.1 , 0.1)) , QColor(Qt::yellow));
     if (!goalKeeperOneTouch) {
         firstTimeGoalKeeperOneTouch = false;
     }
@@ -2863,7 +2867,7 @@ void DefensePlan::executeGoalKeeper() {
         }
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
 
-            if (lastStateForGoalKeeper == QString("noBesidePoleMode") || counterBallWasBesidePoles < 10){
+            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 10){
                 counterBallWasBesidePoles++;
                 kickSkill->setTarget(Vector2D(0 , wm->ball->pos.y));
                 drawer->draw(Segment2D(wm->ball->pos , Vector2D(0 , wm->ball->pos.y)) , QColor(Qt::blue));
@@ -2910,7 +2914,7 @@ void DefensePlan::executeGoalKeeper() {
                 kickSkill->setAvoidpenaltyarea(false);
                 kickSkill->setGoaliemode(true);
                 kickSkill->setChip(true);
-                kickSkill->setKickspeed(5);
+                kickSkill->setChipdist(4.5);
             }
         }
         else {
@@ -2921,7 +2925,7 @@ void DefensePlan::executeGoalKeeper() {
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("One touch Mode" , D_AHZ);
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
-                gpa[goalKeeperAgent->id()]->setDivemode(true);
+                gpa[goalKeeperAgent->id()]->setDivemode(false);
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(-goalKeeperTarget + wm->ball->pos);
                 gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
@@ -2953,7 +2957,8 @@ void DefensePlan::executeGoalKeeper() {
                         kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
                     }
                     kickSkill->setChip(true);
-                    kickSkill->setKickspeed(5);
+                    kickSkill->setKickspeed(6.5);
+                    kickSkill->setChipdist(4.5);
                 }
                 else {
                     ROS_INFO_STREAM("16");
