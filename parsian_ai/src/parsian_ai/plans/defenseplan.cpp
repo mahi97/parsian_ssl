@@ -1941,7 +1941,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
                     }
                     if(fabs(wm->ball->pos.y - wm->field->ourGoalL().y) < 0.1)
                         goalKeeperTarget = downBallRectanglePoint - Vector2D(0.25, 0);
-                    else if(wm->ball->pos.y < wm->field->ourGoalL().y )
+                    else if(wm->ball->pos.y < wm->field->ourGoalL().y)
                         goalKeeperTarget = Vector2D(downBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
                     else
                         goalKeeperTarget = Vector2D(upBallRectanglePoint.x , 0) - Vector2D(0.4 , 0) + Vector2D(0 , wm->ball->pos.y);
