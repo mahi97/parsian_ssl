@@ -50,19 +50,16 @@ Vector2D DefensePlan::getGKPositionInTwoDefense(Vector2D firstPoint , Vector2D o
     return goalkeeperPosition;
 }
 
-Vector2D DefensePlan::getGKPositionInThreeDefense(double downLimit , double upLimit){
+Vector2D DefensePlan::getGKPositionInThreeDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
     Vector2D goalkeeperPosition;
     Vector2D sol[2];
-    Vector2D ourGoalLeft = wm->field->ourGoalL();
-    Vector2D ourGoalRight = wm->field->ourGoalR();
-    Vector2D originPoint = ballPrediction(true);
     int numberOfAgents = 1;
-    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForGK(numberOfAgents , ourGoalLeft , originPoint , ourGoalRight) , downLimit , upLimit));
-    defenseArea.intersection(getBisectorLine(ourGoalLeft , originPoint , ourGoalRight) , &sol[0] , &sol[1]);
+    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForGK(getBestLineWithTallesForGK(numberOfAgents , firstPoint , originPoint , secondPoint) , firstPoint , originPoint , secondPoint , downLimit , upLimit));
+    drawer->draw(defenseArea , 0 , 180 , "red");
+    defenseArea.intersection(getBisectorLine(firstPoint , originPoint , secondPoint) , &sol[0] , &sol[1]);
     goalkeeperPosition = sol[0].isValid() && sol[0].dist(originPoint) < sol[1].dist(originPoint) ? sol[0] : sol[1];
     return goalkeeperPosition;
 }
-
 Vector2D DefensePlan::getGKPositionWithoutDefense(double downLimit , double upLimit){
     Vector2D goalkeeperPosition;
     Vector2D sol[2];
@@ -81,29 +78,29 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     double downLimit , upLimit;
     switch (numberOfDefenders){
     case 0:{
-        downLimit = 0.2;
+        downLimit = 0.3;
         drawer->draw(Circle2D(wm->field->center() , 0.5) , 0, 360 , "black");
         upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
         goalKeeperPosition = getGKPositionWithoutDefense(downLimit , upLimit);
         break;
     }
     case 1:{
-        downLimit = 0.2;
+        downLimit = 0.3;
         upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
         goalKeeperPosition = getGKPositionInOneDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 2:{
         PDEBUG("AYA" ,2, D_AHZ);
-        downLimit = 0.2;
+        downLimit = 0.3;
         upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
         goalKeeperPosition = getGKPositionInTwoDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 3:{
-        downLimit = 0.2;
-        upLimit = 1.2;
-        goalKeeperPosition = getGKPositionInThreeDefense(downLimit , upLimit);
+        downLimit = 0.3;
+        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
+        goalKeeperPosition = getGKPositionInThreeDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     default:

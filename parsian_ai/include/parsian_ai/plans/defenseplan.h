@@ -69,7 +69,7 @@ protected:
     Vector2D oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit);
     Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     Vector2D getGKPositionInOneDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit);
-    Vector2D getGKPositionInThreeDefense(double downLimit , double upLimit);
+    Vector2D getGKPositionInThreeDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit);
     Vector2D getGKPositionWithoutDefense(double downLimit , double upLimit);
     Vector2D getGKPositionAccordingToTheDefense(int numberOfDefenders , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
     Vector2D getGKPositionInTwoDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit);
