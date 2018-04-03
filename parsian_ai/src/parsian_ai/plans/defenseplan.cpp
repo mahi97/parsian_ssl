@@ -7,6 +7,28 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA (1.697056275 + Robot::robot_radius_new)
 
+
+double DefensePlan::findBestRadiusForGK(Line2D bestLineWithTalles ,Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
+    double bestRadiusForDefenseArea = 0;
+    Segment2D smallerFrontageOfTriangle;
+    Segment2D biggerFrontageOfTriangle;
+    if (Segment2D(firstPoint , originPoint).length() > Segment2D(secondPoint , originPoint).length()){
+        biggerFrontageOfTriangle = Segment2D(firstPoint , originPoint);
+        smallerFrontageOfTriangle = Segment2D(secondPoint , originPoint);
+    } else {
+        biggerFrontageOfTriangle = Segment2D(secondPoint , originPoint);
+        smallerFrontageOfTriangle = Segment2D(firstPoint , originPoint);
+    }
+    bestRadiusForDefenseArea = biggerFrontageOfTriangle.intersection(bestLineWithTalles).dist(wm->field->ourGoal());
+    if(bestRadiusForDefenseArea <= downLimit){
+        bestRadiusForDefenseArea = downLimit;
+    }
+    if(bestRadiusForDefenseArea >= upLimit){
+        bestRadiusForDefenseArea = upLimit;
+    }
+    return bestRadiusForDefenseArea;
+}
+
 Segment2D DefensePlan::getBestSegmentWithTallesForGK(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint) {
     double robotDiameter = 2 * Robot::robot_radius_new;
     Vector2D sol[2];
