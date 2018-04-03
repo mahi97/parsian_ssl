@@ -2072,8 +2072,8 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 //        return 0.0;
 //
 
-    auto effectiveHigh = (highIntersect - (Vector2D(wm->field->oppGoal()))).length() > fieldWidth/2 ? fieldWidth/2 : highIntersect;
-    auto effectiveLow = (highIntersect - (Vector2D(wm->field->oppGoal()))).length() > (fieldWidth/2) ? -(fieldWidth/2) : lowIntersect;
+    auto effectiveHigh = ((highIntersect - (Vector2D(wm->field->oppGoal()))).length() > fieldWidth/2) ? fieldWidth/2 : highIntersect.dist(wm->field->oppGoal());
+    auto effectiveLow = ((highIntersect - (Vector2D(wm->field->oppGoal()))).length() > (fieldWidth/2)) ? -(fieldWidth/2) : lowIntersect.dist(wm->field->oppGoal());
 
     double penaltyOffset = 0.3;
     auto extendedWidth = penaltyWidth + 2*penaltyOffset;
