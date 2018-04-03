@@ -883,7 +883,8 @@ int DefensePlan::findNeededDefense(){
     if (getLinesOfBallTriangle().at(0).length() > getLinesOfBallTriangle().at(1).length()) {
         biggerFrintageOfTriangle = getLinesOfBallTriangle().at(0);
         smallerFrintageOfTriangle = getLinesOfBallTriangle().at(1);
-    } else {
+    }
+    else {
         biggerFrintageOfTriangle = getLinesOfBallTriangle().at(1);
         smallerFrintageOfTriangle = getLinesOfBallTriangle().at(0);
     }
