@@ -3816,16 +3816,17 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos) {
 //        }
 //        else {
 //            angleDegreeThrNotStop = 0;
-//            if (goalKeeperAgent->pos().dist(AZBisecOpenSeg.nearestPoint(goalKeeperAgent->pos())) > 0.3 + thr) {
-//                target = AZBisecOpenSeg.nearestPoint(goalKeeperAgent->pos());
-//                thr = 0;
-//                if (!wm->field->isInField(target)) {
-//                    target = AZBisecOpenSeg.intersection(goalLine) + goalKeeperTargetOffSet;
-//                }
-//            }
-//            else{
+            if (goalKeeperAgent->pos().dist(AZBisecOpenSeg.nearestPoint(goalKeeperAgent->pos())) > 0.1 + thr) {
+                target = AZBisecOpenSeg.nearestPoint(goalKeeperAgent->pos());
+                thr = 0;
+                if (!wm->field->isInField(target)) {
+                    target = AZBisecOpenSeg.intersection(goalLine) + goalKeeperTargetOffSet;
+                }
+            }
+            else{
+                thr = 0.05;
                  target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , wm->ball->pos , openAngGoalIntersectionBottom);
-//            }
+            }
 //            if (!wm->field->isInField(target) || target.x < -5.7) {
 //                target = know->getPointInDirection(wm->field->ourGoal() , wm->ball->pos , 0.25);
 //            }
