@@ -550,6 +550,7 @@ void CCoach::updateAttackState() {
 }
 
 void CCoach::choosePlaymakeAndSupporter(){
+
     playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
