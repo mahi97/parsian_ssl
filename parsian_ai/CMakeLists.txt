@@ -99,40 +99,31 @@ add_library(${PROJECT_NAME}
 		src/${PROJECT_NAME}/gamestate.cpp
 		src/${PROJECT_NAME}/config.cpp
 		src/${PROJECT_NAME}/coach.cpp
-        include/parsian_ai/mahi.h)
-
-add_library(${PROJECT_NAME}_plays
-		src/parsian_ai/plays/dynamicattack.cpp
-		src/parsian_ai/plays/masterplay.cpp
-		src/parsian_ai/plays/ourballplacement.cpp
-		src/parsian_ai/plays/playoff.cpp
-		src/parsian_ai/plays/ourpenalty.cpp
-		src/parsian_ai/plays/theirpenalty.cpp
-		src/parsian_ai/plays/theirkickoff.cpp
-		src/parsian_ai/plays/theirindirect.cpp
-		src/parsian_ai/plays/theirdirect.cpp
-		src/parsian_ai/plays/theirballplacement.cpp
-		src/parsian_ai/plays/stopplay.cpp
-		src/parsian_ai/plays/halftimelineup.cpp
-		src/parsian_ai/plays/ourpenaltyshootout.cpp
-                src/parsian_ai/plays/theirpenaltyshootout.cpp
-		)
-
-add_library(${PROJECT_NAME}_plans
-		src/parsian_ai/plans/defenseplan.cpp
-		src/parsian_ai/plans/markplan.cpp
-		src/parsian_ai/plans/plan.cpp
-		src/parsian_ai/plans/positioningplan.cpp
-		)
-
-add_library(${PROJECT_NAME}_roles
-		src/parsian_ai/roles/role.cpp
-		src/parsian_ai/roles/block.cpp
-		src/parsian_ai/roles/playoffrole.cpp
-		src/parsian_ai/roles/stop.cpp
-                src/parsian_ai/roles/fault.cpp
-		src/parsian_ai/roles/dynamicrole.cpp
-		src/parsian_ai/roles/playmake.cpp
+		src/${PROJECT_NAME}/plays/dynamicattack.cpp
+		src/${PROJECT_NAME}/plays/masterplay.cpp
+		src/${PROJECT_NAME}/plays/ourballplacement.cpp
+		src/${PROJECT_NAME}/plays/playoff.cpp
+		src/${PROJECT_NAME}/plays/ourpenalty.cpp
+		src/${PROJECT_NAME}/plays/theirpenalty.cpp
+		src/${PROJECT_NAME}/plays/theirkickoff.cpp
+		src/${PROJECT_NAME}/plays/theirindirect.cpp
+		src/${PROJECT_NAME}/plays/theirdirect.cpp
+                src/${PROJECT_NAME}/plays/theirballplacement.cpp
+                src/${PROJECT_NAME}/plays/theirpenaltyshootout.cpp
+                src/${PROJECT_NAME}/plays/ourpenaltyshootout.cpp
+                src/${PROJECT_NAME}/plays/stopplay.cpp
+		src/${PROJECT_NAME}/plays/halftimelineup.cpp
+		src/${PROJECT_NAME}/plans/defenseplan.cpp
+		src/${PROJECT_NAME}/plans/markplan.cpp
+		src/${PROJECT_NAME}/plans/plan.cpp
+		src/${PROJECT_NAME}/plans/positioningplan.cpp
+		src/${PROJECT_NAME}/roles/role.cpp
+		src/${PROJECT_NAME}/roles/block.cpp
+		src/${PROJECT_NAME}/roles/playoffrole.cpp
+		src/${PROJECT_NAME}/roles/stop.cpp
+		src/${PROJECT_NAME}/roles/fault.cpp
+		src/${PROJECT_NAME}/roles/dynamicrole.cpp
+		src/${PROJECT_NAME}/roles/playmake.cpp
 		)
 
 add_library(${PROJECT_NAME}_util
