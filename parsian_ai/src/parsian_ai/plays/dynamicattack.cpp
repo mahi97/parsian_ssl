@@ -540,26 +540,9 @@ void CDynamicAttack::playMake() {
                 } else {
                     roleAgentPM->setNoKick(true);
                 }*/
-<<<<<<< 81406a893e63df10769114fc32345cc5505dd455
 //        if(isInpass())
 //            swapPlaymakeInPass();
             break;
-=======
-            //        if(isInpass())
-            //            swapPlaymakeInPass();
-            break;
-
-        case PlayMakeSkill ::Chip:
-            ROS_INFO_STREAM("chip");
-            roleAgentPM->setNoKick(false);
-            if (currentPlan.playmake.region == DynamicRegion ::Goal) {
-                roleAgentPM ->setTarget(wm->field->oppGoal());
-                roleAgentPM->setChip(true);
-                if (wm->ball->pos.x < -2) {
-                    roleAgentPM ->setChipDist(conf.HighDistChip);
-                } else {
-                    roleAgentPM ->setChipDist(conf.MediumDistChip);
->>>>>>> fix it at least
 
         case PlayMakeSkill ::Chip:
             ROS_INFO_STREAM("chip");
@@ -599,11 +582,8 @@ void CDynamicAttack::playMake() {
             roleAgentPM->setNoKick(false);
             roleAgentPM->setTarget(wm->field->oppGoal());
             // Parsa : ino hamintory avaz kardam kar kard...
-<<<<<<< 81406a893e63df10769114fc32345cc5505dd455
             roleAgentPM->setKickSpeed(6); // TODO : 8m/s by profiller
-=======
-            roleAgentPM->setKickSpeed(conf.MediumSpeedPass); // TODO : 8m/s by profiller
->>>>>>> fix it at least
+
             roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Shot); // Skill Kick
             break;
     }
