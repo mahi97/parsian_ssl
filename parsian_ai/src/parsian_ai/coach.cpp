@@ -240,7 +240,7 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             }
         }
     } else if (gameState->ourPlayOffKick()) {
-        if (wm->ball->pos.x < -1) {
+        if (wm->ball->pos.x < 1) {
             preferedDefenseCounts = (selectedPlay->defensePlan.findNeededDefense() == 1) ? 1 : 2;
 
         } else if (wm->ball->pos.x > 0.5) {
@@ -622,10 +622,12 @@ void CCoach::decideAttack() {
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
+        ROS_INFO_STREAM("nana gk: "<<goalieAgent->id());
     }
     for (auto defenseAgent : defenseAgents) {
         if (ourPlayersID.contains(defenseAgent->id())) {
             ourPlayersID.removeOne(defenseAgent->id());
+            ROS_INFO_STREAM("nana defenseAgent: "<<defenseAgent->id());
         }
     }
 
