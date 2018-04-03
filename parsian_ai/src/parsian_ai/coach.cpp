@@ -1575,13 +1575,15 @@ POffSkills CCoach::strToEnum(const std::string& _str) {
 }
 
 void CCoach::getBadsAndGoods(const QList<int>& _ourplayers) {
-
     const int max_robot_num = 12;
-    bool goods[max_robot_num] = {conf.good_0, conf.good_1, conf.good_2, conf.good_3, conf.good_4, conf.good_5,
-                                 conf.good_6, conf.good_7, conf.good_8, conf.good_9, conf.good_10, conf.good_11};
 
-    bool bads[max_robot_num] = {conf.bad_0, conf.bad_1, conf.bad_2, conf.bad_3, conf.bad_4, conf.bad_5,
-                                conf.bad_6, conf.bad_7, conf.bad_8, conf.bad_9, conf.bad_10, conf.bad_11};
+    bool goods[max_robot_num]
+            = {conf.good_0, conf.good_1, conf.good_2, conf.good_3, conf.good_4, conf.good_5,
+               conf.good_6, conf.good_7, conf.good_10, conf.good_11};
+
+    bool bads[max_robot_num]
+            = {conf.bad_0, conf.bad_1, conf.bad_2, conf.bad_3, conf.bad_4, conf.bad_5,
+               conf.bad_6, conf.bad_7, conf.bad_10, conf.bad_11};
 
     badshooters.clear();
     goodshooters.clear();
