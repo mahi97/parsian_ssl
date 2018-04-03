@@ -219,9 +219,7 @@ void CRoleDynamic::execute() {
             agent->action = oneTouchSkill;
             ROS_INFO_STREAM("kian: akharesh: ID:" << agent->id() << ", action: oneTouchSkill");
             break;
-        case PositionSkill::NoSkill:
-        default:
-            agent->action = nullptr;
+        case PositionSkill::NoSkill:;
             break;
         }
     }

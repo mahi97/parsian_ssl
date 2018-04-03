@@ -240,10 +240,10 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             }
         }
     } else if (gameState->ourPlayOffKick()) {
-        if (wm->ball->pos.x < -1) {
+        if (wm->ball->pos.x < 1) {
             preferedDefenseCounts = (selectedPlay->defensePlan.findNeededDefense() == 1) ? 1 : 2;
 
-        } else if (wm->ball->pos.x > 0.5) {
+        } else if (wm->ball->pos.x > 1.5) {
             preferedDefenseCounts = 0;
         }
 
@@ -623,10 +623,12 @@ void CCoach::decideAttack() {
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
+        ROS_INFO_STREAM("nana gk: "<<goalieAgent->id());
     }
     for (auto defenseAgent : defenseAgents) {
         if (ourPlayersID.contains(defenseAgent->id())) {
             ourPlayersID.removeOne(defenseAgent->id());
+            ROS_INFO_STREAM("nana defenseAgent: "<<defenseAgent->id());
         }
     }
 
@@ -812,7 +814,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-    MarkNum = 0;
+//    MarkNum = 0;
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
@@ -1752,20 +1754,16 @@ int CCoach::findGoalie() {
         preferedGoalieID = -1;
         ROS_INFO_STREAM("check goaliID first : " << preferedGoalieID);
 
-    } else
-    {
-        if (conf.GoalieFromGUI)
-        {
+    } else {
+        if (conf.GoalieFromGUI) {
             preferedGoalieID = conf.Goalie;
-        } else
-        {
+        } else {
             preferedGoalieID = wm->our.data->goalieID;
             ROS_INFO_STREAM("check goaliID from wm : " << preferedGoalieID);
 
         }
     }
-    if (gameState->timeOut() || gameState->halfTime())
-    {
+    if (gameState->timeOut() || gameState->halfTime()) {
         preferedGoalieID = -1;
         ROS_INFO_STREAM("check goaliID timeout : " << preferedGoalieID);
 
@@ -1789,7 +1787,6 @@ parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
 
     int _max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts},
             _min{conf.numberOfDefenseEval <= 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts};
-
 
 
     for (int i {_min}; i < _max+ 1; i++)
