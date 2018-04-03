@@ -286,34 +286,6 @@
                         },
                         {
                             "angel": 0,
-                            "pos-x": 2.8287292817679557,
-                            "pos-y": -3.1725000000000003,
-                            "skills": [
-                                {
-                                    "flag": false,
-                                    "name": "MoveSkill",
-                                    "primary": 0,
-                                    "secondary": 0
-                                }
-                            ],
-                            "tolerance": 30
-                        },
-                        {
-                            "angel": 0,
-                            "pos-x": 0.69613259668508309,
-                            "pos-y": -2.7225000000000001,
-                            "skills": [
-                                {
-                                    "flag": false,
-                                    "name": "MoveSkill",
-                                    "primary": 0,
-                                    "secondary": 0
-                                }
-                            ],
-                            "tolerance": 30
-                        },
-                        {
-                            "angel": 0,
                             "pos-x": 0.49723756906077288,
                             "pos-y": 2.1825000000000001,
                             "skills": [
@@ -353,22 +325,8 @@
                         },
                         {
                             "angel": 0,
-                            "pos-x": 1.569060773480663,
-                            "pos-y": 3.4874999999999998,
-                            "skills": [
-                                {
-                                    "flag": false,
-                                    "name": "MoveSkill",
-                                    "primary": 0,
-                                    "secondary": 0
-                                }
-                            ],
-                            "tolerance": 30
-                        },
-                        {
-                            "angel": 0,
                             "pos-x": 0.90607734806629914,
-                            "pos-y": 3.2850000000000001,
+                            "pos-y": 3.2962499999999997,
                             "skills": [
                                 {
                                     "flag": false,
