@@ -1703,8 +1703,15 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             PDEBUG("TS Mode :", 7 , D_AHZ);
             goalKeeperPredictionModeInPlayOff = false;
             goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal() , ballPrediction(true) , 1);
-            if(wm->field->ourBigPenaltyArea(1,0.1,0).contains(goalKeeperTarget))
-                return ;
+            if(wm->field->ourBigPenaltyArea(1,0.1,0).contains(goalKeeperTarget)) {
+                QList<int> empty;
+                empty.clear();
+                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) - 0.2)))//!Lhum 4 0.2
+                    return;
+                else {
+                    goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal(), ballPrediction(true), 0.5);
+                }
+            }
             drawer->draw(Circle2D(goalKeeperTarget, 0.9) , "white");
             drawer->draw(Segment2D(goalKeeperTarget , wm->field->ourGoal()) , "blue");
             if (!wm->field->isInOurPenaltyArea(goalKeeperTarget)) {
@@ -3422,6 +3429,9 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
         return predictedBall;
     }*/
+    else if(_isGoalie && !know->variables["transientFlag"].toBool()){
+        return wm->ball->pos;
+    }
     else if (_isGoalie) {
         wm->field->ourBigPenaltyArea(1, 0 , 0).intersection(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100 ), &solu[0], &solu[1]);/////////////////Lhum
         drawer->draw(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100)  , "black");
