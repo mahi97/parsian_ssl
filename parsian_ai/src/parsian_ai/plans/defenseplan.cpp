@@ -80,7 +80,6 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     return goalKeeperPosition;
 }
 
-
 Vector2D DefensePlan::getGKPositionInOneDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
     Vector2D goalkeeperPosition;
     Vector2D sol[2];
