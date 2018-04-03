@@ -1623,7 +1623,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     MWBM matcher;
     int passcount=0;
     passcount=min(_plan->execution.passCount+1,_ourplayers.size() );
-    ROS_INFO_STREAM("nana plan pass:"<<_plan->execution.passCount<<"pass count: "<< _plan->execution.passCount<<" , plan size: "<< _plan->common.currentSize );
     matcher.create(_plan->common.currentSize - passcount, _ourplayers.size()-passcount );
 
 
@@ -1633,8 +1632,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     double minweight = 100, secMinweight=100, thirdMinweight=100;
     getBadsAndGoods(_ourplayers);
     for(int i=0;i<passcount;i++) {
-        ROS_INFO_STREAM("nana passcounti:"<<i);
-        ROS_INFO_STREAM("nana goodshooters:"<<goodshooters.size());
+
         if (goodshooters.size() > 0) {
             for (int goodshooter:goodshooters) {
                 if (_ourplayers.contains(goodshooter)) {
@@ -1662,7 +1660,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                 }
 
 
-                ROS_INFO_STREAM("nana delete good:"<<_ourplayers[matchedID]);
                 goodshooters.removeOne(_ourplayers[matchedID]);
             }
         }
@@ -1674,7 +1671,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                         continue;
                 }
                 if(i==0) {
-                    ROS_INFO_STREAM("nana matching 0:"<<j);
                     weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
                     if (weight < minweight) {
                         minweight = weight;
@@ -1682,7 +1678,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                     }
                 }
                 else if (i==1 && j!= matchedID){
-                    ROS_INFO_STREAM("nana matching 1:"<<j);
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                     if(weight <  secMinweight)
                     {
@@ -1691,10 +1686,8 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                     }
                 }
                 else if (i==2 && j!= matchedID && j!= secMatchedID){
-                    ROS_INFO_STREAM("nana matching 2__"<<j<<" __:agent pos x:"<<agents[_ourplayers.at(j)]->pos().x<<"_y:"<<agents[_ourplayers.at(j)]->pos().y
-                                                       <<"plan pos : x:"<<_plan->matching.initPos.agents.at(i).x<<"_y:"<<_plan->matching.initPos.agents.at(i).y);
+
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
-                    ROS_INFO_STREAM("nana weight 2:"<<weight);
                     if(weight <  thirdMinweight)
                     {
                         thirdMinweight=weight;
@@ -1705,7 +1698,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         }
 
     }
-    ROS_INFO_STREAM("nana match 0:"<<matchedID<<"___1:"<<secMatchedID<<"___2:"<<thirdMatchedID);
 
 
     if (matchedID != -1) {
@@ -1725,7 +1717,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         int k =0;
         for (int j = 0; j < _ourplayers.size(); j++) {
             if (j != matchedID && j!= secMatchedID && j!= thirdMatchedID) {
-                ROS_INFO_STREAM("nana j:"<<j<<"_k:"<<k);
                 weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
                 matcher.setWeight(i - passcount, k, -(weight));
                 othersmatch.append(j);
@@ -1740,7 +1731,6 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         nmatchedID=othersmatch.at(nmatchedID);
 
         _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
-        ROS_INFO_STREAM("nana:" << _ourplayers.at(nmatchedID) << "__" << i << "__" << nmatchedID);
 
     }
     qDebug() << "[Coach] matched by" << _plan->common.matchedID;
