@@ -304,7 +304,7 @@ void CDynamicAttack::makePlan(int agentSize) {
 
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
-    if (wm->ball->pos.x < 0) {
+    if (isBallInOurField) {
         ROS_INFO_STREAM("kian: dont have the ball");
         currentPlan.mode = DynamicMode::NotWeHaveBall;
         if (conf.ChipForward && evalmovefwd()) {
@@ -1720,6 +1720,7 @@ void CDynamicAttack::chooseBestPositons_new()
             regionPriority << 4 << 2 << 5 << 1 << 3 << 0 << 7 << 6 << 8;
             break;
         default:
+            regionPriority << 7 << 2 << 8 << 1 << 6 << 0 << 4 << 5 << 3;
             break;
     }
 
@@ -1810,7 +1811,7 @@ int CDynamicAttack::getNearestRegionToRobot(Vector2D agentPos)
 
 void CDynamicAttack::assignId_new()
 {
-
+    if (regionPriority.isEmpty()) return;
     QList<Rect2D> searchRegions;
     for(int i{0}; i<3; i++)
     {
@@ -2072,8 +2073,8 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 //        return 0.0;
 //
 
-    auto effectiveHigh = (highIntersect - (Vector2D(wm->field->oppGoal()))).length() > fieldWidth/2 ? fieldWidth/2 : highIntersect;
-    auto effectiveLow = (highIntersect - (Vector2D(wm->field->oppGoal()))).length() > (fieldWidth/2) ? -(fieldWidth/2) : lowIntersect;
+    auto effectiveHigh = ((highIntersect - (Vector2D(wm->field->oppGoal()))).length() > fieldWidth/2) ? fieldWidth/2 : highIntersect.dist(wm->field->oppGoal());
+    auto effectiveLow = ((highIntersect - (Vector2D(wm->field->oppGoal()))).length() > (fieldWidth/2)) ? -(fieldWidth/2) : lowIntersect.dist(wm->field->oppGoal());
 
     double penaltyOffset = 0.3;
     auto extendedWidth = penaltyWidth + 2*penaltyOffset;

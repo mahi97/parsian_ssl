@@ -811,7 +811,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-    MarkNum = 0;
+//    MarkNum = 0;
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents

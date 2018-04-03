@@ -110,7 +110,7 @@ public:
     void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
     void assignTasks_new();
     bool getPMfromCaoch(){return PMfromCoach;};
-    int getReceiverID(){return receiver->id();};
+    int getReceiverID(){if (receiver != nullptr) return receiver->id(); else return -1;};
 
 
     void createRegions(); // splits the opp field into a grid of regions
