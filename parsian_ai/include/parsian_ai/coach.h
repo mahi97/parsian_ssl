@@ -120,6 +120,7 @@ private:
 
     CPlayOff *ourPlayOff;
     COurPenalty *ourPenalty;
+    COurPenaltyShootout* ourPenaltyShootout;
     COurBallPlacement *ourBallPlacement;
     CTheirDirect *theirDirect;
     CTheirPenalty *theirPenalty;
@@ -174,6 +175,7 @@ private:
     void decidePlayOff(QList<int> &_ourPlayers, POMODE _mode = INDIRECT);
 
     void decidePlayOn(QList<int> &ourPlayers, QList<int> &lastPlayers);
+
 
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr;
@@ -270,6 +272,10 @@ private:
     void decideOurPenalty(QList<int> &);
 
     void decideTheirPenalty(QList<int> &);
+
+    void decideOurPenaltyshootout(QList<int> &);
+
+    void decideTheirPenaltyshootout(QList<int> &);
 
     void decideStart(QList<int> &);
 
