@@ -8,6 +8,37 @@ using namespace std;
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA (1.697056275 + Robot::robot_radius_new)
 
 
+Vector2D DefensePlan::getGKPositionInOneDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
+    Vector2D goalkeeperPosition;
+    Vector2D sol[2];
+    Segment2D biggestLineOfBallTriangle;
+    Vector2D anotherIntesection;
+    int numberOfAgents = 1;
+    double robotRadius = Robot::robot_radius_new;
+    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForGK(getBestLineWithTallesForGK(numberOfAgents , firstPoint , originPoint , secondPoint) , firstPoint , originPoint , secondPoint , downLimit , upLimit));
+    drawer->draw(defenseArea , 0 , 180 , "red");
+    defenseArea.intersection(getBisectorLine(firstPoint , originPoint , secondPoint) , &sol[0] , &sol[1]);
+    goalkeeperPosition = sol[0].isValid() && sol[0].dist(originPoint) < sol[1].dist(originPoint) ? sol[0] : sol[1];
+    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
+    biggestLineOfBallTriangle = Segment2D(firstPoint , originPoint).length() < Segment2D(secondPoint , originPoint).length() ? Segment2D(firstPoint , originPoint) : Segment2D(secondPoint , originPoint);
+    if(firstPoint == wm->field->ourGoalL() || firstPoint == wm->field->ourGoalR()){
+        biggestLineOfBallTriangle = Segment2D(firstPoint , originPoint);
+    }
+    if(secondPoint == wm->field->ourGoalL() || secondPoint == wm->field->ourGoalR()){
+        biggestLineOfBallTriangle = Segment2D(secondPoint , originPoint);
+    }
+    double distanceFromYalForFirstPosition = biggestLineOfBallTriangle.dist(goalkeeperPosition);
+    if(distanceFromYalForFirstPosition > robotRadius){
+        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(goalkeeperPosition);
+        goalkeeperPosition += Vector2D(anotherIntesection - goalkeeperPosition).norm()*(distanceFromYalForFirstPosition - robotRadius);
+    }
+    else if(distanceFromYalForFirstPosition <= robotRadius){
+        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(goalkeeperPosition);
+        goalkeeperPosition += Vector2D(goalkeeperPosition - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
+    }
+    return goalkeeperPosition;
+}
+
 Vector2D DefensePlan::getGKPositionInTwoDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
     Vector2D goalkeeperPosition;
     Vector2D sol[2];
@@ -51,6 +82,7 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     switch (numberOfDefenders){
     case 0:{
         downLimit = 0.2;
+        drawer->draw(Circle2D(wm->field->center() , 0.5) , 0, 360 , "black");
         upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
         goalKeeperPosition = getGKPositionWithoutDefense(downLimit , upLimit);
         break;
@@ -80,30 +112,6 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     return goalKeeperPosition;
 }
 
-Vector2D DefensePlan::getGKPositionInOneDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
-    Vector2D goalkeeperPosition;
-    Vector2D sol[2];
-    Segment2D biggestLineOfBallTriangle;
-    Vector2D anotherIntesection;
-    int numberOfAgents = 1;
-    double robotRadius = Robot::robot_radius_new;
-    Circle2D defenseArea(wm->field->ourGoal(),findBestRadiusForGK(getBestLineWithTallesForGK(numberOfAgents , firstPoint , originPoint , secondPoint) , firstPoint , originPoint , secondPoint , downLimit , upLimit));
-    drawer->draw(defenseArea , 0 , 180 , "red");
-    defenseArea.intersection(getBisectorLine(firstPoint , originPoint , secondPoint) , &sol[0] , &sol[1]);
-    goalkeeperPosition = sol[0].isValid() && sol[0].dist(originPoint) < sol[1].dist(originPoint) ? sol[0] : sol[1];
-    /////////////////// Az bi chizi bar sikhaki malideh im :) ///////////////////////////////
-    biggestLineOfBallTriangle = Segment2D(firstPoint , originPoint).length() > Segment2D(secondPoint , originPoint).length() ? Segment2D(firstPoint , originPoint) : Segment2D(secondPoint , originPoint);
-    double distanceFromYalForFirstPosition = biggestLineOfBallTriangle.dist(goalkeeperPosition);
-    if(distanceFromYalForFirstPosition > robotRadius){
-        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(goalkeeperPosition);
-        goalkeeperPosition += Vector2D(anotherIntesection - goalkeeperPosition).norm()*(distanceFromYalForFirstPosition - robotRadius);
-    }
-    else if(distanceFromYalForFirstPosition <= robotRadius){
-        anotherIntesection = biggestLineOfBallTriangle.nearestPoint(goalkeeperPosition);
-        goalkeeperPosition += Vector2D(goalkeeperPosition - anotherIntesection).norm()*(robotRadius - distanceFromYalForFirstPosition);
-    }
-    return goalkeeperPosition;
-}
 
 double DefensePlan::findBestRadiusForGK(Line2D bestLineWithTalles ,Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
     double bestRadiusForDefenseArea = 0;
@@ -165,7 +173,7 @@ Line2D DefensePlan::getBestLineWithTallesForGK(int defenseCount , Vector2D first
     Segment2D ourGoalLine(firstPoint,  secondPoint);
     Segment2D smallerFrontageOfTriangle;
     Segment2D biggerFrontageOfTriangle;
-    if (Segment2D(firstPoint , originPoint).length() > Segment2D(secondPoint , originPoint).length()){
+    if (Segment2D(firstPoint , originPoint).length() >= Segment2D(secondPoint , originPoint).length()){
         biggerFrontageOfTriangle = Segment2D(firstPoint , originPoint);
         smallerFrontageOfTriangle = Segment2D(secondPoint , originPoint);
     } else {
@@ -2739,24 +2747,24 @@ void DefensePlan::executeGoalKeeper() {
         }
         //goalKeeperTarget = ballRectanglePoints.at(0).dist(goalKeeperAgent->pos()) < ballRectanglePoints.at(1).dist(goalKeeperAgent->pos()) ? ballRectanglePoints.at(0) : ballRectanglePoints.at(1);
     }
-    if (!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch && !stopMode && !ballIsBesidePoles) {
-        tempSol = wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperTarget));
-        if (tempSol.size()) {
-            if (tempSol.size() == 1) {
-                goalKeeperTarget = tempSol.at(0);
-            } else if (tempSol.size() == 2) {
-                goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
-            }
-        }
-    }
-    if(!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch && !stopMode && !ballIsBesidePoles) {
-        tempSol.append(wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperAgent->pos())));
-        if (tempSol.size() == 1) {
-            goalKeeperTarget = tempSol.at(0);
-        } else if (tempSol.size() == 2) {
-            goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
-        }
-    }
+//    if (!wm->field->isInOurPenaltyArea(goalKeeperTarget) && !goalKeeperOneTouch && !stopMode && !ballIsBesidePoles) {
+//        tempSol = wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperTarget));
+//        if (tempSol.size()) {
+//            if (tempSol.size() == 1) {
+//                goalKeeperTarget = tempSol.at(0);
+//            } else if (tempSol.size() == 2) {
+//                goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
+//            }
+//        }
+//    }
+//    if(!wm->field->isInOurPenaltyArea(goalKeeperAgent->pos()) && !goalKeeperOneTouch && !stopMode && !ballIsBesidePoles) {
+//        tempSol.append(wm->field->ourPAreaIntersect(Segment2D(wm->field->ourGoal() , goalKeeperAgent->pos())));
+//        if (tempSol.size() == 1) {
+//            goalKeeperTarget = tempSol.at(0);
+//        } else if (tempSol.size() == 2) {
+//            goalKeeperTarget = tempSol.at(0).dist(wm->ball->pos) < tempSol.at(1).dist(wm->ball->pos) ? tempSol.at(0) : tempSol.at(1);
+//        }
+//    }
     if (goalKeeperAgent != nullptr) {
         ROS_INFO_STREAM("1");
         DBUG(QString("goalKeeper clear mode : %1").arg(know->variables["goalKeeperClearMode"].toBool()) , D_AHZ);
