@@ -878,7 +878,34 @@ void CSkillKick::findPosToGo() {
         finalDir = Vector2D(cos(kickFinalDir.radian()), sin(kickFinalDir.radian()));
     }
 
-    //Todo: Penalty red
+    if(finalPos.x >wm->field->_FIELD_WIDTH/2 -  wm->field->_PENALTY_DEPTH - 0.1 && fabs(finalPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+        if(wm->field->oppBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+            if(sol1.dist(finalPos) > sol2.dist(finalPos)) {
+                if(sol2.x != wm->field->oppGoal().x) {
+                    sol1 = sol2;
+                }
+            }
+            if(sol1.x == wm->field->oppGoal().x)
+                sol1 = sol2;
+            finalPos = sol1;
+        }
+        finalDir = ballPos - finalPos;
+    }
+    if(finalPos.x < -1 * wm->field->_FIELD_WIDTH/2 +  wm->field->_PENALTY_DEPTH + 0.1 && fabs(finalPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+        if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+            drawer->draw(wm->field->ourBigPenaltyArea(1,0.1,0),QColor(Qt::red),true);
+            if(sol1.dist(finalPos) > sol2.dist(finalPos)) {
+                if(sol2.x >= -1 * wm->field->_FIELD_WIDTH/2 + 0.02) {
+                    sol1 = sol2;
+                }
+            }
+            if(sol1.x == wm->field->ourGoal().x)
+                sol1 = sol2;
+            finalPos = sol1;
+        }
+        finalDir = ballPos - finalPos;
+    }
+
     Vector2D s1, s2;
     Circle2D finalPosArea;
     Segment2D directPath(agentPos, finalPos);

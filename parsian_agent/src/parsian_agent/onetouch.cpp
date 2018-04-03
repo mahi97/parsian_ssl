@@ -181,11 +181,15 @@ void CSkillKickOneTouch::execute() {
         drawer->draw(QString("agentT : %1").arg(agentTime) , Vector2D(1, -1));
 
 
-        if (oppPenaltyAreaWP.contains(waitPos)) {
-            if (wm->field->oppPenaltyRect().intersection(ballLine, &sol1, &sol2) != 0) {
-                if (sol1.dist(waitPos) > sol2.dist(waitPos)) {
-                    sol1 = sol2;
+        if(intersectPos.x >wm->field->_FIELD_WIDTH/2 -  wm->field->_PENALTY_DEPTH - 0.1 && fabs(intersectPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+            if(wm->field->oppBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+                if(sol1.dist(ballPos)  < sol2.dist(ballPos)) {
+                    if(sol2.x != wm->field->oppGoal().x) {
+                        sol1 = sol2;
+                    }
                 }
+                if(sol1.x == wm->field->oppGoal().x)
+                    sol1 = sol2;
                 intersectPos = sol1;
             }
         }
