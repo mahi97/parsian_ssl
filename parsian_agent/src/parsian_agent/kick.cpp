@@ -258,7 +258,7 @@ void CSkillKick::waitAndKick() {
 
     gpa->init(intersectPos + addVec, oneTouchDir);
 
-    gpa->setOnetouchmode(true);
+    gpa->setOnetouchmode(false);
     gpa->execute();
 //    draw(intersectPos);
     // TODO : Robot Command
@@ -530,16 +530,16 @@ void CSkillKick::jTurn() {
         distCoef = 0.17;
     } else if (movementDir > 0) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 15;
+            shift = 5 + (1 - agentPos.dist(ballPos)) * 5;
         } else {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 20;
+            shift = 5 + (1 - agentPos.dist(ballPos)) * 15;
         }
         distCoef = 0.17;
     } else if (movementDir < 0) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 15;
+            shift = -5 - (1 - agentPos.dist(ballPos)) * 5;
         } else {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 20;
+            shift = -5 - (1 - agentPos.dist(ballPos)) * 15;
         }
 
         distCoef = 0.17;
@@ -564,7 +564,7 @@ void CSkillKick::jTurn() {
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
-    speedPid->kp = 5.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
+    speedPid->kp = 6.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
                    max(wm->ball->vel.length() * 2, 0);
 
 
@@ -583,7 +583,7 @@ void CSkillKick::jTurn() {
     double vx = movementThSpeed.x * speedPid->PID_OUT() ;//+ posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
     double vy = movementThSpeed.y * speedPid->PID_OUT() ;//+ posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);
     angPid->error = (kickFinalDir - agentDir.th()).radian();
-    agent->setRobotAbsVel(wm->ball->vel.x + vx, wm->ball->vel.y + vy, angPid->PID_OUT());
+    agent->setRobotAbsVel(wm->ball->vel.x*1.2 + vx, wm->ball->vel.y*1.2 + vy, angPid->PID_OUT());
     speedPid->pError = speedPid->error;
 
     posPid->pError = posPid->error;
@@ -800,7 +800,7 @@ void CSkillKick::findPosToGo() {
         if(isKhafan)
             distThr = 0.45;
         if (Circle2D(agentPos, 0.1).intersection(Segment2D(ballPos, wm->ball->getPosInFuture(0.5)), &dummy, &dummy)) {
-            gpa->setOnetouchmode(true);
+            gpa->setOnetouchmode(false);
             finalPos = ballPath.nearestPoint(kickerPoint);
 
         } else {
