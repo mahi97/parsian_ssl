@@ -284,7 +284,7 @@ private:
     //// MAHI STUFF
     int lastAgentCount;
     void validateSegment(Segment2D& segment);
-
+    bool inTimePlan();
 protected:
     void reset() override;
 };

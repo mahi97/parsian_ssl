@@ -442,13 +442,9 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         mahiAgentsID[i] = -1;
     }
 
-    makePlan(agentSize);
+    if (inTimePlan()) {
+        makePlan(agentSize);
 
-    for (int i = 0; i < agents.size(); i++) {
-        if (agents[i]->isVisible() && agents[i]->action != nullptr) {
-            Action *mahi = agents[i]->action;
-            ROS_INFO_STREAM(i << ": " << mahi->getActionName().toStdString().c_str());
-        }
     }
 
     if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
@@ -1734,10 +1730,8 @@ void CDynamicAttack::chooseBestPositons_new()
     int passSenderID{playmake->id()};
     ROS_INFO_STREAM("hamid playkame ID: " << passSenderID);
     Vector2D passSenderPos;
-    Vector2D passSenderDir;
     if(passSenderID != -1) {
         passSenderPos = wm->our[passSenderID]->pos;
-        passSenderDir  = wm->our[passSenderID]->dir;
         ourRelaxedIDs.append(passSenderID);
     } else {
         passSenderPos.invalidate();
@@ -2027,7 +2021,7 @@ void CDynamicAttack::clearRobotsRegionsWeights()
         for(int j{0}; j<9; j++)
         {
             robotRegionsWeights[i][j] = -1.0;
-            bestPointForRobotsInRegions[i][j] = Vector2D(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
+            bestPointForRobotsInRegions[i][j].invalidate();
         }
     }
 }
@@ -2255,4 +2249,14 @@ void CDynamicAttack::validateSegment(Segment2D &seg) {
         mid = (seg.a() + seg.b()) / 2;
     }
 
+}
+
+bool CDynamicAttack::inTimePlan() {
+    if (playmake != nullptr) {
+        if (wm->ball->pos.dist(playmake->pos()) < 1.0) {
+            return true;
+        }
+
+    }
+    return false;
 }
