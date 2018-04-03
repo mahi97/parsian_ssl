@@ -39,6 +39,8 @@ void CRolePlayOff::reset() {
 }
 
 void CRolePlayOff::update() {
+
+    normalSpeed = normalaizeKickSpeed();
     switch (selectedSkill) {
     case RoleSkill::Gotopoint:
         break;
@@ -57,7 +59,7 @@ void CRolePlayOff::update() {
         kickSkill->setTarget(target);
         kickSkill->setAvoidpenaltyarea(avoidPenaltyArea);
         kickSkill->setInterceptmode(intercept);
-        kickSkill->setKickspeed(kickSpeed);
+        kickSkill->setKickspeed(normalSpeed);
         kickSkill->setChip(chip);
         kickSkill->setDontkick(!doPass);
         kickSkill->setTolerance(0.5);
@@ -150,4 +152,20 @@ int CRolePlayOff::resetTime() {
 
 int CRolePlayOff::getElapsed() const {
     return timer.elapsed();
+}
+
+double normalaizeKickSpeed()
+{
+    double normalSpeed;
+
+    if(kickSpeed>=0 && kickSpeed<= 6.5)
+        normalSpeed = kickSpeed;
+    else if (kickSpeed >6.5 && kickSpeed <= 12)
+        normalSpeed = 6.5;
+    else if (kickSpeed >10 && kickSpeed <= 650)
+                normalSpeed = ((double)kickSpeed)/100.0;
+    else if (kickSpeed>650 && kickSpeed <= 1023)
+        normalSpeed = 6.5;
+
+    return normalSpeed;
 }
