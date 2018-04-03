@@ -278,14 +278,8 @@ void CRolePlayMake::executeOurPenaltyShootout() {
 
     // working here
     bool chipchip = false;
-<<<<<<< HEAD
-
-    DBUG("penalty Shootout : ", D_NADIA);
-    if (abs(wm->ball->pos.x) > 4.4) { //penalty finished
-=======
     DBUG("penalty Shootout : ", D_NADIA);
     if (fabs(wm->ball->pos.x) > fabs(wm->field->oppGoal().x - 0.1)) { //penalty finished
->>>>>>> 7c2d22341e952c8162f552c017ef43bd14a9b720
         firstKick = true;
     }
     if (gameState->ourPenaltyShootout() && !gameState->ready()/*knowledge->getGameMode()==CKnowledge::Stop*/) {
@@ -450,10 +444,7 @@ void CRolePlayMake::execute() {
         return;
 
     } else if (gameState->ourPenaltyShootout()) {
-<<<<<<< HEAD
-=======
         ROS_INFO_STREAM("shootout: execute->playmakerol: ");
->>>>>>> 7c2d22341e952c8162f552c017ef43bd14a9b720
         DBUG(QString("st:%1").arg(!gameState->ourPenaltyShootout()), D_NADIA);
         executeOurPenaltyShootout();
         return;
