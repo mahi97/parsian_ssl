@@ -158,7 +158,7 @@ private:
     QList<Agent *> lastDefenseAgents;
 
     void matchPlan(NGameOff::SPlan *_plan, const QList<int> &_ourplayers);
-    void getBadsAndGoods();
+    void getBadsAndGoods(const QList<int>& _ourplayers);
     QList<int> badshooters;
     QList<int> goodshooters;
 

@@ -1437,12 +1437,13 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
 
         NGameOff::SPlan *thePlan = planMsgToSPlan(receivedPlan, _ourplayers.size());
 
-        matchPlan(thePlan, _ourplayers); //Match The Plan
 
-        checkGUItoRefineMatch(thePlan, _ourplayers);
         ourPlayOff->setMasterPlan(thePlan);
         ourPlayOff->analyseShoot(); // should call after setmasterplan
         ourPlayOff->analysePass();  // should call after setmasterplan
+        checkGUItoRefineMatch(thePlan, _ourplayers);
+
+        matchPlan(thePlan, _ourplayers); //Match The Plan
         ourPlayOff->setInitial(true);
         ourPlayOff->lockAgents = true;
         //        lastPlan = thePlan;
@@ -1593,7 +1594,7 @@ POffSkills CCoach::strToEnum(const std::string& _str) {
     }
 }
 
-void CCoach::getBadsAndGoods() {
+void CCoach::getBadsAndGoods(const QList<int>& _ourplayers) {
 
     bool goods[10] = {conf.good_0, conf.good_1, conf.good_2, conf.good_3, conf.good_4,
                       conf.good_5, conf.good_6, conf.good_7, conf.good_8, conf.good_9};
@@ -1603,26 +1604,37 @@ void CCoach::getBadsAndGoods() {
     badshooters.clear();
     goodshooters.clear();
     for (int i = 0; i < 10; i++) {
-        if (bads[i])
-            badshooters.append(i);
-        else if (goods[i])
-            goodshooters.append(i);
-    }
+        if (_ourplayers.contains(i)) {
+            if (bads[i]) {
+                badshooters.append(i);
 
+            } else if (goods[i]) {
+
+                goodshooters.append(i);
+            }
+
+        }
+
+    }
 }
 
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     MWBM matcher;
-    matcher.create(_plan->common.currentSize - _plan->execution.passCount-1, _ourplayers.size()-_plan->execution.passCount-1 );
+    int passcount=0;
+    passcount=min(_plan->execution.passCount+1,_ourplayers.size() );
+    ROS_INFO_STREAM("nana plan pass:"<<_plan->execution.passCount<<"pass count: "<< _plan->execution.passCount<<" , plan size: "<< _plan->common.currentSize );
+    matcher.create(_plan->common.currentSize - passcount, _ourplayers.size()-passcount );
 
 
 
     int matchedID = -1,secMatchedID=-1, thirdMatchedID=-1;
     double weight = 0;
     double minweight = 100, secMinweight=100, thirdMinweight=100;
-    for(int i=0;i<_plan->execution.passCount+1;i++) {
-        ROS_INFO_STREAM("passcounti:"<<i);
+    getBadsAndGoods(_ourplayers);
+    for(int i=0;i<passcount;i++) {
+        ROS_INFO_STREAM("nana passcounti:"<<i);
+        ROS_INFO_STREAM("nana goodshooters:"<<goodshooters.size());
         if (goodshooters.size() > 0) {
             for (int goodshooter:goodshooters) {
                 if (_ourplayers.contains(goodshooter)) {
@@ -1633,13 +1645,13 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                             minweight = weight;
                             matchedID = j;
                         }
-                    } else if (i == 1) {
+                    } else if (i == 1 && j!= matchedID) {
                         weight = agents[j]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             secMinweight = weight;
                             secMatchedID = j;
                         }
-                    } else if (i == 2) {
+                    } else if (i == 2 && j!= matchedID && j!= secMatchedID) {
                         weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             thirdMinweight = weight;
@@ -1650,19 +1662,19 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                 }
 
 
-                ROS_INFO_STREAM("delet good:"<<_ourplayers[matchedID]);
-                goodshooters.removeAt(_ourplayers[matchedID]);
+                ROS_INFO_STREAM("nana delete good:"<<_ourplayers[matchedID]);
+                goodshooters.removeOne(_ourplayers[matchedID]);
             }
         }
         else{
 
             for (int j = 0; j < _ourplayers.size(); j++) {
                 if(badshooters.size()<_ourplayers.size()-i) {
-                    if (badshooters.contains(agents[j]->id()))
+                    if (badshooters.contains(agents[_ourplayers.at(j)]->id()))
                         continue;
                 }
                 if(i==0) {
-                    ROS_INFO_STREAM("matching 0:"<<j);
+                    ROS_INFO_STREAM("nana matching 0:"<<j);
                     weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
                     if (weight < minweight) {
                         minweight = weight;
@@ -1670,8 +1682,8 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                     }
                 }
                 else if (i==1 && j!= matchedID){
-                    ROS_INFO_STREAM("matching 1:"<<j);
-                    weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
+                    ROS_INFO_STREAM("nana matching 1:"<<j);
+                    weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                     if(weight <  secMinweight)
                     {
                         secMinweight=weight;
@@ -1679,8 +1691,10 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                     }
                 }
                 else if (i==2 && j!= matchedID && j!= secMatchedID){
-                    ROS_INFO_STREAM("matching 2:"<<j);
-                    weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
+                    ROS_INFO_STREAM("nana matching 2__"<<j<<" __:agent pos x:"<<agents[_ourplayers.at(j)]->pos().x<<"_y:"<<agents[_ourplayers.at(j)]->pos().y
+                                                       <<"plan pos : x:"<<_plan->matching.initPos.agents.at(i).x<<"_y:"<<_plan->matching.initPos.agents.at(i).y);
+                    weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
+                    ROS_INFO_STREAM("nana weight 2:"<<weight);
                     if(weight <  thirdMinweight)
                     {
                         thirdMinweight=weight;
@@ -1691,7 +1705,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         }
 
     }
-    ROS_INFO_STREAM("match 0:"<<matchedID<<"___1:"<<secMatchedID<<"___2:"<<thirdMatchedID);
+    ROS_INFO_STREAM("nana match 0:"<<matchedID<<"___1:"<<secMatchedID<<"___2:"<<thirdMatchedID);
 
 
     if (matchedID != -1) {
@@ -1704,27 +1718,26 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
         _plan->common.matchedID.insert(2, _ourplayers.at(thirdMatchedID));
     }
 
+    QList<int> othersmatch;
 
-
-    for (int i =_plan->execution.passCount+1 ; i < _plan->common.currentSize; i++) {
+    othersmatch.clear();
+    for (int i = passcount; i < _plan->common.currentSize; i++) {
+        int k =0;
         for (int j = 0; j < _ourplayers.size(); j++) {
             if (j != matchedID && j!= secMatchedID && j!= thirdMatchedID) {
+                ROS_INFO_STREAM("nana j:"<<j<<"_k:"<<k);
                 weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
-                matcher.setWeight(i -_plan->execution.passCount-1, j, -(weight));
-
+                matcher.setWeight(i - passcount, k, -(weight));
+                othersmatch.append(j);
+                k++;
             }
         }
     }
     int nmatchedID = -1;
     qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
-    for (size_t i = _plan->execution.passCount+1; i < _plan->common.currentSize; i++) {
-        nmatchedID = matcher.getMatch(i - _plan->execution.passCount-1);
-        if (nmatchedID >= matchedID)
-            nmatchedID++;
-        if (nmatchedID >= secMatchedID)
-            nmatchedID++;
-        if (nmatchedID >= thirdMatchedID)
-            nmatchedID++;
+    for (size_t i = passcount; i < _plan->common.currentSize; i++) {
+        nmatchedID = matcher.getMatch(i - passcount);
+        nmatchedID=othersmatch.at(nmatchedID);
 
         _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
         ROS_INFO_STREAM("nana:" << _ourplayers.at(nmatchedID) << "__" << i << "__" << nmatchedID);
@@ -1803,6 +1816,7 @@ parsian_msgs::parsian_ai_statusPtr CCoach::fillAIStatus()
 
     int _max{conf.numberOfDefenseEval > 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts},
             _min{conf.numberOfDefenseEval <= 0 ? preferedDefenseCounts + conf.numberOfDefenseEval : preferedDefenseCounts};
+
 
 
     for (int i {_min}; i < _max+ 1; i++)
