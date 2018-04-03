@@ -1478,6 +1478,7 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
     }
 }
 
+
 void DefensePlan::setGoalKeeperState(){
     //// In this function,we determine the specific states that goalkeeper must
     //// have a logical behavior by good conditions.In other word we have some
@@ -3445,6 +3446,7 @@ void DefensePlan::findOppAgentsToMark(){
     }
 }
 
+
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
     //// This function predicts the opponent agent with considering the position
     //// && velocity of the opponent agent.
@@ -3471,6 +3473,7 @@ Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
         return opp->pos + VelReliabiity * opp->vel;
     }
 }
+
 
 void DefensePlan::findPos(int _markAgentSize){
     //// In this function, we choose the different plans of the mark in different
