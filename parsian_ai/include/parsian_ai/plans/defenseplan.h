@@ -82,6 +82,9 @@ protected:
     Vector2D getGoaliePositionInOneDef(Vector2D _ballPos, double _limit1, double _limit2);
     double goalieThr;
     ////////
+    /// \brief angleDegreeThrNotStop
+    Vector2D lastTargetForStrictFollow;
+    double AHZDegThreshOld = 0;
     int angleDegreeThrNotStop = 0;
     double besideCounter;
     int lastOpponentAgentsToBeMarkSize;
