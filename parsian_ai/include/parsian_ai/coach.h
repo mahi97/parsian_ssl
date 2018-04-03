@@ -120,6 +120,7 @@ private:
 
     CPlayOff *ourPlayOff;
     COurPenalty *ourPenalty;
+    COurPenaltyShootout* ourPenaltyShootout;
     COurBallPlacement *ourBallPlacement;
     CTheirDirect *theirDirect;
     CTheirPenalty *theirPenalty;
@@ -175,6 +176,7 @@ private:
 
     void decidePlayOn(QList<int> &ourPlayers, QList<int> &lastPlayers);
 
+
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr;
 
@@ -189,7 +191,7 @@ private:
     ///////////////////////new play make and supporter chooser
     int playmakeId;
     int supporterId;
-    double playMakeTh;
+    int lastSupporterId;
     int lastPlayMake;
 
     void choosePlaymakeAndSupporter();
@@ -270,6 +272,10 @@ private:
     void decideOurPenalty(QList<int> &);
 
     void decideTheirPenalty(QList<int> &);
+
+    void decideOurPenaltyshootout(QList<int> &);
+
+    void decideTheirPenaltyshootout(QList<int> &);
 
     void decideStart(QList<int> &);
 

@@ -79,7 +79,6 @@ void CPlayOff::globalExecute() {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
         if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
-            //             TODO : write critical play here
             if (criticalPlay()) {
                 ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
@@ -1248,7 +1247,7 @@ bool CPlayOff::isTimeOver() {
     if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
         setTimer = false;
         ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
-        if(ros::Time::now().sec - tempStart >= 2*masterPlan->execution.passCount) { // 2 Second
+        if(ros::Time::now().sec - tempStart >= 3*masterPlan->execution.passCount) { // 2 Second
             setTimer = true;
             return true;
         }
