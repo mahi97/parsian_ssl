@@ -1706,7 +1706,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             if(wm->field->ourBigPenaltyArea(1,0.1,0).contains(goalKeeperTarget)) {
                 QList<int> empty;
                 empty.clear();
-                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) - 0.2)))//!Lhum 4 0.2
+                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) - 0.5)))//!Lhum 4 0.2
                     return;
                 else {
                     goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal(), ballPrediction(true), 0.5);
@@ -2811,11 +2811,12 @@ void DefensePlan::executeGoalKeeper() {
             kickSkill->setKickspeed(0);
             if (goalKeeperPredictionModeInPlayOff) {
                 ROS_INFO_STREAM("E: 4");
+                drawer->draw(Circle2D(goalKeeperTarget , 0.4) , "red");
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
             } else {
                 ROS_INFO_STREAM("E: 5");
-                drawer->draw(Circle2D(goalKeeperTarget , 0.4) , "red");
+                drawer->draw(Circle2D(goalKeeperTarget , 0.1) , "blue");
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);//lhum
             }
