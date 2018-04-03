@@ -40,7 +40,7 @@ void CRolePlayOff::reset() {
 
 void CRolePlayOff::update() {
 
-    normalSpeed = normalaizeKickSpeed();
+    double normalSpeed = normalaizeKickSpeed();
     switch (selectedSkill) {
     case RoleSkill::Gotopoint:
         break;
@@ -154,7 +154,7 @@ int CRolePlayOff::getElapsed() const {
     return timer.elapsed();
 }
 
-double normalaizeKickSpeed()
+double CRolePlayOff::normalaizeKickSpeed()
 {
     double normalSpeed;
 
