@@ -511,7 +511,6 @@ void CSkillKick::jTurn() {
     ////////////set Active adaptive PIDs
 
 
-    dirReduce = (fabs(movementDir) / 70) * (fabs(movementDir) / 70);
     if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15) &&
         agentPos.dist(ballPos) < 0.35) {
         dirReduce -= 4.5;
@@ -519,7 +518,6 @@ void CSkillKick::jTurn() {
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
     speedPid->kp = 5 + 2.1 * agentPos.dist(ballPos) + dirReduce + wm->ball->vel.length()*0.4;
-
 
     if (penaltyKick) {
         angPid->kp = 7;
@@ -938,7 +936,7 @@ void CSkillKick::execute() {
 
 
 
-    drawer->draw(Segment2D(agent->pos(),agentPos+ agent->dir().norm()*10));
+    drawer->draw(QString("ball vel: %1").arg(wm->ball->vel.length()),Vector2D(2,-2));
     ballRealVel = wm->ball->vel.length();
     agentPos = agent->pos();
     kkDist = agentPos.dist(target);
