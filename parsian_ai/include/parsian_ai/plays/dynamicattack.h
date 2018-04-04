@@ -95,13 +95,22 @@ class CDynamicAttack : public CMasterPlay {
 
 public:
 
+
+
+    CDynamicAttack();
+    ~CDynamicAttack() override;
+
+    void execute_x() override;
+    void init(const QList <Agent*>& _agents) override;
+
+
     // NEW PASS ZONE
     void chooseBestPositons_new();
     void assignId_new();
     void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
     void assignTasks_new();
     bool getPMfromCaoch(){return PMfromCoach;};
-    int getReceiverID(){return receiver->id();};
+    int getReceiverID(){if (receiver != nullptr) return receiver->id(); else return -1;};
 
 
     void createRegions(); // splits the opp field into a grid of regions
@@ -115,16 +124,11 @@ public:
     double calcReceiverDistanceFactor(Vector2D point, int passReceiverID, int region_id);
     double calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point);
     double caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis_new);
-    double calcOneTouchAngleFactor(Vector2D point, Vector2D passSenderPos);
+    double calcOneTouchAngleFactor(Vector2D point);
     double calcWidenessFactor(Vector2D passSenderPos, Vector2D point);
+    double calcNotInWayFactor(Vector2D passSenderPos, Vector2D point);
     void hamidDebug();
     // END NEW PASS ZONE
-
-    CDynamicAttack();
-    ~CDynamicAttack() override;
-
-    void execute_x() override;
-    void init(const QList <Agent*>& _agents) override;
 
     void setDefenseClear(bool _isDefenseClearing);
     void setDirectShot(bool _directShot);
@@ -143,12 +147,11 @@ public:
     SDynamicPlan* nextPlanA;
     SDynamicPlan* nextPlanB;
 
-    Agent* getMahiPlayMaker();
-
 private:
     // NEW PASS ZONE
     FieldRegion regions[3][3];
     QList<int> ourRelaxedIDs, oppRelaxedIDs;
+    QList<int> regionPriority;
     double robotRegionsWeights[11][9];
     Vector2D bestPointForRobotsInRegions[11][9];
     QList<int> matchingIDs;
@@ -217,7 +220,6 @@ private:
     int farGuardFromPoint(const int& _guardIndex, const Vector2D& _point);
     void chooseReceiverAndBestPosForPass();
     void chooseBestPositons();
-    void chooseMarkPos();
     double getDynamicValue(const Vector2D& _dynamicPos) const;
     void checkPoints(QList<Vector2D>& _points);
 
@@ -226,6 +228,7 @@ private:
 
     ///////////////////
     bool isPathClear(Vector2D _pos1, Vector2D _pos2, double rad, double t);
+    bool isPathClearFromOpp(Vector2D _pos1, Vector2D _pos2, double rad, double t);
 
     inline bool chipOrNot(Vector2D target,
                           double _radius = 1, double _treshold = .5);
@@ -234,7 +237,6 @@ private:
 
     Vector2D neaerstGuardToPoint(const Vector2D& startVec) const;
 
-    void managePasser();
     bool isPlayMakeChanged();
 
     QString getString(const DynamicMode& _mode) const;
@@ -255,11 +257,14 @@ private:
     QList<Vector2D> dynamicPosition;
     QList<int> regionsList;
     Agent* mahiPlayMaker;
+    Agent* mahiSupporter;
     int mahiAgentsID[8];
     bool isBallInOurField;
 
-    int playmakeID = -1;
     Agent* playmake;
+
+    int supporterID = -1;
+    Agent* supporter;
 
     bool goToDynamic[5];
     int lastPlayMakerId;
@@ -275,9 +280,14 @@ private:
 
     QList<int> kianmatchedIDList;
     bool PMfromCoach;
+    Vector2D getEmptyTarget(const Vector2D& _position, const double& _radius);
     /////////Intentions
 //    int intenHighProb;
 
+    //// MAHI STUFF
+    int lastAgentCount;
+    void validateSegment(Segment2D& segment);
+    bool inTimePlan();
 protected:
     void reset() override;
 };

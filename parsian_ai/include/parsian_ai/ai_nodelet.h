@@ -29,7 +29,7 @@ class AINodelet : public nodelet::Nodelet {
 
 private:
     boost::shared_ptr<AI> ai;
-    ros::Subscriber worldModelSub, robotStatusSub, refereeSub, teamConfSub, behaviorSub, mousePosSub,forceRefereeSub;
+    ros::Subscriber worldModelSub, robotStatusSub, refereeSub, teamConfSub, behaviorSub, mousePosSub,forceRefereeSub, robotfaultSub;
     ros::Publisher drawPub;
 
     ros::Publisher *robTask;
@@ -52,6 +52,7 @@ private:
     void behaviorCb(const parsian_msgs::parsian_behaviorConstPtr& _behavior);
     void timerCb(const ros::TimerEvent &event);
     void mousePosCb(const parsian_msgs::vector2DConstPtr& _mousePos);
+    void faultdetectionCallBack(const parsian_msgs::parsian_robot_fault & _rs);
 
 };
 }

@@ -341,6 +341,7 @@ private:
     bool initial;
 
     bool firstPass;
+    bool isOnetouch;
 
     SPlan* masterPlan;
     EMode masterMode;
