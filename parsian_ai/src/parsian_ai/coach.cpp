@@ -1212,27 +1212,30 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
 
     getBadsAndGoods(_ourPlayers);
 
-    if(goodshooters.size() > 0){
+    if(goodshooters.size() > 0) {
         double minweight = 200, weight = 200;
         int minID = -1;
+
         for (int goodshooter: goodshooters) {
-            int j = _ourPlayers.indexOf(goodshooter);
-            weight = agents[_ourPlayers.at(j)]->pos().dist(wm->ball->pos);
-            if (weight < minweight) {
-                minweight = weight;
-                minID = j;
+            if(_ourPlayers.contains(goodshooter)) {
+                int j = _ourPlayers.indexOf(goodshooter);
+                weight = agents[goodshooter]->pos().dist(wm->ball->pos);
+                if (weight < minweight) {
+                    minweight = weight;
+                    minID = j;
+                }
             }
         }
-        if(minID != -1){
-            CRoleStop::info()->setAgentBehindBall(goodshooters.at(minID));
+        if (minID != -1) {
+            CRoleStop::info()->setAgentBehindBall(_ourPlayers.at(minID));
         } else {
             CRoleStop::info()->setAgentBehindBall(goodshooters.at(0));
         }
     } else if(badshooters.size() >= _ourPlayers.size()) {
         CRoleStop::info()->setAgentBehindBall(-1);
     } else {
-        for(int i=0;i<_ourPlayers.size();i++){
-            if(!badshooters.contains(i)){
+        for (int i = 0; i < _ourPlayers.size(); i++) {
+            if (!badshooters.contains(i)) {
                 CRoleStop::info()->setAgentBehindBall(i);
                 break;
             }
@@ -1642,6 +1645,8 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     double weight = 0;
     double minweight = 100, secMinweight = 100, thirdMinweight = 100;
     getBadsAndGoods(_ourplayers);
+    goodshooters.clear();
+    badshooters.clear();
 
     for (int i = 0; i < passcount; i++) {
 

@@ -97,13 +97,14 @@ void CRoleStopInfo::findPositions() {
         robotId.append(agentIDBehindBall);
 
         QList<Agent*> temp;
+
         for (int i = 0; i < count(); i++) {
             if (robot(i)->id() != agentIDBehindBall) {
                 temp.append(robot(i));
             }
         }
         int k = 0;
-        for (int i = 0; i < count()-1; i++) {
+        for (int i = 0; i < temp.size(); i++) {
             for (int j = 1; j < Ps.count(); j++) {
                 matcher.setWeight(i, j - 1, -Ps[j].dist(temp.at(i)->pos()));
             }
