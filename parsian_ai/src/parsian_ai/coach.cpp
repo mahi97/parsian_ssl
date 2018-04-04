@@ -414,16 +414,13 @@ void CCoach::assignDefenseAgents(int defenseCount) {
 
 }
 
-bool CCoach::isBallcollide() {
+bool CCoach::isBallcollide(int framCount, double diffDir) {
 
-    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0){
-        ROS_INFO_STREAM("KALI : hanooz harkat nakarde");
-        return false;
-    }
+    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0) return false;
     lastBallVels.append(std::move(wm->ball->vel));
     averageVel += wm->ball->vel.length();
     if(lastBallVels.size()>2){
-        float innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
+        double innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
 
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
@@ -436,13 +433,13 @@ bool CCoach::isBallcollide() {
             return false;
         }
 
-        if(innerproduct > .985){  // <10 degree
+        if(innerproduct > cos(diffDir*0.6*M_PI/180)){
             removeLastBallVel();
             ROS_INFO_STREAM("KALI : saff mire");
             return false;
         }
 
-        if(innerproduct < .966){// 15 degree
+        if(innerproduct < cos(diffDir*M_PI/180)){
             ROS_INFO_STREAM("KALI : taghir jahat");
             clearBallVels();
             return true;
@@ -454,13 +451,13 @@ bool CCoach::isBallcollide() {
         }
     }
 
-    removeLastBallVel();
+    removeLastBallVel(framCount);
     ROS_INFO_STREAM("KALI : hichi nashod");
     return false;
 }
-void CCoach::removeLastBallVel(){
+void CCoach::removeLastBallVel(int frameCount){
     averageVel -=  lastBallVels.first().length();
-    if(lastBallVels.size() > 5)
+    if(lastBallVels.size() > frameCount)
         lastBallVels.removeFirst();
 
 }
@@ -562,11 +559,14 @@ void CCoach::choosePlaymakeAndSupporter(){
         return;
     }
 
+
+
+    ROS_INFO_STREAM("MAHI INTENTION: " << playMakeIntention.elapsed());
     ////////////////////first we choose our playmake
     double ballVel = wm->ball->vel.length();
     Vector2D ballPos = wm->ball->pos;
     if (ballVel < 0.4) {
-        double maxD = -1000.1;
+        double maxD = -10000000.1;
         for (const auto& player : ourPlayers) {
             double o = -1 * agents[player]->pos().dist(ballPos) ;
             if (player == lastPlayMake) {
@@ -578,11 +578,6 @@ void CCoach::choosePlaymakeAndSupporter(){
             }
         }
     } else {
-        if (playMakeIntention.elapsed() < conf.playMakeIntention) { // TODO : fix config
-            playmakeId = lastPlayMake;
-            return;
-        }
-        playMakeIntention.restart();
 
         double maxD = -10000000.1;
         for (const auto& player : ourPlayers) {
@@ -597,6 +592,16 @@ void CCoach::choosePlaymakeAndSupporter(){
 
         }
 
+    }
+
+    if (lastPlayMake != playmakeId || isBallcollide(3, 30)) {
+        playMakeIntention.restart();
+
+    } else {
+        if (playMakeIntention.elapsed() < conf.playMakeIntention) {
+            playmakeId = lastPlayMake;
+            return;
+        }
     }
 
     lastPlayMake = playmakeId;
@@ -1945,3 +1950,4 @@ bool CCoach::isFastPlay() {
         return true; // TODO : fix this by considering that opp agents
     }
 }
+

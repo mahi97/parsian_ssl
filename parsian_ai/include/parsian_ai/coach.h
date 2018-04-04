@@ -92,19 +92,11 @@ private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
     QList <Vector2D> ballHist;
-    //////////////////////////
-    bool lastASWasCritical;
-    Vector2D passPos;
-    bool passPlayMake;
-    Vector2D lastBallVelPM;
-    Vector2D lastBallPos;
 
     double findMostPossible(Vector2D agentPos);
 
     States lastState;
     Agent *goalieAgent;
-    Agent *exeptionPlayMake;
-    double exeptionPlayMakeThr;
 
     QList<Agent *> defenseAgents;
     int preferedDefenseCounts, lastPreferredDefenseCounts;
@@ -113,8 +105,6 @@ private:
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
-    double playMakeIntentionInterval;
-    double possessionIntentionInterval;
 
     CMasterPlay *selectedPlay;
 
@@ -189,7 +179,7 @@ private:
     QTime trasientTimeOut;
     int translationTimeOutTime;
 
-    bool isBallcollide();
+    bool isBallcollide(int frameCount = 5, double diffDir = 15);
 
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
@@ -252,7 +242,7 @@ private:
     QList<Vector2D> lastBallVels;
     Vector2D startTransientBallPos;
 
-    void removeLastBallVel();
+    void removeLastBallVel(int frameCount = 5);
     void clearBallVels();
 
     //////////////Decide Attack functions
@@ -323,5 +313,10 @@ private:
 
     void findDefneders(const int &max_number, const int& min_number);
     NoAction* haltAction;
+
+//    QList<Vector2D> lastBallVel;
+    QList<Vector2D> lastBallDir;
+
+
 };
 #endif //PARSIAN_AI_COACH_H
