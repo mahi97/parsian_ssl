@@ -7,6 +7,10 @@ CRoleStopInfo* CRoleStop::m_info = new CRoleStopInfo("stop");
 CRoleStopInfo::CRoleStopInfo(QString _roleName)
         : CRoleInfo(_roleName) {
     //  inCorner = -1;
+    agentIDBehindBall = -1;
+}
+void CRoleStopInfo::setAgentBehindBall(int agentId) {
+    agentIDBehindBall = agentId;
 }
 
 Vector2D CRoleStopInfo::getEmptyTarget(const Vector2D& _position, const double& _radius) {
@@ -65,15 +69,57 @@ void CRoleStopInfo::findPositions() {
         Ps.append(getEmptyTarget(startPos*(1.0 - (double)(i)/count()) + endPos*((double)(i)/count()), 1));
     }
 
-    MWBM matcher;
-    matcher.create(count(), Ps.count());
-    for (int i = 0; i < count(); i++)
-        for (int j = 0 ;j < Ps.count(); j++)
-            matcher.setWeight(i, j, -Ps[j].dist(robot(i)->pos()));
 
-    matcher.findMatching();
-    for (int i = 0; i < count(); i++) {
-        robotId.append(robot(matcher.getMatch(i))->id());
+    bool contain = false;
+    for(int i =0 ; i<count(); i++){
+        if(robot(i)->id() == agentIDBehindBall){
+            contain = true;
+            break;
+        }
+    }
+    MWBM matcher;
+    if(agentIDBehindBall == -1 || !contain) {
+        matcher.create(count(), Ps.count());
+
+        for (int i = 0; i < count(); i++) {
+            for (int j = 0; j < Ps.count(); j++)
+                matcher.setWeight(i, j, -Ps[j].dist(robot(i)->pos()));
+        }
+
+        matcher.findMatching();
+
+        for (int i = 0; i < count(); i++) {
+            robotId.append(robot(matcher.getMatch(i))->id());
+        }
+
+    } else {
+        matcher.create(count() - 1, Ps.count() - 1);
+        robotId.append(agentIDBehindBall);
+
+        QList<Agent*> temp;
+        for (int i = 0; i < count(); i++) {
+            if (robot(i)->id() != agentIDBehindBall) {
+                temp.append(robot(i));
+            }
+        }
+        int k = 0;
+        for (int i = 0; i < count()-1; i++) {
+            for (int j = 1; j < Ps.count(); j++) {
+                matcher.setWeight(i, j - 1, -Ps[j].dist(temp.at(i)->pos()));
+            }
+            k++;
+            ROS_INFO_STREAM("other than good pos in robot: " << i);
+
+        }
+
+        matcher.findMatching();
+
+        for (int i = 0; i < k; i++) {
+            robotId.append(temp.at(matcher.getMatch(i))->id());
+            ROS_INFO_STREAM("nana id "<<i+1<<" : "<<temp.at(matcher.getMatch(i))->id());
+//            robotId.append(matcher.getMatch(i)+1);
+//            ROS_INFO_STREAM("nana id "<<i<<" : "<<matcher.getMatch(i)+1);
+        }
     }
 
     return;
