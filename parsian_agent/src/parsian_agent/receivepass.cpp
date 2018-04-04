@@ -49,7 +49,7 @@ void CSkillReceivePass::execute() {
     receivePassMode = decideMode();
     Segment2D ballPath;
     Vector2D sol1, sol2;
-    ballPath.assign(ballPos, ballPos + wm->ball->vel.norm() * (10));
+    ballPath.assign(ballPos, ballPos + wm->ball->vel.norm() * (20));
     drawer->draw(receiveArea, QColor(Qt::cyan));
 
 
@@ -136,6 +136,32 @@ void CSkillReceivePass::execute() {
             }
             intersectPos = sol1;
         }
+            if(intersectPos.x >wm->field->_FIELD_WIDTH/2 -  wm->field->_PENALTY_DEPTH - 0.1 && fabs(intersectPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+                if(wm->field->oppBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+                    if(sol1.dist(intersectPos) > sol2.dist(intersectPos)) {
+                        if(sol2.x != wm->field->oppGoal().x) {
+                            sol1 = sol2;
+                        }
+                    }
+                    if(sol1.x == wm->field->oppGoal().x)
+                        sol1 = sol2;
+                    intersectPos = sol1;
+                }
+            }
+            if(intersectPos.x < -1 * wm->field->_FIELD_WIDTH/2 +  wm->field->_PENALTY_DEPTH + 0.1 && fabs(intersectPos.y) < wm->field->_PENALTY_WIDTH/2 +0.1 ) {
+                if(wm->field->ourBigPenaltyArea(1,0.1,0).intersection(ballPath,&sol1,&sol2)) {
+                   drawer->draw(wm->field->ourBigPenaltyArea(1,0.1,0),QColor(Qt::red),true);
+                    if(sol1.dist(intersectPos) > sol2.dist(intersectPos)) {
+                        if(sol2.x >= -1 * wm->field->_FIELD_WIDTH/2 + 0.02) {
+                            sol1 = sol2;
+                        }
+                    }
+                    if(sol1.x == wm->field->ourGoal().x)
+                        sol1 = sol2;
+                    intersectPos = sol1;
+                }
+            }
+            drawer -> draw(intersectPos,QColor(Qt::red));
             if(agentPos.dist(intersectPos) < 0.5) {
                 gotopointavoid->setOnetouchmode(true);
             }

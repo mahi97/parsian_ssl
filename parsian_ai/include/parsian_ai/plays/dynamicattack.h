@@ -110,7 +110,7 @@ public:
     void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
     void assignTasks_new();
     bool getPMfromCaoch(){return PMfromCoach;};
-    int getReceiverID(){return receiver->id();};
+    int getReceiverID(){if (receiver != nullptr) return receiver->id(); else return -1;};
 
 
     void createRegions(); // splits the opp field into a grid of regions
@@ -126,6 +126,7 @@ public:
     double caclClearPathFactor(Vector2D point, Vector2D passSenderPos, double robot_raduis_new);
     double calcOneTouchAngleFactor(Vector2D point);
     double calcWidenessFactor(Vector2D passSenderPos, Vector2D point);
+    double calcNotInWayFactor(Vector2D passSenderPos, Vector2D point);
     void hamidDebug();
     // END NEW PASS ZONE
 
@@ -150,6 +151,7 @@ private:
     // NEW PASS ZONE
     FieldRegion regions[3][3];
     QList<int> ourRelaxedIDs, oppRelaxedIDs;
+    QList<int> regionPriority;
     double robotRegionsWeights[11][9];
     Vector2D bestPointForRobotsInRegions[11][9];
     QList<int> matchingIDs;
@@ -226,6 +228,7 @@ private:
 
     ///////////////////
     bool isPathClear(Vector2D _pos1, Vector2D _pos2, double rad, double t);
+    bool isPathClearFromOpp(Vector2D _pos1, Vector2D _pos2, double rad, double t);
 
     inline bool chipOrNot(Vector2D target,
                           double _radius = 1, double _treshold = .5);
@@ -284,7 +287,7 @@ private:
     //// MAHI STUFF
     int lastAgentCount;
     void validateSegment(Segment2D& segment);
-
+    bool inTimePlan();
 protected:
     void reset() override;
 };
