@@ -1528,7 +1528,7 @@ void DefensePlan::setGoalKeeperState(){
         if (wm->field->isInField(wm->ball->pos)){
             ballIsOutOfField = false;
             QList<Vector2D> solutions;
-            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10);
+            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 100);
             Segment2D goalLine(wm->field->ourGoal() + Vector2D(0 , 1) , wm->field->ourGoal() - Vector2D(0 , 1));
             QList<Circle2D> defs;
             double AZBisecOpenAngle = 0, AZBigestOpenAngle = 0, AZDangerPercent = 0;
@@ -1745,10 +1745,9 @@ void DefensePlan::setGoalKeeperTargetPoint() {
         else if (goalKeeperOneTouch){
             ROS_INFO_STREAM("4");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
-            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 50);
+            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 100);
             goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
-            drawer->draw(goalKeeperTarget , QColor(Qt::cyan));
-            DBUG(QString("OneTouch To Side Point"), D_AHZ);
+            drawer->draw(goalKeeperTarget , QColor(Qt::cyan));            
             return;
         }
         else if (goalKeeperClearMode){
