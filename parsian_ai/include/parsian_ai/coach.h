@@ -152,11 +152,15 @@ private:
     QList<int> robotsIdHist;
     bool first;
     QList<int> missMatchIds;
+
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
     QList<Agent *> lastDefenseAgents;
 
     void matchPlan(NGameOff::SPlan *_plan, const QList<int> &_ourplayers);
+    void getBadsAndGoods(const QList<int>& _ourplayers);
+    QList<int> badshooters;
+    QList<int> goodshooters;
 
     NGameOff::SPlan *planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
 
