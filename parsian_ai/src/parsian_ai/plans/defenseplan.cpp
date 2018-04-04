@@ -1696,10 +1696,6 @@ void DefensePlan::setGoalKeeperTargetPoint() {
         drawer->draw(dangerCircle , "yellow");
         drawer->draw(dangerCircle1 , "yellow");
         if (ballIsOutOfField || stopMode) {
-<<<<<<< HEAD
-            ROS_INFO_STREAM("ED: 1");
-=======
->>>>>>> f1e4da0aaae45ecbac2629c775f43d852bfdc025
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             dangerForGoalKeeperClear = false;
             drawer->draw(QString("Ball Is Out Of Field"), Vector2D(0, 1), "red");
@@ -1728,13 +1724,13 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             PDEBUG("TS Mode :", 7 , D_AHZ);
             goalKeeperPredictionModeInPlayOff = false;
             goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal() , ballPrediction(true) , 1);
-            if(wm->field->ourBigPenaltyArea(1,0.1,0).contains(goalKeeperTarget)) {
+            if(wm->field->ourBigPenaltyArea(1,0,0).contains(goalKeeperTarget)) {
                 QList<int> empty;
                 empty.clear();
-                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) - 0.5)))//!Lhum 4 0.2
+                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) + 0.5)))//!Lhum 4 0.2
                     return;
                 else {
-                    goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal(), ballPrediction(true), 0.5);
+                    goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal(), ballPrediction(true), 0.3);
                 }
             }
             drawer->draw(Circle2D(goalKeeperTarget, 0.9) , "white");
@@ -2775,7 +2771,7 @@ void DefensePlan::executeGoalKeeper() {
 
     playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick();
     playOnMode = gameState->isStart();
-    stopMode = ggitameState->isStop();
+    stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
     tempSol.clear();
     ROS_INFO_STREAM("_________________");
@@ -3411,16 +3407,6 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
         return BallPos;
     }
 //    wm->opp.update();
-<<<<<<< HEAD
-    if(wm->opp.activeAgentsCount() > 0) {
-        PDEBUG("Elham:" , wm->opp.activeAgentsCount() , D_AHZ);
-        for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
-            Circle2D oppCircle(wm->opp.active(i)->pos, 0.1);
-            if (oppCircle.intersection(ballPosVel, &solu[0], &solu[1]) > 0) {
-                if (wm->opp.active(i)->pos.dist(BallPos) < dist2Ball) {
-                    dist2Ball = wm->opp.active(i)->pos.dist(BallPos);
-                    predictedBall = wm->opp.active(i)->pos;
-=======
     QList<int> temp;
     if(wm->opp.activeAgentsCount() > 0) {
         ROS_INFO_STREAM("ED: raft");
@@ -3464,63 +3450,24 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
                             }
                         }
                     }
->>>>>>> f1e4da0aaae45ecbac2629c775f43d852bfdc025
                 }
             }
         }
     }
-    if(_isGoalie)
-        ROS_INFO_STREAM("ED: Shoroa");
     if (dist2Ball != 1000) {
-<<<<<<< HEAD
-        drawer->draw(QString("Def Predicted Level 1"), Vector2D(0, 2), "red");
-        drawer->draw(predictedBall);
-        if(_isGoalie)
-            ROS_INFO_STREAM("ED: E");
-        drawer->draw(Circle2D(predictedBall , 0.5) , "blue");
-        return predictedBall;
-    }
-   /* else if (wm->field->isInOurPenaltyArea(BallPos + wm->ball->) && BallVel.length() > 0.5) {//////////Lhum
-=======
         drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
         return predictedBall;
     }
-   /* else if (wm->field->isInOurPenaltyArea(BallPos + wm->ball->) && BallVel.length() > 0.5) {
->>>>>>> f1e4da0aaae45ecbac2629c775f43d852bfdc025
-        if ((BallVel.x <= 0.2 || _isGoalie))
-            predictedBall = BallPos + BallVel;
-        }
-        else {
-            drawer->draw(QString("Def Predicted"), Vector2D(0, 1), "red");
-            predictedBall = BallPos + Vector2D(0, BallVel.y);
-        }
-        drawer->draw(predictedBall);
-        drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
-        return predictedBall;
-    }*/
-<<<<<<< HEAD
-    else if (_isGoalie) {
-        wm->field->ourBigPenaltyArea(1, 0 , 0).intersection(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100 ), &solu[0], &solu[1]);/////////////////Lhum
-        drawer->draw(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100)  , "black");
-=======
-    else if(_isGoalie && !know->variables["transientFlag"].toBool())
-        return wm->ball->pos;
-    else if (_isGoalie) {
-        wm->field->ourBigPenaltyArea(1, 0 , 0).intersection(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100 ), &solu[0], &solu[1]);/////////////////Lhum
->>>>>>> f1e4da0aaae45ecbac2629c775f43d852bfdc025
+    else if (_isGoalie && know->variables["transientFlag"].toBool()) {
+        wm->field->ourBigPenaltyArea(1, -0.1 , 0).intersection(Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100 ), &solu[0], &solu[1]);/////////////////Lhum
         ROS_INFO_STREAM("ED: "<< solu[0].x);
-        if(solu[0].isValid() && solu[1].isValid()) {
-            if (_isGoalie) {
+        if((solu[0].isValid() && solu[1].isValid()) && ((solu[0].y > 0.6 && solu[1].y < -0.6) || (solu[1].y > 0.6 && solu[0].y < -0.6))){
                 predictedBall = (BallPos.dist(solu[0]) < BallPos.dist(solu[1])) ? (solu[1]) : (solu[0]);
-            } else {
-                drawer->draw(QString("Def Predicted Level 2"), Vector2D(0, 2), "red");
-                predictedBall = (BallPos.dist(solu[0]) < BallPos.dist(solu[1])) ? Vector2D(BallPos.x, solu[0].y) : Vector2D(BallPos.x, solu[1].y);
-            }
         }
-        else if(solu[0].isValid()){
+        else if(solu[0].isValid() && wm->field->isInOurPenaltyArea(wm->ball->pos)){
             predictedBall = solu[0];
         }
-        else if(solu[1].isValid()){
+        else if(solu[1].isValid() && wm->field->isInOurPenaltyArea(wm->ball->pos)){
             predictedBall = solu[1];
         }
         else{
