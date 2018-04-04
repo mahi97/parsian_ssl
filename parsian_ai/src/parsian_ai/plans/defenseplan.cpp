@@ -1516,8 +1516,8 @@ void DefensePlan::setGoalKeeperState(){
     dangerForGoalKeeperClearByOurAgents = false;
     dangerForGoalKeeperClearByOppAgents = false;
     isCrowdedInFrontOfPenaltyAreaByOppAgents = false;
-    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.3 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
-    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.3 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
+    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.22 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
+    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.22 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
     drawer->draw(ourLeftPole);
     drawer->draw(ourRightPole);
     isCrowdedInFrontOfPenaltyAreaByOurAgents = false;
