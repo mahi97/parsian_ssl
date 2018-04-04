@@ -104,26 +104,26 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     case 0:{
         downLimit = 0.3;
         drawer->draw(Circle2D(wm->field->center() , 0.5) , 0, 360 , "black");
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionWithoutDefense(downLimit , upLimit);
         break;
     }
     case 1:{
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInOneDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 2:{
         PDEBUG("AYA" ,2, D_AHZ);
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInTwoDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 3:{
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInThreeDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
@@ -1530,7 +1530,7 @@ void DefensePlan::setGoalKeeperState(){
         if (wm->field->isInField(wm->ball->pos)){
             ballIsOutOfField = false;
             QList<Vector2D> solutions;
-            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10);
+            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 100);
             Segment2D goalLine(wm->field->ourGoal() + Vector2D(0 , 1) , wm->field->ourGoal() - Vector2D(0 , 1));
             QList<Circle2D> defs;
             double AZBisecOpenAngle = 0, AZBigestOpenAngle = 0, AZDangerPercent = 0;
@@ -1698,7 +1698,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
         ROS_INFO_STREAM("target");
         drawer->draw(dangerCircle , "yellow");
         drawer->draw(dangerCircle1 , "yellow");
-        if (ballIsOutOfField || stopMode) {
+        if (ballIsOutOfField || stopMode || gameState->ourKickoff()) {
             ROS_INFO_STREAM("1");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             dangerForGoalKeeperClear = false;
@@ -1744,20 +1744,15 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             }
             return;
         }
-        else if (goalKeeperOneTouch) {
+        else if (goalKeeperOneTouch){
             ROS_INFO_STREAM("4");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
-            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 50);
-            //if(wm->field->isInOurPenaltyArea(ballPos + ballVel))
-                goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
-                drawer->draw(wm->field->ourGoalR() + Vector2D(0.1 , -0.1) , QColor(Qt :: red));
-            drawer->draw(ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , 0), wm->field->ourGoalL() + Vector2D(0.1 , 0))) , QColor(Qt::yellow));
-            //drawer->draw(ballVel , QColor(Qt::yellow));
-            drawer->draw(goalKeeperTarget , QColor(Qt::cyan));
-            DBUG(QString("OneTouch To Side Point"), D_AHZ);
+            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 100);
+            goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
+            drawer->draw(goalKeeperTarget , QColor(Qt::cyan));            
             return;
         }
-        else if (goalKeeperClearMode) {
+        else if (goalKeeperClearMode){
             ROS_INFO_STREAM("5");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             ////////////// Danger Mode for inside of the penalty area///////////
@@ -2163,15 +2158,15 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     ahzMatchDirections.clear();
     ahzMatchPoints.clear();
     ourAgents.append(defenseAgents);
-    if (0 && defExceptions.active) {
-        if (defExceptions.exepAgentId != -1) {
-            for (int i = 0; i < ourAgents.size(); i++) {
-                if (i == defExceptions.exepAgentId) {
-                    ourAgents.removeAt(i);
-                }
-            }
-        }
-    }
+//    if (defExceptions.active) {
+//        if (defExceptions.exepAgentId != -1) {
+//            for (int i = 0; i < ourAgents.size(); i++) {
+//                if (i == defExceptions.exepAgentId) {
+//                    ourAgents.removeAt(i);
+//                }
+//            }
+//        }
+//    }
     ///////////////// Added By AHZ for segment (before MRL game) ///////////////
     if(stopMode){
         ourAgents.clear();
@@ -2330,17 +2325,17 @@ void DefensePlan::execute(){
         if(!defenseAgents.empty()){
             if(wm->our.activeAgentsCount() <= _NUM_PLAYERS){
                 if(playOnMode || stopMode){
-                   // checkDefenseExeptions();
-                    //if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
-                    //    runDefenseExeptions();
-                    //    defenseCount = defenseAgents.size() - 1;
-                    //}
-                    //else {
+//                    checkDefenseExeptions();
+//                    if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
+//                        runDefenseExeptions();
+//                        defenseCount = defenseAgents.size() - 1;
+//                    }
+//                    else {
                         defExceptions.exepAgentId = -1;
                         defExceptions.exeptionMode = NoneExep;
                         defenseCount = defenseAgents.size();
                         know->variables["defenseOneTouchMode"] = false;
-                    //}
+//                    }
                 }
                 else{
                     know->variables["defenseOneTouchMode"] = false;
@@ -3227,8 +3222,8 @@ Vector2D DefensePlan::avoidCircularPenaltyAreaByMasoud(Agent* agent, const Vecto
 
     double distFromGoal = RADIUS_FOR_CRITICAL_DEFENSE_AREA + Robot::robot_radius_new;
     if (agentPos.dist(wm->field->ourGoal()) < distFromGoal/* && !isballAndDefenseAgentsInOneRegion(agentPos) && defenseArea.contains(wm->ball->pos))
-                                                                                                                    ||
-                                                                                                                    (agentPos.dist(wm->field->ourGoal()) < distFromGoal && !defenseArea.contains(wm->ball->pos))*/){
+                                                                                                                            ||
+                                                                                                                            (agentPos.dist(wm->field->ourGoal()) < distFromGoal && !defenseArea.contains(wm->ball->pos))*/){
         agentPos = wm->field->ourGoal() + Vector2D().setPolar(distFromGoal, (agentPos - wm->field->ourGoal()).th().degree());
         defenseArea.intersection(Line2D(agentPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
         Vector2D inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? sol[0] : sol[1];
@@ -3351,7 +3346,7 @@ int DefensePlan::decideNumOfMarks(){
                 return defenseCount;
             }
             else if (playOnMode) {
-                return 0;
+                return defenseCount - defenseNumber();
             }
         }
     }
@@ -3849,10 +3844,10 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos) {
             thr = 0.1;
             if(AZBigestOpenAngle > 4 + AHZDegThreshOld){
                 AHZDegThreshOld = 0;
-                target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , wm->ball->pos , openAngGoalIntersectionBottom);
+                target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , ballPrediction(true) , openAngGoalIntersectionBottom);
             }
             else{
-                AHZDegThreshOld = 1.4;
+                AHZDegThreshOld = 1;
                 target = lastTargetForStrictFollow;
             }
         }

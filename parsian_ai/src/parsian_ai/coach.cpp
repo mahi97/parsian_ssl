@@ -812,7 +812,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-    
+
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
@@ -820,13 +820,15 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         ourPlayers.clear();
         ourPlayers = lastPlayers;
 
-    } else {
+    } else {        
         // TODO : matching is based on ID, It should be Goal-Oriented -- optimal -- base of position
         qSort(ourPlayers.begin(), ourPlayers.end());
         for (int i = 0; i < MarkNum; i++) {
+            PDEBUG("marknum =" , MarkNum , D_AHZ);
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
             ourPlayers.removeFirst();
         }
+        PDEBUG("mark agents =" , selectedPlay->markAgents.size() , D_AHZ);
     }
     lastBallPossesionState = ballPState;
 }
