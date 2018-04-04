@@ -10,13 +10,14 @@ using namespace std;
 
 QList<Vector2D> DefensePlan::getPositionJustForZJU(int numberOfOverDefenders){
     QList<Vector2D> defendersForZJU;
+    defendersForZJU.clear();
     if(wm->ball->pos.y > 0){
-        for(size_t i = 0 ; i < numberOfOverDefenders ; i++){
-            defendersForZJU.append(Vector2D(-4.7 , (-(i+1)/2)));
+        for(int i = 0 ; i < numberOfOverDefenders ; i++){
+            defendersForZJU.append(Vector2D(-4.7 , -(i+1)/2));
         }
     }
     else{
-        for(size_t i = 0 ; i < numberOfOverDefenders ; i++){
+        for(int i = 0 ; i < numberOfOverDefenders ; i++){
             defendersForZJU.append(Vector2D(-4.7 , (i+1)/2));
         }
     }
