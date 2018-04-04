@@ -1633,7 +1633,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     for(int i=0;i<passcount;i++) {
 
         if (goodshooters.size() > 0) {
-            for (int goodshooter:goodshooters) {
+            for (int goodshooter: goodshooters) {
                 if (_ourplayers.contains(goodshooter)) {
                     int j = _ourplayers.indexOf(goodshooter);
                     if (i == 0) {
@@ -1642,13 +1642,13 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                             minweight = weight;
                             matchedID = j;
                         }
-                    } else if (i == 1 && j!= matchedID) {
+                    } else if (i == 1 && j != matchedID) {
                         weight = agents[j]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             secMinweight = weight;
                             secMatchedID = j;
                         }
-                    } else if (i == 2 && j!= matchedID && j!= secMatchedID) {
+                    } else if (i == 2 && j != matchedID && j != secMatchedID) {
                         weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             thirdMinweight = weight;

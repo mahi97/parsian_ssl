@@ -108,17 +108,12 @@ void CRoleStopInfo::findPositions() {
                 matcher.setWeight(i, j - 1, -Ps[j].dist(temp.at(i)->pos()));
             }
             k++;
-            ROS_INFO_STREAM("other than good pos in robot: " << i);
-
         }
 
         matcher.findMatching();
 
         for (int i = 0; i < k; i++) {
             robotId.append(temp.at(matcher.getMatch(i))->id());
-            ROS_INFO_STREAM("nana id "<<i+1<<" : "<<temp.at(matcher.getMatch(i))->id());
-//            robotId.append(matcher.getMatch(i)+1);
-//            ROS_INFO_STREAM("nana id "<<i<<" : "<<matcher.getMatch(i)+1);
         }
     }
 
