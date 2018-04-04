@@ -27,14 +27,14 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     currentPlan = new SPlayOffPlan();
     masterPlan = nullptr;
     kickOffPos[0] = Vector2D(wm->ball->pos.x - 0.36, wm->ball->pos.y);
-    kickOffPos[1] = Vector2D(-0.36,  3);
-    kickOffPos[2] = Vector2D(-0.36, -3);
+    kickOffPos[1] = Vector2D(-0.26,  3);
+    kickOffPos[2] = Vector2D(-0.26, -3);
     kickOffPos[3] = Vector2D(-2.4  ,  0);
-    kickOffPos[4] = Vector2D(-0.6,  1.2);
-    kickOffPos[5] = Vector2D(-0.6, -1.2);
+    kickOffPos[4] = Vector2D(-0.9,  1.2);
+    kickOffPos[5] = Vector2D(-0.9, -1.2);
     // TODO : fill kickoffpos for rest of robots if needed
-    kickOffPos[6] = Vector2D(-0.45, 1.7);
-    kickOffPos[7] = Vector2D(-0.45, -1.7);
+    kickOffPos[6] = Vector2D(-0.75, 1.7);
+    kickOffPos[7] = Vector2D(-0.75, -1.7);
 
 
     initial    = true;
