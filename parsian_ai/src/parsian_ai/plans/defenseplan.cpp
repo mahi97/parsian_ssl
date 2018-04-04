@@ -104,26 +104,26 @@ Vector2D DefensePlan::getGKPositionAccordingToTheDefense(int numberOfDefenders ,
     case 0:{
         downLimit = 0.3;
         drawer->draw(Circle2D(wm->field->center() , 0.5) , 0, 360 , "black");
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionWithoutDefense(downLimit , upLimit);
         break;
     }
     case 1:{
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInOneDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 2:{
         PDEBUG("AYA" ,2, D_AHZ);
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInTwoDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
     case 3:{
         downLimit = 0.3;
-        upLimit = RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
+        upLimit = 1.2;//RADIUS_FOR_CRITICAL_DEFENSE_AREA - Robot::robot_radius_new;
         goalKeeperPosition = getGKPositionInThreeDefense(firstPoint , originPoint , secondPoint , downLimit , upLimit);
         break;
     }
@@ -1696,7 +1696,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
         ROS_INFO_STREAM("target");
         drawer->draw(dangerCircle , "yellow");
         drawer->draw(dangerCircle1 , "yellow");
-        if (ballIsOutOfField || stopMode) {
+        if (ballIsOutOfField || stopMode || gameState->ourKickoff()) {
             ROS_INFO_STREAM("1");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             dangerForGoalKeeperClear = false;
@@ -3346,7 +3346,7 @@ int DefensePlan::decideNumOfMarks(){
                 return defenseCount;
             }
             else if (playOnMode) {
-                return 0;
+                return defenseCount - defenseNumber();
             }
         }
     }
@@ -3844,10 +3844,10 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos) {
             thr = 0.1;
             if(AZBigestOpenAngle > 4 + AHZDegThreshOld){
                 AHZDegThreshOld = 0;
-                target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , wm->ball->pos , openAngGoalIntersectionBottom);
+                target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , ballPrediction(true) , openAngGoalIntersectionBottom);
             }
             else{
-                AHZDegThreshOld = 1.4;
+                AHZDegThreshOld = 1;
                 target = lastTargetForStrictFollow;
             }
         }

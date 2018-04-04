@@ -921,21 +921,19 @@ void CMarkPlan::execute(){
             }
         }
         //Checking Not Going To Penalty Area
+        drawer->draw(Circle2D(wm->field->center() , 0.8) , 0,360, "black");
         markPosesRefinePlayon();
         matchPoints.clear();
-        matchPoints.append(0);
-        matchPoints.append(1);
-        matchPoints.append(2);
-        matchPoints.append(3);
+        for(int i = 0 ; i < markPoses.size() ; i++){
+            matchPoints.append(i);
+        }
         know->Matching(agents, markPoses, matchPoints); // todo : knowledge
-        if(agents.count() == markPoses.count()){
-            for(int i = 0; i < markPoses.count(); i++){
-                if (i < matchPoints.size()) {
-                    markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
-                    markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
-                    markGPA[i]->setAvoidpenaltyarea(true);
-                    agents[i]->action = markGPA[i];
-                }
+        for(int i = 0; i < markPoses.count(); i++){
+            if (i < matchPoints.size()) {
+                markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
+                markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
+                markGPA[i]->setAvoidpenaltyarea(true);
+                agents[i]->action = markGPA[i];
             }
         }
     }
@@ -983,23 +981,18 @@ void CMarkPlan::execute(){
         markPosesRefinePlayon();
 
         matchPoints.clear();
-        matchPoints.append(0);
-        matchPoints.append(1);
-        matchPoints.append(2);
-        matchPoints.append(3);
-
+        for(int i = 0 ; i < markPoses.size() ; i++){
+            matchPoints.append(i);
+        }
         know->Matching(agents, markPoses, matchPoints);
         if (agents.count() == markPoses.count()) {
             for (int i = 0; i < markPoses.count(); i++) {
                 if (i < matchPoints.size()) {
-
                     markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
                     markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
-                    //markGPA[i]->init(markPoses[matchPoints[i]],markAngs[matchPoints[i]]);
                     markGPA[i]->setAvoidpenaltyarea(true);
                     markGPA[i]->setAvoidcentercircle(true);
                     agents[i]->action = markGPA[i];
-
                 }
             }
 
