@@ -3847,12 +3847,12 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos) {
         }
         else{
             thr = 0.1;
-            if(AZBigestOpenAngle > 4 + AHZDegThreshOld){
+            if(AZBigestOpenAngle > 2 + AHZDegThreshOld){
                 AHZDegThreshOld = 0;
                 target = getGKPositionAccordingToTheDefense(defenseCount - decideNumOfMarks() , openAngGoalIntersectionTop , wm->ball->pos , openAngGoalIntersectionBottom);
             }
             else{
-                AHZDegThreshOld = 1.4;
+                AHZDegThreshOld = 1;
                 target = lastTargetForStrictFollow;
             }
         }
