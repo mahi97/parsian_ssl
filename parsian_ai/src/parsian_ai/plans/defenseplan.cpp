@@ -1082,7 +1082,7 @@ bool DefensePlan::isInIndirectArea(Vector2D aPoint) {
     //// checks that a point is in the circle around the ball
     //// with 50cm radius or not.
 
-    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);    
+    bool localFlag = Circle2D(wm->ball->pos , 0.7).contains(aPoint);
     return localFlag;
 }
 
@@ -2158,6 +2158,20 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     ahzMatchDirections.clear();
     ahzMatchPoints.clear();
     ourAgents.append(defenseAgents);
+<<<<<<< 5fdb172473909f4c7c21409ef7c929a4a638707e
+=======
+<<<<<<< 72013575e4de520983d7a625d3b4a3d0ce49724a
+    if (0 && defExceptions.active) {
+        if (defExceptions.exepAgentId != -1) {
+            for (int i = 0; i < ourAgents.size(); i++) {
+                if (i == defExceptions.exepAgentId) {
+                    ourAgents.removeAt(i);
+                }
+            }
+        }
+    }
+=======
+>>>>>>> test
 //    if (defExceptions.active) {
 //        if (defExceptions.exepAgentId != -1) {
 //            for (int i = 0; i < ourAgents.size(); i++) {
@@ -2167,6 +2181,10 @@ void DefensePlan::matchingDefPos(int _defenseNum){
 //            }
 //        }
 //    }
+<<<<<<< 5fdb172473909f4c7c21409ef7c929a4a638707e
+=======
+>>>>>>> test
+>>>>>>> test
     ///////////////// Added By AHZ for segment (before MRL game) ///////////////
     if(stopMode){
         ourAgents.clear();
@@ -2325,17 +2343,40 @@ void DefensePlan::execute(){
         if(!defenseAgents.empty()){
             if(wm->our.activeAgentsCount() <= _NUM_PLAYERS){
                 if(playOnMode || stopMode){
+<<<<<<< 5fdb172473909f4c7c21409ef7c929a4a638707e
+=======
+<<<<<<< 72013575e4de520983d7a625d3b4a3d0ce49724a
+                   // checkDefenseExeptions();
+                    //if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
+                    //    runDefenseExeptions();
+                    //    defenseCount = defenseAgents.size() - 1;
+                    //}
+                    //else {
+=======
+>>>>>>> test
 //                    checkDefenseExeptions();
 //                    if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
 //                        runDefenseExeptions();
 //                        defenseCount = defenseAgents.size() - 1;
 //                    }
 //                    else {
+<<<<<<< 5fdb172473909f4c7c21409ef7c929a4a638707e
+=======
+>>>>>>> test
+>>>>>>> test
                         defExceptions.exepAgentId = -1;
                         defExceptions.exeptionMode = NoneExep;
                         defenseCount = defenseAgents.size();
                         know->variables["defenseOneTouchMode"] = false;
+<<<<<<< 5fdb172473909f4c7c21409ef7c929a4a638707e
 //                    }
+=======
+<<<<<<< 72013575e4de520983d7a625d3b4a3d0ce49724a
+                    //}
+=======
+//                    }
+>>>>>>> test
+>>>>>>> test
                 }
                 else{
                     know->variables["defenseOneTouchMode"] = false;
