@@ -447,65 +447,12 @@ void CSkillKick::jTurn() {
     double distCoef = 0.15;
 
     idealPass = (ballPos - agentPos).norm() * distCoef;
-    /*
-    if(abs(movementDir) < 30 && ballPos.dist(agentPos) < 0.25)
-    {
-        isFinalController =true;
-    }
-    else
-    {
-        isFinalController = false;
-    }
-    if(movementDir <= 70 && movementDir >= -70)
-    {
-        targetForJturnPos = ballPos + (ballPos - target).norm()*0.11;
-        if(movementDir > 20)
-        {
-            if(wm->ball->vel.length() > 0.1)
-                shift = 15 + (1-agentPos.dist(ballPos))*45;
-            else
-                shift = 0 + (1-agentPos.dist(ballPos))*10;
-
-        }
-        else if(movementDir < -20)
-        {
-            if(wm->ball->vel.length() > 0.1)
-                shift = -15 - (1-agentPos.dist(ballPos))*45;
-
-            else
-                shift = 0 - (1-agentPos.dist(ballPos))*10;
-        }
-        else
-        {
-            agent->setRoller(spin);
-            shift = 0;
-        }
-
-        idealPass.rotate(shift);
-        targetForJturnSpeed = agentPos + idealPass;
-
-    }
-    else
-    {
-        if(movementDir > 0)
-        {
-            shift = 15 + (1-agentPos.dist(ballPos))*61;
-        }
-        else if(movementDir < 0)
-        {
-            shift = -15 - (1-agentPos.dist(ballPos))*61;
-        }
-        idealPass.rotate(shift);
-        targetForJturnSpeed = agentPos + idealPass;
-    }
-
-    */
 
     posPid->error = 0;
     posPid->kd = 0;
     if (movementDir < 20 && movementDir > -20) {
         shift = 0;
-        if (0 &&wm->ball->vel.length() < 0.2) {
+        if (wm->ball->vel.length() < 0.2) {
         posPid->error = movementDir;
         posPid->kd = 0.01;
         }
@@ -564,8 +511,7 @@ void CSkillKick::jTurn() {
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
-    speedPid->kp = 5.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
-                   max(wm->ball->vel.length() * 2, 0);
+    speedPid->kp = 5.5 + 2.1 * agentPos.dist(ballPos) + dirReduce;
 
 
     if (!jTurnFromBack) {
@@ -580,8 +526,8 @@ void CSkillKick::jTurn() {
 
     angPid->kp = 5;
 
-    double vx = movementThSpeed.x * speedPid->PID_OUT() ;//+ posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
-    double vy = movementThSpeed.y * speedPid->PID_OUT() ;//+ posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);
+    double vx = movementThSpeed.x * speedPid->PID_OUT() + posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
+    double vy = movementThSpeed.y * speedPid->PID_OUT() + posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);
     angPid->error = (kickFinalDir - agentDir.th()).radian();
     agent->setRobotAbsVel(wm->ball->vel.x + vx, wm->ball->vel.y + vy, angPid->PID_OUT());
     speedPid->pError = speedPid->error;
