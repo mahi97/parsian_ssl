@@ -335,9 +335,8 @@ void CCoach::calcDesiredMarkCounts(){
 
 
 void CCoach::assignGoalieAgent(int goalieID) {
-    QList<int> ids = workingIDs;
     goalieAgent = nullptr;
-    if (ids.contains(goalieID)) {
+    if (workingIDs.contains(goalieID)) {
         goalieAgent = agents[goalieID];
     }
 }
@@ -549,9 +548,7 @@ void CCoach::updateAttackState() {
 }
 
 void CCoach::choosePlaymakeAndSupporter(){
-//    playmakeId = 10;
-//    return;
-    playmakeId = -1;
+
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
@@ -568,7 +565,7 @@ void CCoach::choosePlaymakeAndSupporter(){
     ////////////////////first we choose our playmake
     double ballVel = wm->ball->vel.length();
     Vector2D ballPos = wm->ball->pos;
-    if (ballVel < 0.3) {
+    if (ballVel < 0.4) {
         double maxD = -1000.1;
         for (const auto& player : ourPlayers) {
             double o = -1 * agents[player]->pos().dist(ballPos) ;
@@ -585,27 +582,22 @@ void CCoach::choosePlaymakeAndSupporter(){
             playmakeId = lastPlayMake;
             return;
         }
-
         playMakeIntention.restart();
-        double nearest[10] = {};
-        for (const auto& ourPlayer : ourPlayers) {
-            nearest[ourPlayer] = agents[ourPlayer]->pos().dist(wm->ball->pos + wm->ball->vel) ;
-//            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
-//                                                                4, 3, 2,
-//                                                                2); // TODO : read from common config agents
-        }
-        if (lastPlayMake >= 0 && lastPlayMake <= 11) {
-            nearest[lastPlayMake] -= conf.playMakeMoveThr;
-        }
-        double minT = 1e8; // 10 ^ 8
+
+        double maxD = -10000000.1;
         for (const auto& player : ourPlayers) {
-            if (nearest[player] < minT) {
-                minT = nearest[player];
+            double o = -1 * agents[player]->pos().dist(wm->ball->pos + wm->ball->vel) ;
+            if (player == lastPlayMake) {
+                o += conf.playMakeMoveThr;
+            }
+            if (o > maxD) {
+                maxD = o;
                 playmakeId = player;
             }
-        }
-    }
 
+        }
+
+    }
 
     lastPlayMake = playmakeId;
 }
@@ -1060,8 +1052,6 @@ void CCoach::generateWorkingRobotIds()
             }
         }
     }
-//        for(int i{}; i<workingIDs.count(); i++)
-//            ROS_INFO_STREAM("kian: " << workingIDs[i]);
 }
 
 void CCoach::replacefaultedrobots()
@@ -1096,10 +1086,6 @@ void CCoach::replacefaultedrobots()
 
 void CCoach::resetnonVisibleAgents()
 {
-//    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
-//        ROS_INFO_STREAM("kian: agentID: " << agents[i]->id());
-//    for(int j{}; j < wm->our.activeAgentsCount(); j++)
-//        ROS_INFO_STREAM("kian: wmID: " << wm->our.activeAgentID(j));
     for(int i{}; i < _MAX_NUM_PLAYERS; i++)
     {
         if(agents[i] != nullptr)
@@ -1122,16 +1108,12 @@ void CCoach::execute()
 {
     resetnonVisibleAgents();
     generateWorkingRobotIds();
-    if(gameState->isStop())
-        replacefaultedrobots();
+    if(gameState->isStop()) replacefaultedrobots();
     findGoalie();
 
     // choose playmake agent
     choosePlaymakeAndSupporter();
 
-    /* determine how many agents are needed for defense, with minimum 0 for penalty
-     and maximum of 3
-     */
     decidePreferredDefenseAgentsCount();
 
     // decide the whole strategy for defense agents, including Goalie, defense and Mark

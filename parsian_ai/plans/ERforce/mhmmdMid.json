@@ -101,7 +101,7 @@
                         {
                             "angel": 171.52885536698517,
                             "pos-x": 5.5911602209944746,
-                            "pos-y": -4.004999999999999,
+                            "pos-y": -3.9937500000000004,
                             "skills": [
                                 {
                                     "flag": false,
@@ -111,9 +111,15 @@
                                 },
                                 {
                                     "flag": false,
-                                    "name": "PassSkill",
+                                    "name": "ReceivePassSkill",
                                     "primary": 450,
-                                    "secondary": 200,
+                                    "secondary": 200
+                                },
+                                {
+                                    "flag": false,
+                                    "name": "PassSkill",
+                                    "primary": 500,
+                                    "secondary": 500,
                                     "target": {
                                         "agent": 2,
                                         "index": 2
@@ -158,7 +164,7 @@
                         {
                             "angel": 0,
                             "pos-x": 2.1215469613259668,
-                            "pos-y": 0.20250000000000057,
+                            "pos-y": 0.21375000000000011,
                             "skills": [
                                 {
                                     "flag": false,
