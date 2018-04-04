@@ -107,8 +107,6 @@ public:
     // NEW PASS ZONE
     void chooseBestPositons_new();
     void assignId_new();
-    void chooseBestPosForPass_new(QList<Vector2D> semiDynamicPosition);
-    void assignTasks_new();
     bool getPMfromCaoch(){return PMfromCoach;};
     int getReceiverID(){if (receiver != nullptr) return receiver->id(); else return -1;};
 
@@ -116,7 +114,6 @@ public:
     void createRegions(); // splits the opp field into a grid of regions
     Vector2D getBestPosToShootToGoal(Vector2D from, double &regionWidth, bool oppGaol );
     bool isPathClear(Vector2D point, Vector2D from, double rad, bool considerRelaxedIDs);
-    Vector2D getEmptyPosOnPoints(Vector2D from, double &regionWidth, QList<Vector2D> points);
     int getNearestOppToPoint(Vector2D point);
     void clearRobotsRegionsWeights();
     int getNearestRegionToRobot(Vector2D agentPos);

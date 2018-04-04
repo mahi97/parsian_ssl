@@ -991,7 +991,10 @@ float Agent::convertkickspeedtokickchargetime(float kickspeed, int spin)
         spin = 7;
     if (gotkickprofilerdatas)
     {
-        return kick_coef_a[spin]*kickspeed*kickspeed + kick_coef_b[spin]*kickspeed + kick_coef_c[spin];
+        int discharge = kick_coef_a[spin]*kickspeed*kickspeed + kick_coef_b[spin]*kickspeed + kick_coef_c[spin];
+        if(discharge > 1023)
+            discharge = 1023;
+        return discharge;
     }
     else
     {
@@ -1008,10 +1011,14 @@ void Agent::getchipprofilerdata()
         for(int i{}; i <= 7; i++)
         {
             std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_chip_"+ to_string(i) +".csv");
-            if (!file.is_open())
+            if (!file.is_open()) 
             {
-                if(i == 0)
+                if(i == 0 || 1)
                 {
+                    chip_coef_a[0] = 25.3;
+                    chip_coef_b[0] = 130.9;
+                    chip_coef_c[0] = 230.9;
+                    gotchipprofilerdatas = true;
                     ROS_INFO_STREAM("chip profiler datas no spin failed to open");
                     return;
                 }
@@ -1054,7 +1061,8 @@ float Agent::convertchipdisttochipchargetime(float chipdist, int spin)
     float chipspeed{};
     //TODO calculate coef for converting dist to chip speed
     float A{9.25693}, B{0.0027}, H{0.0659}, K{-0.0316};
-    chipspeed = A*sqrt(B*chipdist - H) + K;
+    //chipspeed = A*sqrt(B*chipdist - H) + K;
+    chipspeed = chipdist;
     //    ROS_INFO("kian convert");
         if(spin < 0)
             spin  = 0;
@@ -1062,7 +1070,12 @@ float Agent::convertchipdisttochipchargetime(float chipdist, int spin)
             spin = 7;
         if (gotchipprofilerdatas)
         {
-            return chip_coef_a[spin]*chipspeed*chipspeed + chip_coef_b[spin]*chipspeed + chip_coef_c[spin];
+            int chipRes = chip_coef_a[spin]*chipspeed*chipspeed + chip_coef_b[spin]*chipspeed + chip_coef_c[spin];
+            if(chipRes <= 1023) {
+                return chipRes;
+            } else {
+                return 1023;
+            }
         }
         else
         {

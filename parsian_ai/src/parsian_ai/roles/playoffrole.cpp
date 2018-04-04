@@ -79,23 +79,11 @@ void CRolePlayOff::update() {
         oneTouchSkill->setWaitpos(waitPos);
         oneTouchSkill->setChip(false);
         oneTouchSkill->setShottoemptyspot(false);
-//            if (wm->getIsSimulMode())
-//        oneTouchSkill->setKickspeed(8);
-//            else
-        oneTouchSkill->setKickspeed(kickSpeed);
+        oneTouchSkill->setKickdischargetime(kickSpeed);
+        oneTouchSkill->setIskickdischargetime(true);
         updated = false;
         break;
     case RoleSkill::ReceivePass:
-//        oneTouchSkill->setTarget(targetDir);
-//        oneTouchSkill->setWaitPos(target);
-//        oneTouchSkill->setAgent(agent);
-//        oneTouchSkill->setChip(false);
-//        oneTouchSkill->setShotToEmptySpot(false);
-//        if (wm->getIsSimulMode())
-//            oneTouchSkill->setKickSpeed(8);
-//        else
-//            oneTouchSkill->setKickSpeed(1023);
-//        updated = false;
         receivePassSkill->setTarget(target);
         receivePassSkill->setReceiveradius(receiveRadius);
         if (ignoreAngle) {

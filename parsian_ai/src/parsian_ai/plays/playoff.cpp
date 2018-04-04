@@ -320,7 +320,7 @@ void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(isChip);
-        double speed = 8;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
+        double speed = 1023;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
@@ -358,7 +358,7 @@ void CPlayOff::dynamicPlayBlocker() {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(false);
-        roleAgent[0] -> setKickSpeed(7);//knowledge->getProfile(roleAgent[0]->getAgentID(), 7.8, false, false)); // Vartypes This TODO
+        roleAgent[0] -> setKickSpeed(1023);//knowledge->getProfile(roleAgent[0]->getAgentID(), 7.8, false, false)); // Vartypes This TODO
         roleAgent[0] -> setTarget(wm->field->oppGoal().rotatedVector((wm->ball->pos.y < 0 ? 90 : -90)));
         roleAgent[0] -> setDoPass(false);
         roleAgent[0] -> setIntercept(false);
@@ -401,7 +401,7 @@ void CPlayOff::dynamicPlayKhafan() {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(true);
-        roleAgent[0] -> setKickSpeed(6); // Vartypes This
+        roleAgent[0] -> setKickSpeed(1023); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
         roleAgent[0] -> setIntercept(false);
@@ -432,7 +432,7 @@ void CPlayOff::dynamicPlayKhafan() {
         roleAgent[1] -> setAvoidCenterCircle(false);
         roleAgent[1] -> setAvoidPenaltyArea(true);
         roleAgent[1] -> setChip(false);
-        roleAgent[1] -> setKickSpeed(7); // Vartypes This
+        roleAgent[1] -> setKickSpeed(1023); // Vartypes This
         roleAgent[1] -> setTarget(wm->field->oppGoal());
         roleAgent[1] -> setDoPass(true);
         roleAgent[1] -> setIntercept(false);

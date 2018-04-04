@@ -530,16 +530,16 @@ void CSkillKick::jTurn() {
         distCoef = 0.17;
     } else if (movementDir > 0) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 5;
-        } else {
             shift = 5 + (1 - agentPos.dist(ballPos)) * 15;
+        } else {
+            shift = 5 + (1 - agentPos.dist(ballPos)) * 25;
         }
         distCoef = 0.17;
     } else if (movementDir < 0) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 5;
-        } else {
             shift = -5 - (1 - agentPos.dist(ballPos)) * 15;
+        } else {
+            shift = -5 - (1 - agentPos.dist(ballPos)) * 25;
         }
 
         distCoef = 0.17;
@@ -564,7 +564,7 @@ void CSkillKick::jTurn() {
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
-    speedPid->kp = 6.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 2, 1.0) + dirReduce +
+    speedPid->kp = 6.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 3, 2.0) + dirReduce +
                    max(wm->ball->vel.length() * 2, 0);
 
 
@@ -602,21 +602,21 @@ void CSkillKick::turnForKick() {
     double angReduce = 1;
 
     if (isPlayoff) {
-        if (fabs((agentDir.th() - kickFinalDir).degree()) < 70) {
+        if (fabs((agentDir.th() - kickFinalDir).degree()) < 80) {
             angReduce = 0.5;
         }
         if ((agentDir.th() - kickFinalDir).degree()  < - 10) {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4 , -1 * angReduce, angPid->PID_OUT() + 4 * angReduce);
+            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4 , -1 * angReduce, angPid->PID_OUT() + 3.5 * angReduce);
 
 
         } else if ((agentDir.th() - kickFinalDir).degree()  > 10) {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4, 1 * angReduce, angPid->PID_OUT() - 4 * angReduce) ;
+            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4, 1 * angReduce, angPid->PID_OUT() - 3.5 * angReduce) ;
         }
 
 
@@ -795,8 +795,8 @@ void CSkillKick::findPosToGo() {
     Vector2D addVec = agentDir.norm() * 0.08;
     gpa->setOnetouchmode(false);
 
-    if (wm->ball->vel.length() > 1.5 - distThr || (isKhafan && (wm->ball->vel.length() > 0.5 - distThr)) ) {
-        distThr = 1.45;
+    if (wm->ball->vel.length() > 0.5 - distThr  ) {
+        distThr = 0.45;
         if(isKhafan)
             distThr = 0.45;
         if (Circle2D(agentPos, 0.1).intersection(Segment2D(ballPos, wm->ball->getPosInFuture(0.5)), &dummy, &dummy)) {
@@ -859,14 +859,14 @@ void CSkillKick::findPosToGo() {
         }
 
         //TODO : penalty area
-        if ((ballPath.intersection(targetNormalSeg).isValid()) && ((agentPos.dist(ballPos) < 1) || isKhafan) && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
+        if ((ballPath.intersection(targetNormalSeg).isValid()) && ((agentPos.dist(ballPos) < 1) || isKhafan)){// && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
             jTurn();
             return;
         }
 
     } else {
         distThr = 0;
-        if (ballPos.dist(agentPos) < 0.5) {
+        if (ballPos.dist(agentPos) < 0.6) {
             if (fabs((kickFinalDir - agentDir.th()).degree()) > 30 && kickerArea.contains(ballPos)) {
                 turnForKick();
             } else {
