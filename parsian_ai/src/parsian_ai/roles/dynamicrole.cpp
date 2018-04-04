@@ -70,6 +70,7 @@ void CRoleDynamic::update() {
     }
     if(isplaymake)
     {
+        shotSkill->setIskhafan(true);
         switch (playMakeSkill) {
         case PlayMakeSkill ::Shot:
             shotSkill->setTarget(target);
