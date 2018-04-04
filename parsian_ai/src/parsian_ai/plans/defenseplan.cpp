@@ -2896,7 +2896,7 @@ void DefensePlan::executeGoalKeeper() {
         }
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
 
-            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 10){
+            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 100){
                 counterBallWasBesidePoles++;
                 kickSkill->setTarget(Vector2D(0 , wm->ball->pos.y));
                 drawer->draw(Segment2D(wm->ball->pos , Vector2D(0 , wm->ball->pos.y)) , QColor(Qt::blue));
