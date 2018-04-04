@@ -27,8 +27,8 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     currentPlan = new SPlayOffPlan();
     masterPlan = nullptr;
     kickOffPos[0] = Vector2D(wm->ball->pos.x - 0.36, wm->ball->pos.y);
-    kickOffPos[1] = Vector2D(-0.26,  3);
-    kickOffPos[2] = Vector2D(-0.26, -3);
+    kickOffPos[1] = Vector2D(-0.36,  3);
+    kickOffPos[2] = Vector2D(-0.36, -3);
     kickOffPos[3] = Vector2D(-2.4  ,  0);
     kickOffPos[4] = Vector2D(-0.9,  1.2);
     kickOffPos[5] = Vector2D(-0.9, -1.2);
@@ -252,7 +252,7 @@ void CPlayOff::staticExecute() {
 
             }
 
-            if (isPlanEnd() && false) {
+            if (isPlanEnd()) {
                 playOnFlag = true;
                 ROS_INFO("Playoff Ends");
             }

@@ -842,7 +842,7 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
         _mode = NGameOff::FirstPlay;
 
-    } else if (wm->ball->pos.x < 1 || !gotplan) {
+    } else if ((wm->ball->pos.x < 1 && !gameState->ourKickoff())|| !gotplan) {
         _mode = NGameOff::DynamicPlay;
 
     } else if (!firstIsFinished && conf.UseFirstPlay) {
@@ -865,18 +865,22 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
 
         case NGameOff::StaticPlay:
             initStaticPlay(_gameMode, _ourplayers);
+            ROS_INFO("initPlayOffMode: StaticPlay");
             break;
         case NGameOff::DynamicPlay:
-            ROS_INFO("HSHM_: DynamicPlay");
+            ROS_INFO("initPlayOffMode: DynamicPlay");
             initDynamicPlay(_ourplayers);
             break;
         case NGameOff::FastPlay:
+            ROS_INFO("initPlayOffMode: initFastPlay");
             initFastPlay(_ourplayers);
             break;
         case NGameOff::FirstPlay:
+            ROS_INFO("initPlayOffMode: initFirstPlay");
             initFirstPlay(_ourplayers);
             break;
         default:
+            ROS_INFO("initPlayOffMode: initStaticPlay");
             initStaticPlay(_gameMode, _ourplayers);
     }
 }
