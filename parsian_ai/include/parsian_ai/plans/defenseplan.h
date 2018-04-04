@@ -52,6 +52,7 @@ protected:
 
     bool isInIndirectArea(Vector2D);
     int defenseNumber();
+    QList<Vector2D> getPositionJustForZJU(int numberOfOverDefenders);
     double findBestOffsetForDefenseArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
     double findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit);
     Line2D getBestLineWithTallesForRecatngularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
