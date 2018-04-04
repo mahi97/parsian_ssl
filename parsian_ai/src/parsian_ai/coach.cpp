@@ -200,10 +200,10 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
 
     if (gameState->isStop()) {
-        if (wm->ball->pos.x < 0) {
+        if (wm->ball->pos.x < 1) {
             preferedDefenseCounts = agentsCount - 1;
 
-        } else if (wm->ball->pos.x > 1) {
+        } else if (wm->ball->pos.x > 1.2) {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
@@ -756,17 +756,17 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     updateAttackState(); //// Too Bad Conditions will be Handle here
 
     if (0 <= playmakeId && playmakeId <= 11) {
-        if(dynamicAttack->getPMfromCaoch())
-        {
+//        if(dynamicAttack->getPMfromCaoch())
+//        {
             dynamicAttack->setPlayMake(agents[playmakeId]);
             ourPlayers.removeOne(playmakeId);
             ROS_INFO_STREAM("PMfromCaoch true");
-        } else
-        {
-            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
-            ourPlayers.removeOne(dynamicAttack->getReceiverID());
-            ROS_INFO_STREAM("PMfromCaoch false");
-        }
+//        } else
+//        {
+//            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
+//            ourPlayers.removeOne(dynamicAttack->getReceiverID());
+//            ROS_INFO_STREAM("PMfromCaoch false");
+//        }
     }
 
     dynamicAttack->setDefenseClear(false); // TODO : fix
@@ -783,7 +783,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             dynamicAttack->setDirectShot(true);
         } else if (mostPossible > (conf.DirectTrsh - shotToGoalthr)) { // TODO : Fix This
             dynamicAttack->setDirectShot(true);
-            shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.2);
+            shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.4);
         } else {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
@@ -812,7 +812,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-//    MarkNum = 0;
+    
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
