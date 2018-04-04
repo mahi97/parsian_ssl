@@ -505,24 +505,20 @@ void CSkillKick::jTurn() {
     posPid->kd = 0;
     if (movementDir < 20 && movementDir > -20) {
         shift = 0;
-        if (0 &&wm->ball->vel.length() < 0.2) {
-        posPid->error = movementDir;
-        posPid->kd = 0.01;
-        }
     } else if (movementDir > 50) {
-        shift = 25 + (1 - agentPos.dist(ballPos)) * 80;
+        shift = 15 + (1 - agentPos.dist(ballPos)) * 61;
     } else if (movementDir < -50) {
-        shift = -25 - (1 - agentPos.dist(ballPos)) * 80;
+        shift = -15 - (1 - agentPos.dist(ballPos)) * 61;
     } else if (movementDir > 30) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 20;
+            shift = 5 + (1 - agentPos.dist(ballPos)) * 10;
         } else {
             shift = 5 + (1 - agentPos.dist(ballPos)) * 35;
         }
         distCoef = 0.17;
     } else if (movementDir < -30) {
         if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 20;
+            shift = -5 - (1 - agentPos.dist(ballPos)) * 10;
         } else {
             shift = -5 - (1 - agentPos.dist(ballPos)) * 35;
         }
@@ -557,20 +553,18 @@ void CSkillKick::jTurn() {
     ////////////set Active adaptive PIDs
 
 
-    dirReduce = (fabs(movementDir) / 70) * (fabs(movementDir) / 70);
     if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15) &&
         agentPos.dist(ballPos) < 0.25) {
         dirReduce -= 5;
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
-    speedPid->kp = 6.5 + 3.1 * agentPos.dist(ballPos) * std::max(wm->ball->vel.length() * 3, 2.0) + dirReduce +
-                   max(wm->ball->vel.length() * 2, 0);
+    speedPid->kp = 6 + 2.1 * agentPos.dist(ballPos)  + dirReduce;
 
 
-    if (!jTurnFromBack) {
-        dirReduce += 1;
-    }
+//    if (!jTurnFromBack) {
+//        dirReduce += 1;
+//    }
 
 
     if (penaltyKick) {
@@ -984,7 +978,7 @@ void CSkillKick::execute() {
 
 
 
-    drawer->draw(Segment2D(agent->pos(),agentPos+ agent->dir().norm()*10));
+    drawer->draw(QString("ball vel: %1").arg(wm->ball->vel.length()),Vector2D(2,-2));
     ballRealVel = wm->ball->vel.length();
     agentPos = agent->pos();
     kkDist = agentPos.dist(target);
