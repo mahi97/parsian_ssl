@@ -69,6 +69,16 @@ void CRoleStopInfo::findPositions() {
         Ps.append(getEmptyTarget(startPos*(1.0 - (double)(i)/count()) + endPos*((double)(i)/count()), 1));
     }
 
+    double weight;
+    double minweight=100.0;
+    for (int i = 0; i < count(); i++) {
+        weight=robot(i)->pos().dist(Ps[0]);
+        if(weight<minweight){
+            agentIDBehindBall=robot(i)->id();
+            minweight=weight;
+        }
+    }
+
 
     bool contain = false;
     for(int i =0 ; i<count(); i++){
@@ -77,6 +87,7 @@ void CRoleStopInfo::findPositions() {
             break;
         }
     }
+
     MWBM matcher;
     if(agentIDBehindBall == -1 || !contain) {
         matcher.create(count(), Ps.count());
