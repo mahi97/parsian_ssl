@@ -565,55 +565,47 @@ void CCoach::choosePlaymakeAndSupporter(){
         return;
     }
 
-    if (false) {
-//        playmakeId = swapPlaymake;
+    ////////////////////first we choose our playmake
+    double ballVel = wm->ball->vel.length();
+    Vector2D ballPos = wm->ball->pos;
+    if (ballVel < 0.3) {
+        double maxD = -1000.1;
+        for (const auto& player : ourPlayers) {
+            double o = -1 * agents[player]->pos().dist(ballPos) ;
+            if (player == lastPlayMake) {
+                o += conf.playMakeStopThr;
+            }
+            if (o > maxD) {
+                maxD = o;
+                playmakeId = player;
+            }
+        }
     } else {
+        if (playMakeIntention.elapsed() < conf.playMakeIntention) { // TODO : fix config
+            playmakeId = lastPlayMake;
+            return;
+        }
 
-        ////////////////////first we choose our playmake
-        double ballVel = wm->ball->vel.length();
-        Vector2D ballPos = wm->ball->pos;
-        if (ballVel < 0.3) {
-            double maxD = -1000.1;
-            for (const auto& player : ourPlayers) {
-                if(player == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
-                    ROS_INFO_STREAM("playofff: skipped: "<<player);
-                    continue;
-                }
-                double o = -1 * agents[player]->pos().dist(ballPos) ;
-                if (player == lastPlayMake) {
-                    o += conf.playMakeStopThr;
-                }
-                if (o > maxD) {
-                    maxD = o;
-                    playmakeId = player;
-                }
-            }
-        } else {
-            if (playMakeIntention.elapsed() < conf.playMakeIntention) { // TODO : fix config
-                playmakeId = lastPlayMake;
-                return;
-            }
-
-            playMakeIntention.restart();
-            double nearest[10] = {};
-            for (const auto& ourPlayer : ourPlayers) {
-                nearest[ourPlayer] = agents[ourPlayer]->pos().dist(wm->ball->pos + wm->ball->vel) ;
+        playMakeIntention.restart();
+        double nearest[10] = {};
+        for (const auto& ourPlayer : ourPlayers) {
+            nearest[ourPlayer] = agents[ourPlayer]->pos().dist(wm->ball->pos + wm->ball->vel) ;
 //            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
 //                                                                4, 3, 2,
 //                                                                2); // TODO : read from common config agents
-            }
-            if (lastPlayMake >= 0 && lastPlayMake <= 11) {
-                nearest[lastPlayMake] -= conf.playMakeMoveThr;
-            }
-            double minT = 1e8; // 10 ^ 8
-            for (const auto& player : ourPlayers) {
-                if (nearest[player] < minT) {
-                    minT = nearest[player];
-                    playmakeId = player;
-                }
+        }
+        if (lastPlayMake >= 0 && lastPlayMake <= 11) {
+            nearest[lastPlayMake] -= conf.playMakeMoveThr;
+        }
+        double minT = 1e8; // 10 ^ 8
+        for (const auto& player : ourPlayers) {
+            if (nearest[player] < minT) {
+                minT = nearest[player];
+                playmakeId = player;
             }
         }
     }
+
 
     lastPlayMake = playmakeId;
 }
@@ -758,9 +750,9 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     if (0 <= playmakeId && playmakeId <= 11) {
 //        if(dynamicAttack->getPMfromCaoch())
 //        {
-            dynamicAttack->setPlayMake(agents[playmakeId]);
-            ourPlayers.removeOne(playmakeId);
-            ROS_INFO_STREAM("PMfromCaoch true");
+        dynamicAttack->setPlayMake(agents[playmakeId]);
+        ourPlayers.removeOne(playmakeId);
+        ROS_INFO_STREAM("PMfromCaoch true");
 //        } else
 //        {
 //            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
@@ -812,7 +804,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-    
+
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
