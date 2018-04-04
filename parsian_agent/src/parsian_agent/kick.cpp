@@ -602,21 +602,21 @@ void CSkillKick::turnForKick() {
     double angReduce = 1;
 
     if (isPlayoff) {
-        if (fabs((agentDir.th() - kickFinalDir).degree()) < 70) {
+        if (fabs((agentDir.th() - kickFinalDir).degree()) < 80) {
             angReduce = 0.5;
         }
         if ((agentDir.th() - kickFinalDir).degree()  < - 10) {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4 , -1 * angReduce, angPid->PID_OUT() + 4 * angReduce);
+            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4 , -1 * angReduce, angPid->PID_OUT() + 3.5 * angReduce);
 
 
         } else if ((agentDir.th() - kickFinalDir).degree()  > 10) {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4, 1 * angReduce, angPid->PID_OUT() - 4 * angReduce) ;
+            agent->setRobotVel((-0.12 + agentPos.dist(ballPos)) * 4, 1 * angReduce, angPid->PID_OUT() - 3.5 * angReduce) ;
         }
 
 

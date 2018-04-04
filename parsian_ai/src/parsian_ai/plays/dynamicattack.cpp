@@ -276,31 +276,10 @@ void CDynamicAttack::makePlan(int agentSize) {
     //// Initialize Plan with null values
     currentPlan.mode = DynamicMode::NoMode;
     currentPlan.agentSize = agentSize;
-    for (auto &positionAgent : nextPlanA->positionAgents) {
+    for (auto &positionAgent : currentPlan.positionAgents) {
         positionAgent.region = DynamicRegion::NoMatter;
         positionAgent.skill  = PositionSkill::NoSkill;
     }
-
-//
-//    //// Initialize Plan with null values
-//    nextPlanB->mode = DynamicMode::NoMode;
-//    nextPlanB->agentSize = agentSize;
-//    for (auto &positionAgent : nextPlanB->positionAgents) {
-//        positionAgent.region = DynamicRegion::NoMatter;
-//        positionAgent.skill  = PositionSkill::NoSkill;
-//    }
-//
-//    if(true) {
-//        ROS_INFO_STREAM("kian: nomode");
-//        nextPlanA->mode = DynamicMode::NoMode;
-//        nextPlanA->playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
-//        for (size_t i = 0; i < agentSize; i++) {
-//            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
-//            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
-//        }
-//        currentPlan = *nextPlanA;
-//        return;
-//    }
 
     //// We Don't have the ball -- counter-attack, blocking, move forward
     //// And Ball is in our field
@@ -319,7 +298,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     }
         //// we have ball and
         //// shot prob is more than 50%
-    else if (directShot) {
+    else if (directShot && false) {
         ROS_INFO_STREAM("kian: diret shot");
         currentPlan.mode = DynamicMode::DirectKick;
         currentPlan.playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
@@ -328,71 +307,15 @@ void CDynamicAttack::makePlan(int agentSize) {
             currentPlan.positionAgents[i].skill  = PositionSkill::Ready;
         }
     }
-//    else if (critical) {
-//        ROS_INFO_STREAM("kian: critical");
-//        nextPlanA->mode = DynamicMode::Critical;
-//        {
-//            oppRob = wm->field->oppGoal();
-//            lastPMInitWasDribble = true;
-//            if (conf.DribbleInFast) {
-//                nextPlanA->playmake.init(PlayMakeSkill::Dribble, DynamicRegion::Goal);
-//            } else {
-//                nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
-//            }
-//            for (size_t i = 0; i < agentSize; i++) {
-//                nextPlanA->positionAgents[i].region = DynamicRegion::Best;
-//                nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
-//            }
-//        }
-//
-//    }
-//        //// if Defense isn't clearing and
-//        //// we have ball and
-//        //// shot prob isn't more than 50% and
-//        //// there isn't a critical situation and
-//        //// we don't have positioning agent
-//    else if (agentSize == 0) {
-//        ROS_INFO_STREAM("kian: no positioning");
-//        nextPlanA->mode = DynamicMode::NoPositionAgent;
-//        nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);
-//    }
-//        // we have ball and
-//        // shot prob isn't more than 50% and
-//        // there isn't a critical situation and
-//        // we have positioning agents
-//        // it's needed to be fast
-//    else if (fast) {
-//        ROS_INFO_STREAM("kian: fast");
-//        oppRob = wm->field->oppGoal();
-//        nextPlanA->mode = DynamicMode ::Fast;
-//        if (conf.DribbleInFast) {
-//            nextPlanA->playmake.init(PlayMakeSkill::Dribble, DynamicRegion ::Goal);
-//        } else {
-//            nextPlanA->playmake.init(PlayMakeSkill::Shot, DynamicRegion ::Goal);
-//        }
+//    else {
+//        ROS_INFO_STREAM("kian: nomode");
+//        currentPlan.mode = DynamicMode::NoMode;
+//        currentPlan.playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
 //        for (size_t i = 0; i < agentSize; i++) {
-//            nextPlanA->positionAgents[i].region = DynamicRegion::Best;
-//            nextPlanA->positionAgents[i].skill  = PositionSkill::Ready;
+//            currentPlan.positionAgents[i].region = DynamicRegion::Best;
+//            currentPlan.positionAgents[i].skill  = PositionSkill::Ready;
 //        }
 //    }
-//        // if Defense isn't clearing and
-//        // we have ball and
-//        // shot prob isn't more than 50% and
-//        // there isn't a critical situation and
-//        // we have positioning agents
-//        // there's no need to be fast and
-//        // there is no plan for this situation
-//        ///the correct mode is as below but the ::choosebesrtposforpass:: giving a  bad position
-//        /////////TODO: fix the pos
-    else {
-        ROS_INFO_STREAM("kian: nomode");
-        currentPlan.mode = DynamicMode::NoMode;
-        currentPlan.playmake.init(PlayMakeSkill::Pass, DynamicRegion::Best);
-        for (size_t i = 0; i < agentSize; i++) {
-            currentPlan.positionAgents[i].region = DynamicRegion::Best;
-            currentPlan.positionAgents[i].skill  = PositionSkill::Ready;
-        }
-    }
 }
 
 void CDynamicAttack::assignId() {
@@ -510,7 +433,7 @@ void CDynamicAttack::playMake() {
             roleAgentPM -> setChip(chipOrNot(currentPlan.passPos, 0.5, 0.1));
             roleAgentPM -> setTarget(currentPlan.passPos);
             roleAgentPM -> setEmptySpot(false);
-            roleAgentPM -> setNoKick(true);
+            roleAgentPM -> setNoKick(false);
             if (roleAgentPM->getChip()) {
 //            roleAgentPM->setChipDist(appropriateChipSpeed());       //TODO: set chip distanse not speed
                 roleAgentPM->setChipDist(conf.MediumDistChip);
@@ -1063,21 +986,21 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
         currentPlan.passID = -1;
         return;
     }
+
+    Vector2D bestPoint; bestPoint.invalidate();
+    double bestOneTouchFactor = -100;
+    int bestReceiver = -1;
     for (int i = 0; i < points.count(); i++) {
         if (probs[i] < 0.5) continue;
-        double bestOneTouchFactor = -100;
-        int bestReceiver = -1;
-        for(int j{0}; j < matchingIDs.count(); j++)
-        {
-            double tempOverall = calcOneTouchAngleFactor(points[i]);
-            if (tempOverall > bestOneTouchFactor)
-            {
-                bestReceiver = matchingIDs[i];
-                bestOneTouchFactor = tempOverall;
-            }
+        double tempOverall = calcOneTouchAngleFactor(points[i]);
+        if (tempOverall > bestOneTouchFactor) {
+            bestReceiver = matchingIDs[i];
+            bestOneTouchFactor = tempOverall;
+            bestPoint = points[i];
         }
     }
-
+    currentPlan.passPos = bestPoint;
+    currentPlan.passID = bestReceiver;
 }
 
 double CDynamicAttack::getDynamicValue(const Vector2D &_dynamicPos) const {

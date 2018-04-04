@@ -200,10 +200,10 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
 
     if (gameState->isStop()) {
-        if (wm->ball->pos.x < 0) {
+        if (wm->ball->pos.x < 1) {
             preferedDefenseCounts = agentsCount - 1;
 
-        } else if (wm->ball->pos.x > 1) {
+        } else if (wm->ball->pos.x > 1.2) {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
