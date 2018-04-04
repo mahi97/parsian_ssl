@@ -112,7 +112,7 @@ void CSkillKickOneTouch::execute() {
     Vector2D agentPos = agent->pos();
 
     Segment2D ballPath;
-    double stopParam = 0.09;
+    double stopParam = 0.085;
     ballPath.assign(ballPos, ballPos + wm->ball->vel.norm() * 15);
     Segment2D ballLine;
     ballLine.assign(ballPos, ballPos + wm->ball->vel.norm() * (15));
@@ -205,10 +205,10 @@ void CSkillKickOneTouch::execute() {
             if (chip) {
                 agent->setChip(kickSpeed);
             } else {
-                agent->setKick(kickSpeed);
+                agent->setKick(1000);
             }
         }
-        agent->setRoller(49);
+        agent->setRoller(0);
     } else if (ballPos.dist(agentPos) < onetouchKickRad) {
         kick->setAgent(agent);
         kick->setTarget(target);
@@ -223,6 +223,7 @@ void CSkillKickOneTouch::execute() {
         gotopointavoid->execute();
     }
 
+   // agent->setKick(600);
     ballLastVel = wm->ball->vel;
     lastInterceptPos = intersectPos;
 }
