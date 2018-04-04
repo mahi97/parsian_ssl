@@ -367,19 +367,10 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         mahiAgentsID[i] = -1;
     }
 
-<<<<<<< 813b3419acfa607adc33bff3c9949fa3eccba273
     if (inTimePlan() || true) {
         makePlan(agentSize);
     }
-<<<<<<< 8a56a0163f7afb8ce4723cf2fe2b760f10cfb0ba
-=======
 
-=======
-//    if (inTimePlan()) {
-        makePlan(agentSize);
-//    }
->>>>>>> mahi
->>>>>>> mahi
     if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
         chooseBestPositons_new();
         assignId_new();
