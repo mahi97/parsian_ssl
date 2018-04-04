@@ -2363,8 +2363,6 @@ void DefensePlan::execute(){
                                                                 defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
                             }
                             else{
-                                drawer->draw(Circle2D(wm->field->center() , 0.3) , 0 , 360 , "cyan");
-                                PDEBUG("OVER DEF" , realDefSize - findNeededDefense() , D_AHZ);
                                 AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(findNeededDefense() , realDefSize , conf.DownLimit , conf.UpLimit),
                                                                 defenseFormationForRectangularPositioning(findNeededDefense() , realDefSize , 1.4 , 2.5));
                                 for(size_t i = 0 ; i < getPositionJustForZJU(realDefSize - findNeededDefense()).size() ; i++){
