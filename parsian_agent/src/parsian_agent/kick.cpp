@@ -450,43 +450,52 @@ void CSkillKick::jTurn() {
 
     posPid->error = 0;
     posPid->kd = 0;
-    if (movementDir < 20 && movementDir > -20) {
+    if (movementDir < 15 && movementDir > -15) {
         shift = 0;
         if (wm->ball->vel.length() < 0.2) {
         posPid->error = movementDir;
-        posPid->kd = 0.01;
+        posPid->kd = 0.2;
         }
-    } else if (movementDir > 50) {
-        shift = 25 + (1 - agentPos.dist(ballPos)) * 80;
-    } else if (movementDir < -50) {
-        shift = -25 - (1 - agentPos.dist(ballPos)) * 80;
+    } else if (movementDir > 65) {
+        shift = 25 + (1 - agentPos.dist(ballPos)) * 70;
+    } else if (movementDir < -65) {
+        shift = -25 - (1 - agentPos.dist(ballPos)) * 70;
     } else if (movementDir > 30) {
-        if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 20;
+        if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
+            shift = 30 + (1 - agentPos.dist(ballPos)) * 20;
+        } else if (wm->ball->vel.length() < 0.1) {
+            shift = 10 + (1 - agentPos.dist(ballPos)) * 25;
         } else {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 35;
+            shift = 20 + (1 - agentPos.dist(ballPos)) * 35;
         }
         distCoef = 0.17;
     } else if (movementDir < -30) {
-        if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 20;
+        if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
+            shift = -30 - (1 - agentPos.dist(ballPos)) * 20;
+        } else if (wm->ball->vel.length() < 0.1) {
+            shift = -10 - (1 - agentPos.dist(ballPos)) * 25;
         } else {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 35;
+            shift = -20 - (1 - agentPos.dist(ballPos)) * 35;
         }
 
         distCoef = 0.17;
     } else if (movementDir > 0) {
-        if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 15;
+        if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
+            shift = 25 + (1 - agentPos.dist(ballPos)) * 20;
+        } else if (wm->ball->vel.length() < 0.1) {
+            shift = 5 + (1 - agentPos.dist(ballPos)) * 20;
         } else {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 25;
+            shift = 15 + (1 - agentPos.dist(ballPos)) * 25;
         }
         distCoef = 0.17;
     } else if (movementDir < 0) {
-        if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 15;
+        if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
+            shift = -25 - (1 - agentPos.dist(ballPos)) * 20;
+        }
+        else if (wm->ball->vel.length() < 0.1) {
+            shift = -5 - (1 - agentPos.dist(ballPos)) * 20;
         } else {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 25;
+            shift = -15 - (1 - agentPos.dist(ballPos)) * 25;
         }
 
         distCoef = 0.17;
@@ -496,9 +505,7 @@ void CSkillKick::jTurn() {
     targetForJturnSpeed = agentPos + idealPass;
 
     movementThSpeed = (targetForJturnSpeed - agentPos).norm();
-    movementThPos = (targetForJturnPos - agentPos).norm();
-    double dirReduce = (fabs(movementDir) / 70) * (fabs(movementDir) / 70);
-
+    double dirReduce;
     speedPid->error = targetForJturnSpeed.dist(agentPos);
 
     ////////////set Active adaptive PIDs
@@ -506,17 +513,12 @@ void CSkillKick::jTurn() {
 
     dirReduce = (fabs(movementDir) / 70) * (fabs(movementDir) / 70);
     if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15) &&
-        agentPos.dist(ballPos) < 0.25) {
-        dirReduce -= 5;
+        agentPos.dist(ballPos) < 0.35) {
+        dirReduce -= 4.5;
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     posPid->kp = 0.001;
-    speedPid->kp = 5.5 + 2.1 * agentPos.dist(ballPos) + dirReduce;
-
-
-    if (!jTurnFromBack) {
-        dirReduce += 1;
-    }
+    speedPid->kp = 5 + 2.1 * agentPos.dist(ballPos) + dirReduce + wm->ball->vel.length()*0.4;
 
 
     if (penaltyKick) {
@@ -529,7 +531,7 @@ void CSkillKick::jTurn() {
     double vx = movementThSpeed.x * speedPid->PID_OUT() + posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
     double vy = movementThSpeed.y * speedPid->PID_OUT() + posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);
     angPid->error = (kickFinalDir - agentDir.th()).radian();
-    agent->setRobotAbsVel(wm->ball->vel.x*1.2 + vx, wm->ball->vel.y*1.2 + vy, angPid->PID_OUT());
+    agent->setRobotAbsVel(wm->ball->vel.x*1 + vx, wm->ball->vel.y*1 + vy, angPid->PID_OUT());
     speedPid->pError = speedPid->error;
 
     posPid->pError = posPid->error;
@@ -577,13 +579,15 @@ void CSkillKick::turnForKick() {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel(0.5, -1 * angReduce, angPid->PID_OUT() + 4 * angReduce);
+            agent->setRobotVel(1, -0.7 * angReduce, angPid->PID_OUT() + 3 * angReduce);
+            agent->accelerationLimiter(0,false);
 
         } else if ((agentDir.th() - kickFinalDir).degree()  > 10) {
             angPid->kp = 4 * angReduce;
 
             angPid->error = ((ballPos - agentPos).th() - agent->dir().th()).radian();
-            agent->setRobotVel(0.5, 1 * angReduce, angPid->PID_OUT() - 4 * angReduce) ;
+            agent->setRobotVel(1, 0.7 * angReduce, angPid->PID_OUT() - 3* angReduce) ;
+            agent->accelerationLimiter(0,false);
         }
     }
 }
@@ -805,7 +809,11 @@ void CSkillKick::findPosToGo() {
         }
 
         //TODO : penalty area
-        if ((ballPath.intersection(targetNormalSeg).isValid()) && ((agentPos.dist(ballPos) < 1) || isKhafan)){// && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
+        if(((agentPos.dist(ballPos + wm->ball->vel*0.5) < 0.6) && isKhafan)) {
+            jTurn();
+            return;
+        }
+        if ((ballPath.intersection(targetNormalSeg).isValid()) && ((agentPos.dist(ballPos) < 1) || isKhafan) && (fabs(((ballPos - agentPos).th() - kickFinalDir).degree()) < 60)) {
             jTurn();
             return;
         }
@@ -976,7 +984,7 @@ void CSkillKick::execute() {
 
 
     if(kickerOn) {
-        agent->setRoller(spin);
+        agent->setRoller(3);
     } else {
         agent->setRoller(0);
     }
