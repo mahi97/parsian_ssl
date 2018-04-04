@@ -78,6 +78,7 @@ void CRoleStopInfo::findPositions() {
             minweight=weight;
         }
     }
+    ROS_INFO_STREAM("nana passer:"<<agentIDBehindBall);
 
 
     bool contain = false;
@@ -92,6 +93,7 @@ void CRoleStopInfo::findPositions() {
     if(agentIDBehindBall == -1 || !contain) {
         matcher.create(count(), Ps.count());
 
+        ROS_INFO_STREAM("nana : mahi match");
         for (int i = 0; i < count(); i++) {
             for (int j = 0; j < Ps.count(); j++)
                 matcher.setWeight(i, j, -Ps[j].dist(robot(i)->pos()));
@@ -104,29 +106,52 @@ void CRoleStopInfo::findPositions() {
         }
 
     } else {
-        matcher.create(count() - 1, Ps.count() - 1);
         robotId.append(agentIDBehindBall);
-
-        QList<Agent*> temp;
-
-        for (int i = 0; i < count(); i++) {
-            if (robot(i)->id() != agentIDBehindBall) {
-                temp.append(robot(i));
+        QList<Agent *> stopagents;
+        QList<Vector2D> stopPositions;
+        QList<int> matchinglist;
+        for(int i=0;i<count();i++){
+            if(robot(i)->id()!=agentIDBehindBall) {
+                stopagents.append(robot(i));
             }
         }
-        int k = 0;
-        for (int i = 0; i < temp.size(); i++) {
-            for (int j = 1; j < Ps.count(); j++) {
-                matcher.setWeight(i, j - 1, -Ps[j].dist(temp.at(i)->pos()));
+        for (int j = 1; j < Ps.count(); j++) {
+            stopPositions.append(Ps[j]);
+        }
+
+        know->MatchingMinTheMax(stopagents,stopPositions,matchinglist);
+        for (int i = 0; i <matchinglist.size() ; i++) {
+            if(robot(i)->id()>=agentIDBehindBall) {
+                robotId.insert(i+1, robot(i + 1)->id());
             }
-            k++;
+            else {
+                robotId.insert(i+1, robot(i)->id());
+            }
         }
 
-        matcher.findMatching();
-
-        for (int i = 0; i < k; i++) {
-            robotId.append(temp.at(matcher.getMatch(i))->id());
-        }
+//        matcher.create(count() - 1, Ps.count() - 1);
+//        robotId.append(agentIDBehindBall);
+//
+//        QList<Agent*> temp;
+//
+//        for (int i = 0; i < count(); i++) {
+//            if (robot(i)->id() != agentIDBehindBall) {
+//                temp.append(robot(i));
+//            }
+//        }
+//        int k = 0;
+//        for (int i = 0; i < temp.size(); i++) {
+//            for (int j = 1; j < Ps.count(); j++) {
+//                matcher.setWeight(i, j - 1, -Ps[j].dist(temp.at(i)->pos()));
+//            }
+//            k++;
+//        }
+//
+//        matcher.findMatching();
+//
+//        for (int i = 0; i < k; i++) {
+//            robotId.append(temp.at(matcher.getMatch(i))->id());
+//        }
     }
 
     return;
