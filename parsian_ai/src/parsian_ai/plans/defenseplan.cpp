@@ -7,6 +7,25 @@ using namespace std;
 #define LONG_CHIP_POWER 1023
 #define RADIUS_FOR_CRITICAL_DEFENSE_AREA (1.697056275 + Robot::robot_radius_new)
 
+QList<Vector2D> DefensePlan::getPositionJustForZJU(int numberOfOverDefenders){
+    QList<Vector2D> defendersForZJU;
+    defendersForZJU.clear();
+    if(wm->ball->pos.y > 0){
+        for(int i = 0 ; i < numberOfOverDefenders ; i++){
+            defendersForZJU.append(Vector2D(-4.7 , -(i+1)/2));
+        }
+    }
+    else{
+        for(int i = 0 ; i < numberOfOverDefenders ; i++){
+            defendersForZJU.append(Vector2D(-4.7 , (i+1)/2));
+        }
+    }
+    for(size_t i = 0 ; i < defendersForZJU.size() ; i++){
+        drawer->draw(Circle2D(defendersForZJU.at(i) , 0.4) , 0 , 360 , "blue");
+    }
+    return defendersForZJU;
+}
+
 Vector2D DefensePlan::getGKPositionInOneDefense(Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint , double downLimit , double upLimit){
     Vector2D goalkeeperPosition;
     Vector2D sol[2];
@@ -275,9 +294,6 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         else if (neededDefenseAgents == 3){
             defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
-        for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
-            defensePosiotion.append(Vector2D(0, i));
-        }
     }
     else {
         if (allOfDefenseAgents == 1) {
@@ -493,15 +509,20 @@ QList<int> DefensePlan::detectOpponentPassOwners(double downEdgeLength , double 
 }
 
 int DefensePlan::defenseNumber(){
-    //    if (conf.StrictFormation){
-    //        if (conf.Defense > 3){
-    //            return 3;
-    //        } else {
-    //            return conf.Defense;
-    //        }
-    //    } else {
-    return findNeededDefense();
-    //    }
+    if (conf.StrictFormation){
+        if (conf.Defense > 3){
+            return 3;
+        } else {
+            return conf.Defense;
+        }
+    } else {
+        if(conf.ThreeDefenseMode){
+            return min(3,defenseCount);
+        }
+        else{
+            return findNeededDefense();
+        }
+    }
 }
 
 Vector2D DefensePlan::oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit) {
@@ -625,9 +646,6 @@ QList<Vector2D> DefensePlan::defenseFormationForRectangularPositioning(int neede
             defensePosiotion = twoDefenseFormationForRectangularPositioning(downLimit , upLimit);
         } else if (neededDefenseAgents == 3) {
             defensePosiotion = threeDefenseFormationForRecatangularPositioning(downLimit , upLimit);
-        }
-        for (int i = 0 ; i < allOfDefenseAgents - neededDefenseAgents ; i++) {
-            defensePosiotion.append(Vector2D(0, i));
         }
     } else {
         if (allOfDefenseAgents == 1) {
@@ -1481,7 +1499,6 @@ void DefensePlan::manToManMarkBlockShotInPlayOff(int _markAgentSize) {
         drawer->draw(markRoles.at(i) , markPoses.at(i) - Vector2D(0, 0.4) , "white");
     }
 }
-
 
 void DefensePlan::setGoalKeeperState(){
     //// In this function,we determine the specific states that goalkeeper must
@@ -2352,9 +2369,31 @@ void DefensePlan::execute(){
                     defenseCount = defenseAgents.size();
                 }
                 if(defenseCount > 0){
-                    realDefSize = defenseCount - decideNumOfMarks();
-                    AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , conf.DownLimit , conf.UpLimit),
-                                                    defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
+                    if(conf.ThreeDefenseMode){
+                        realDefSize = min(3 , defenseCount);
+                        if(realDefSize == 3){
+                            if(findNeededDefense() == 3){
+                                AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , conf.DownLimit , conf.UpLimit),
+                                                                defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
+                            }
+                            else{
+                                AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(findNeededDefense() , realDefSize , conf.DownLimit , conf.UpLimit),
+                                                                defenseFormationForRectangularPositioning(findNeededDefense() , realDefSize , 1.4 , 2.5));
+                                for(size_t i = 0 ; i < getPositionJustForZJU(realDefSize - findNeededDefense()).size() ; i++){
+                                    AHZDefPoints.append(getPositionJustForZJU(realDefSize - findNeededDefense()).at(i));
+                                }
+                            }
+                        }
+                        else if(realDefSize < 3){
+                            AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , conf.DownLimit , conf.UpLimit),
+                                                            defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
+                        }
+                    }
+                    else{
+                        realDefSize = defenseCount - decideNumOfMarks();
+                        AHZDefPoints = defenseFormation(defenseFormationForCircularPositioning(defenseNumber() , realDefSize , conf.DownLimit , conf.UpLimit),
+                                                        defenseFormationForRectangularPositioning(defenseNumber() , realDefSize , 1.4 , 2.5));
+                    }
                     matchingDefPos(realDefSize);
                 }
             }
@@ -3210,8 +3249,8 @@ Vector2D DefensePlan::avoidCircularPenaltyAreaByMasoud(Agent* agent, const Vecto
 
     double distFromGoal = RADIUS_FOR_CRITICAL_DEFENSE_AREA + Robot::robot_radius_new;
     if (agentPos.dist(wm->field->ourGoal()) < distFromGoal/* && !isballAndDefenseAgentsInOneRegion(agentPos) && defenseArea.contains(wm->ball->pos))
-                                    ||
-                                    (agentPos.dist(wm->field->ourGoal()) < distFromGoal && !defenseArea.contains(wm->ball->pos))*/){
+                                                                                                                    ||
+                                                                                                                    (agentPos.dist(wm->field->ourGoal()) < distFromGoal && !defenseArea.contains(wm->ball->pos))*/){
         agentPos = wm->field->ourGoal() + Vector2D().setPolar(distFromGoal, (agentPos - wm->field->ourGoal()).th().degree());
         defenseArea.intersection(Line2D(agentPos, wm->field->ourGoal()) , &sol[0] , &sol[1]);
         Vector2D inter = sol[0].isValid() && sol[0].dist(agentPos) < sol[1].dist(agentPos) ? sol[0] : sol[1];
@@ -3320,17 +3359,22 @@ int DefensePlan::decideNumOfMarks(){
     playOnMode = gameState->isStart();
     playOffMode = gameState->theirDirectKick() || gameState->theirIndirectKick();
     if (defenseCount > 0){
-        if (gameState->isStop()){
+        if(conf.ThreeDefenseMode){
             return defenseCount - defenseNumber();
         }
-        if (playOffMode) {
-            return defenseCount;
-        }
-        else if (know->variables["transientFlag"].toBool()) {
-            return defenseCount;
-        }
-        else if (playOnMode) {
-            return 0;
+        else{
+            if (gameState->isStop()){
+                return defenseCount - defenseNumber();
+            }
+            if (playOffMode) {
+                return defenseCount;
+            }
+            else if (know->variables["transientFlag"].toBool()) {
+                return defenseCount;
+            }
+            else if (playOnMode) {
+                return 0;
+            }
         }
     }
     return 0;
@@ -3520,7 +3564,6 @@ void DefensePlan::findOppAgentsToMark(){
     }
 }
 
-
 Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
     //// This function predicts the opponent agent with considering the position
     //// && velocity of the opponent agent.
@@ -3547,7 +3590,6 @@ Vector2D DefensePlan::posvel(CRobot* opp, double VelReliabiity) {
         return opp->pos + VelReliabiity * opp->vel;
     }
 }
-
 
 void DefensePlan::findPos(int _markAgentSize){
     //// In this function, we choose the different plans of the mark in different
