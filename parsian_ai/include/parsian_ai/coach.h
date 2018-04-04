@@ -31,6 +31,20 @@
 #include <parsian_ai/roles/fault.h>
 
 
+#include <parsian_util/geom/angle_deg.h>
+#include <parsian_util/geom/circle_2d.h>
+#include <parsian_util/geom/line_2d.h>
+#include <parsian_util/geom/matrix_2d.h>
+#include <parsian_util/geom/polygon_2d.h>
+#include <parsian_util/geom/ray_2d.h>
+#include <parsian_util/geom/rect_2d.h>
+#include <parsian_util/geom/sector_2d.h>
+#include <parsian_util/geom/segment_2d.h>
+#include <parsian_util/geom/size_2d.h>
+#include <parsian_util/geom/triangle_2d.h>
+#include <parsian_util/geom/vector_2d.h>
+
+
 
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
@@ -188,7 +202,7 @@ private:
     int lastSupporterId;
     int lastPlayMake;
 
-    void choosePlaymakeAndSupporter();
+    void choosePlaymakeAndSupporter(bool defenseFirst);
 
     ///////////////////////////////////////////////
 
@@ -286,10 +300,6 @@ private:
 
     bool isFastPlay();
 
-    ///////////////////////// AHZ //////////
-    int findNeededDefense();
-
-
     double overDefThr;
 
     // inter change
@@ -297,7 +307,8 @@ private:
 
     int faultDetectionCounter[_MAX_NUM_PLAYERS];
 
-
+    double kickTimeEstimation(Agent * _agent, const Vector2D& target);
+    double timeNeeded(Agent *_agentT,const Vector2D& posT, double vMax);
     // MAHI ADD IN ROS
     QList<CRobot *> toBeMopps;
     int desiredDefCount;
@@ -316,7 +327,6 @@ private:
 
 //    QList<Vector2D> lastBallVel;
     QList<Vector2D> lastBallDir;
-
 
 };
 #endif //PARSIAN_AI_COACH_H
