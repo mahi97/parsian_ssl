@@ -24,14 +24,14 @@ struct velAndAccByKK {
 enum { OneTouchState , ClearState , NoState };
 
 class DefensePlan : public Plan {
-protected:            
-    int defenseCount;                  
+protected:
+    int defenseCount;
     GotopointAction* gps[_MAX_NUM_PLAYERS];
     GotopointavoidAction *gpa[_MAX_NUM_PLAYERS];
     KickAction* kickSkill;
     Action* AHZSkills;
     CDefPos defPos;
-    Vector2D pointForKick, oneToucherDir;    
+    Vector2D pointForKick, oneToucherDir;
     Vector2D goalKeeperTarget,lastTarget, goalieDirection , defensePoints[12], defenseTargets[12];
     void setPointToKick();
     void setGoalKeeperState();
@@ -52,6 +52,7 @@ protected:
 
     bool isInIndirectArea(Vector2D);
     int defenseNumber();
+    QList<Vector2D> getPositionJustForZJU(int numberOfOverDefenders);
     double findBestOffsetForDefenseArea(Line2D bestLineWithTalles, double downLimit , double upLimit);
     double findBestRadiusForDefenseArea(Line2D bestLineWithTalles , double downLimit , double upLimit);
     Line2D getBestLineWithTallesForRecatngularPositioning(int defenseCount , Vector2D firstPoint , Vector2D originPoint , Vector2D secondPoint);
@@ -64,7 +65,7 @@ protected:
     QList<Vector2D> twoDefenseFormationForRectangularPositioning(double downLimit , double upLimit);
     QList<Vector2D> twoDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<Vector2D> threeDefenseFormationForRecatangularPositioning(double downLimit , double upLimit);
-    QList<Vector2D> threeDefenseFormationForCircularPositioning(double downLimit , double upLimit);    
+    QList<Vector2D> threeDefenseFormationForCircularPositioning(double downLimit , double upLimit);
     QList<int> detectOpponentPassOwners(double downEdge , double upEdge);
     Vector2D oneDefenseFormationForRecatngularPositioning(double downLimit , double upLimit);
     Vector2D oneDefenseFormationForCircularPositioning(double downLimit , double upLimit);
@@ -119,7 +120,7 @@ protected:
     int decideNumOfMarks();
     kkDefPos tempDefPos;
     void matchingDefPos(int _defenseNum);
-    bool defenseOneTouchOrNot();        
+    bool defenseOneTouchOrNot();
     bool agentEffectOnBallProbability(Vector2D ballPos, Vector2D ballVel, Vector2D agentPos, Vector2D agentVel, bool isTowardOurgoal);
     Vector2D getGoalieShootOutTarget(bool isSkyDive);
     bool canReachToBall(int agentId, int theirAgentId);
@@ -165,7 +166,7 @@ public:
     //////////////////HMD/////////////////
     QList<Vector2D> markPoses;
     QList<Vector2D> markAngs;
-    double markRadius; 
+    double markRadius;
     double segmentpershoot;
     double segmentperpass;
     bool MantoManAllTransientFlag;
@@ -200,8 +201,8 @@ private:
     rcsc::Vector2D* getIntersectWithDefenseArea(const Line2D& segment, const Vector2D& blockPoint);
     rcsc::Vector2D* getIntersectWithDefenseArea(const Segment2D& segment, const Vector2D& blockPoint);
     rcsc::Vector2D* getIntersectWithDefenseArea(const Circle2D& circle, bool upperPoint);
-    void assignSkill(Agent *_agent , Action *_skill);    
-    void initVars(float goalCircleRad = 0.9); // default is 0.8    
+    void assignSkill(Agent *_agent , Action *_skill);
+    void initVars(float goalCircleRad = 0.9); // default is 0.8
     bool defenderForMark;
     bool doubleMarking;
     bool isDefenseFastest;
@@ -230,8 +231,8 @@ private:
     int GOTCounter;
     double thr;
     double noDefThr;
-    QList<Vector2D> ballPosHistory;    
-    void calcPointForOneTouch();    
+    QList<Vector2D> ballPosHistory;
+    void calcPointForOneTouch();
     bool isInOneTouch;
     bool isOnetouch;
     int oneTouchCycleTest;
@@ -239,13 +240,13 @@ private:
     int cycleCounter;
     Vector2D oneTouchPoint[2];
     bool oneTouchPointFlag;
-    bool oneTouchPointFlagG;        
+    bool oneTouchPointFlagG;
     bool doBlockPass;
     double timeToReach;
     Vector2D blockPassPoint;
     QList<int> dangerousOpp;
     double goalieAreaHis;
-    Vector2D goalieTargetDir;    
+    Vector2D goalieTargetDir;
     int isBallGoingToOppAreaCnt;
     double pushBallHist;
     int failureAtempCnt;
@@ -253,7 +254,7 @@ private:
     double savedClearDist;
     int goaliePassBlockCnt;
     Vector2D gBassBlockTargetSave;
-    double predictThresh;    
+    double predictThresh;
     bool inPenaltyAreaFlag;
     int predictMostDangrousOppToBall();
     Vector2D NearestDistanceToBallSegment(Vector2D point);

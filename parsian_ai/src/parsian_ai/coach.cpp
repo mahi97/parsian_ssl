@@ -544,13 +544,13 @@ double CCoach::findMostPossible(Vector2D agentPos) {
 }
 
 void CCoach::updateAttackState() {
-
     ourAttackState = SAFE;
     return;
 }
 
 void CCoach::choosePlaymakeAndSupporter(){
-
+//    playmakeId = 10;
+//    return;
     playmakeId = -1;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
@@ -623,12 +623,10 @@ void CCoach::decideAttack() {
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
-        ROS_INFO_STREAM("nana gk: "<<goalieAgent->id());
     }
     for (auto defenseAgent : defenseAgents) {
         if (ourPlayersID.contains(defenseAgent->id())) {
             ourPlayersID.removeOne(defenseAgent->id());
-            ROS_INFO_STREAM("nana defenseAgent: "<<defenseAgent->id());
         }
     }
 
@@ -1152,6 +1150,7 @@ void CCoach::execute()
     //// Handle Roles Here
     CRoleStop::info()->reset();
     CRoleFault::info()->reset();
+
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
@@ -1209,6 +1208,21 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     if (!ourPlayOff->deleted) {
         ourPlayOff->reset();
         ourPlayOff->deleted = true;
+    }
+
+    getBadsAndGoods(_ourPlayers);
+    if(goodshooters.size() > 0){
+        CRoleStop::info()->setAgentBehindBall(goodshooters.at(0));
+        ROS_INFO_STREAM("nana coach good id: "<<goodshooters.at(0));
+    } else if(badshooters.size() >= _ourPlayers.size()) {
+        CRoleStop::info()->setAgentBehindBall(-1);
+    } else {
+        for(int i=0;i<_ourPlayers.size();i++){
+            if(!badshooters.contains(i)){
+                CRoleStop::info()->setAgentBehindBall(i);
+                break;
+            }
+        }
     }
 
     for (int i = 0; i < _ourPlayers.size(); i++) {
@@ -1619,7 +1633,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     for(int i=0;i<passcount;i++) {
 
         if (goodshooters.size() > 0) {
-            for (int goodshooter:goodshooters) {
+            for (int goodshooter: goodshooters) {
                 if (_ourplayers.contains(goodshooter)) {
                     int j = _ourplayers.indexOf(goodshooter);
                     if (i == 0) {
@@ -1628,13 +1642,13 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                             minweight = weight;
                             matchedID = j;
                         }
-                    } else if (i == 1 && j!= matchedID) {
+                    } else if (i == 1 && j != matchedID) {
                         weight = agents[j]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             secMinweight = weight;
                             secMatchedID = j;
                         }
-                    } else if (i == 2 && j!= matchedID && j!= secMatchedID) {
+                    } else if (i == 2 && j != matchedID && j != secMatchedID) {
                         weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
                         if (weight < secMinweight) {
                             thirdMinweight = weight;
