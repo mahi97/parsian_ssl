@@ -842,7 +842,7 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
         _mode = NGameOff::FirstPlay;
 
-    } else if (wm->ball->pos.x < -1 || !gotplan) {
+    } else if (wm->ball->pos.x < 1 || !gotplan) {
         _mode = NGameOff::DynamicPlay;
 
     } else if (!firstIsFinished && conf.UseFirstPlay) {
@@ -1634,17 +1634,17 @@ void CCoach::getBadsAndGoods(const QList<int>& _ourplayers) {
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     MWBM matcher;
-    int passcount=0;
-    passcount=min(_plan->execution.passCount+1,_ourplayers.size() );
-    matcher.create(_plan->common.currentSize - passcount, _ourplayers.size()-passcount );
+    int passcount = 0;
+    passcount = min(_plan->execution.passCount + 1, _ourplayers.size());
+    matcher.create(_plan->common.currentSize - passcount, _ourplayers.size() - passcount);
 
-
-
-    int matchedID = -1,secMatchedID=-1, thirdMatchedID=-1;
+    int matchedID = -1, secMatchedID = -1, thirdMatchedID = -1;
     double weight = 0;
-    double minweight = 100, secMinweight=100, thirdMinweight=100;
+    double minweight = 100, secMinweight = 100, thirdMinweight = 100;
     getBadsAndGoods(_ourplayers);
-    for(int i=0;i<passcount;i++) {
+
+    for (int i = 0; i < passcount; i++) {
+
         if (goodshooters.size() > 0) {
 
             for (int goodshooter: goodshooters) {
@@ -1657,13 +1657,13 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                             matchedID = j;
                         }
                     } else if (i == 1 && j != matchedID) {
-                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
+                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                         if (weight < secMinweight) {
                             secMinweight = weight;
                             secMatchedID = j;
                         }
                     } else if (i == 2 && j != matchedID && j != secMatchedID) {
-                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
+                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                         if (weight < secMinweight) {
                             thirdMinweight = weight;
                             thirdMatchedID = j;
@@ -1672,38 +1672,38 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
                 }
 
 
-                goodshooters.removeOne(_ourplayers[matchedID]);
             }
-        }
-        else{
+            if (matchedID != -1)
+                goodshooters.removeOne(_ourplayers[matchedID]);
+            if (secMatchedID != -1)
+                goodshooters.removeOne(_ourplayers[secMatchedID]);
+            if (thirdMatchedID != -1)
+                goodshooters.removeOne(_ourplayers[thirdMatchedID]);
+        } else {
 
             for (int j = 0; j < _ourplayers.size(); j++) {
-                if(badshooters.size()<_ourplayers.size()-i) {
+                if (badshooters.size() < _ourplayers.size() - i) {
                     if (badshooters.contains(agents[_ourplayers.at(j)]->id()))
                         continue;
                 }
-                if(i==0) {
+                if (i == 0) {
                     weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
                     if (weight < minweight) {
                         minweight = weight;
                         matchedID = j;
                     }
-                }
-                else if (i==1 && j!= matchedID){
+                } else if (i == 1 && j != matchedID) {
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
-                    if(weight <  secMinweight)
-                    {
-                        secMinweight=weight;
-                        secMatchedID=j;
+                    if (weight < secMinweight) {
+                        secMinweight = weight;
+                        secMatchedID = j;
                     }
-                }
-                 else if (i==2 && j!= matchedID && j!= secMatchedID){
+                } else if (i == 2 && j != matchedID && j != secMatchedID) {
 
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
-                    if(weight <  thirdMinweight)
-                    {
-                        thirdMinweight=weight;
-                        thirdMatchedID=j;
+                    if (weight < thirdMinweight) {
+                        thirdMinweight = weight;
+                        thirdMatchedID = j;
                     }
                 }
             }
@@ -1726,9 +1726,9 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     othersmatch.clear();
     for (int i = passcount; i < _plan->common.currentSize; i++) {
-        int k =0;
+        int k = 0;
         for (int j = 0; j < _ourplayers.size(); j++) {
-            if (j != matchedID && j!= secMatchedID && j!= thirdMatchedID) {
+            if (j != matchedID && j != secMatchedID && j != thirdMatchedID) {
                 weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
                 matcher.setWeight(i - passcount, k, -(weight));
                 othersmatch.append(j);
@@ -1740,7 +1740,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
     for (size_t i = passcount; i < _plan->common.currentSize; i++) {
         nmatchedID = matcher.getMatch(i - passcount);
-        nmatchedID=othersmatch.at(nmatchedID);
+        nmatchedID = othersmatch.at(nmatchedID);
 
         _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
 
