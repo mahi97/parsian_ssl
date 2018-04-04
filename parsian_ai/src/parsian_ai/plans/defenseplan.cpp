@@ -295,6 +295,16 @@ QList<Vector2D> DefensePlan::defenseFormationForCircularPositioning(int neededDe
         else if (neededDefenseAgents == 3){
             defensePosiotion = threeDefenseFormationForCircularPositioning(downLimit , upLimit);
         }
+        if(wm->ball->pos.y > 0){
+            for(int i = 0 ; i < (allOfDefenseAgents - neededDefenseAgents) ; i++){
+                defensePosiotion.append(Vector2D(-4.7 , -(i+1)/2));
+            }
+        }
+        else{
+            for(int i = 0 ; i < (allOfDefenseAgents - neededDefenseAgents) ; i++){
+                defensePosiotion.append(Vector2D(-4.7 , (i+1)/2));
+            }
+        }
     }
     else {
         if (allOfDefenseAgents == 1) {
@@ -2238,12 +2248,14 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         gpa[ourAgents[i]->id()]->setNoavoid(true);
         gpa[ourAgents[i]->id()]->setSlowmode(false);
         gpa[ourAgents[i]->id()]->setDivemode(false);
+        gpa[ourAgents[i]->id()]->setOnetouchmode(false);
         gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
         gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
         if(gameState->theirIndirectKick()){
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setDivemode(false);
+            gpa[ourAgents[i]->id()]->setOnetouchmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         }
@@ -2251,6 +2263,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(true);
             gpa[ourAgents[i]->id()]->setDivemode(false);
+            gpa[ourAgents[i]->id()]->setOnetouchmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
         }
@@ -2258,6 +2271,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             gpa[ourAgents[i]->id()]->setNoavoid(true);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setDivemode(false);
+            gpa[ourAgents[i]->id()]->setOnetouchmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
             gpa[ourAgents[i]->id()]->setBallobstacleradius(0);
         }
@@ -3346,7 +3360,7 @@ int DefensePlan::decideNumOfMarks(){
                 return defenseCount;
             }
             else if (playOnMode) {
-                return defenseCount - defenseNumber();
+                return 0;
             }
         }
     }
