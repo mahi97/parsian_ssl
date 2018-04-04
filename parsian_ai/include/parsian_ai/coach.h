@@ -120,6 +120,7 @@ private:
 
     CPlayOff *ourPlayOff;
     COurPenalty *ourPenalty;
+    COurPenaltyShootout* ourPenaltyShootout;
     COurBallPlacement *ourBallPlacement;
     CTheirDirect *theirDirect;
     CTheirPenalty *theirPenalty;
@@ -151,11 +152,15 @@ private:
     QList<int> robotsIdHist;
     bool first;
     QList<int> missMatchIds;
+
     ///////////////////////////////////////
     int cyclesWaitAfterballMoved;
     QList<Agent *> lastDefenseAgents;
 
     void matchPlan(NGameOff::SPlan *_plan, const QList<int> &_ourplayers);
+    void getBadsAndGoods(const QList<int>& _ourplayers);
+    QList<int> badshooters;
+    QList<int> goodshooters;
 
     NGameOff::SPlan *planMsgToSPlan(parsian_msgs::plan_serviceResponse planMsg, int _currSize);
 
@@ -175,6 +180,7 @@ private:
 
     void decidePlayOn(QList<int> &ourPlayers, QList<int> &lastPlayers);
 
+
     QTime defenseTimeForVisionProblem[2];
     double shotToGoalthr;
 
@@ -189,7 +195,7 @@ private:
     ///////////////////////new play make and supporter chooser
     int playmakeId;
     int supporterId;
-    double playMakeTh;
+    int lastSupporterId;
     int lastPlayMake;
 
     void choosePlaymakeAndSupporter();
@@ -270,6 +276,10 @@ private:
     void decideOurPenalty(QList<int> &);
 
     void decideTheirPenalty(QList<int> &);
+
+    void decideOurPenaltyshootout(QList<int> &);
+
+    void decideTheirPenaltyshootout(QList<int> &);
 
     void decideStart(QList<int> &);
 
