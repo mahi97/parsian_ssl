@@ -58,6 +58,7 @@ CDynamicAttack::CDynamicAttack() {
     assignLocations();
 
     lastAgentCount = -1;
+    playmake = nullptr;
 }
 
 CDynamicAttack::~CDynamicAttack() {
@@ -2170,6 +2171,7 @@ void CDynamicAttack::validateSegment(Segment2D &seg) {
 }
 
 bool CDynamicAttack::inTimePlan() {
+    return true;
     if (playmake != nullptr) {
         if (wm->ball->pos.dist(playmake->pos()) < 1.0) {
             return true;
