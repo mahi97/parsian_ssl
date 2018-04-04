@@ -99,6 +99,9 @@ void CRoleDynamic::update() {
                     shotSkill->setChipdist(0);
                 }
             }
+            shotSkill->setIskickchargetime(true);
+            shotSkill->setKickchargetime(1023);
+
             break;
         case PlayMakeSkill::Chip:
             shotSkill->setTarget(target);
