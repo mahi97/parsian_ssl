@@ -1318,7 +1318,7 @@ void DefensePlan::setGoalKeeperState(){
         if (wm->field->isInField(wm->ball->pos)){
             ballIsOutOfField = false;
             QList<Vector2D> solutions;
-            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10);
+            Segment2D ballLine(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 50);
             Segment2D goalLine(wm->field->ourGoal() + Vector2D(0 , 1) , wm->field->ourGoal() - Vector2D(0 , 1));
             QList<Circle2D> defs;
             double AZBisecOpenAngle = 0, AZBigestOpenAngle = 0, AZDangerPercent = 0;
@@ -1535,22 +1535,8 @@ void DefensePlan::setGoalKeeperTargetPoint() {
         else if (goalKeeperOneTouch) {
             ROS_INFO_STREAM("4");
             lastStateForGoalKeeper = QString("noBesidePoleMode");
-            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 50);
-            //if(wm->field->isInOurPenaltyArea(ballPos + ballVel))
-            //    goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
-            //if(wm->field->isInOurPenaltyArea(ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , 0) , wm->field->ourGoalL() + Vector2D(0.1 , 0))))) {//time ham bayad check she hatma !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            /*if(goalKeeperTarget.dist(goalKeeperAgent->pos()) < 0.2)
-                goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
-            else*/
-            goalKeeperTarget = ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , 0), wm->field->ourGoalL() + Vector2D(0.1 , 0)));
-            //Segment2D segment= Segment2D(ballLine.intersection(Segment2D(wm->field->ourGoalR(), wm->field->ourGoalL())), ballPos);
-            //else{
-            //    goalKeeperTarget = ballPos;
-            //}
-            //drawer->draw(ballPos , QColor(Qt::yellow));
-            drawer->draw(ballLine.intersection(Segment2D(wm->field->ourGoalR() + Vector2D(0.1 , 0), wm->field->ourGoalL() + Vector2D(0.1 , 0))) , QColor(Qt::yellow));
-            //drawer->draw(ballVel , QColor(Qt::yellow));
-            drawer->draw(goalKeeperTarget , QColor(Qt::cyan));
+            Segment2D ballLine(ballPos, ballPos + ballVel.norm() * 50);            
+            goalKeeperTarget = ballLine.nearestPoint(goalKeeperAgent->pos());
             DBUG(QString("OneTouch To Side Point"), D_AHZ);
             return;
         }
@@ -1961,15 +1947,15 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     ahzMatchDirections.clear();
     ahzMatchPoints.clear();
     ourAgents.append(defenseAgents);
-    if (defExceptions.active) {
-        if (defExceptions.exepAgentId != -1) {
-            for (int i = 0; i < ourAgents.size(); i++) {
-                if (i == defExceptions.exepAgentId) {
-                    ourAgents.removeAt(i);
-                }
-            }
-        }
-    }
+//    if (defExceptions.active) {
+//        if (defExceptions.exepAgentId != -1) {
+//            for (int i = 0; i < ourAgents.size(); i++) {
+//                if (i == defExceptions.exepAgentId) {
+//                    ourAgents.removeAt(i);
+//                }
+//            }
+//        }
+//    }
     ///////////////// Added By AHZ for segment (before MRL game) ///////////////
     if(stopMode){
         ourAgents.clear();
@@ -2125,17 +2111,17 @@ void DefensePlan::execute(){
         if(!defenseAgents.empty()){
             if(wm->our.activeAgentsCount() <= _NUM_PLAYERS){
                 if(playOnMode || stopMode){
-                    checkDefenseExeptions();
-                    if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
-                        runDefenseExeptions();
-                        defenseCount = defenseAgents.size() - 1;
-                    }
-                    else {
+//                    checkDefenseExeptions();
+//                    if (defExceptions.active && !know->variables["transientFlag"].toBool()) {
+//                        runDefenseExeptions();
+//                        defenseCount = defenseAgents.size() - 1;
+//                    }
+//                    else {
                         defExceptions.exepAgentId = -1;
                         defExceptions.exeptionMode = NoneExep;
                         defenseCount = defenseAgents.size();
                         know->variables["defenseOneTouchMode"] = false;
-                    }
+//                    }
                 }
                 else{
                     know->variables["defenseOneTouchMode"] = false;
