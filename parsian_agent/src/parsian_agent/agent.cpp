@@ -101,6 +101,7 @@ Matrix Agent::ANN_forward(Matrix input) {
 
 Agent::Agent(int _ID)
 {
+    selfID = static_cast<short>(_ID);
     gotkickprofilerdatas = false;
     for(int i{}; i < 8; i++)
     {
@@ -124,7 +125,6 @@ Agent::Agent(int _ID)
     stopTrain = false;
     wh1 = wh2 = wh3 = wh4 = 0.0;
     startTrain = false;
-    selfID = static_cast<short>(_ID);
     skill = nullptr;
     skillName = "";
     onOffState = true;
@@ -969,16 +969,20 @@ void Agent::getkickprofilerdata()
             }
             // Close the File
             file.close();
+            ROS_INFO_STREAM("readfrom datalistSize" << dataList.size());
             for(int j{1}; j<dataList.size(); j++)
+            {
+                ROS_INFO_STREAM("readfrom ID compare" << atoi(dataList[j][0].c_str()) << ", " << id());
                 if(atoi(dataList[j][0].c_str()) == id())
                 {
-                    //ROS_INFO_STREAM("readfrom datalist" << i << atof(dataList[j][1].c_str()));
+                    ROS_INFO_STREAM("readfrom datalist" << i << dataList[j][1].c_str());
                     kick_coef_a[i] = atof(dataList[j][1].c_str());
                     kick_coef_b[i] = atof(dataList[j][2].c_str());
                     kick_coef_c[i] = atof(dataList[j][3].c_str());
                     if(i == 0)
                         gotkickprofilerdatas = true;
                 }
+            }
         }
     }
 }
@@ -1013,7 +1017,7 @@ void Agent::getchipprofilerdata()
             std::ifstream file(ros::package::getPath("parsian_agent") + "/profiler_data/coefficients/coeffs_chip_"+ to_string(i) +".csv");
             if (!file.is_open()) 
             {
-                if(i == 0 || 1)
+                if(i == 0)
                 {
                     chip_coef_a[0] = 25.3;
                     chip_coef_b[0] = 130.9;
