@@ -1012,6 +1012,9 @@ void Agent::getchipprofilerdata()
             {
                 if(i == 0)
                 {
+                    chip_coef_a[0] = 25.3;
+                    chip_coef_b[0] = 130.9;
+                    chip_coef_c[0] = 230.9;
                     ROS_INFO_STREAM("chip profiler datas no spin failed to open");
                     return;
                 }
@@ -1054,7 +1057,8 @@ float Agent::convertchipdisttochipchargetime(float chipdist, int spin)
     float chipspeed{};
     //TODO calculate coef for converting dist to chip speed
     float A{9.25693}, B{0.0027}, H{0.0659}, K{-0.0316};
-    chipspeed = A*sqrt(B*chipdist - H) + K;
+    //chipspeed = A*sqrt(B*chipdist - H) + K;
+    chipspeed = chipdist;
     //    ROS_INFO("kian convert");
         if(spin < 0)
             spin  = 0;
