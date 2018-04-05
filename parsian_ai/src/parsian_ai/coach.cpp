@@ -3,7 +3,7 @@
 ////
 
 #include <parsian_ai/coach.h>
-
+#include <parsian_util/geom/vector_2d.h>
 
 CCoach::CCoach(Agent**_agents)
 {
@@ -13,10 +13,6 @@ CCoach::CCoach(Agent**_agents)
     inited = false;
     agents = _agents;
     lastAssignCycle = -10;
-    lastBallVelPM = Vector2D(0, 0);
-    lastBallPos = Vector2D(0, 0);
-    passPos = Vector2D(0, 0);
-    passPlayMake = false;
     first = true;
 
     ///////////////////////////////////
@@ -26,9 +22,7 @@ CCoach::CCoach(Agent**_agents)
     intentionTimePossession.start();
     playMakeIntention.start();
 
-    possessionIntentionInterval = 200;
     playOnTime = 2000;
-    playMakeIntentionInterval = 300;
 
 
     // Old Plays
@@ -64,8 +58,6 @@ CCoach::CCoach(Agent**_agents)
     know->variables["transientFlag"].setValue(false);
     trasientTimeOut.start();
     translationTimeOutTime = 4000;
-    exeptionPlayMake = nullptr;
-    exeptionPlayMakeThr = 0;
 
     //    m_planLoader = new CLoadPlayOffJson(QDir::currentPath() + QString("/playoff"));
     goalieAgent = nullptr;
@@ -152,7 +144,6 @@ void CCoach::checkGoalieInsight() {
         //            goalieTimer.restart();
         //        }
         DBUG("inja miad", D_MHMMD);
-
     }
 }
 
@@ -192,18 +183,11 @@ void CCoach::decidePreferredDefenseAgentsCount() {
         }
     }
 
-    // TODO : Fix lock agent for unexpected robot fall
-    if (selectedPlay != nullptr && selectedPlay->lockAgents) {
-        preferedDefenseCounts = lastPreferredDefenseCounts;
-        return;
-    }
-
-
     if (gameState->isStop()) {
-        if (wm->ball->pos.x < 0) {
+        if (wm->ball->pos.x < 1) {
             preferedDefenseCounts = agentsCount - 1;
 
-        } else if (wm->ball->pos.x > 1) {
+        } else if (wm->ball->pos.x > 1.2) {
             preferedDefenseCounts = conf.Defense;
         }
     } else if (gameState->isStart()) {
@@ -218,12 +202,6 @@ void CCoach::decidePreferredDefenseAgentsCount() {
 
             }
         } else { //// PLAYON
-            bool oppsAttack = false;
-            for (int i = 0 ; i < wm->opp.activeAgentsCount() ; i++) {
-                if (wm->opp.active(i)->pos.x <= 0) {
-                    oppsAttack = true;
-                }
-            }
 
             if (agentsCount == 1) {
                 preferedDefenseCounts = 0; //// just one playmake
@@ -231,12 +209,8 @@ void CCoach::decidePreferredDefenseAgentsCount() {
             } else if (agentsCount == 2) {
                 preferedDefenseCounts = 1; //// one playmake and one defense
             } else {
-                if (oppsAttack) {
-                    preferedDefenseCounts = 2;
-                } else {
-                    preferedDefenseCounts = 1;
-                }
-
+                preferedDefenseCounts = std::min(selectedPlay->defensePlan.findNeededDefense(), agentsCount - 1);
+//                preferedDefenseCounts += agentsCount - 1 - preferedDefenseCounts - selectedPlay->markPlan.findNeededMark();
             }
         }
     } else if (gameState->ourPlayOffKick()) {
@@ -335,12 +309,12 @@ void CCoach::calcDesiredMarkCounts(){
 
 
 void CCoach::assignGoalieAgent(int goalieID) {
-    QList<int> ids = workingIDs;
     goalieAgent = nullptr;
-    if (ids.contains(goalieID)) {
+    if (workingIDs.contains(goalieID)) {
         goalieAgent = agents[goalieID];
     }
 }
+
 BallPossesion CCoach::isBallOurs() {
     BallPossesion decidePState;
 
@@ -368,6 +342,69 @@ BallPossesion CCoach::isBallOurs() {
 
     return decidePState;
 }
+
+double CCoach::timeNeeded(Agent *_agentT,const Vector2D& posT, double vMax) {
+
+    double acc;
+    double dec = 3.5;
+    Vector2D tAgentVel = _agentT->vel();
+    Vector2D tAgentDir = _agentT->dir();
+    double dist = 0;
+    QList <Vector2D> _result;
+    Vector2D _target;
+    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
+
+    double vXvirtual = (posT - _agentT->pos()).x;
+    double vYvirtual = (posT - _agentT->pos()).y;
+    double veltanV = (vXvirtual) * cos(tAgentDir.th().radian()) + (vYvirtual) * sin(tAgentDir.th().radian());
+    double velnormV = -1 * (vXvirtual) * sin(tAgentDir.th().radian()) + (vYvirtual) * cos(tAgentDir.th().radian());
+    double accCoef;
+
+    accCoef = atan(std::fabs(veltanV) / std::fabs(velnormV)) / _PI * 2;
+    acc = accCoef * 4.5 + (1 - accCoef) * 3.5;
+    double tDec = vMax / dec;
+    double tAcc = (vMax - tAgentVelTanjent) / acc;
+    dist = posT.dist(_agentT->pos());
+    double dB = tDec * vMax / 2 + tAcc * (vMax + tAgentVelTanjent) / 2;
+
+    if (dist > dB) {
+        return tAcc + tDec + (dist - dB) / vMax;
+    } else {
+        return ((1 / dec) + (1 / acc)) * sqrt(dist * (2 * dec * acc / (acc + dec)) + (tAgentVelTanjent * tAgentVelTanjent / (2 * acc))) - (tAgentVelTanjent) / acc;
+    }
+
+}
+
+double CCoach::kickTimeEstimation(Agent * _agent, const Vector2D& target) {
+    Vector2D agentPos = _agent->pos();
+    Vector2D agentDir = _agent->dir();
+    Vector2D ballPos = wm->ball->pos;
+    Vector2D s1,s2;
+    Vector2D finalPos;
+    double agentTime = 0;
+    Segment2D ballPath(ballPos,ballPos + wm->ball->vel.norm()*20);
+
+    if(wm->ball->vel.length() < 0.1)
+    {
+        return timeNeeded(_agent, ballPos + (ballPos - target).norm()*0.1, 4.5);
+    }
+
+    if (Circle2D(agentPos, 0.1).intersection(Segment2D(ballPos, wm->ball->getPosInFuture(0.5)), &s1, &s2)) {
+        finalPos = ballPath.nearestPoint(agentPos);
+        return timeNeeded(_agent, finalPos, 4.5);
+    } else {
+        for (double i = 0.5; i < 5; i += 0.1) {
+            finalPos = wm->ball->getPosInFuture(i);
+            agentTime = timeNeeded(_agent, finalPos - (finalPos-target).norm()*0.1, 4.5);
+            if (agentTime < (i - (0.5))) {
+                return i;
+            }
+        }
+        return 100;
+    }
+
+}
+
 
 
 void CCoach::assignDefenseAgents(int defenseCount) {
@@ -415,16 +452,13 @@ void CCoach::assignDefenseAgents(int defenseCount) {
 
 }
 
-bool CCoach::isBallcollide() {
+bool CCoach::isBallcollide(int framCount, double diffDir) {
 
-    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0){
-        ROS_INFO_STREAM("KALI : hanooz harkat nakarde");
-        return false;
-    }
+    if(wm->ball->vel.length() <.05 && lastBallVels.size() == 0) return false;
     lastBallVels.append(std::move(wm->ball->vel));
     averageVel += wm->ball->vel.length();
     if(lastBallVels.size()>2){
-        float innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
+        double innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
 
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
@@ -437,13 +471,13 @@ bool CCoach::isBallcollide() {
             return false;
         }
 
-        if(innerproduct > .985){  // <10 degree
+        if(innerproduct > cos(diffDir*0.6*M_PI/180)){
             removeLastBallVel();
             ROS_INFO_STREAM("KALI : saff mire");
             return false;
         }
 
-        if(innerproduct < .966){// 15 degree
+        if(innerproduct < cos(diffDir*M_PI/180)){
             ROS_INFO_STREAM("KALI : taghir jahat");
             clearBallVels();
             return true;
@@ -455,13 +489,13 @@ bool CCoach::isBallcollide() {
         }
     }
 
-    removeLastBallVel();
+    removeLastBallVel(framCount);
     ROS_INFO_STREAM("KALI : hichi nashod");
     return false;
 }
-void CCoach::removeLastBallVel(){
+void CCoach::removeLastBallVel(int frameCount){
     averageVel -=  lastBallVels.first().length();
-    if(lastBallVels.size() > 5)
+    if(lastBallVels.size() > frameCount)
         lastBallVels.removeFirst();
 
 }
@@ -548,13 +582,21 @@ void CCoach::updateAttackState() {
     return;
 }
 
-void CCoach::choosePlaymakeAndSupporter(){
-//    playmakeId = 10;
-//    return;
-    playmakeId = -1;
+void CCoach::choosePlaymakeAndSupporter(bool defenseFirst){
+
+    if (!gameState->isStart()) {
+        playmakeId = -1;
+        playMakeIntention.restart();
+        return;
+    }
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
+    }
+    if (defenseFirst) {
+        for (auto& d : defenseAgents) {
+            if (ourPlayers.contains(d->id())) ourPlayers.removeOne(d->id());
+        }
     }
 
     if (ourPlayers.empty()) {
@@ -565,72 +607,70 @@ void CCoach::choosePlaymakeAndSupporter(){
         return;
     }
 
-    if (false) {
-//        playmakeId = swapPlaymake;
-    } else {
+    ROS_INFO_STREAM("MAHIs INTENTION: " << playMakeIntention.elapsed());
+    ////////////////////first we choose our playmake
+    double ballVel = wm->ball->vel.length();
+    Vector2D ballPos = wm->ball->pos;
+    ROS_INFO("!0");
 
-        ////////////////////first we choose our playmake
-        double ballVel = wm->ball->vel.length();
-        Vector2D ballPos = wm->ball->pos;
-        if (ballVel < 0.3) {
-            double maxD = -1000.1;
-            for (const auto& player : ourPlayers) {
-                if(player == selectedPlay->playoff_badPasserID && ourPlayers.size() > 1){
-                    ROS_INFO_STREAM("playofff: skipped: "<<player);
-                    continue;
-                }
-                double o = -1 * agents[player]->pos().dist(ballPos) ;
-                if (player == lastPlayMake) {
-                    o += conf.playMakeStopThr;
-                }
-                if (o > maxD) {
-                    maxD = o;
-                    playmakeId = player;
-                }
+    if (ballVel < 0.4) {
+        double maxD = -10000000.1;
+        for (const auto& player : ourPlayers) {
+            double o = -1 * agents[player]->pos().dist(ballPos) ;
+            if (player == lastPlayMake) {
+                o += conf.playMakeStopThr;
             }
-        } else {
-            if (playMakeIntention.elapsed() < conf.playMakeIntention) { // TODO : fix config
-                playmakeId = lastPlayMake;
-                return;
-            }
-
-            playMakeIntention.restart();
-            double nearest[10] = {};
-            for (const auto& ourPlayer : ourPlayers) {
-                nearest[ourPlayer] = agents[ourPlayer]->pos().dist(wm->ball->pos + wm->ball->vel) ;
-//            nearest[ourPlayer] = CKnowledge::kickTimeEstimation(agents[ourPlayer], wm->field->oppGoal(), *wm->ball,
-//                                                                4, 3, 2,
-//                                                                2); // TODO : read from common config agents
-            }
-            if (lastPlayMake >= 0 && lastPlayMake <= 11) {
-                nearest[lastPlayMake] -= conf.playMakeMoveThr;
-            }
-            double minT = 1e8; // 10 ^ 8
-            for (const auto& player : ourPlayers) {
-                if (nearest[player] < minT) {
-                    minT = nearest[player];
-                    playmakeId = player;
-                }
+            if (o > maxD) {
+                maxD = o;
+                playmakeId = player;
             }
         }
+
+    } else {
+
+        double maxD = -10000000.1;
+        for (const auto& player : ourPlayers) {
+            double o = -1 * kickTimeEstimation(agents[player], wm->field->oppGoal());
+            if (player == lastPlayMake) {
+                o += conf.playMakeMoveThr;
+            }
+            if (o > maxD) {
+                maxD = o;
+                playmakeId = player;
+            }
+
+        }
+
     }
+
+    if (lastPlayMake != playmakeId || isBallcollide(3, 30)) {
+        playMakeIntention.restart();
+
+    } else {
+        if (playMakeIntention.elapsed() < conf.playMakeIntention) {
+            playmakeId = lastPlayMake;
+            return;
+        }
+    }
+
 
     lastPlayMake = playmakeId;
 }
 
 void CCoach::decideAttack() {
     // find unused agents!
+    ROS_INFO("MAJH-1");
+
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
         ourPlayersID.removeOne(goalieAgent->id());
-        ROS_INFO_STREAM("nana gk: "<<goalieAgent->id());
     }
     for (auto defenseAgent : defenseAgents) {
         if (ourPlayersID.contains(defenseAgent->id())) {
             ourPlayersID.removeOne(defenseAgent->id());
-            ROS_INFO_STREAM("nana defenseAgent: "<<defenseAgent->id());
         }
     }
+    ROS_INFO("MAJH0");
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -708,6 +748,7 @@ void CCoach::decideAttack() {
 
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
+    ROS_INFO("MAJHxx");
 
     lastPlayers.clear();
     lastPlayers.append(ourPlayersID);
@@ -758,17 +799,8 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     updateAttackState(); //// Too Bad Conditions will be Handle here
 
     if (0 <= playmakeId && playmakeId <= 11) {
-        if(dynamicAttack->getPMfromCaoch())
-        {
-            dynamicAttack->setPlayMake(agents[playmakeId]);
-            ourPlayers.removeOne(playmakeId);
-            ROS_INFO_STREAM("PMfromCaoch true");
-        } else
-        {
-            dynamicAttack->setPlayMake(agents[dynamicAttack->getReceiverID()]);
-            ourPlayers.removeOne(dynamicAttack->getReceiverID());
-            ROS_INFO_STREAM("PMfromCaoch false");
-        }
+        dynamicAttack->setPlayMake(agents[playmakeId]);
+        ourPlayers.removeOne(playmakeId);
     }
 
     dynamicAttack->setDefenseClear(false); // TODO : fix
@@ -785,7 +817,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             dynamicAttack->setDirectShot(true);
         } else if (mostPossible > (conf.DirectTrsh - shotToGoalthr)) { // TODO : Fix This
             dynamicAttack->setDirectShot(true);
-            shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.2);
+            shotToGoalthr = std::max(0.0, conf.DirectTrsh - 0.4);
         } else {
             dynamicAttack->setDirectShot(false);
             shotToGoalthr = 0;
@@ -797,24 +829,23 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
     dynamicAttack->setCritical(ourAttackState == CRITICAL);
 
     //////////////////////////////////////////////assign agents
-    bool overdef =  (selectedPlay->defensePlan.findNeededDefense() == 1) ? true : false;
     int MarkNum = 0;
     switch (ballPState) {
         case BallPossesion::WEHAVETHEBALL:
-            MarkNum = 0;
+            MarkNum = 0; // TODO : Check ERFORCE Game
             break;
         case BallPossesion::WEDONTHAVETHEBALL:
-            MarkNum = (overdef) ? 4 : 3;
+            MarkNum = std::max(selectedPlay->markPlan.findNeededMark(), ourPlayers.count() - 1);
             break;
         case BallPossesion::SOSOOUR:
-            MarkNum = 2;
+            MarkNum = std::max(selectedPlay->markPlan.findNeededMark(), ourPlayers.count() - 2);
             break;
         case BallPossesion::SOSOTHEIR:
-            MarkNum = 3;
+            MarkNum = std::max(selectedPlay->markPlan.findNeededMark(), ourPlayers.count() - 1);
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-//    MarkNum = 0;
+
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
@@ -822,14 +853,17 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         ourPlayers.clear();
         ourPlayers = lastPlayers;
 
-    } else {
+    } else {        
         // TODO : matching is based on ID, It should be Goal-Oriented -- optimal -- base of position
         qSort(ourPlayers.begin(), ourPlayers.end());
         for (int i = 0; i < MarkNum; i++) {
+            PDEBUG("marknum =" , MarkNum , D_AHZ);
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
             ourPlayers.removeFirst();
         }
+        PDEBUG("mark agents =" , selectedPlay->markAgents.size() , D_AHZ);
     }
+
     lastBallPossesionState = ballPState;
 }
 
@@ -844,7 +878,7 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
         _mode = NGameOff::FirstPlay;
 
-    } else if (wm->ball->pos.x < -1 || !gotplan) {
+    } else if ((wm->ball->pos.x < 1 && !gameState->ourKickoff())|| !gotplan) {
         _mode = NGameOff::DynamicPlay;
 
     } else if (!firstIsFinished && conf.UseFirstPlay) {
@@ -867,18 +901,22 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
 
         case NGameOff::StaticPlay:
             initStaticPlay(_gameMode, _ourplayers);
+            ROS_INFO("initPlayOffMode: StaticPlay");
             break;
         case NGameOff::DynamicPlay:
-            ROS_INFO("HSHM_: DynamicPlay");
+            ROS_INFO("initPlayOffMode: DynamicPlay");
             initDynamicPlay(_ourplayers);
             break;
         case NGameOff::FastPlay:
+            ROS_INFO("initPlayOffMode: initFastPlay");
             initFastPlay(_ourplayers);
             break;
         case NGameOff::FirstPlay:
+            ROS_INFO("initPlayOffMode: initFirstPlay");
             initFirstPlay(_ourplayers);
             break;
         default:
+            ROS_INFO("initPlayOffMode: initStaticPlay");
             initStaticPlay(_gameMode, _ourplayers);
     }
 }
@@ -1066,8 +1104,6 @@ void CCoach::generateWorkingRobotIds()
             }
         }
     }
-//        for(int i{}; i<workingIDs.count(); i++)
-//            ROS_INFO_STREAM("kian: " << workingIDs[i]);
 }
 
 void CCoach::replacefaultedrobots()
@@ -1102,10 +1138,6 @@ void CCoach::replacefaultedrobots()
 
 void CCoach::resetnonVisibleAgents()
 {
-//    for(int i{}; i < _MAX_NUM_PLAYERS; i++)
-//        ROS_INFO_STREAM("kian: agentID: " << agents[i]->id());
-//    for(int j{}; j < wm->our.activeAgentsCount(); j++)
-//        ROS_INFO_STREAM("kian: wmID: " << wm->our.activeAgentID(j));
     for(int i{}; i < _MAX_NUM_PLAYERS; i++)
     {
         if(agents[i] != nullptr)
@@ -1128,30 +1160,31 @@ void CCoach::execute()
 {
     resetnonVisibleAgents();
     generateWorkingRobotIds();
-    if(gameState->isStop())
-        replacefaultedrobots();
+    if(gameState->isStop()) replacefaultedrobots();
     findGoalie();
-
-    // choose playmake agent
-    choosePlaymakeAndSupporter();
-
-    /* determine how many agents are needed for defense, with minimum 0 for penalty
-     and maximum of 3
-     */
     decidePreferredDefenseAgentsCount();
 
-    // decide the whole strategy for defense agents, including Goalie, defense and Mark
-    decideDefense();
+    // choose playmake agent
+    bool defenseFirst = wm->ball->vel.length() > 1
+                        && Segment2D(wm->field->oppGoalR(), wm->field->oppGoalL()).
+            intersection(Segment2D(wm->ball->pos, wm->ball->pos + wm->ball->dir.norm() * 10)).isValid();
+    playmakeId = -1;
+    if (defenseFirst) {
+        decideDefense();
+        choosePlaymakeAndSupporter(true);
+    } else {
+        choosePlaymakeAndSupporter(false);
+        decideDefense();
+    }
 
+
+    // devcide the whole strategy for defense agents, including Goalie, defense and Mark
 
     checkTransitionToForceStart();
     virtualTheirPlayOffState();
-    ROS_INFO_STREAM("PlayMake ID :" << playmakeId);
-    ROS_INFO_STREAM("GAME STATE : " << static_cast<int>(gameState->getState()));
-    ////////////////////////////////////////////
-    //// Handle Roles Here
     CRoleStop::info()->reset();
     CRoleFault::info()->reset();
+
     for (auto &stopRole : stopRoles) {
         stopRole->assign(nullptr);
     }
@@ -1161,6 +1194,7 @@ void CCoach::execute()
             stopRole->execute();
         }
     }
+
 }
 
 void CCoach::setFastPlay() {
@@ -1209,6 +1243,38 @@ void CCoach::decideStop(QList<int> & _ourPlayers) {
     if (!ourPlayOff->deleted) {
         ourPlayOff->reset();
         ourPlayOff->deleted = true;
+    }
+
+    getBadsAndGoods(_ourPlayers);
+
+    if(goodshooters.size() > 0) {
+        double minweight = 200, weight = 200;
+        int minID = -1;
+
+        for (int goodshooter: goodshooters) {
+            if(_ourPlayers.contains(goodshooter)) {
+                int j = _ourPlayers.indexOf(goodshooter);
+                weight = agents[goodshooter]->pos().dist(wm->ball->pos);
+                if (weight < minweight) {
+                    minweight = weight;
+                    minID = j;
+                }
+            }
+        }
+        if (minID != -1) {
+            CRoleStop::info()->setAgentBehindBall(_ourPlayers.at(minID));
+        } else {
+            CRoleStop::info()->setAgentBehindBall(goodshooters.at(0));
+        }
+    } else if(badshooters.size() >= _ourPlayers.size()) {
+        CRoleStop::info()->setAgentBehindBall(-1);
+    } else {
+        for (int i = 0; i < _ourPlayers.size(); i++) {
+            if (!badshooters.contains(i)) {
+                CRoleStop::info()->setAgentBehindBall(i);
+                break;
+            }
+        }
     }
 
     for (int i = 0; i < _ourPlayers.size(); i++) {
@@ -1606,77 +1672,78 @@ void CCoach::getBadsAndGoods(const QList<int>& _ourplayers) {
 void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     MWBM matcher;
-    int passcount=0;
-    passcount=min(_plan->execution.passCount+1,_ourplayers.size() );
-    matcher.create(_plan->common.currentSize - passcount, _ourplayers.size()-passcount );
+    int passcount = 0;
+    passcount = min(_plan->execution.passCount + 1, _ourplayers.size());
+    matcher.create(_plan->common.currentSize - passcount, _ourplayers.size() - passcount);
 
-
-
-    int matchedID = -1,secMatchedID=-1, thirdMatchedID=-1;
+    int matchedID = -1, secMatchedID = -1, thirdMatchedID = -1;
     double weight = 0;
-    double minweight = 100, secMinweight=100, thirdMinweight=100;
+    double minweight = 100, secMinweight = 100, thirdMinweight = 100;
     getBadsAndGoods(_ourplayers);
-    for(int i=0;i<passcount;i++) {
+    goodshooters.clear();
+    badshooters.clear();
+
+    for (int i = 0; i < passcount; i++) {
 
         if (goodshooters.size() > 0) {
-            for (int goodshooter:goodshooters) {
+
+            for (int goodshooter: goodshooters) {
                 if (_ourplayers.contains(goodshooter)) {
                     int j = _ourplayers.indexOf(goodshooter);
                     if (i == 0) {
-                        weight = agents[j]->pos().dist(wm->ball->pos);
+                        weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
                         if (weight < minweight) {
                             minweight = weight;
                             matchedID = j;
                         }
-                    } else if (i == 1 && j!= matchedID) {
-                        weight = agents[j]->pos().dist(_plan->matching.initPos.agents.at(j));
+                    } else if (i == 1 && j != matchedID) {
+                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                         if (weight < secMinweight) {
                             secMinweight = weight;
                             secMatchedID = j;
                         }
-                    } else if (i == 2 && j!= matchedID && j!= secMatchedID) {
-                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(j));
+                    } else if (i == 2 && j != matchedID && j != secMatchedID) {
+                        weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
                         if (weight < secMinweight) {
                             thirdMinweight = weight;
                             thirdMatchedID = j;
-
                         }
                     }
                 }
 
 
-                goodshooters.removeOne(_ourplayers[matchedID]);
             }
-        }
-        else{
+            if (matchedID != -1)
+                goodshooters.removeOne(_ourplayers[matchedID]);
+            if (secMatchedID != -1)
+                goodshooters.removeOne(_ourplayers[secMatchedID]);
+            if (thirdMatchedID != -1)
+                goodshooters.removeOne(_ourplayers[thirdMatchedID]);
+        } else {
 
             for (int j = 0; j < _ourplayers.size(); j++) {
-                if(badshooters.size()<_ourplayers.size()-i) {
+                if (badshooters.size() < _ourplayers.size() - i) {
                     if (badshooters.contains(agents[_ourplayers.at(j)]->id()))
                         continue;
                 }
-                if(i==0) {
+                if (i == 0) {
                     weight = agents[_ourplayers.at(j)]->pos().dist(wm->ball->pos);
                     if (weight < minweight) {
                         minweight = weight;
                         matchedID = j;
                     }
-                }
-                else if (i==1 && j!= matchedID){
+                } else if (i == 1 && j != matchedID) {
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
-                    if(weight <  secMinweight)
-                    {
-                        secMinweight=weight;
-                        secMatchedID=j;
+                    if (weight < secMinweight) {
+                        secMinweight = weight;
+                        secMatchedID = j;
                     }
-                }
-                else if (i==2 && j!= matchedID && j!= secMatchedID){
+                } else if (i == 2 && j != matchedID && j != secMatchedID) {
 
                     weight = agents[_ourplayers.at(j)]->pos().dist(_plan->matching.initPos.agents.at(i));
-                    if(weight <  thirdMinweight)
-                    {
-                        thirdMinweight=weight;
-                        thirdMatchedID=j;
+                    if (weight < thirdMinweight) {
+                        thirdMinweight = weight;
+                        thirdMatchedID = j;
                     }
                 }
             }
@@ -1699,9 +1766,9 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     othersmatch.clear();
     for (int i = passcount; i < _plan->common.currentSize; i++) {
-        int k =0;
+        int k = 0;
         for (int j = 0; j < _ourplayers.size(); j++) {
-            if (j != matchedID && j!= secMatchedID && j!= thirdMatchedID) {
+            if (j != matchedID && j != secMatchedID && j != thirdMatchedID) {
                 weight = _plan->matching.initPos.agents.at(i).dist(agents[_ourplayers.at(j)]->pos());
                 matcher.setWeight(i - passcount, k, -(weight));
                 othersmatch.append(j);
@@ -1713,7 +1780,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
     qDebug() << "[Coach] matched plan with : " << matcher.findMatching();
     for (size_t i = passcount; i < _plan->common.currentSize; i++) {
         nmatchedID = matcher.getMatch(i - passcount);
-        nmatchedID=othersmatch.at(nmatchedID);
+        nmatchedID = othersmatch.at(nmatchedID);
 
         _plan->common.matchedID.insert(i, _ourplayers.at(nmatchedID));
 
@@ -1935,3 +2002,4 @@ bool CCoach::isFastPlay() {
         return true; // TODO : fix this by considering that opp agents
     }
 }
+

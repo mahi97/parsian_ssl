@@ -27,8 +27,7 @@ void AINodelet::onInit() {
     robotfaultSub = nh.subscribe("/autofault", 100, &AINodelet::faultdetectionCallBack, this);
 
     drawPub = nh.advertise<parsian_msgs::parsian_draw>("/draws", 1000);
-    timer_ = nh.createTimer(ros::Duration(0.1), boost::bind(&AINodelet::timerCb, this, _1));
-
+    timer_ = nh.createTimer(ros::Duration(.062), boost::bind(&AINodelet::timerCb, this, _1));
     plan_client = nh.serviceClient<parsian_msgs::plan_service> ("/get_plans", true);
 
     behaviorPub = private_nh.advertise<parsian_msgs::parsian_ai_status>("/status", 10);
@@ -51,9 +50,8 @@ void AINodelet::teamConfCb(const parsian_msgs::parsian_team_configConstPtr& _con
 
 void AINodelet::timerCb(const ros::TimerEvent& event){
 
-
-    drawer->draws.texts.clear();
     if (drawer != nullptr)   drawPub.publish(drawer->draws);
+    drawer->draws.texts.clear();
     drawer->draws.circles.clear();
     drawer->draws.segments.clear();
     drawer->draws.polygons.clear();

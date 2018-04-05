@@ -30,11 +30,11 @@ CPlayOff::CPlayOff() : CMasterPlay() {
     kickOffPos[1] = Vector2D(-0.36,  3);
     kickOffPos[2] = Vector2D(-0.36, -3);
     kickOffPos[3] = Vector2D(-2.4  ,  0);
-    kickOffPos[4] = Vector2D(-0.6,  1.2);
-    kickOffPos[5] = Vector2D(-0.6, -1.2);
+    kickOffPos[4] = Vector2D(-0.9,  1.2);
+    kickOffPos[5] = Vector2D(-0.9, -1.2);
     // TODO : fill kickoffpos for rest of robots if needed
-    kickOffPos[6] = Vector2D(-0.45, 1.7);
-    kickOffPos[7] = Vector2D(-0.45, -1.7);
+    kickOffPos[6] = Vector2D(-0.75, 1.7);
+    kickOffPos[7] = Vector2D(-0.75, -1.7);
 
 
     initial    = true;
@@ -252,7 +252,7 @@ void CPlayOff::staticExecute() {
 
             }
 
-            if (isPlanEnd() && false) {
+            if (isPlanEnd()) {
                 playOnFlag = true;
                 ROS_INFO("Playoff Ends");
             }
@@ -320,7 +320,7 @@ void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(isChip);
-        double speed = 8;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
+        double speed = 6.5;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
@@ -358,7 +358,7 @@ void CPlayOff::dynamicPlayBlocker() {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(false);
-        roleAgent[0] -> setKickSpeed(7);//knowledge->getProfile(roleAgent[0]->getAgentID(), 7.8, false, false)); // Vartypes This TODO
+        roleAgent[0] -> setKickSpeed(1023);//knowledge->getProfile(roleAgent[0]->getAgentID(), 7.8, false, false)); // Vartypes This TODO
         roleAgent[0] -> setTarget(wm->field->oppGoal().rotatedVector((wm->ball->pos.y < 0 ? 90 : -90)));
         roleAgent[0] -> setDoPass(false);
         roleAgent[0] -> setIntercept(false);
@@ -401,7 +401,7 @@ void CPlayOff::dynamicPlayKhafan() {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(true);
-        roleAgent[0] -> setKickSpeed(6); // Vartypes This
+        roleAgent[0] -> setKickSpeed(6.5); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
         roleAgent[0] -> setIntercept(false);
@@ -432,7 +432,7 @@ void CPlayOff::dynamicPlayKhafan() {
         roleAgent[1] -> setAvoidCenterCircle(false);
         roleAgent[1] -> setAvoidPenaltyArea(true);
         roleAgent[1] -> setChip(false);
-        roleAgent[1] -> setKickSpeed(7); // Vartypes This
+        roleAgent[1] -> setKickSpeed(1023); // Vartypes This
         roleAgent[1] -> setTarget(wm->field->oppGoal());
         roleAgent[1] -> setDoPass(true);
         roleAgent[1] -> setIntercept(false);
@@ -1463,7 +1463,7 @@ void CPlayOff::fillRoleProperties() {
                     }
                 }
 
-                for (auto x :masterPlan->execution.passer) {
+                for (auto x : masterPlan->execution.passer) {
                     if (x.id == i) {
                         if (i > 0 && masterPlan->execution.reciver.at(i - 1).id == x.id) {
                             if (positionAgent[i].getArgs().staticSkill == ReceivePassSkill) {
@@ -1568,11 +1568,9 @@ void CPlayOff::assignPass(CRolePlayOff* _roleAgent, const SPositioningAgent& _po
     _roleAgent->setAvoidPenaltyArea(true);
     _roleAgent->setChip(chipOrNot(_posAgent.getArgs()));
     if (_roleAgent->getChip()) {
-        _roleAgent->setKickSpeed(_posAgent.getArgs().rightData/100.0);
+        _roleAgent->setKickSpeed(static_cast<double>(_posAgent.getArgs().rightData)/100.0);
         //_roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().rightData)/200);
-        DBUG(QString("VALUE : %1").arg(static_cast <double>(_posAgent.getArgs().rightData) / 200), D_MAHI);
     } else {
-
         _roleAgent->setKickSpeed(static_cast<double>(_posAgent.getArgs().leftData)/100.0);
         //        _roleAgent->setKickRealSpeed(static_cast <double> (_posAgent.getArgs().leftData)/100);
 

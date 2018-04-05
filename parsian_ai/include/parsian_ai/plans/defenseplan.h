@@ -26,6 +26,7 @@ enum { OneTouchState , ClearState , NoState };
 class DefensePlan : public Plan {
 protected:
     int defenseCount;
+
     GotopointAction* gps[_MAX_NUM_PLAYERS];
     GotopointavoidAction *gpa[_MAX_NUM_PLAYERS];
     KickAction* kickSkill;

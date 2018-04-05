@@ -31,6 +31,20 @@
 #include <parsian_ai/roles/fault.h>
 
 
+#include <parsian_util/geom/angle_deg.h>
+#include <parsian_util/geom/circle_2d.h>
+#include <parsian_util/geom/line_2d.h>
+#include <parsian_util/geom/matrix_2d.h>
+#include <parsian_util/geom/polygon_2d.h>
+#include <parsian_util/geom/ray_2d.h>
+#include <parsian_util/geom/rect_2d.h>
+#include <parsian_util/geom/sector_2d.h>
+#include <parsian_util/geom/segment_2d.h>
+#include <parsian_util/geom/size_2d.h>
+#include <parsian_util/geom/triangle_2d.h>
+#include <parsian_util/geom/vector_2d.h>
+
+
 
 enum class BallPossesion {
     WEDONTHAVETHEBALL = 0,
@@ -92,19 +106,11 @@ private:
     /////////////////////transition to force start
     void checkTransitionToForceStart();
     QList <Vector2D> ballHist;
-    //////////////////////////
-    bool lastASWasCritical;
-    Vector2D passPos;
-    bool passPlayMake;
-    Vector2D lastBallVelPM;
-    Vector2D lastBallPos;
 
     double findMostPossible(Vector2D agentPos);
 
     States lastState;
     Agent *goalieAgent;
-    Agent *exeptionPlayMake;
-    double exeptionPlayMakeThr;
 
     QList<Agent *> defenseAgents;
     int preferedDefenseCounts, lastPreferredDefenseCounts;
@@ -113,8 +119,6 @@ private:
     QTime intentionTimePossession;
     QTime playMakeIntention;
     QTime playOnExecTime;
-    double playMakeIntentionInterval;
-    double possessionIntentionInterval;
 
     CMasterPlay *selectedPlay;
 
@@ -189,7 +193,7 @@ private:
     QTime trasientTimeOut;
     int translationTimeOutTime;
 
-    bool isBallcollide();
+    bool isBallcollide(int frameCount = 5, double diffDir = 15);
 
     void calcDesiredMarkCounts(); // not used at all
     ///////////////////////new play make and supporter chooser
@@ -198,7 +202,7 @@ private:
     int lastSupporterId;
     int lastPlayMake;
 
-    void choosePlaymakeAndSupporter();
+    void choosePlaymakeAndSupporter(bool defenseFirst);
 
     ///////////////////////////////////////////////
 
@@ -252,7 +256,7 @@ private:
     QList<Vector2D> lastBallVels;
     Vector2D startTransientBallPos;
 
-    void removeLastBallVel();
+    void removeLastBallVel(int frameCount = 5);
     void clearBallVels();
 
     //////////////Decide Attack functions
@@ -296,10 +300,6 @@ private:
 
     bool isFastPlay();
 
-    ///////////////////////// AHZ //////////
-    int findNeededDefense();
-
-
     double overDefThr;
 
     // inter change
@@ -307,7 +307,8 @@ private:
 
     int faultDetectionCounter[_MAX_NUM_PLAYERS];
 
-
+    double kickTimeEstimation(Agent * _agent, const Vector2D& target);
+    double timeNeeded(Agent *_agentT,const Vector2D& posT, double vMax);
     // MAHI ADD IN ROS
     QList<CRobot *> toBeMopps;
     int desiredDefCount;
@@ -323,5 +324,9 @@ private:
 
     void findDefneders(const int &max_number, const int& min_number);
     NoAction* haltAction;
+
+//    QList<Vector2D> lastBallVel;
+    QList<Vector2D> lastBallDir;
+
 };
 #endif //PARSIAN_AI_COACH_H
