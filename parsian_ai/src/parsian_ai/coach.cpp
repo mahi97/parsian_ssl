@@ -812,7 +812,7 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
             break;
     }
     MarkNum = std::min(MarkNum, ourPlayers.count());
-    
+
     selectedPlay->markAgents.clear();
     if(wm->ball->pos.x >= 0
        && selectedPlay->lockAgents
@@ -820,13 +820,15 @@ void CCoach::decidePlayOn(QList<int>& ourPlayers, QList<int>& lastPlayers) {
         ourPlayers.clear();
         ourPlayers = lastPlayers;
 
-    } else {
+    } else {        
         // TODO : matching is based on ID, It should be Goal-Oriented -- optimal -- base of position
         qSort(ourPlayers.begin(), ourPlayers.end());
         for (int i = 0; i < MarkNum; i++) {
+            PDEBUG("marknum =" , MarkNum , D_AHZ);
             selectedPlay->markAgents.append(agents[ourPlayers.front()]);
             ourPlayers.removeFirst();
         }
+        PDEBUG("mark agents =" , selectedPlay->markAgents.size() , D_AHZ);
     }
     lastBallPossesionState = ballPState;
 }
@@ -842,7 +844,7 @@ void CCoach::selectPlayOffMode(int agentSize, NGameOff::EMode &_mode) {
     } else if (gameState->ourKickoff() && !gameState->canKickBall()) {
         _mode = NGameOff::FirstPlay;
 
-    } else if (wm->ball->pos.x < 1 || !gotplan) {
+    } else if ((wm->ball->pos.x < 1 && !gameState->ourKickoff())|| !gotplan) {
         _mode = NGameOff::DynamicPlay;
 
     } else if (!firstIsFinished && conf.UseFirstPlay) {
@@ -865,18 +867,22 @@ void CCoach::initPlayOffMode(const NGameOff::EMode _mode,
 
         case NGameOff::StaticPlay:
             initStaticPlay(_gameMode, _ourplayers);
+            ROS_INFO("initPlayOffMode: StaticPlay");
             break;
         case NGameOff::DynamicPlay:
-            ROS_INFO("HSHM_: DynamicPlay");
+            ROS_INFO("initPlayOffMode: DynamicPlay");
             initDynamicPlay(_ourplayers);
             break;
         case NGameOff::FastPlay:
+            ROS_INFO("initPlayOffMode: initFastPlay");
             initFastPlay(_ourplayers);
             break;
         case NGameOff::FirstPlay:
+            ROS_INFO("initPlayOffMode: initFirstPlay");
             initFirstPlay(_ourplayers);
             break;
         default:
+            ROS_INFO("initPlayOffMode: initStaticPlay");
             initStaticPlay(_gameMode, _ourplayers);
     }
 }
