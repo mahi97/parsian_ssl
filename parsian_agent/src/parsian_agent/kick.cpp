@@ -450,32 +450,29 @@ void CSkillKick::jTurn() {
 
     posPid->error = 0;
     posPid->kd = 0;
-    if (movementDir < 20 && movementDir > -20) {
+    if (movementDir < 17 && movementDir > -17) {
         shift = 0;
-        if (wm->ball->vel.length() < 0.2) {
-        posPid->error = movementDir;
-        posPid->kd = 0.2;
-        }
-    } else if (movementDir > 65) {
-        shift = 25 + (1 - agentPos.dist(ballPos)) * 70;
-    } else if (movementDir < -65) {
-        shift = -25 - (1 - agentPos.dist(ballPos)) * 70;
+
+    } else if (movementDir > 50) {
+        shift = 25 + (1 - agentPos.dist(ballPos)) * 61;
+    } else if (movementDir < -50) {
+        shift = -25 - (1 - agentPos.dist(ballPos)) * 61;
     } else if (movementDir > 30) {
         if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
             shift = 30 + (1 - agentPos.dist(ballPos)) * 20;
         } else if (wm->ball->vel.length() < 0.1) {
-            shift = 10 + (1 - agentPos.dist(ballPos)) * 25;
+            shift = 20 + (1 - agentPos.dist(ballPos)) * 10;
         } else {
-            shift = 15 + (1 - agentPos.dist(ballPos)) * 25;
+            shift = 20 + (1 - agentPos.dist(ballPos)) * 30;
         }
         distCoef = 0.17;
     } else if (movementDir < -30) {
         if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
             shift = -30 - (1 - agentPos.dist(ballPos)) * 20;
         } else if (wm->ball->vel.length() < 0.1) {
-            shift = -10 - (1 - agentPos.dist(ballPos)) * 25;
+            shift = -20 - (1 - agentPos.dist(ballPos)) * 10;
         } else {
-            shift = -15 - (1 - agentPos.dist(ballPos)) * 25;
+            shift = -20 - (1 - agentPos.dist(ballPos)) * 30;
         }
 
         distCoef = 0.17;
@@ -483,9 +480,9 @@ void CSkillKick::jTurn() {
         if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15)) {
             shift = 25 + (1 - agentPos.dist(ballPos)) * 20;
         } else if (wm->ball->vel.length() < 0.1) {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 15;
+            shift = 15 + (1 - agentPos.dist(ballPos)) * 10;
         } else {
-            shift = 5 + (1 - agentPos.dist(ballPos)) * 20;
+            shift = 15 + (1 - agentPos.dist(ballPos)) * 12;
         }
         distCoef = 0.17;
     } else if (movementDir < 0) {
@@ -493,9 +490,9 @@ void CSkillKick::jTurn() {
             shift = -25 - (1 - agentPos.dist(ballPos)) * 20;
         }
         else if (wm->ball->vel.length() < 0.1) {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 15;
+            shift = -15 - (1 - agentPos.dist(ballPos)) * 10;
         } else {
-            shift = -5 - (1 - agentPos.dist(ballPos)) * 20;
+            shift = -15 - (1 - agentPos.dist(ballPos)) * 12;
         }
 
         distCoef = 0.17;
@@ -510,21 +507,24 @@ void CSkillKick::jTurn() {
 
     ////////////set Active adaptive PIDs
 
-
+    dirReduce = (fabs(movementDir)/50) *(fabs(movementDir)/50);
     if (wm->field->isInOppPenaltyArea(ballPos + (wm->field->oppGoal() - ballPos).norm() * 0.15) &&
         agentPos.dist(ballPos) < 0.35) {
-        dirReduce -= 4.5;
+        dirReduce -= 2;
+    }
+    if(isPlayoff) {
+        dirReduce -= 1;
     }
     drawer->draw(QString("error: %1").arg(posPid->error),Vector2D(2,2));
     //posPid->kp = 0.001;
-    speedPid->kp = 6 + 1.1 * agentPos.dist(ballPos) + dirReduce ;
+    speedPid->kp = 6 + 4 * agentPos.dist(ballPos) + dirReduce*2 ;
 
     if (penaltyKick) {
         angPid->kp = 7;
         speedPid->kp = 4;
     }
 
-    angPid->kp = 5;
+    angPid->kp = 4.5;
 
     double vx = movementThSpeed.x * speedPid->PID_OUT();// + posPid->PID_OUT() * cos (agent->dir().th().radian() + _PI /2);
     double vy = movementThSpeed.y * speedPid->PID_OUT();// + posPid->PID_OUT() * sin (agent->dir().th().radian() + _PI /2);

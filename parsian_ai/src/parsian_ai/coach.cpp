@@ -1460,7 +1460,7 @@ void CCoach::initStaticPlay(const POMODE _mode, const QList<int>& _ourplayers) {
             planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
             break;
         case POMODE::DIRECT:
-            planRequest.plan_req.gameMode = planRequest.plan_req.DIRECT;
+            planRequest.plan_req.gameMode = planRequest.plan_req.INDIRECT;
             break;
         case POMODE::KICKOFF:
             planRequest.plan_req.gameMode = planRequest.plan_req.KICKOFF;

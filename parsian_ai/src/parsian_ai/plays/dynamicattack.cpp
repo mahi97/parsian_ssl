@@ -301,7 +301,7 @@ void CDynamicAttack::makePlan(int agentSize) {
     }
         //// we have ball and
         //// shot prob is more than 50%
-    else if (directShot) {
+    else if (directShot || true) {
         ROS_INFO_STREAM("kian: diret shot");
         currentPlan.mode = DynamicMode::DirectKick;
         currentPlan.playmake.init(PlayMakeSkill::Shot, DynamicRegion::Goal);

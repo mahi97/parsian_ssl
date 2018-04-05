@@ -1357,7 +1357,7 @@ void CPlayOff::passManager() {
                      QColor(Qt::darkMagenta));
         doPass = positionAgent[r.id].getAbsArgs(r.state).staticPos.dist(c->pos())
                  <= masterPlan->common.lastDist;
-        doAfterlife = !Circle2D(lastBallPos, 0.4).contains(wm->ball->pos);
+        doAfterlife = !Circle2D(lastBallPos, 0.1).contains(wm->ball->pos);
         roleAgent[p.id]->setDoPass(doPass);
     }
 
