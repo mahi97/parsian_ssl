@@ -1515,8 +1515,8 @@ void DefensePlan::setGoalKeeperState(){
     dangerForGoalKeeperClearByOurAgents = false;
     dangerForGoalKeeperClearByOppAgents = false;
     isCrowdedInFrontOfPenaltyAreaByOppAgents = false;
-    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.3 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
-    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.3 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
+    Rect2D ourLeftPole(wm->field->ourGoalL() + Vector2D(0.2 , 0.3) , wm->field->ourGoalL() - Vector2D(0 , 0.3));
+    Rect2D ourRightPole(wm->field->ourGoalR() + Vector2D(0.2 , 0.3) , wm->field->ourGoalR() - Vector2D(0 , 0.3));
     isCrowdedInFrontOfPenaltyAreaByOurAgents = false;
     playOnMode = gameState->isStart();
     ////////////////////////////////////////////////////////////////////////////
@@ -2917,7 +2917,7 @@ void DefensePlan::executeGoalKeeper() {
         }
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
 
-            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 10){
+            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 100){
                 counterBallWasBesidePoles++;
                 kickSkill->setTarget(Vector2D(0 , wm->ball->pos.y));
                 drawer->draw(Segment2D(wm->ball->pos , Vector2D(0 , wm->ball->pos.y)) , QColor(Qt::blue));
