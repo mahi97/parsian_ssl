@@ -287,7 +287,9 @@ void CDynamicAttack::makePlan(int agentSize) {
     if (isBallInOurField) {
         ROS_INFO_STREAM("kian: dont have the ball");
         currentPlan.mode = DynamicMode::NotWeHaveBall;
-        if (conf.ChipForward && evalmovefwd()) {
+        if (conf.ChipForward
+//            && evalmovefwd()
+                ) {
             currentPlan.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Forward);
         } else {
             currentPlan.playmake.init(PlayMakeSkill::Chip, DynamicRegion::Goal);
@@ -456,23 +458,26 @@ void CDynamicAttack::playMake() {
                 roleAgentPM ->setTarget(wm->field->oppGoal());
                 roleAgentPM->setChip(true);
                 if (wm->ball->pos.x < -2) {
-                    roleAgentPM ->setChipDist(conf.HighDistChip);
+                    roleAgentPM->setChipDist(conf.HighDistChip);
+                } else if (wm->ball->pos.x > 4) {
+                    roleAgentPM->setChipDist(conf.LowDistChip);
                 } else {
                     roleAgentPM ->setChipDist(conf.MediumDistChip);
 
                 }
             } else if (currentPlan.playmake.region == DynamicRegion ::Forward) {
-                roleAgentPM->setTarget(move_fwd_target);
+//                roleAgentPM->setTarget(move_fwd_target);
+                roleAgentPM->setTarget(Vector2D(1000, 0));
                 roleAgentPM->setChip(false);
-                roleAgentPM->setKickSpeed(conf.LowSpeedPass);
+                roleAgentPM->setKickSpeed(conf.LowDistChip);
             } else {
                 roleAgentPM->setChip(true);
                 roleAgentPM->setTarget(wm->field->oppGoal());
                 roleAgentPM->setChipDist(conf.LowDistChip);
             }
-            roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill ::Chip);// Skill Chip
+            roleAgentPM->setSelectedPlayMakeSkill(PlayMakeSkill::Chip);// Skill Chip
             break;
-        case PlayMakeSkill ::Shot: {
+        case PlayMakeSkill::Shot : {
             roleAgentPM->setEmptySpot(true);
             roleAgentPM->setChip(false);
             roleAgentPM->setNoKick(false);

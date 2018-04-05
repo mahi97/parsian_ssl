@@ -263,14 +263,16 @@ class Handler(FileSystemEventHandler):
             # print("Ball Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT)):
+                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
+                             (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
                 plan["symmetry"] = False
                 return True
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             # print("Ball Symm Pos Matched")
             if len(plan["agentInitPos"]) >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                    and plan["planMode"] == plan_mode:
+                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
+                             (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
                 plan["symmetry"] = True
                 return True
         return False

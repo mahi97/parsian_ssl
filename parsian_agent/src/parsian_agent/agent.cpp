@@ -385,9 +385,7 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
 //         agentStopTime.restart();
 //         timerReset = true;
 //     }
-    if(vel().length() < 0.5 && diveMode) {
-        return;
-    }
+
     double lastV, commandV;
     double vCoef = 1;
     double tempVf = vforward , tempVn = vnormal;
@@ -434,12 +432,28 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
                 vforward = lastVf + (decCoef * conf->DecMax * 0.0166667);
             }
         }
+    } else {
+        if (vforward >= 0) {
+            if (vforward > (lastVf + conf->AccMaxForward * 0.0166667 * 2)) {
+                vforward = lastVf + (conf->AccMaxForward * 0.0166667 * 2) * sign(vforward);
+            }
+            if (vforward < (lastVf - decCoef * conf->DecMax * 0.0166667 * 2)) {
+                vforward = lastVf - (decCoef * conf->DecMax * 0.0166667 * 2);
+            }
+        } else {
+            if (vforward < (lastVf - conf->AccMaxForward * 0.0166667 * 2)) {
+                vforward = lastVf - (conf->AccMaxForward * 0.0166667 * 2);
+            }
+            if (vforward > (lastVf + decCoef * conf->DecMax * 0.0166667 * 2)) {
+                vforward = lastVf + (decCoef * conf->DecMax * 0.0166667 * 2);
+            }
+        }
     }
 ////    debug(QString("vn: %1 , lVn :%2").arg(vnormal).arg(lastVn),D_MHMMD);
     if (vnormal >= 0) {
         if (diveMode) {
-            if (vnormal > (lastVn + 10 * 0.0166667)) {
-                vnormal = lastVn + (10 * 0.0166667) * sign(vnormal);
+            if (vnormal > (lastVn + 8 * 0.0166667)) {
+                vnormal = lastVn + (8 * 0.0166667) * sign(vnormal);
             }
         } else {
             if (vnormal > (lastVn + conf->AccMaxNormal * 0.0166667)) {
@@ -452,8 +466,8 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
         }
     } else {
         if (diveMode) {
-            if (vnormal < (lastVn - 10 * 0.0166667)) {
-                vnormal = lastVn + (10 * 0.0166667) * sign(vnormal);
+            if (vnormal < (lastVn - 8 * 0.0166667)) {
+                vnormal = lastVn + (8 * 0.0166667) * sign(vnormal);
             }
         } else {
             if (vnormal < (lastVn - conf->AccMaxNormal * 0.0166667)) {
