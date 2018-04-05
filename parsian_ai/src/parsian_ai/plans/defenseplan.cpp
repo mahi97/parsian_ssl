@@ -2295,7 +2295,9 @@ void DefensePlan::execute(){
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    stopMode = gameState->isStop();
+    gpa[goalKeeperAgent->id()]->setOnetouchflag(false);
+    gpa[goalKeeperAgent->id()]->setChip(false);
+    stopMode = gameState->isStop();    
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
     drawer->draw(getLinesOfBallTriangle().at(0));
@@ -2889,21 +2891,10 @@ void DefensePlan::executeGoalKeeper() {
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
             }            
         }
-        else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {
-            if (lastStateForGoalKeeper == QString("BesidePoleMode") || counterBallWasBesidePoles < 100){
-                counterBallWasBesidePoles++;
-                kickSkill->setTarget(Vector2D(0 , wm->ball->pos.y));
-                drawer->draw(Segment2D(wm->ball->pos , Vector2D(0 , wm->ball->pos.y)) , QColor(Qt::blue));
-            }
-            else{
-                if (wm->ball->pos.y >= 0) {
-                    kickSkill->setTarget(Vector2D(-10 , -4) - wm->field->ourGoal());
-                } else {
-                    kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
-                }
-            }
+        else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {            
             know->variables["goalKeeperClearMode"] = true;
-            know->variables["goalKeeperOneTouchMode"] = false;            
+            know->variables["goalKeeperOneTouchMode"] = false;
+//            if(wm->ball->ve)
             if (wm->ball->vel.length() > 0.4 && wm->ball->vel.length() < 1.3) {
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("Clear slow ball" , D_AHZ);
@@ -2949,10 +2940,14 @@ void DefensePlan::executeGoalKeeper() {
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
                 gpa[goalKeeperAgent->id()]->setDivemode(true);
                 gpa[goalKeeperAgent->id()]->setOnetouchmode(true);
-                gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setTargetdir(-goalKeeperTarget + wm->ball->pos);
                 gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
                 gpa[goalKeeperAgent->id()]->setNoavoid(true);
+                gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
+                gpa[goalKeeperAgent->id()]->setOnetouchflag(true);
+                gpa[goalKeeperAgent->id()]->setChip(true);
+                gpa[goalKeeperAgent->id()]->setChipdist(4.5);
+                gpa[goalKeeperAgent->id()]->setKickspeed(0);
             }
             else if (dangerForGoalKeeperClear) {
                 drawer->draw(Circle2D(goalKeeperTarget , 0.5), QColor(Qt::red));
