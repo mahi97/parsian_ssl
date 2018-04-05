@@ -920,7 +920,7 @@ int DefensePlan::findNeededDefense(){
         neededDefense = 1;
     }
     else{
-        for(numOfDefenses = 1 ; numOfDefenses < 4 ; numOfDefenses++){
+        for(numOfDefenses = 2 ; numOfDefenses < 4 ; numOfDefenses++){
             Circle2D temp = Circle2D(wm->field->ourGoal(),findBestRadiusForDefenseArea(getBestLineWithTallesForCircularPositioning(numOfDefenses,ourGoalL,ballPos, ourGoalR), conf.DownLimit , conf.UpLimit));
             temp.intersection(getLinesOfBallTriangle().at(0) , &sol[0] , &sol[1]);
             temp.intersection(getLinesOfBallTriangle().at(1) , &sol[2] , &sol[3]);
