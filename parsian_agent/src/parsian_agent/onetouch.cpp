@@ -205,7 +205,7 @@ void CSkillKickOneTouch::execute() {
             if (chip) {
                 agent->setChip(kickSpeed);
             } else {
-                agent->setKick(1000);
+                agent->setKick(kickSpeed);
             }
         }
         agent->setRoller(0);
