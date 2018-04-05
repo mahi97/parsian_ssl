@@ -264,20 +264,25 @@ class Handler(FileSystemEventHandler):
 
         if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             # print("Ball Pos Matched")
-            if planSize >= player_num \
-                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
-                             (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
-                plan["symmetry"] = False
-                return True
+            if planSize >= player_num and plan["chance"] > 0 and plan["lastDist"] >= 0:
+                if plan_mode == KICKOFF:
+                    if plan["planMode"] == KICKOFF:
+                        plan["symmetry"] = False
+                        return True
+                elif plan["planMode"] != KICKOFF:
+                    plan["symmetry"] = False
+                    return True
+
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             # print("Ball Symm Pos Matched")
-            if planSize >= player_num \
-                    and plan["chance"] > 0 and plan["lastDist"] >= 0 \
-                    and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
-                             (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
-                plan["symmetry"] = True
-                return True
+            if planSize >= player_num and plan["chance"] > 0 and plan["lastDist"] >= 0:
+                if plan_mode == KICKOFF:
+                    if plan["planMode"] == KICKOFF:
+                        plan["symmetry"] = True
+                        return True
+                elif plan["planMode"] != KICKOFF:
+                    plan["symmetry"] = True
+                    return True
         return False
 
     def plan_size(self, plan):
@@ -307,9 +312,13 @@ class Handler(FileSystemEventHandler):
         subsublist = []
         if len(sublist) > 0:
             for plan in sublist:
-                if plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or\
-                        (plan_mode == INDIRECT and plan["planMode"] == DIRECT):
+                if plan_mode == KICKOFF:
+                    if plan["planMode"] == KICKOFF:
+                        subsublist.append(plan)
+                elif plan["planMode"] != KICKOFF:
                     subsublist.append(plan)
+
+        print("# active and valid plans after mode check: " + str(len(subsublist)) + "\n")
 
         if len(subsublist) > 0:
             print("# active and valid plans: " + str(len(subsublist)) + "\n")

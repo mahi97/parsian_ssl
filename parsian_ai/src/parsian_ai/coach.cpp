@@ -589,6 +589,8 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst){
         playMakeIntention.restart();
         return;
     }
+    playmakeId = 5;
+    return;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
