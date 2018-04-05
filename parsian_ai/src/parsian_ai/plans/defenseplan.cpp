@@ -3402,7 +3402,6 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
                                 drawer->draw(Circle2D(wm->ball->pos , 0.2) , "blue");
                                 return wm->ball->pos;
                             }
-
                         }
                         else if(solu[1].isValid()){//Lhum!!!
                             if(dist2Ball != min(dist2Ball , solu[1].dist(wm->ball->pos))) {

@@ -1699,31 +1699,31 @@ void CDynamicAttack::chooseBestPositons_new()
     for (int i{0}; i < 3; i++) for (int j{0}; j < 3; j++) if (regions[i][j].rectangle.contains(wm->ball->pos + wm->ball->vel)) ballR = i*3+j;
     switch (ballR) {
         case 0:
-            regionPriority << 6 << 3 << 2 << 8 << 7 << 5 << 4 << 1 << 0;
+            regionPriority << 6 << 3 << 2 << 7 << 8 << 1 << 5 << 4 << 0;
             break;
         case 1:
-            regionPriority << 7 << 4 << 2 << 8 << 5 << 3 << 6 << 0 << 1;
+            regionPriority << 0 << 3 << 7 << 8 << 2 << 6 << 4 << 5 << 1;
             break;
         case 2:
-            regionPriority << 4 << 8 << 5 << 7 << 3 << 6 << 1 << 0 << 2;
+            regionPriority << 5 << 1 << 8 << 4 << 7 << 0 << 3 << 6 << 2;
             break;
         case 3:
             regionPriority << 7 << 2 << 8 << 1 << 6 << 0 << 4 << 5 << 3;
             break;
         case 4:
-            regionPriority << 2 << 8 << 7 << 1 << 3 << 1 << 7 << 6 << 4;
+            regionPriority << 3 << 2 << 8 << 7 << 1 << 0 << 6 << 4 << 5;
             break;
         case 5:
-            regionPriority << 2 << 8 << 4 << 1 << 3 << 7 << 0 << 6 << 5;
+            regionPriority << 4 << 7 << 2 << 1 << 8 << 3 << 0 << 6 << 5;
             break;
         case 6:
-            regionPriority << 0 << 3 << 8 << 2 << 1 << 5 << 4 << 7 << 6;
+            regionPriority << 0 << 3 << 8 << 1 << 2 << 7 << 5 << 4 << 6;
             break;
         case 7:
-            regionPriority << 6 << 3 << 2 << 8 << 7 << 4 << 5 << 1 << 7;
+            regionPriority << 6 << 3 << 1 << 2 << 8 << 0 << 4 << 5 << 7;
             break;
         case 8:
-            regionPriority << 4 << 2 << 5 << 1 << 3 << 0 << 7 << 6 << 8;
+            regionPriority << 5 << 7 << 2 << 4 << 1 << 6 << 3 << 6 << 8;
             break;
         default:
             regionPriority << 7 << 2 << 8 << 1 << 6 << 0 << 4 << 5 << 3;
