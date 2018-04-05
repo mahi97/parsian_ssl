@@ -1002,3 +1002,7 @@ void CMarkPlan::execute(){
     }
 }
 
+int CMarkPlan::findNeededMark() {
+    return 2;
+}
+
