@@ -78,7 +78,7 @@ void CPlayOff::globalExecute() {
     if (masterMode == NGameOff::StaticPlay) {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
+        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) <= 0.05) {
             if (criticalPlay()) {
                 ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
@@ -1244,7 +1244,7 @@ bool CPlayOff::isTimeOver() {
         tempStart = ros::Time::now().sec;
     }
 
-    if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
+    if (!Circle2D(lastBallPos, 0.06).contains(wm->ball->pos)) {
         setTimer = false;
         ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
         if(ros::Time::now().sec - tempStart >= 3*masterPlan->execution.passCount) { // 2 Second
