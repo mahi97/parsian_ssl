@@ -372,6 +372,7 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
     if (inTimePlan() || true) {
         makePlan(agentSize);
     }
+
     if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
         chooseBestPositons_new();
         assignId_new();
