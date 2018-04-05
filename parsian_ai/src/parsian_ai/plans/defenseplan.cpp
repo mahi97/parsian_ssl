@@ -2946,7 +2946,7 @@ void DefensePlan::executeGoalKeeper() {
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget); //HINT : gpa->init
                 gpa[goalKeeperAgent->id()]->setOnetouchflag(true);
                 gpa[goalKeeperAgent->id()]->setChip(true);
-                gpa[goalKeeperAgent->id()]->setChipdist(4.5);
+                gpa[goalKeeperAgent->id()]->setChipdist(450);
                 gpa[goalKeeperAgent->id()]->setKickspeed(0);
             }
             else if (dangerForGoalKeeperClear) {
