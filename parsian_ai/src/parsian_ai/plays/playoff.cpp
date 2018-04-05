@@ -1409,7 +1409,7 @@ void CPlayOff::checkEndState() {
         if (roleAgent[i]->getAgent() == nullptr) {
             continue;
         }
-        if (isTaskDone(roleAgent[i])) {
+        if (isTaskDone(roleAgent[i]) || doAfterlife) {
 
             roleAgent[i]->setRoleUpdate(false);
             roleAgent[i]->resetTime();
