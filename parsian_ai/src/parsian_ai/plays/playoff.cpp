@@ -1344,8 +1344,8 @@ Vector2D CPlayOff::getEmptyTarget(const Vector2D& _position, const double& _radi
 }
 ///////////////PassManager///////////////////
 void CPlayOff::passManager() {
-    const AgentPoint &p = masterPlan->execution.passer.at(0);
     const AgentPoint &r = masterPlan->execution.reciver.at(0);
+    const AgentPoint &p = masterPlan->execution.passer.at(0);
 
     const int &i = masterPlan->common.matchedID.value(r.id);
 
@@ -1409,24 +1409,29 @@ void CPlayOff::checkEndState() {
         if (roleAgent[i]->getAgent() == nullptr) {
             continue;
         }
-        if (isTaskDone(roleAgent[i]) || doAfterlife) {
+
+        Agent *firstPasser = soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)];
+
+        if (isTaskDone(roleAgent[i]) || (doAfterlife && roleAgent[i]->getAgent()->id() != firstPasser->id())) {
 
             roleAgent[i]->setRoleUpdate(false);
             roleAgent[i]->resetTime();
 
-            POffSkills temp_skill = positionAgent[i].positionArg.at(positionAgent[i].positionArg.size() - 1).staticSkill;
+            POffSkills last_skill = positionAgent[i].positionArg.at(
+                    positionAgent[i].positionArg.size() - 1).staticSkill;
 
-            if (doAfterlife && temp_skill == Position ){
-
+            if (last_skill == Position) {
+                if (!doAfterlife && positionAgent[i].stateNumber == positionAgent[i].positionArg.size() - 2) {
+                    roleAgent[i]->setRoleUpdate(true);
+                } else if (doAfterlife){
                     positionAgent[i].stateNumber = positionAgent[i].positionArg.size() - 1;
-                    ROS_INFO_STREAM("after_life " << roleAgent[i]->getAgent()->id());
-
-            } else if (positionAgent[i].stateNumber + 1  < positionAgent[i].positionArg.size()) {
+                }
+            } else if (positionAgent[i].stateNumber + 1 < positionAgent[i].positionArg.size()) {
                 if (positionAgent[i].getArgs(1).staticSkill == Defense
-                        ||  positionAgent[i].getArgs(1).staticSkill == Support
-                        ||  positionAgent[i].getArgs(1).staticSkill == Position
-                        ||  positionAgent[i].getArgs(1).staticSkill == Goalie
-                        ||  positionAgent[i].getArgs(1).staticSkill == Mark) {
+                    || positionAgent[i].getArgs(1).staticSkill == Support
+                    || positionAgent[i].getArgs(1).staticSkill == Position
+                    || positionAgent[i].getArgs(1).staticSkill == Goalie
+                    || positionAgent[i].getArgs(1).staticSkill == Mark) {
 
                     if (doAfterlife) {
                         positionAgent[i].stateNumber++;
