@@ -1264,7 +1264,8 @@ bool CPlayOff::isBallDirChanged() {
 
     // USE PASSER FORM INITIAL LEVEL
     const int& passer = masterPlan->execution.passer.at(0).id;
-    const int& recive = masterPlan->execution.reciver.at(0).id;
+    const int& recieve = masterPlan->execution.reciver.at(0).id;
+    const int recive = masterPlan->common.matchedID.value(recieve);
     Vector2D& b  = wm->ball->pos;
     if (b.dist(lastBallPos) > 0.5 && !roleAgent[passer]->getChip()) {
         Vector2D  bv = b + wm->ball->vel.norm() * wm->field->_MAX_DIST;
@@ -1410,7 +1411,7 @@ void CPlayOff::checkEndState() {
             continue;
         }
 
-        Agent *firstPasser = soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)];
+        Agent *firstPasser = soccer->agents[masterPlan->execution.passer.at(0).id];
 
         if (isTaskDone(roleAgent[i]) || (doAfterlife && roleAgent[i]->getAgent()->id() != firstPasser->id())) {
 
@@ -2050,7 +2051,7 @@ bool CPlayOff::firstKickFailed() {
     return false;
     if (lastBallPos.dist(wm->ball->pos) > 0.15 && Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)
         && wm->ball->vel.length() < 0.1) {
-        const int &i = masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id);
+        const int &i = masterPlan->execution.passer.at(0).id;
 
         playoff_badPasserID = soccer->agents[i]->id();
         ROS_INFO("playofff bad kick");
@@ -2250,7 +2251,15 @@ void CPlayOff::analysePass() {
         masterPlan->execution.passCount = tPass.size();
         if (havePassInPlan) {
             for (int i = 0; i < tPass.size(); i++) {
-                masterPlan->execution.passer.append(tPass.at(i).first);
+                if(i == 0) {
+                    AgentPoint p;
+                    p.id = masterPlan->common.matchedID.value(tPass.at(i).first.id);
+                    p.state = tPass.at(i).first.state;
+                    masterPlan->execution.passer.append(p);
+                } else{
+                    masterPlan->execution.passer.append(tPass.at(i).first);
+                }
+
                 masterPlan->execution.reciver.append(tPass.at(i).second);
             }
 //            qDebug() << "First Pass:";
@@ -2271,9 +2280,10 @@ bool CPlayOff::criticalPlay() {
         criticalKick->setChip(false);
         criticalKick->setDontkick(false);
         criticalKick->setPassprofiler(false);
-        criticalKick->setKickspeed(7);
+        criticalKick->setKickspeed(6.5);
         criticalKick->setTolerance(0.5);
     }
+//    soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)]->action = criticalKick;
     soccer->agents[masterPlan->execution.passer[0].id]->action = criticalKick;
     return wm->ball->vel.length() > 0.5;
 
