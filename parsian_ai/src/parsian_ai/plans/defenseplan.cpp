@@ -1554,13 +1554,7 @@ void DefensePlan::setGoalKeeperState(){
                 solutions.append(sol[1]);
             }
             if (solutions.size()){
-                if (solutions.size() == 1) {
-                    if (wm->field->isInField(solutions.at(0))) {
-                        dangerCircle = Circle2D(solutions.at(0), 0.40);
-                        dangerCircle1 = Circle2D(solutions.at(0), 0.40);
-                    }
-                }
-                else if (solutions.size() == 2) {
+                if (solutions.size() == 2) {
                     dangerCircle = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
                     dangerCircle1 = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
                 }
@@ -1692,19 +1686,14 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             solutions.append(sol[1]);
         }
         if (solutions.size()) {
-            if (solutions.size() == 1){
-                if (wm->field->isInField(solutions.at(0))) {
-                    dangerCircle = Circle2D(solutions.at(0), 0.40);
-                    dangerCircle1 = Circle2D(solutions.at(0), 0.40);
-                }
-            } else if (solutions.size() == 2) {
+            if (solutions.size() == 2) {
                 dangerCircle = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
                 dangerCircle1 = Circle2D(solutions.at(0).dist(wm->ball->pos) < solutions.at(1).dist(wm->ball->pos) ? solutions.at(0) : solutions.at(1), 0.40);
             }
         }
         drawer->draw(dangerCircle , "yellow");
         drawer->draw(dangerCircle1 , "yellow");
-        if (ballIsOutOfField || stopMode) {
+        if (ballIsOutOfField || stopMode){
             lastStateForGoalKeeper = QString("noBesidePoleMode");
             dangerForGoalKeeperClear = false;
             drawer->draw(QString("Ball Is Out Of Field"), Vector2D(0, 1), "red");
@@ -1716,7 +1705,6 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             dangerForGoalKeeperClear = false;
             goalKeeperPredictionModeInPlayOff = true;
             DBUG(QString("Their Indirect") , D_AHZ);
-//            oppPasser = wm->opp[know->nearestOppToBall()]->pos; //todo: move to wm
             if(gameState->theirIndirectKick()){
                 goalKeeperTarget = wm->field->ourGoal() + goalKeeperTargetOffSet;
             }
@@ -2903,8 +2891,7 @@ void DefensePlan::executeGoalKeeper() {
             know->variables["goalKeeperOneTouchMode"] = false;
             if (wm->ball->vel.length() > 0.4 && wm->ball->vel.length() < 1.3) {
                 AHZSkills = gpa[goalKeeperAgent->id()];
-                DBUG("Clear slow ball" , D_AHZ);
-                AHZSkills = gpa[goalKeeperAgent->id()];
+                DBUG("Clear slow ball" , D_AHZ);                
                 gpa[goalKeeperAgent->id()]->setDivemode(false);
                 gpa[goalKeeperAgent->id()]->setOnetouchmode(false);
                 gpa[goalKeeperAgent->id()]->setSlowmode(false);
@@ -2934,10 +2921,11 @@ void DefensePlan::executeGoalKeeper() {
                 kickSkill->setAvoidpenaltyarea(false);
                 kickSkill->setGoaliemode(true);
                 kickSkill->setChip(true);
-                kickSkill->setChipdist(4.5);
+                kickSkill->setIskickchargetime(true);
+                kickSkill->setKickchargetime(1023);
             }
         }
-        else {
+        else {            
             if (goalKeeperOneTouch) {
                 DBUG("One touch Mode" , D_AHZ);
                 know->variables["goalKeeperClearMode"] = false;
@@ -2957,27 +2945,28 @@ void DefensePlan::executeGoalKeeper() {
             }
             else if (dangerForGoalKeeperClear) {
                 drawer->draw(Circle2D(goalKeeperTarget , 0.5), QColor(Qt::red));
-                if (dangerForInsideOfThePenaltyArea) {
-                    know->variables["goalKeeperClearMode"] = true;
-                    know->variables["goalKeeperOneTouchMode"] = false;
-                    DBUG("Danger Mode" , D_AHZ);
-                    AHZSkills = kickSkill;
-                    kickSkill->setTolerance(10);
-                    kickSkill->setDontkick(false);
-                    kickSkill->setSlow(true);
-                    kickSkill->setSpin(0);
-                    kickSkill->setChip(true);
-                    kickSkill->setAvoidpenaltyarea(false);
-                    kickSkill->setGoaliemode(true);
-                    kickSkill->setChipdist(4.5);
-                    if (wm->ball->pos.y >= 0){
-                        kickSkill->setTarget(Vector2D(-10 , -4) - wm->field->ourGoal());
-                    }
-                    else{
-                        kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
-                    }                    
-                }
-                else{
+//                if (dangerForInsideOfThePenaltyArea) {
+//                    know->variables["goalKeeperClearMode"] = true;
+//                    know->variables["goalKeeperOneTouchMode"] = false;
+//                    DBUG("Danger Mode" , D_AHZ);
+//                    AHZSkills = kickSkill;
+//                    kickSkill->setTolerance(10);
+//                    kickSkill->setDontkick(false);
+//                    kickSkill->setSlow(true);
+//                    kickSkill->setSpin(0);
+//                    kickSkill->setChip(true);
+//                    kickSkill->setAvoidpenaltyarea(false);
+//                    kickSkill->setGoaliemode(true);
+//                    kickSkill->setChipdist(4.5);
+//                    if (wm->ball->pos.y >= 0){
+//                        kickSkill->setTarget(Vector2D(-10 , -4) - wm->field->ourGoal());
+//                    }
+//                    else{
+//                        kickSkill->setTarget(Vector2D(-10 , 4) - wm->field->ourGoal());
+//                    }
+//                }
+//                else{
+                    goalKeeperTarget = strictFollowBall(ballPrediction(true));
                     know->variables["goalKeeperClearMode"] = false;
                     know->variables["goalKeeperOneTouchMode"] = false;
                     AHZSkills = gpa[goalKeeperAgent->id()];
@@ -2988,7 +2977,7 @@ void DefensePlan::executeGoalKeeper() {
                     gpa[goalKeeperAgent->id()]->setTargetdir(goalKeeperAgent->pos() - wm->field->ourGoal());
                     gpa[goalKeeperAgent->id()]->setAvoidpenaltyarea(false);
                     gpa[goalKeeperAgent->id()]->setNoavoid(true);
-                }
+//                }
             }
             else {
                 //// strict follow
