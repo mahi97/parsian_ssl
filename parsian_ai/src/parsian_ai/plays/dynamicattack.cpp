@@ -364,35 +364,30 @@ void CDynamicAttack::assignTasks() {
  * @param agentSize number of positioning Agents
  */
 void CDynamicAttack::dynamicPlanner(int agentSize) {
-
+    ROS_INFO("MAHI : 1");
     for (size_t i = 0; i < 8; i++) {
         mahiAgentsID[i] = -1;
     }
+    ROS_INFO("MAHI : 2");
 
     if (inTimePlan() || true) {
         makePlan(agentSize);
     }
+    ROS_INFO("MAHI : 3");
 
     if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
         chooseBestPositons_new();
-        assignId_new();
-        chooseReceiverAndBestPosForPass();
-    }
+        ROS_INFO("MAHI : 4");
 
-//    if(isInpass())
-//    {
-//        ROS_INFO_STREAM("ispassed" << playmakeIntention.elapsed());
-//        playmakeIntention.restart();
-//    }
-//    if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
-//    {
-//        PMfromCoach = true;
-//    }
-//    if(playmakeIntention.elapsed() <= 1000 && playmake != nullptr)
-//    {
-//        PMfromCoach = false;//change to false later
-//        ROS_INFO_STREAM("playmake PMfromCoach is false");
-//    }
+        assignId_new();
+        ROS_INFO("MAHI : 5");
+
+        chooseReceiverAndBestPosForPass();
+    }    ROS_INFO("MAHI : 6");
+
+
+    ROS_INFO("MAHI : 7");
+
     assignTasks();
     ROS_INFO("MAHI");
 
@@ -403,8 +398,12 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
             DBUG(QString("[dynamicAttack - %1] mahiAgentID buged").arg(__LINE__), D_MAHI);
         }
     }
+    ROS_INFO("MAHI : 8");
+
     if (playmake != nullptr && playmake->id() != -1) {
         roleAgentPM->execute();
+        ROS_INFO("MAHI : 9");
+
     }
     lastAgentCount = agentSize;
 
@@ -1609,16 +1608,6 @@ void CDynamicAttack::chooseBestPositons_new()
     QList<Rect2D> avoidRects;
     avoidRects.append(wm->field->oppPenaltyRect());
 
-    // get the pass sender
-    int passSenderID{playmake->id()};
-    ROS_INFO_STREAM("hamid playkame ID: " << passSenderID);
-    Vector2D passSenderPos;
-    if(passSenderID != -1) {
-        passSenderPos = wm->our[passSenderID]->pos;
-        ourRelaxedIDs.append(passSenderID);
-    } else {
-        passSenderPos.invalidate();
-    }
 
     int ballR = -1;
     regionPriority.clear();
@@ -1657,75 +1646,6 @@ void CDynamicAttack::chooseBestPositons_new()
     }
 
     return;
-
-    // this section determines the factors and calculates the probability of those factors
-    for (auto& passReciever : agents)
-    {
-        int passRecieverID = passReciever->id();
-        if (passRecieverID == passSenderID) continue;
-
-        // getting the pass receiver
-        Vector2D passRecieverPos;
-        Vector2D passRecieverDir;
-        if(passRecieverID != -1) {
-            passRecieverPos = wm->our[passRecieverID]->pos;
-            passRecieverDir = wm->our[passRecieverID]->dir;
-            ourRelaxedIDs.append(passRecieverID);
-        } else {
-            passRecieverPos.invalidate();
-        }
-        ROS_INFO_STREAM("hamid pass receiverpos: (" << passRecieverPos.x << ", " << passRecieverPos.y);
-        for(int region_id{0}; region_id<9; region_id++)
-        {
-            Vector2D bestPoint(regions[region_id/3][region_id%3].rectangle.center());
-            double maxProbability = 0;
-            for(auto& point : regions[region_id/3][region_id%3].points)
-            {
-                for(int i{0}; i<avoidRects.count(); i++)
-                {
-                    if (avoidRects[i].contains(point))
-                        continue;
-                }
-
-                double prob = 0.0;
-                //factors for pass
-                double receiverDistanceFactor = 0; // be the closer than opp robots (temp), could change based on timing
-                double senderDistanceFactor = 0; // being within a specified interval (temp), could change based on timing
-                double clearPathFactor = 0; // if the path to the point is clear for receiving robot
-                double widenessFactor = 0;
-                double notInWayFactor = 0;
-
-                // factors for shoot
-                double oneTouchAngleFactor = 0; // if the angle to the opp goal is whitin a desird interval
-                double shootFactor = 0;
-
-                receiverDistanceFactor = calcReceiverDistanceFactor(point, passRecieverID, region_id);
-                senderDistanceFactor = calcSenderDistanceFactor(passSenderPos, point);
-                clearPathFactor = caclClearPathFactor(point, passSenderPos, ROBOT_RADIUS);
-                oneTouchAngleFactor = calcOneTouchAngleFactor(point);
-                widenessFactor = calcWidenessFactor(passSenderPos, point);
-                notInWayFactor = calcNotInWayFactor(passSenderPos, point);
-
-                double f = 1.0;
-                prob += f1(widenessFactor,0.5*f);
-                prob += f1(receiverDistanceFactor,2.0*f);
-                prob += f1(senderDistanceFactor,0.1*f);
-                prob += f1(clearPathFactor,1.0*f);
-                prob += f1(oneTouchAngleFactor,0.1*f);
-                prob += f1(notInWayFactor,1*f);
-//                prob  = fm1(prob,5.2*f);
-
-                if( prob > maxProbability )
-                {
-                    maxProbability = prob;
-                    bestPoint = point;
-                }
-            }
-            robotRegionsWeights[passRecieverID][region_id] = maxProbability;
-            bestPointForRobotsInRegions[passRecieverID][region_id] = bestPoint;
-        }
-
-    }
 }
 
 int CDynamicAttack::getNearestRegionToRobot(Vector2D agentPos)
@@ -1743,7 +1663,7 @@ int CDynamicAttack::getNearestRegionToRobot(Vector2D agentPos)
 
 void CDynamicAttack::assignId_new()
 {
-    if (regionPriority.isEmpty()) return;
+    if (regionPriority.isEmpty() || playmake == nullptr) return;
     QList<Rect2D> searchRegions;
     for(int i{0}; i<3; i++)
     {
