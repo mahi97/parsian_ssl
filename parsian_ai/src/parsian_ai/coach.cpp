@@ -653,6 +653,7 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst){
         }
     }
 
+
     lastPlayMake = playmakeId;
 }
 

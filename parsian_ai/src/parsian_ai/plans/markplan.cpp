@@ -930,10 +930,10 @@ void CMarkPlan::execute(){
         know->Matching(agents, markPoses, matchPoints); // todo : knowledge
         for(int i = 0; i < markPoses.count(); i++){
             if (i < matchPoints.size()) {
+                agents[i]->action = markGPA[i];
                 markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
                 markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
                 markGPA[i]->setAvoidpenaltyarea(true);
-                agents[i]->action = markGPA[i];
             }
         }
     }
@@ -988,11 +988,11 @@ void CMarkPlan::execute(){
         if (agents.count() == markPoses.count()) {
             for (int i = 0; i < markPoses.count(); i++) {
                 if (i < matchPoints.size()) {
+                    agents[i]->action = markGPA[i];
                     markGPA[i]->setTargetpos(markPoses[matchPoints[i]]); //HINT : gpa->init
                     markGPA[i]->setTargetdir(markAngs[matchPoints[i]]);
                     markGPA[i]->setAvoidpenaltyarea(true);
                     markGPA[i]->setAvoidcentercircle(true);
-                    agents[i]->action = markGPA[i];
                 }
             }
 
