@@ -41,6 +41,7 @@ void CRolePlayOff::reset() {
 void CRolePlayOff::update() {
 
     double normalSpeed = normalaizeKickSpeed();
+    ROS_INFO_STREAM("playofffff: "<< normalSpeed);
     switch (selectedSkill) {
     case RoleSkill::Gotopoint:
         break;
@@ -59,8 +60,12 @@ void CRolePlayOff::update() {
         kickSkill->setTarget(target);
         kickSkill->setAvoidpenaltyarea(avoidPenaltyArea);
         kickSkill->setInterceptmode(intercept);
-        kickSkill->setKickspeed(normalSpeed);
         kickSkill->setChip(chip);
+            if(chip){
+            kickSkill->setChipdist(normalSpeed);
+            } else {
+                kickSkill->setKickspeed(normalSpeed);
+            }
         kickSkill->setDontkick(!doPass);
         kickSkill->setTolerance(0.5);
         kickSkill->setPassprofiler(false);
