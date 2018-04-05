@@ -39,6 +39,7 @@ protected:
     void setGoalKeeperTargetPoint();
     bool goalKeeperOneTouch, goalKeeperClearMode, ballIsOutOfField, ballIsBesidePoles;
     double strictfollowThr;
+    double differentialTime = 0;
     bool dangerForGoalKeeperClear;
     int oneTouchCnt;
     ////////////////////////////// AHZ ///////////////////

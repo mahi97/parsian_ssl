@@ -1734,10 +1734,17 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             if(wm->field->ourBigPenaltyArea(1,0,0).contains(goalKeeperTarget)) {
                 QList<int> empty;
                 empty.clear();
-                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) + 0.5)))//!Lhum 4 0.2
+                if(goalKeeperTarget.dist(wm->ball->pos) < 2*Robot::robot_radius_new){
+                    differentialTime = 0;
+                }
+                else{
+                    differentialTime = 0.2;
+                }
+                if(wm->field->ourPenaltyRect().contains(wm->ball->getPosInFuture(timeNeeded(goalKeeperAgent , goalKeeperTarget , 4 , empty , empty , false , 0 , false) + differentialTime)))//!Lhum 4 0.2
                     return;
                 else {
-                    goalKeeperTarget = know->getPointInDirection(wm->field->ourGoal(), ballPrediction(true), 0.3);
+                    Vector2D anIntersection = Segment2D(wm->field->ourGoalL() , wm->field->ourGoalR()).intersection(getBisectorLine(wm->field->ourGoalL() , ballPrediction(true) , wm->field->ourGoalR()));
+                    goalKeeperTarget = know->getPointInDirection(anIntersection, ballPrediction(true), 0.3);
                 }
             }
             drawer->draw(Circle2D(goalKeeperTarget, 0.9) , "white");
@@ -2066,7 +2073,7 @@ DefensePlan::DefensePlan(){
     isOnetouch = false;
     inPenaltyAreaFlag = false;
     noDefThr = 0;
-
+    differentialTime = 0;
     clearCnt = 0;
 
     defenseCount = defenseAgents.size();
@@ -2837,7 +2844,7 @@ void DefensePlan::executeGoalKeeper() {
                 gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
             } else {
                 gpa[goalKeeperAgent->id()]->setTargetpos(goalKeeperTarget);
-                gpa[goalKeeperAgent->id()]->setTargetdir(ballPrediction(true) - wm->field->ourGoal());
+                gpa[goalKeeperAgent->id()]->setTargetdir(wm->ball->pos - goalKeeperTarget);
             }
         }
         else if(stopMode){            
@@ -2894,7 +2901,6 @@ void DefensePlan::executeGoalKeeper() {
         else if (goalKeeperClearMode && !dangerForGoalKeeperClear) {            
             know->variables["goalKeeperClearMode"] = true;
             know->variables["goalKeeperOneTouchMode"] = false;
-//            if(wm->ball->ve)
             if (wm->ball->vel.length() > 0.4 && wm->ball->vel.length() < 1.3) {
                 AHZSkills = gpa[goalKeeperAgent->id()];
                 DBUG("Clear slow ball" , D_AHZ);
@@ -3367,7 +3373,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
     }
 //    wm->opp.update();
     QList<int> temp;
-    if(wm->opp.activeAgentsCount() > 0) {
+    if((wm->opp.activeAgentsCount() > 0) && 0) {
         ROS_INFO_STREAM("ED: raft");
         temp = detectOpponentPassOwners(1 , 100);//taghir kone
         Segment2D ballSegment = Segment2D(wm->ball->pos , wm->ball->pos + wm->ball->vel.norm() * 100);
@@ -3413,7 +3419,7 @@ Vector2D DefensePlan::ballPrediction(bool _isGoalie) {
             }
         }
     }
-    if (dist2Ball != 1000) {
+    if ((dist2Ball != 1000) && 0) {
         drawer->draw(Circle2D(predictedBall , 0.2) , "blue");
         return predictedBall;
     }
@@ -3872,7 +3878,7 @@ Vector2D DefensePlan::strictFollowBall(Vector2D _ballPos) {
             }
         }
         if(!wm->field->isInField(target) || target.x < -5.9){
-            target = know->getPointInDirection(wm->field->ourGoal() , wm->ball->pos , 0.25);
+            target = know->getPointInDirection(wm->field->ourGoal() , wm->ball->pos , 0.35);
         }
     }
     lastTargetForStrictFollow = target;
