@@ -1719,7 +1719,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             dangerForGoalKeeperClear = false;
             goalKeeperPredictionModeInPlayOff = true;
             DBUG(QString("Their Indirect") , D_AHZ);
-            oppPasser = wm->opp[know->nearestOppToBall()]->pos; //todo: move to wm
+//            oppPasser = wm->opp[know->nearestOppToBall()]->pos; //todo: move to wm
             if(gameState->theirIndirectKick()){
                 goalKeeperTarget = wm->field->ourGoal() + goalKeeperTargetOffSet;
             }
