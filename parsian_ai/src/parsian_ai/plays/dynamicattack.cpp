@@ -383,10 +383,8 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         ROS_INFO("MAHI : 5");
 
         chooseReceiverAndBestPosForPass();
-    }    ROS_INFO("MAHI : 6");
 
-
-    ROS_INFO("MAHI : 7");
+    }
 
     assignTasks();
     ROS_INFO("MAHI");
@@ -963,7 +961,6 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
 
         validateSegment(recieveSegment);
         double angle = 0, biggestAngle = 0, prob = 0;
-
         CKnowledge::getEmptyAngle(*wm->field, playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
         points.append(recieveSegment.intersection(Line2D(playmake->pos(), angle)));
         probs.append(prob);
@@ -1853,7 +1850,6 @@ double CDynamicAttack::calcReceiverDistanceFactor(Vector2D point, int passReceiv
 
     return 1.0 - (wm->our[passReceiverID]->pos - point).length()/
                  (regions[region_id/3][region_id%3].rectangle.topLeft() - regions[region_id/3][region_id%3].rectangle.bottomRight()).length();
-
 }
 
 double CDynamicAttack::calcSenderDistanceFactor(Vector2D passSenderPos, Vector2D point)
@@ -2084,7 +2080,6 @@ void CDynamicAttack::validateSegment(Segment2D &seg) {
         seg.assign(seg.a(), t);
         mid = (seg.a() + seg.b()) / 2;
     }
-
 }
 
 bool CDynamicAttack::inTimePlan() {
