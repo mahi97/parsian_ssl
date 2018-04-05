@@ -79,8 +79,9 @@ void CRolePlayOff::update() {
         oneTouchSkill->setWaitpos(waitPos);
         oneTouchSkill->setChip(false);
         oneTouchSkill->setShottoemptyspot(false);
-        oneTouchSkill->setKickdischargetime(kickSpeed);
-        oneTouchSkill->setIskickdischargetime(true);
+        oneTouchSkill->setKickspeed(normalSpeed);
+//        oneTouchSkill->setKickdischargetime(kickSpeed);
+        oneTouchSkill->setIskickdischargetime(false); // true bud ba khat bala comment shod
         updated = false;
         break;
     case RoleSkill::ReceivePass:
@@ -111,7 +112,6 @@ void CRolePlayOff::execute() {
         break;
     case RoleSkill::Kick:
         agent->action = kickSkill;
-        DBUG(QString("[playoffrole] kickEXE : %2").arg(kickSpeed), D_MAHI);
         break;
     case RoleSkill::Mark:
         break;
@@ -143,16 +143,13 @@ int CRolePlayOff::getElapsed() const {
 }
 
 double CRolePlayOff::normalaizeKickSpeed() {
-    double normalSpeed;
+    double normalSpeed = 0;
 
-    if (kickSpeed >= 0 && kickSpeed <= 6.5)
-        normalSpeed = kickSpeed;
-    else if (kickSpeed > 6.5 && kickSpeed <= 12)
-        normalSpeed = 6.5;
-    else if (kickSpeed > 10 && kickSpeed <= 650)
-        normalSpeed = ((double) kickSpeed) / 100.0;
-    else if (kickSpeed > 650)
-        normalSpeed = 6.5;
+    if (kickSpeed < 0)          normalSpeed = 0;
+    else if (kickSpeed <= 6.5)  normalSpeed = kickSpeed;
+    else if (kickSpeed <= 12)   normalSpeed = 6.5;
+    else if (kickSpeed <= 650)  normalSpeed = kickSpeed / 100.0;
+    else if (kickSpeed > 650)   normalSpeed = 6.5;
 
     return normalSpeed;
 }
