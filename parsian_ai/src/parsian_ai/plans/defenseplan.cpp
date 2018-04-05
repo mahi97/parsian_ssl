@@ -2286,7 +2286,30 @@ void DefensePlan::execute(){
     drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
     drawer->draw(getLinesOfBallTriangle().at(0));
     drawer->draw(getLinesOfBallTriangle().at(1));
-    PDEBUG("needed defens =" , findNeededDefense() , D_AHZ);
+    if(gameState->isStart()){
+        drawer->draw("START" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->isStop()){
+        drawer->draw("STOP" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->theirKickoff()){
+        drawer->draw("THEIR KICK OFF" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->ourKickoff()){
+        drawer->draw("OUR KICK OFF" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->theirIndirectKick()){
+        drawer->draw("THEIR INDIRECT" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->ourIndirectKick()){
+        drawer->draw("OUR INDIRECT" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->theirDirectKick()){
+        drawer->draw("THEIR DIRECT" , Vector2D(-6.2 , 3) , 30);
+    }
+    else if(gameState->ourDirectKick()){
+        drawer->draw("OUR DIRECT" , Vector2D(-6.2 , 3) , 30);
+    }
     ballPosHistory.prepend(Vector2D(wm->ball->pos.x, wm->ball->pos.y));
     if (ballPosHistory.count() > 7){
         ballPosHistory.removeLast();
@@ -2739,7 +2762,7 @@ void DefensePlan::executeGoalKeeper() {
     //// function. In this function also like the other functions for goalkeeper,
     //// we have some mode for handling the goalkeeper behavior.
 
-    playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick();
+    playOffMode = gameState->theirDirectKick()  || gameState->theirIndirectKick() || gameState->kickoff();
     playOnMode = gameState->isStart();
     stopMode = gameState->isStop();
     QList<Vector2D> tempSol;
