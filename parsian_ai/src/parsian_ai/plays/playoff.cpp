@@ -320,7 +320,7 @@ void CPlayOff::dynamicPlayChipToGoal(bool isChip) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(isChip);
-        double speed = 1023;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
+        double speed = 6.5;//knowledge->getProfile(roleAgent[0]->getAgentID(), roleAgent[0]->getAgent()->pos().dist(wm->field->oppGoal()), false, false); TODO
         roleAgent[0] -> setKickSpeed(speed); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
@@ -401,7 +401,7 @@ void CPlayOff::dynamicPlayKhafan() {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
         roleAgent[0] -> setChip(true);
-        roleAgent[0] -> setKickSpeed(1023); // Vartypes This
+        roleAgent[0] -> setKickSpeed(6.5); // Vartypes This
         roleAgent[0] -> setTarget(wm->field->oppGoal());
         roleAgent[0] -> setDoPass(false);
         roleAgent[0] -> setIntercept(false);
