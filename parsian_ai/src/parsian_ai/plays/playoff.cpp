@@ -456,6 +456,7 @@ void CPlayOff::dynamicPlayKhafan() {
 
 
 void CPlayOff::checkEndKhafan() {
+    ROS_INFO_STREAM("TIMENS: "<< ros::Time::now().sec << " TIMES: "<< ros::Time::now().sec);
     if (ready) {
         dynamicState = 2;
     } else if (pass) {
@@ -473,7 +474,8 @@ void CPlayOff::checkEndKhafan() {
     }
 
     if (dynamicState == 4) {
-        DBUG(QString("[dastan] : %1").arg(ros::Time::now().sec - dynamicStartTime), D_MAHI);
+
+        DBUG(QString("ENDKHAFAN : %1").arg(ros::Time::now().sec - dynamicStartTime), D_MAHI);
         if (wm->ball->pos.dist(wm->field->oppGoal()) - 0.5 < roleAgent[1]->getAgent()->pos().dist(wm->field->oppGoal())) {
             pass = false;
             shot = true;
@@ -488,7 +490,7 @@ void CPlayOff::checkEndKhafan() {
             dynamicState = 0;
         }
 
-        if ((ros::Time::now().sec - dynamicStartTime) > 300 && dynamicStartTime != -1) {
+        if ((ros::Time::now().sec - dynamicStartTime) > 3 && dynamicStartTime != -1) {
             playOnFlag = true;
             dynamicState = 0;
 
@@ -505,7 +507,7 @@ void CPlayOff::checkEndKhafan() {
         }
         DBUG(QString("[dastan] : %1").arg(ros::Time::now().sec - dynamicStartTime), D_MAHI);
 
-        if (ros::Time::now().sec - dynamicStartTime > 200 && dynamicStartTime != -1) {
+        if (ros::Time::now().sec - dynamicStartTime > 2 && dynamicStartTime != -1) {
             playOnFlag = true;
             dynamicState = 0;
 
@@ -544,7 +546,7 @@ void CPlayOff::checkEndBlocker() {
             dynamicState = 0;
         }
 
-        if (ros::Time::now().sec - dynamicStartTime > 300 && dynamicStartTime != -1) {
+        if (ros::Time::now().sec - dynamicStartTime > 3 && dynamicStartTime != -1) {
             playOnFlag = true;
             dynamicState = 0;
         }
@@ -576,7 +578,7 @@ void CPlayOff::checkEndChipToGoal() {
             dynamicState = 0;
         }
 
-        if (ros::Time::now().sec - dynamicStartTime > 200 && dynamicStartTime != -1) {
+        if (ros::Time::now().sec - dynamicStartTime > 2 && dynamicStartTime != -1) {
             playOnFlag = true;
             dynamicState = 0;
         }
@@ -2284,7 +2286,7 @@ bool CPlayOff::criticalPlay() {
         criticalKick->setTolerance(0.5);
     }
 //    soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)]->action = criticalKick;
-    soccer->agents[masterPlan->execution.passer[0].id]->action = criticalKick;
+    soccer->agents[masterPlan->execution.passer.at(0).id]->action = criticalKick;
     return wm->ball->vel.length() > 0.5;
 
 }
