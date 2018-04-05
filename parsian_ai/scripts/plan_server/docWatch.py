@@ -259,9 +259,12 @@ class Handler(FileSystemEventHandler):
         DIRECT = 1
         INDIRECT = 2
         KICKOFF = 3
+
+        planSize = self.plan_size(plan)
+
         if self.circle_contains(ball_x, ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             # print("Ball Pos Matched")
-            if len(plan["agentInitPos"]) >= player_num \
+            if planSize >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
                              (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
@@ -269,13 +272,20 @@ class Handler(FileSystemEventHandler):
                 return True
         if self.circle_contains(ball_x, -ball_y, rad, plan["ballInitPos"]["x"], plan["ballInitPos"]["y"]):
             # print("Ball Symm Pos Matched")
-            if len(plan["agentInitPos"]) >= player_num \
+            if planSize >= player_num \
                     and plan["chance"] > 0 and plan["lastDist"] >= 0 \
                     and (plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or
                              (plan_mode == INDIRECT and plan["planMode"] == DIRECT)):
                 plan["symmetry"] = True
                 return True
         return False
+
+    def plan_size(self, plan):
+        i = 0
+        for pos in plan["agentInitPos"]:
+            if pos["x"] != -100:
+                i += 1
+        return i+1
 
     def nearest_plan(self, player_num, ball_x, ball_y, plan_mode):
         DIRECT = 1
@@ -285,7 +295,8 @@ class Handler(FileSystemEventHandler):
         player_num_filter = []
 
         for plan in self.__final_dict:
-            if len(plan["agentInitPos"]) >= player_num:
+            planAgentSize = self.plan_size(plan)
+            if planAgentSize >= player_num:
                 player_num_filter.append(plan)
 
         active_list = self.get_master_active_plans(player_num_filter)
@@ -296,7 +307,8 @@ class Handler(FileSystemEventHandler):
         subsublist = []
         if len(sublist) > 0:
             for plan in sublist:
-                if plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT):
+                if plan["planMode"] == plan_mode or (plan_mode == DIRECT and plan["planMode"] == INDIRECT) or\
+                        (plan_mode == INDIRECT and plan["planMode"] == DIRECT):
                     subsublist.append(plan)
 
         if len(subsublist) > 0:
@@ -381,7 +393,7 @@ class Handler(FileSystemEventHandler):
         plan_gui_msg.isActive = plan_dict["isActive"]
         plan_gui_msg.isMaster = plan_dict["isMaster"]
         plan_gui_msg.planFile = plan_dict["filename"]
-        plan_gui_msg.agentSize = len(plan_dict["agentInitPos"])
+        plan_gui_msg.agentSize = self.plan_size(plan_dict)
         plan_gui_msg.chance = plan_dict["chance"]
         plan_gui_msg.lastDist = plan_dict["lastDist"]
         plan_gui_msg.tags = plan_dict["tags"]
@@ -398,7 +410,7 @@ class Handler(FileSystemEventHandler):
         plan_msg.isActive = plan_dict["isActive"]
         plan_msg.isMaster = plan_dict["isMaster"]
         plan_msg.planFile = plan_dict["filename"]
-        plan_msg.agentSize = len(plan_dict["agentInitPos"])
+        plan_msg.agentSize = self.plan_size(plan_dict)
         plan_msg.chance = plan_dict["chance"]
         plan_msg.lastDist = plan_dict["lastDist"]
         plan_msg.tags = plan_dict["tags"]

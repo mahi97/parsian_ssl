@@ -78,7 +78,7 @@ void CPlayOff::globalExecute() {
     if (masterMode == NGameOff::StaticPlay) {
 
         DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) < 0.06) {
+        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) <= 0.05) {
             if (criticalPlay()) {
                 ROS_INFO("criticalPlay set playon flag");
                 playOnFlag = true;
@@ -1244,7 +1244,7 @@ bool CPlayOff::isTimeOver() {
         tempStart = ros::Time::now().sec;
     }
 
-    if (!Circle2D(lastBallPos, 0.5).contains(wm->ball->pos)) {
+    if (!Circle2D(lastBallPos, 0.06).contains(wm->ball->pos)) {
         setTimer = false;
         ROS_INFO_STREAM("MAHIS: Time That Left: " << ros::Time::now().sec - tempStart);
         if(ros::Time::now().sec - tempStart >= 3*masterPlan->execution.passCount) { // 2 Second
@@ -1344,8 +1344,8 @@ Vector2D CPlayOff::getEmptyTarget(const Vector2D& _position, const double& _radi
 }
 ///////////////PassManager///////////////////
 void CPlayOff::passManager() {
-    const AgentPoint &p = masterPlan->execution.passer.at(0);
     const AgentPoint &r = masterPlan->execution.reciver.at(0);
+    const AgentPoint &p = masterPlan->execution.passer.at(0);
 
     const int &i = masterPlan->common.matchedID.value(r.id);
 
@@ -1409,24 +1409,29 @@ void CPlayOff::checkEndState() {
         if (roleAgent[i]->getAgent() == nullptr) {
             continue;
         }
-        if (isTaskDone(roleAgent[i])) {
+
+        Agent *firstPasser = soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)];
+
+        if (isTaskDone(roleAgent[i]) || (doAfterlife && roleAgent[i]->getAgent()->id() != firstPasser->id())) {
 
             roleAgent[i]->setRoleUpdate(false);
             roleAgent[i]->resetTime();
 
-            POffSkills temp_skill = positionAgent[i].positionArg.at(positionAgent[i].positionArg.size() - 1).staticSkill;
+            POffSkills last_skill = positionAgent[i].positionArg.at(
+                    positionAgent[i].positionArg.size() - 1).staticSkill;
 
-            if (doAfterlife && temp_skill == Position ){
-
+            if (last_skill == Position) {
+                if (!doAfterlife && positionAgent[i].stateNumber == positionAgent[i].positionArg.size() - 2) {
+                    roleAgent[i]->setRoleUpdate(true);
+                } else if (doAfterlife){
                     positionAgent[i].stateNumber = positionAgent[i].positionArg.size() - 1;
-                    ROS_INFO_STREAM("after_life " << roleAgent[i]->getAgent()->id());
-
-            } else if (positionAgent[i].stateNumber + 1  < positionAgent[i].positionArg.size()) {
+                }
+            } else if (positionAgent[i].stateNumber + 1 < positionAgent[i].positionArg.size()) {
                 if (positionAgent[i].getArgs(1).staticSkill == Defense
-                        ||  positionAgent[i].getArgs(1).staticSkill == Support
-                        ||  positionAgent[i].getArgs(1).staticSkill == Position
-                        ||  positionAgent[i].getArgs(1).staticSkill == Goalie
-                        ||  positionAgent[i].getArgs(1).staticSkill == Mark) {
+                    || positionAgent[i].getArgs(1).staticSkill == Support
+                    || positionAgent[i].getArgs(1).staticSkill == Position
+                    || positionAgent[i].getArgs(1).staticSkill == Goalie
+                    || positionAgent[i].getArgs(1).staticSkill == Mark) {
 
                     if (doAfterlife) {
                         positionAgent[i].stateNumber++;
