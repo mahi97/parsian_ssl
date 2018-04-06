@@ -1821,10 +1821,12 @@ int CCoach::findGoalie() {
     } else {
         if (conf.GoalieFromGUI) {
             preferedGoalieID = conf.Goalie;
-        } else {
+        } else if (wm->our.data->activeAgents.contains(wm->our.data->goalieID)){
             preferedGoalieID = wm->our.data->goalieID;
             ROS_INFO_STREAM("check goaliID from wm : " << preferedGoalieID);
 
+        } else {
+            preferedGoalieID = -1;
         }
     }
     if (gameState->timeOut() || gameState->halfTime()) {
