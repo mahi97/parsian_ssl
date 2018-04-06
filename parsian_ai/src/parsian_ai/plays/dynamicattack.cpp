@@ -444,16 +444,16 @@ void CDynamicAttack::dynamicPlanner(int agentSize) {
         mahiAgentsID[i] = -1;
     }
 
-        makePlan(agentSize);
+    makePlan(agentSize);
 
-    if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
+//    if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
         chooseBestPositons_new();
 
         assignId_new();
 
-        chooseReceiverAndBestPosForPass();
-
-    }
+//        chooseReceiverAndBestPosForPass();
+//
+//    }
 
     assignTasks();
     for(size_t i = 0;i < currentPlan.agentSize;i++) {
@@ -1624,7 +1624,8 @@ void CDynamicAttack::createRegions()
     for(int i{0}; i<3; i++)
     {
         row0.push_back(Rect2D(Vector2D(2*i,4.5), 2, 2.8));
-        row1.push_back(Rect2D(Vector2D(2*i,1.7), 2, 3.4));
+        if (i == 2) row1.push_back(Rect2D(Vector2D(2*i - 0.7,1.7), 2, 3.4));
+        else row1.push_back(Rect2D(Vector2D(2*i,1.7), 2, 3.4));
         row2.push_back(Rect2D(Vector2D(2*i,-1.7), 2, 2.8));
     }
     rectangles.push_back(row0);
