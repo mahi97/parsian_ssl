@@ -75,17 +75,16 @@ bool CPlayOff:: isBlockDisturbing() {
 
 void CPlayOff::globalExecute() {
 
-    if (masterMode == NGameOff::StaticPlay) {
-
-        DBUG(QString("lastTime : %1").arg(ros::Time::now().sec - lastTime), D_MAHI);
-        if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) <= 0.05) {
-            if (criticalPlay()) {
-                ROS_INFO("criticalPlay set playon flag");
-                playOnFlag = true;
-            }
-            return;
+    if (!initial && ros::Time::now().sec - lastTime > 10 && lastBallPos.dist(wm->ball->pos) <= 0.06) {
+        qDebug()<< "nkmiujgt5fr4";
+        if (criticalPlay()) {
+            playOnFlag = true;
         }
+        return;
+    } else
+        ROS_INFO_STREAM("llastTime: " <<ros::Time::now().sec - lastTime<<" masterMode: "<< masterMode <<" balldist: "<<lastBallPos.dist(wm->ball->pos) );
 
+    if (masterMode == NGameOff::StaticPlay) {
 
         if (masterPlan != nullptr) {
             DBUG(QString("Plan Number : %1 ==> ").arg(masterPlan->gui.planFile), D_MAHI);
@@ -278,6 +277,8 @@ void CPlayOff::kickoffPositioning(int playersNum) {
 
 void CPlayOff::dynamicExecute() {
 
+    ROS_INFO_STREAM("dynamicSelect: "<<dynamicSelect);
+
     if (dynamicSelect == CHIP && false) {
         dynamicPlayChipToGoal(true);
         checkEndChipToGoal();
@@ -299,6 +300,10 @@ void CPlayOff::dynamicExecute() {
 
 
 void CPlayOff::dynamicAssignID() {
+    lastTime = ros::Time::now().sec;
+    lastBallPos = wm->ball->pos;
+    initial = false;
+
     dynamicAgentSize = _NUM_PLAYERS;
     for (int i = 0; i < _NUM_PLAYERS; i++) {
         if (dynamicMatch[i] != -1) {
@@ -353,7 +358,6 @@ void CPlayOff::dynamicPlayBlocker() {
     if (initial) {
         dynamicAssignID();
         ready = true;
-
     } else if (ready) {
         roleAgent[0] -> setAvoidCenterCircle(false);
         roleAgent[0] -> setAvoidPenaltyArea(true);
@@ -2276,17 +2280,31 @@ void CPlayOff::analysePass() {
 
 bool CPlayOff::criticalPlay() {
 
+    ROS_INFO("criticalll");
     if (criticalInit) {
         criticalInit = false;
         criticalKick->setTarget(wm->field->oppGoal());
-        criticalKick->setChip(false);
+        criticalKick->setChip(wm->ball->pos.x < 1);
         criticalKick->setDontkick(false);
         criticalKick->setPassprofiler(false);
         criticalKick->setKickspeed(6.5);
+        criticalKick->setChipdist(4);
         criticalKick->setTolerance(0.5);
     }
 //    soccer->agents[masterPlan->common.matchedID.value(masterPlan->execution.passer.at(0).id)]->action = criticalKick;
-    soccer->agents[masterPlan->execution.passer.at(0).id]->action = criticalKick;
+    double minDist = 100;
+    int nearestID = -1;
+    for(int i=0; i< 8; i++) {
+        if(soccer->agents[i] != nullptr){
+            if(soccer->agents[i]->pos().dist(wm->ball->pos) < minDist){
+                nearestID = i;
+                minDist = soccer->agents[i]->pos().dist(wm->ball->pos);
+            }
+        }
+    }
+    if(nearestID != -1){
+        soccer->agents[nearestID]->action = criticalKick;
+    }
     return wm->ball->vel.length() > 0.5;
 
 }
