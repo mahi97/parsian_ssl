@@ -2234,7 +2234,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
         //////////////// Avoid Penalty Area ///////////////////////
-        if(wm->field->ourBigPenaltyArea(1,0.01,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
+        if(wm->field->ourBigPenaltyArea(1,0.02,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
             matchPoints[matchResult[i]] = avoidCircularPenaltyAreaByMasoud(ourAgents[i], matchPoints[matchResult[i]]);
         }
         ////////////////////////////////////////////////////////////
