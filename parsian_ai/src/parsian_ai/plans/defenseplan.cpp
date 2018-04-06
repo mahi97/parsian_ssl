@@ -1674,7 +1674,7 @@ void DefensePlan::setGoalKeeperTargetPoint() {
     tempSol.clear();
     ballRectanglePoints.clear();
     ///////////////////////////////////////////////////////////////////////////
-    if (goalKeeperAgent != nullptr) {
+    if (goalKeeperAgent != nullptr && goalKeeperAgent->id() != -1) {
         ballPos = wm->ball->pos;
         ballVel = wm->ball->vel;
         predictedBall = ballPos + ballVel;
@@ -2290,9 +2290,9 @@ void DefensePlan::execute(){
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    gpa[goalKeeperAgent->id()]->setOnetouchflag(false);
-    gpa[goalKeeperAgent->id()]->setChip(false);
-    stopMode = gameState->isStop();    
+    //gpa[goalKeeperAgent->id()]->setOnetouchflag(false);
+   // gpa[goalKeeperAgent->id()]->setChip(false);
+    stopMode = gameState->isStop();
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
     drawer->draw(getLinesOfBallTriangle().at(0));
@@ -2801,7 +2801,7 @@ void DefensePlan::executeGoalKeeper() {
         }
         //goalKeeperTarget = ballRectanglePoints.at(0).dist(goalKeeperAgent->pos()) < ballRectanglePoints.at(1).dist(goalKeeperAgent->pos()) ? ballRectanglePoints.at(0) : ballRectanglePoints.at(1);
     }
-    if (goalKeeperAgent != nullptr) {
+    if (goalKeeperAgent != nullptr && goalKeeperAgent->id() != -1) {
         DBUG(QString("goalKeeper clear mode : %1").arg(know->variables["goalKeeperClearMode"].toBool()) , D_AHZ);
         DBUG(QString("goalKeeper oneTouch mode : %1").arg(know->variables["goalKeeperOneTouchMode"].toBool()) , D_AHZ);
         if (playOffMode) {

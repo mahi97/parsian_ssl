@@ -982,7 +982,7 @@ void CSkillKick::execute() {
 
 
     if(kickerOn) {
-        agent->setRoller(3);
+        agent->setRoller(spin);
     } else {
         agent->setRoller(0);
     }
