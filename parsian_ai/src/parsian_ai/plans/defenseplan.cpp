@@ -1971,9 +1971,11 @@ void DefensePlan::setGoalKeeperTargetPoint() {
             ////////////// Danger Mode for out of the penalty area /////////////
             if (wm->our.activeAgentsCount() > 0 || wm->opp.activeAgentsCount() > 0) {
                 for (int i = 0; i < wm->our.activeAgentsCount() ; i++) {
-                    if (wm->our.active(i)->id != goalKeeperAgent->id()) {
-                        if (dangerCircle.contains(wm->our.active(i)->pos)) {
-                            isCrowdedInFrontOfPenaltyAreaByOurAgents = true;
+                    if(goalKeeperAgent->id() != -1) {
+                        if (wm->our.active(i)->id != goalKeeperAgent->id()) {
+                            if (dangerCircle.contains(wm->our.active(i)->pos)) {
+                                isCrowdedInFrontOfPenaltyAreaByOurAgents = true;
+                            }
                         }
                     }
                 }
@@ -2290,8 +2292,6 @@ void DefensePlan::execute(){
     ///// points && our agents in defense plan.
 
     int realDefSize = 0;
-    //gpa[goalKeeperAgent->id()]->setOnetouchflag(false);
-   // gpa[goalKeeperAgent->id()]->setChip(false);
     stopMode = gameState->isStop();
     suitableRadius = RADIUS_FOR_CRITICAL_DEFENSE_AREA;
     drawer->draw(Circle2D(wm->field->ourGoal() , suitableRadius) , 0 , 180 , "blue" , false);
