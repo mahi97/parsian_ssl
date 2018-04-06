@@ -2223,7 +2223,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
     for (int i = 0 ; i < defenseCount && i < matchPoints.size(); i++) {
         defensePoints[i] = matchPoints[i];
     }
-    for (int i = 0 ; i < matchPoints.count() && i < matchResult.count() ; i++) {
+    for(int i = 0 ; i < matchPoints.count() && i < matchResult.count() ; i++){
         gpa[ourAgents[i]->id()]->clearOurrelax();
         gpa[ourAgents[i]->id()]->clearTheirrelax();
 
@@ -2232,6 +2232,9 @@ void DefensePlan::matchingDefPos(int _defenseNum){
                 gpa[ourAgents[i]->id()]->addOurrelax(ourAgents[j]->id());
             }
         }
+        for(int k = 0 ; k < wm->opp.activeAgentsCount() ; k++){
+            gpa[ourAgents[i]->id()]->addTheirrelax(ourAgents[k]->id());
+        }
         assignSkill(ourAgents[i] , gpa[ourAgents[i]->id()]);
         //////////////// Avoid Penalty Area ///////////////////////
         if(wm->field->ourBigPenaltyArea(1,0.05,0).intersection(Segment2D(ourAgents.at(i)->pos() , matchPoints.at(matchResult.at(i))) , &sol[0] , &sol[1])){
@@ -2239,7 +2242,7 @@ void DefensePlan::matchingDefPos(int _defenseNum){
         }
         ////////////////////////////////////////////////////////////
         drawer->draw(Circle2D(matchPoints[matchResult[i]] , 0.05) , 0 , 360 , "black" , true);
-        gpa[ourAgents[i]->id()]->setNoavoid(true);
+        gpa[ourAgents[i]->id()]->setNoavoid(false);
         gpa[ourAgents[i]->id()]->setSlowmode(false);
         gpa[ourAgents[i]->id()]->setDivemode(false);
         gpa[ourAgents[i]->id()]->setOnetouchmode(false);
@@ -2251,18 +2254,18 @@ void DefensePlan::matchingDefPos(int _defenseNum){
             gpa[ourAgents[i]->id()]->setDivemode(false);
             gpa[ourAgents[i]->id()]->setOnetouchmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
-            gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
+            gpa[ourAgents[i]->id()]->setBallobstacleradius(0.8);
         }
         else if(stopMode){
-            gpa[ourAgents[i]->id()]->setNoavoid(true);
+            gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(true);
             gpa[ourAgents[i]->id()]->setDivemode(false);
             gpa[ourAgents[i]->id()]->setOnetouchmode(false);
             gpa[ourAgents[i]->id()]->setAvoidpenaltyarea(false);
-            gpa[ourAgents[i]->id()]->setBallobstacleradius(0.5);
+            gpa[ourAgents[i]->id()]->setBallobstacleradius(0.8);
         }
         else{
-            gpa[ourAgents[i]->id()]->setNoavoid(true);
+            gpa[ourAgents[i]->id()]->setNoavoid(false);
             gpa[ourAgents[i]->id()]->setSlowmode(false);
             gpa[ourAgents[i]->id()]->setDivemode(false);
             gpa[ourAgents[i]->id()]->setOnetouchmode(false);
