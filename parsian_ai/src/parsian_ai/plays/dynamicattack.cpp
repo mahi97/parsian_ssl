@@ -440,42 +440,21 @@ void CDynamicAttack::assignTasks() {
  * @param agentSize number of positioning Agents
  */
 void CDynamicAttack::dynamicPlanner(int agentSize) {
-    ROS_INFO("MAHI : 1");
     for (size_t i = 0; i < 8; i++) {
         mahiAgentsID[i] = -1;
     }
-    ROS_INFO("MAHI : 2");
 
-    if (inTimePlan()) {
         makePlan(agentSize);
-    }
-    ROS_INFO("MAHI : 3");
 
     if (agentSize > 0 && (lastAgentCount != agentSize || isPlayMakeChanged())) {
         chooseBestPositons_new();
-        ROS_INFO("MAHI : 4");
 
         assignId_new();
-        ROS_INFO("MAHI : 5");
 
         chooseReceiverAndBestPosForPass();
 
     }
 
-    if(isInpass())
-    {
-        ROS_INFO_STREAM("ispassed" << playmakeIntention.elapsed());
-        playmakeIntention.restart();
-    }
-    if(playmakeIntention.elapsed() > 1000 || playmake == nullptr)
-    {
-        PMfromCoach = true;
-    }
-    if(playmakeIntention.elapsed() <= 1000 && playmake != nullptr)
-    {
-        PMfromCoach = false;//change to false later
-        ROS_INFO_STREAM("playmake PMfromCoach is false");
-    }
     assignTasks();
     for(size_t i = 0;i < currentPlan.agentSize;i++) {
         if(mahiAgentsID[i] >= 0) {
@@ -552,7 +531,7 @@ void CDynamicAttack::playMake() {
                 }
             } else if (currentPlan.playmake.region == DynamicRegion ::Forward) {
 //                roleAgentPM->setTarget(move_fwd_target);
-                roleAgentPM->setTarget(Vector2D(1000, 0));
+                roleAgentPM->setTarget(wm->field->oppGoal());
                 roleAgentPM->setChip(false);
                 roleAgentPM->setKickSpeed(conf.LowDistChip);
             } else {

@@ -589,8 +589,6 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst){
         playMakeIntention.restart();
         return;
     }
-    playmakeId = 5;
-    return;
     QList<int> ourPlayers = wm->our.data->activeAgents;
     if(ourPlayers.contains(preferedGoalieID)) {
         ourPlayers.removeOne(preferedGoalieID);
@@ -661,7 +659,6 @@ void CCoach::choosePlaymakeAndSupporter(bool defenseFirst){
 
 void CCoach::decideAttack() {
     // find unused agents!
-    ROS_INFO("MAJH-1");
 
     QList<int> ourPlayersID = workingIDs;
     if (goalieAgent != nullptr) {
@@ -672,7 +669,6 @@ void CCoach::decideAttack() {
             ourPlayersID.removeOne(defenseAgent->id());
         }
     }
-    ROS_INFO("MAJH0");
 
     switch (gameState->getState()) { // GAMESTATE
 
@@ -750,7 +746,6 @@ void CCoach::decideAttack() {
 
     selectedPlay->init(ourAgents);
     selectedPlay->execute();
-    ROS_INFO("MAJHxx");
 
     lastPlayers.clear();
     lastPlayers.append(ourPlayersID);
