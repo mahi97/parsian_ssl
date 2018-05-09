@@ -68,23 +68,16 @@ void CNewBangBang::trajectoryPlanner() {
 }
 void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2D _agentDir, Vector2D _pos2, Vector2D _dir2, double _V2, double dt, double & _Vx, double & _Vy, double & _W) {
     ///Lhum
-    QFile f("./a.txt");
+    QFile f("./PID.txt");
     f.open(QIODevice::ReadOnly);
     QByteArray b = f.readAll();
-    QList<QByteArray> l = b.split('\n');
+    QList<QByteArray> l = b.split(' ');
     bool ok = false;
-    static double a[5];
-    static int t = 100000005;
-    if(t > 100000000){
-        for(int i = 0 ; i < 3 ; i++)
-            a[i] = l.at(i).toDouble(&ok);
-        t = 0;
-    }
-    else
-        t++;
-    angPid->kp = a[0];
-    angPid->ki = a[1];
-    angPid->kd = a[2];
+    double a[5];
+    a[0] = 2;
+    for(int i = 1 ; i < 3 ; i++)
+        a[i] = l.at(i).toDouble(&ok);
+    //angPid->kp = a[0];
     f.close();
     ///Lhum
     pos2 = _pos2;
@@ -95,7 +88,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     currentVel = agentVel.length();
     agentDir = _agentDir;
     movementTh = pos2 - agentPos;
-    /*if (angPath) {
+    if (angPath) {
         if (angKp) {
             angPid->kp = angKp;
         } else {
@@ -103,7 +96,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
         }
     } else {
         angPid->kp = 3;
-    }*////Lhum
+    }///Lhum
     angPid->error = (dir2.th() -  agentDir.th()).radian();
     agentMovementTh = movementTh.th();
 
