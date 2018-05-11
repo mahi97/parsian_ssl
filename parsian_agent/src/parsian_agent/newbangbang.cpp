@@ -68,7 +68,7 @@ void CNewBangBang::trajectoryPlanner() {
 }
 void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2D _agentDir, Vector2D _pos2, Vector2D _dir2, double _V2, double dt, double & _Vx, double & _Vy, double & _W) {
     ///Lhum
-    QFile f("./PID.txt");
+ /*   QFile f("./PID.txt");
     f.open(QIODevice::ReadOnly);
     QByteArray b = f.readAll();
     QList<QByteArray> l = b.split(' ');
@@ -80,6 +80,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     //angPid->kp = a[0];
     f.close();
     ///Lhum
+    */
     pos2 = _pos2;
     dir2 = _dir2;
     Vel2 = _V2;
@@ -97,7 +98,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     } else {
         angPid->kp = 3;
     }///Lhum
-    angPid->error = (dir2.th() -  agentDir.th()).radian();
+    angPid->error = (dir2.th() - agentDir.th()).radian();
     agentMovementTh = movementTh.th();
 
     if (oneTouch || diveMode) {
