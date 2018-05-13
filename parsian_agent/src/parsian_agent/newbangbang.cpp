@@ -66,21 +66,34 @@ void CNewBangBang::trajectoryPlanner() {
 
     thPid->pError = thPid->error;
 }
+
+#include <QDir>
 void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2D _agentDir, Vector2D _pos2, Vector2D _dir2, double _V2, double dt, double & _Vx, double & _Vy, double & _W) {
     ///Lhum
- /*   QFile f("./PID.txt");
-    f.open(QIODevice::ReadOnly);
+    ROS_INFO_STREAM("BANGBANG" << QDir::currentPath().toStdString());
+    QFile f("./script/elham/PID.txt");
+    f.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    //ROS_INFO_STREAM("text:->" << QString(f.readAll()).toStdString() << "<-");
+   /* while (!f.atEnd()) {
+        QByteArray line = f.readLine();
+        QStringList l = QString(line).split(',');
+        a[i++] = l[0].toDouble();
+        ROS_INFO_STREAM(a[i - 1]);
+    }*/
     QByteArray b = f.readAll();
     QList<QByteArray> l = b.split(' ');
     bool ok = false;
     double a[5];
-    a[0] = 2;
-    for(int i = 1 ; i < 3 ; i++)
+    for(int i = 0 ; i < 3 ; i++) {
         a[i] = l.at(i).toDouble(&ok);
+        ROS_INFO_STREAM(a[i]);
+    }
+    drawer->draw(Vector2D(a[0] , a[0]) , "red");
     //angPid->kp = a[0];
     f.close();
+
     ///Lhum
-    */
     pos2 = _pos2;
     dir2 = _dir2;
     Vel2 = _V2;
@@ -89,7 +102,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     currentVel = agentVel.length();
     agentDir = _agentDir;
     movementTh = pos2 - agentPos;
-    if (angPath) {
+    /*if (angPath) {
         if (angKp) {
             angPid->kp = angKp;
         } else {
@@ -97,7 +110,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
         }
     } else {
         angPid->kp = 3;
-    }///Lhum
+    }*////Lhum
     angPid->error = (dir2.th() - agentDir.th()).radian();
     agentMovementTh = movementTh.th();
 
@@ -169,7 +182,9 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     _Vy =  desiredVy;//(vDes)*sin(appliedTh);
     _W = angPid->PID_OUT();
     DEBUG(QString("v1: %1 ").arg(_W), D_MHMMD);
-
+    angPid->kp = a[0];
+    angPid->ki = a[1];
+    angPid->kd = a[2];
     lastVx = _Vx;
     lastVy = _Vy;
     angPid->pError = angPid->error;
