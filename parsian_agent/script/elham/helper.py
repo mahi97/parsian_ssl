@@ -7,9 +7,6 @@ from parsian_msgs.msg import parsian_skill_gotoPoint
 from parsian_msgs.msg import vector2D
 import random
 
-def f(x, y):
-    return x * y
-
 def GTPA(pub):
     task = parsian_robot_task()
     task.select = parsian_robot_task.GOTOPOINTAVOID
@@ -20,23 +17,27 @@ def GTPA(pub):
     task.gotoPointAvoidTask = setTask
     pub.publish(task)
 
+
 def SA(t):
-    PID = open("PID1.txt", "w")
+    All = open("All.txt", "w")
     with open('PID.txt') as f:
         array = []
         for line in f:
-            array.append([int(x) for x in line.split()])
+            array = [int(x) for x in line.split()]
     with open('result.txt') as r:
-        result = []
+        r = []
         for line in r:
-           result.append([int(x) for x in line.split()])
-    neighbor = int(random.randint(1 , 8))
-    array[0] = array[0] + pow(-1 , (neighbor % 2) + 1)
-    array[1] = array[1] + pow(-1 , (int(neighbor / 2) % 2) + 1)
-    array[2] = array[2] + pow(-1 , (int(neighbor / 4) % 2) + 1)
-    PID.write(str(array))
-    PID.write(str(neighbor))
+           r = [int(x) for x in line.split()]
+    PID = open("PID.txt", "w")
+    neighbor = int(random.randint(1 , 6))
+    array[int(neighbor / 2)] = array[int(neighbor / 2)] + (-1) ** ((neighbor % 2) + 1)
+    PID.write(array)
+    for x in array:
+        PID.write(str(x))
+        PID.write(str(' '))
+    #PID.write(str(array))
     PID.close()
+    All.close()
 
 if __name__ == "__main__":
     if 1:
