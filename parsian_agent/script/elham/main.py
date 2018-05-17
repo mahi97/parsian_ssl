@@ -14,12 +14,14 @@ if __name__ == "__main__":
         rate = rospy.Rate(10)  # 10hz
         pub = rospy.Publisher('agent_' + str(0) + '/task', parsian_robot_task, queue_size=10)  # !!!!!!!!!!!!!!!
         wm_sub = rospy.Subscriber('/world_model', parsian_world_model, wmCallback, queue_size=1, buff_size=2)
-
+        dir = vector2D(1 , 1)
         while not rospy.is_shutdown():
-            t = GTPA(pub)
-            if done(t):
+            #print("dir:")
+            #print(dir)
+            GTPA(pub , dir)
+            if done(dir):
                 NA(pub)
-                SA(6)
+                dir = SA(6)
 
         #!*!zaviye dorost bod
         #t = t + 1

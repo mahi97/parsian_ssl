@@ -85,12 +85,11 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     QList<QByteArray> l = b.split(' ');
     bool ok = false;
     double a[5];
-    ROS_INFO_STREAM("Lhum");
+    ROS_INFO_STREAM("Lhum!" << l.size());
     for(int i = 0 ; i < 3 ; i++) {
         a[i] = l.at(i).toDouble(&ok);
         ROS_INFO_STREAM("Lhum" << a[i]);
     }
-    drawer->draw(Vector2D(a[0] , a[0]) , "red");
     //angPid->kp = a[0];
     f.close();
 

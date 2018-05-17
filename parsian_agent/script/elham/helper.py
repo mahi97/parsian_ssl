@@ -10,7 +10,7 @@ import random
 
 wm = parsian_world_model()
 
-def GTPA(pub):
+def GTPA(pub , d):
     global wm
     if not wm.our:
         return 0
@@ -21,12 +21,10 @@ def GTPA(pub):
     task.select = parsian_robot_task.GOTOPOINTAVOID
     setTask = parsian_skill_gotoPointAvoid()  # type: parsian_skill_gotoPointAvoid
     setTask.diveMode = False
-    setTask.base.targetDir = vector2D(1 , 1)
-    d = vector2D(1 , 1)
-    setTask.base.targetPos = vector2D(0, 0)
+    setTask.base.targetPos = r.pos
+    setTask.base.lookAt = d
     task.gotoPointAvoidTask = setTask
     pub.publish(task)
-    return d
 
 def NA(pub):
     task = parsian_robot_task()
@@ -45,11 +43,14 @@ def done(d):
         if robot.id == 0:
             r = robot
     #target
-    print(r.vel)
-    if r.dir.x / d.x - r.dir.y / d.y < 0.1  and r.dir.x / d.x - r.dir.y / d.y > -0.1 and abs(r.vel.x) + abs(r.vel.y) < 0.00001:
+    #print(r.vel)
+    if abs(((r.dir.x - d.x) * (r.pos.y - d.y) - (r.dir.y - d.y) * (r.pos.x - d.x)) - (r.pos.x - d.x) * (r.pos.y - d.y)) < 1 and abs(r.vel.x) + abs(r.vel.y) < 0.00001:
         return 1
-    else:
-        return 0
+    print(d)
+    print((r.dir.x - d.x) * (r.pos.y - d.y) - (r.dir.y - d.y) * (r.pos.x - d.x))
+    print((r.pos.x - d.x) * (r.pos.y - d.y))
+    print("_______________")
+    return 0
 
 def SA(t):
     All = open("All.txt", "w")
@@ -63,7 +64,7 @@ def SA(t):
         for line in r:
            r = [int(x) for x in line.split()]
     PID = open("PID.txt", "w")
-    neighbor = int(random.randint(1 , 6))
+    neighbor = random.randint(1 , 6)
     array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.1
     #PID.write(array)
     for x in array:
@@ -72,6 +73,11 @@ def SA(t):
     #GTPA(pub)
     PID.close()
     All.close()
+    x = random.randint(-2 , 2)
+    y = random.randint(-2 , 2)
+    d = vector2D(x , y)
+    print(d)
+    return d
 
 if __name__ == "__main__":
     if 1:
