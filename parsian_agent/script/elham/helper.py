@@ -1,17 +1,18 @@
 import rospy
 from std_msgs.msg import String
 
-from parsian_msgs.msg import parsian_world_model, parsian_skill_gotoPointAvoid
+from parsian_msgs.msg import parsian_world_model, parsian_skill_gotoPointAvoid, parsian_robot
 from parsian_msgs.msg import parsian_robot_task
 from parsian_msgs.msg import parsian_skill_gotoPoint
 from parsian_msgs.msg import vector2D
 import random
-
+import math
 
 wm = parsian_world_model()
+d = vector2D(1 , 1)
 
-def GTPA(pub , d):
-    global wm
+def GTPA(pub):
+    global wm , d
     if not wm.our:
         return 0
     for robot in wm.our:
@@ -22,7 +23,8 @@ def GTPA(pub , d):
     setTask = parsian_skill_gotoPointAvoid()  # type: parsian_skill_gotoPointAvoid
     setTask.diveMode = False
     setTask.base.targetPos = r.pos
-    setTask.base.lookAt = d
+    setTask.base.lookAt = vector2D(5000 , 5000)
+    setTask.base.targetDir = vector2D(1 , 1)
     task.gotoPointAvoidTask = setTask
     pub.publish(task)
 
@@ -35,49 +37,72 @@ def wmCallback(data):
     global wm
     wm = data
 
-def done(d):
-    global wm
+def done():
+    global wm , d
     if not wm.our:
         return 0
     for robot in wm.our:
         if robot.id == 0:
             r = robot
+
     #target
     #print(r.vel)
-    if abs(((r.dir.x - d.x) * (r.pos.y - d.y) - (r.dir.y - d.y) * (r.pos.x - d.x)) - (r.pos.x - d.x) * (r.pos.y - d.y)) < 1 and abs(r.vel.x) + abs(r.vel.y) < 0.00001:
-        return 1
     print(d)
-    print((r.dir.x - d.x) * (r.pos.y - d.y) - (r.dir.y - d.y) * (r.pos.x - d.x))
-    print((r.pos.x - d.x) * (r.pos.y - d.y))
+    print(r.angularVel)
+    print(r.dir.x)
+    print(r.dir.y)
+    print(r.dir.x/d.x)
+    print(r.dir.y/d.y)
     print("_______________")
+    if abs(r.dir.x / d.x) < 0.001 and abs(r.dir.y / d.y) < 0.001 and abs(r.vel.x) + abs(r.vel.y) + abs(r.angularVel) < 0.0001:
+        return 1
     return 0
 
-def SA(t):
-    All = open("All.txt", "w")
-    with open('PID.txt') as f:
-        array = []
-        lastArray = []
-        for line in f:
-            array = lastArray = [float(x) for x in line.split()]
-    with open('result.txt') as r:
-        r = []
-        for line in r:
-           r = [int(x) for x in line.split()]
-    PID = open("PID.txt", "w")
-    neighbor = random.randint(1 , 6)
-    array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.1
-    #PID.write(array)
-    for x in array:
-        PID.write(str(x))
-        PID.write(str(' '))
-    #GTPA(pub)
-    PID.close()
-    All.close()
-    x = random.randint(-2 , 2)
-    y = random.randint(-2 , 2)
-    d = vector2D(x , y)
-    print(d)
-    return d
+newResult = 0
+
+def SA(pub , t , lastResult):
+    global newResult
+    if not done():
+        GTPA(pub)
+        newResult += 1
+    else:
+        with open('PID.txt') as f:
+            array = []
+            for line in f:
+                array = [float(x) for x in line.split()]
+        PID = open("PID.txt", "w")
+        neighbor = random.randint(1, 6)
+        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.1
+        # PID.write(array)
+        for x in array:
+            PID.write(str(x))
+            PID.write(str(' '))
+        # GTPA(pub)
+        PID.close()
+        global d
+        if d == vector2D(1, 1):
+            d = vector2D(1, -1)
+        elif d == vector2D(1, -1):
+            d = vector2D(-1, -1)
+        elif d == vector2D(-1, -1):
+            d = vector2D(-1, 1)
+        elif d == vector2D(-1, 1):
+            d = vector2D(1, 1)
+
+        NA(pub)
+        if newResult < lastResult:
+            return newResult
+        rand = random.randint(0 , 1)
+        #if(newResult - lastResult) < rand:
+        #    return newResult
+        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] - ((-1) ** ((neighbor % 2) + 1)) * 0.1
+        # PID.write(array)
+        PID = open("PID.txt", "w")
+        for x in array:
+            PID.write(str(x))
+            PID.write(str(' '))
+        PID.close()
+        return lastResult
 
 if __name__ == "__main__":
     if 1:
