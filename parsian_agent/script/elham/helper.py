@@ -10,6 +10,9 @@ import math
 
 wm = parsian_world_model()
 d = vector2D(1 , 1)
+newResult = 0
+t = 0
+sumResult = 0
 
 def GTPA(pub):
     global wm , d
@@ -24,7 +27,7 @@ def GTPA(pub):
     setTask.diveMode = False
     setTask.base.targetPos = r.pos
     setTask.base.lookAt = vector2D(5000 , 5000)
-    setTask.base.targetDir = vector2D(1 , 1)
+    setTask.base.targetDir = d
     task.gotoPointAvoidTask = setTask
     pub.publish(task)
 
@@ -47,62 +50,80 @@ def done():
 
     #target
     #print(r.vel)
-    print(d)
-    print(r.angularVel)
-    print(r.dir.x)
-    print(r.dir.y)
-    print(r.dir.x/d.x)
-    print(r.dir.y/d.y)
-    print("_______________")
-    if abs(r.dir.x / d.x) < 0.001 and abs(r.dir.y / d.y) < 0.001 and abs(r.vel.x) + abs(r.vel.y) + abs(r.angularVel) < 0.0001:
+    #print(d)
+    #print(r.angularVel)
+    #print(r.dir.x)
+    #print(d.y)
+    x = r.dir.x * (2 / (r.dir.x ** 2 + r.dir.y ** 2)) ** (1/2.0)
+    y = r.dir.y * (2 / (r.dir.x ** 2 + r.dir.y ** 2)) ** (1/2.0)
+    #print(x)
+    #print(y)
+    #print("_______________")
+    if abs(x - d.x) < 0.2 and abs(y - d.y) < 0.2 and abs(r.vel.x) + abs(r.vel.y) + abs(r.angularVel) < 0.01:
         return 1
     return 0
 
-newResult = 0
-
-def SA(pub , t , lastResult):
-    global newResult
+def SA(pub , lastResult):
+    global newResult , t , sumResult
     if not done():
         GTPA(pub)
-        newResult += 1
-    else:
-        with open('PID.txt') as f:
-            array = []
-            for line in f:
-                array = [float(x) for x in line.split()]
-        PID = open("PID.txt", "w")
-        neighbor = random.randint(1, 6)
-        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.1
+        if newResult < 100000:
+            newResult += 1
+            return lastResult
+    t += 1
+    NA(pub)
+    with open('PID.txt') as f:
+        array = []
+        for line in f:
+            array = [float(x) for x in line.split()]
+    PID = open("PID.txt", "w")
+    neighbor = random.randint(1, 6)
+    array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.001
+    # PID.write(array)
+    for x in array:
+        PID.write(str(x))
+        PID.write(str(' '))
+    # GTPA(pub)
+    PID.close()
+    global d
+    if d == vector2D(1, 1):
+        d = vector2D(1, -1)
+    elif d == vector2D(1, -1):
+        d = vector2D(-1, -1)
+    elif d == vector2D(-1, -1):
+        d = vector2D(-1, 1)
+    elif d == vector2D(-1, 1):
+        d = vector2D(1, 1)
+    sumResult += newResult
+    if d == vector2D(1 , 1):
+        print("_______________")
+        print(array)
+        print(sumResult)
+        print(lastResult)
+        if sumResult < lastResult:
+            lastResult = sumResult
+            sumResult = 0
+            return lastResult
+        print("bad bod")
+        rand = random.uniform(0 , 1)
+        print(rand)
+        print((sumResult - lastResult) / (math.e ** t))
+        if (sumResult - lastResult) / (math.e ** t) > rand:
+            lastResult = sumResult
+            newResult = 0
+            sumResult = 0
+            print("ehtemal")
+            return lastResult
+        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] - ((-1) ** ((neighbor % 2) + 1)) * 0.001
         # PID.write(array)
+        PID = open("PID.txt", "w")
         for x in array:
             PID.write(str(x))
             PID.write(str(' '))
-        # GTPA(pub)
         PID.close()
-        global d
-        if d == vector2D(1, 1):
-            d = vector2D(1, -1)
-        elif d == vector2D(1, -1):
-            d = vector2D(-1, -1)
-        elif d == vector2D(-1, -1):
-            d = vector2D(-1, 1)
-        elif d == vector2D(-1, 1):
-            d = vector2D(1, 1)
-
-        NA(pub)
-        if newResult < lastResult:
-            return newResult
-        rand = random.randint(0 , 1)
-        #if(newResult - lastResult) < rand:
-        #    return newResult
-        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] - ((-1) ** ((neighbor % 2) + 1)) * 0.1
-        # PID.write(array)
-        PID = open("PID.txt", "w")
-        for x in array:
-            PID.write(str(x))
-            PID.write(str(' '))
-        PID.close()
-        return lastResult
+        newResult = 0
+        sumResult = 0
+    return lastResult
 
 if __name__ == "__main__":
     if 1:
