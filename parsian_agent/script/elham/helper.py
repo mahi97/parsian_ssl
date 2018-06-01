@@ -61,68 +61,6 @@ def done():
         return 1
     return 0
 
-def SA(pub , lastResult):
-    global newResult , t , sumResult
-    if not done():
-        GTPA(pub)
-        if newResult < 100000:
-            newResult += 1
-            return lastResult
-    t += 1
-    NA(pub)
-    with open('PID.txt') as f:
-        array = []
-        for line in f:
-            array = [float(x) for x in line.split()]
-    PID = open("PID.txt", "w")
-    neighbor = random.randint(1, 6)
-    array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] + ((-1) ** ((neighbor % 2) + 1)) * 0.001
-    # PID.write(array)
-    for x in array:
-        PID.write(str(x))
-        PID.write(str(' '))
-    # GTPA(pub)
-    PID.close()
-    global d
-    if d == vector2D(1, 1):
-        d = vector2D(1, -1)
-    elif d == vector2D(1, -1):
-        d = vector2D(-1, -1)
-    elif d == vector2D(-1, -1):
-        d = vector2D(-1, 1)
-    elif d == vector2D(-1, 1):
-        d = vector2D(1, 1)
-    sumResult += newResult
-    if d == vector2D(1 , 1):
-        print("_______________")
-        print(array)
-        print(sumResult)
-        print(lastResult)
-        if sumResult < lastResult:
-            lastResult = sumResult
-            sumResult = 0
-            return lastResult
-        print("bad bod")
-        rand = random.uniform(0 , 1)
-        print(rand)
-        print((sumResult - lastResult) / (math.e ** t))
-        if (sumResult - lastResult) / (math.e ** t) > rand:
-            lastResult = sumResult
-            newResult = 0
-            sumResult = 0
-            print("ehtemal")
-            return lastResult
-        array[int((neighbor - 1) / 2)] = array[int((neighbor - 1) / 2)] - ((-1) ** ((neighbor % 2) + 1)) * 0.001
-        # PID.write(array)
-        PID = open("PID.txt", "w")
-        for x in array:
-            PID.write(str(x))
-            PID.write(str(' '))
-        PID.close()
-        newResult = 0
-        sumResult = 0
-    return lastResult
-
 def initPSO():
     global a , num , lb , lbt , g
     for x in range(0 , 10):
@@ -157,6 +95,7 @@ def go(pub , n):
         PID.close()
         return;
     GTPA(pub)
+
 
 def PSO(pub):
     global sumTime , lbt , lb , a , gt , g , num , turn
