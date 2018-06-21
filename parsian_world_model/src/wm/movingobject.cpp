@@ -80,7 +80,7 @@ void MovingObject::findModel(double dt) {
     if (acc * vel.norm() > 0.3) {
         ballStopPos.invalidate();
     } else {
-        ballStopPos = pos + vel.norm() * (vv / (2.0 * aa));
+        ballStopPos = pos + vel.setLengthVector((vv / (2.0 * aa)));
     }
     modelFrameCnt ++;
     modelSampleTime = dt;
@@ -181,24 +181,24 @@ Vector2D MovingObject::predict(double time) {
         return pos;
     }
 
-    if (acc.valid() && (acc * vel < 0)) {
+    if (acc.isValid() && (acc * vel < 0)) {
         double vf = (vel.length() - acc.length() * time);
         if (vf < 0) {
             return pos + vel * vel.length() / (2.0 * acc.length());
         }
-        return pos - 0.5 * acc.length() * vel.norm() * time * time + vel * time;
+        return pos - 0.5 * acc.length() * vel.normalizedVector() * time * time + vel * time;
     }
     return pos + vel * time;
 }
 
 
 Vector2D MovingObject::predictV(double time) {
-    if (acc.valid() && (acc * vel < 0)) {
+    if (acc.isValid() && (acc * vel < 0)) {
         double vf = vel.length() - (acc.length() * time);
         if (vf < 0.0) {
             vf = 0.0;
         }
-        return vel.norm() * vf;
+        return vel.setLengthVector(vf);
     }
     return vel;
 }
@@ -223,7 +223,7 @@ double MovingObject::whenIsAtVel(double L) {
 
     if (T1 > 0) {
         if (T2 > 0) {
-            return min(T1, T2);
+            return std::min(T1, T2);
         }
 
         return T1;

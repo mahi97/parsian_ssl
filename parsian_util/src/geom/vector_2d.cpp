@@ -13,7 +13,7 @@
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,23 +35,14 @@
 
 #include "parsian_util/geom/vector_2d.h"
 
+#include <limits>
+
 namespace rcsc {
 
-//const double Vector2D::ERROR_VALUE = std::numeric_limits< double >::max();
+const double Vector2D::EPSILON = 1.0e-6;
+
 const double Vector2D::ERROR_VALUE = 5000.0;
 const Vector2D Vector2D::INVALIDATED(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
 
-}
 
-int sign(double d1) {
-    return (d1 > 0) ? 1 : -1;
 }
-
-double max(double d1, double d2) {
-    return (d1 > d2) ? d1 : d2;
-}
-
-double min(double d1, double d2) {
-    return (d1 < d2) ? d1 : d2;
-}
-

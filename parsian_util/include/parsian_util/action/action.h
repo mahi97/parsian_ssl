@@ -6,6 +6,7 @@
 #define PARSIAN_UTIL_ACTION_H
 
 #include <QString>
+#include <parsian_util/geom.h>
 
 class Action {
 public:

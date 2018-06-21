@@ -13,7 +13,7 @@
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,20 +34,21 @@
 
 #include <iostream>
 
+#include <parsian_util/geom/region_2d.h>
 #include <parsian_util/geom/vector_2d.h>
-
-#include "segment_2d.h"
 
 namespace rcsc {
 
 class Line2D;
 class Ray2D;
+class Segment2D;
 
 /*!
   \class Circle2D
   \brief 2d circle class
  */
-class Circle2D {
+class Circle2D
+    : public Region2D {
 private:
 
     //! center point
@@ -56,7 +57,7 @@ private:
     //! radius of this circle
     double M_radius;
 
-    static const double EPSILOON;
+    static const double EPSILON;
 
 
 public:
@@ -64,27 +65,27 @@ public:
       \brief create a zero area circle at (0,0)
      */
     Circle2D()
-        : M_center(0.0, 0.0)
-        , M_radius(0.0) {
-    }
-
-
+        : M_center( 0.0, 0.0 )
+        , M_radius( 0.0 )
+      { }
 
     /*!
-      \brief constructor with all values
+      \brief construct with center point and radius value.
       \param c center point
       \param r radius value
      */
-    Circle2D(const Vector2D & c,
-             const double & r)
-        : M_center(c)
-        , M_radius(r) {
-        if (r < 0.0) {
-            std::cerr << "Circle2D::Circle2D(). radius must be positive value."
-                      << std::endl;
-            M_radius = 0.0;
-        }
-    }
+    Circle2D( const Vector2D & c,
+              const double & r )
+        : M_center( c )
+        , M_radius( r )
+      {
+          if ( r < 0.0 )
+          {
+              std::cerr << "Circle2D::Circle2D(). radius must be positive value."
+                        << std::endl;
+              M_radius = 0.0;
+          }
+      }
 
     /*!
       \brief assign new value.
@@ -93,44 +94,60 @@ public:
       \return const reference to this
      */
     const
-    Circle2D & assign(const Vector2D & c,
-                      const double & r) {
-        M_center = c;
-        M_radius = r;
-        if (r < 0.0) {
-            std::cerr << "Circle2D::assign(). radius must be positive value."
-                      << std::endl;
-            M_radius = 0.0;
-        }
-        return *this;
-    }
+    Circle2D & assign( const Vector2D & c,
+                       const double & r )
+      {
+          M_center = c;
+          M_radius = r;
+          if ( r < 0.0 )
+          {
+              std::cerr << "Circle2D::assign(). radius must be positive value."
+                        << std::endl;
+              M_radius = 0.0;
+          }
+          return *this;
+      }
+
+    /*!
+      \brief get the area value of this circle
+      \return value of the area
+     */
+    virtual
+    double area() const
+      {
+          return AngleDeg::PI * M_radius * M_radius;
+      }
 
     /*!
       \brief check if point is within this region
       \param point considered point
       \return true if point is contained by this circle
      */
-    bool contains(const Vector2D & point) const {
-        return M_center.dist2(point) < M_radius * M_radius;
-    }
+    virtual
+    bool contains( const Vector2D & point ) const
+      {
+          return M_center.dist2( point ) < M_radius * M_radius;
+      }
 
     /*!
       \brief get the center point
       \return center point coordinate value
      */
     const
-    Vector2D & center() const {
-        return M_center;
-    }
+    Vector2D & center() const
+      {
+          return M_center;
+      }
 
     /*!
       \brief get the radius value
       \return radius value
      */
     const
-    double & radius() const {
-        return M_radius;
-    }
+    double & radius() const
+      {
+          return M_radius;
+      }
 
     /*!
       \brief caluclate the intersection with straight line
@@ -139,9 +156,9 @@ public:
       \param sol2 pointer to the 2nd solution variable
       \return the number of solution
      */
-    int intersection(const Line2D & line,
-                     Vector2D * sol1,
-                     Vector2D * sol2) const;
+    int intersection( const Line2D & line,
+                      Vector2D * sol1,
+                      Vector2D * sol2 ) const;
 
     /*!
       \brief calculate the intersection with ray line
@@ -150,9 +167,20 @@ public:
       \param sol2 pointer to the 2nd solution variable
       \return the number of solution
      */
-    int intersection(const Ray2D & ray,
-                     Vector2D * sol1,
-                     Vector2D * sol2) const;
+    int intersection( const Ray2D & ray,
+                      Vector2D * sol1,
+                      Vector2D * sol2 ) const;
+
+    /*!
+      \brief calculate the intersection with segment line
+      \param segment considerd segment line
+      \param sol1 pointer to the 1st solution variable
+      \param sol2 pointer to the 2nd solution variable
+      \return the number of solution
+     */
+    int intersection( const Segment2D & segment,
+                      Vector2D * sol1,
+                      Vector2D * sol2 ) const;
 
     /*!
       \brief calculate the intersection with another circle
@@ -161,39 +189,47 @@ public:
       \param sol2 pointer to the 2nd solution variable
       \return the number of solution
      */
-    int intersection(const Circle2D & circle,
-                     Vector2D * sol1,
-                     Vector2D * sol2) const;
+    int intersection( const Circle2D & circle,
+                      Vector2D * sol1,
+                      Vector2D * sol2 ) const;
+
+
     /*!
-      \brief calculate the intersection with segment
-      \param seg considerd segment
+      \brief calculate the tangent from a point
+      \param p considerd the point that tangent comes from
       \param sol1 pointer to the 1st solution variable
       \param sol2 pointer to the 2nd solution variable
       \return the number of solution
      */
-
-
-    int intersection(const Segment2D & seg,
-                     Vector2D * sol1,
-                     Vector2D * sol2) const;
-
-
-
-    int tangent(Vector2D p, Vector2D * sol1, Vector2D * sol2);
+    int tangent(const Vector2D& p, Vector2D * sol1, Vector2D * sol2) const;
 
     // static utility
 
     /*!
-      \brief get the circumcircle from triangle vertexs
-      \param a triangle's 1st vertex
-      \param b triangle's 2nd vertex
-      \param c triangle's 3rd vertex
+      \brief get the circle through three points (circumcircle of the triangle).
+      \param p0 triangle's 1st vertex
+      \param p1 triangle's 2nd vertex
+      \param p2 triangle's 3rd vertex
       \return coordinates of circumcenter
     */
     static
-    Circle2D circumcircle(const Vector2D & a,
-                          const Vector2D & b,
-                          const Vector2D & c);
+    Circle2D circumcircle( const Vector2D & p0,
+                           const Vector2D & p1,
+                           const Vector2D & p2 );
+
+    /*!
+      \brief check if the circumcircle contains the input point
+      \param point input point
+      \param p0 triangle's 1st vertex
+      \param p1 triangle's 2nd vertex
+      \param p2 triangle's 3rd vertex
+      \return true if circumcircle contains the point, otherwise false.
+    */
+    static
+    bool contains( const Vector2D & point,
+                   const Vector2D & p0,
+                   const Vector2D & p1,
+                   const Vector2D & p2 );
 };
 
 }

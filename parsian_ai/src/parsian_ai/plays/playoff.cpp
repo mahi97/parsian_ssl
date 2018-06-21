@@ -184,7 +184,7 @@ bool CPlayOff::BlockerExecute(int agentID) {
         newRoleAgent[ID]->setSelectedSkill(RoleSkill::GotopointAvoid);
 
         virtualPos = wm->opp[blockerID]->pos + Vector2D(0.15, 0);
-        blockerLine = Segment2D(wm->ball->pos, wm->ball->pos + (virtualPos - wm->ball->pos).norm() * 3);
+        blockerLine = Segment2D(wm->ball->pos, wm->ball->pos + (virtualPos - wm->ball->pos).normalizedVector() * 3);
         blockerCircle.intersection(blockerLine, &pos1, &pos2);
 
         // Nadia
@@ -205,7 +205,7 @@ bool CPlayOff::BlockerExecute(int agentID) {
         newRoleAgent[ID]->setSelectedSkill(RoleSkill::GotopointAvoid);
 
         virtualPos = wm->opp[blockerID]->pos + Vector2D(0.15, 0);
-        blockerLine = Segment2D(wm->ball->pos, wm->ball->pos + (virtualPos - wm->ball->pos).norm() * 3);
+        blockerLine = Segment2D(wm->ball->pos, wm->ball->pos + (virtualPos - wm->ball->pos).setLengthVector(3));
         blockerCircle.intersection(blockerLine, &pos1, &pos2);
 
         // Nadia
@@ -532,8 +532,8 @@ void CPlayOff::checkEndBlocker() {
 
     if (dynamicState == 2) {
         for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
-            if (Circle2D(roleAgent[0] -> getAgent() -> pos() + roleAgent[0]->getAgent()->dir().norm() * 0.6, 0.3).contains(wm->opp.active(i)->pos))
-                if (roleAgent[0]->getAgent()->dir().norm().dist(roleAgent[0]->getTarget().norm()) < 0.1) {
+            if (Circle2D(roleAgent[0] -> getAgent() -> pos() + roleAgent[0]->getAgent()->dir().normalizedVector() * 0.6, 0.3).contains(wm->opp.active(i)->pos))
+                if (roleAgent[0]->getAgent()->dir().normalizedVector().dist(roleAgent[0]->getTarget().normalizedVector()) < 0.1) {
                     dynamicState = 6;
                     shot = true;
                 }
@@ -591,7 +591,7 @@ void CPlayOff::checkEndChipToGoal() {
 }
 
 Vector2D CPlayOff::getDynamicTarget(int i) {
-    Vector2D first = wm->ball->pos + (wm->field->oppGoal() - wm->ball->pos).norm() * 3;
+    Vector2D first = wm->ball->pos + (wm->field->oppGoal() - wm->ball->pos).normalizedVector() * 3;
     first.y += 0.3;
 
     switch (i) {
@@ -629,7 +629,7 @@ void CPlayOff::firstDegree() {
 
     if (conf.UseBlockBlocker) {
         newRoleAgent[0]->setTargetDir(wm->field->oppGoal() - wm->ball->pos);
-        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().norm() * 0.3);
+        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().normalizedVector() * 0.3);
         blockersPenaltyArea.clear();
 
         for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
@@ -658,7 +658,7 @@ void CPlayOff::secondDegree() {
     if (conf.UseBlockBlocker) {
 
         newRoleAgent[0]->setTargetDir(wm->field->oppGoal() / 2 - wm->ball->pos);
-        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().norm() * 0.3);
+        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().normalizedVector() * 0.3);
 
         blockersCentralRegion.clear();
         for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
@@ -688,7 +688,7 @@ void CPlayOff::thirdDegree() {
     if (conf.UseBlockBlocker) {
 
         newRoleAgent[0]->setTargetDir(wm->field->ourGoal() - wm->ball->pos);
-        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().norm() * 0.3);
+        newRoleAgent[0]->setTarget(wm->ball->pos - newRoleAgent[0]->getTargetDir().normalizedVector() * 0.3);
 
         blockersRoundRegion.clear();
         for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
@@ -1274,7 +1274,7 @@ bool CPlayOff::isBallDirChanged() {
     const int recive = masterPlan->common.matchedID.value(recieve);
     Vector2D& b  = wm->ball->pos;
     if (b.dist(lastBallPos) > 0.5 && !roleAgent[passer]->getChip()) {
-        Vector2D  bv = b + wm->ball->vel.norm() * wm->field->_MAX_DIST;
+        Vector2D  bv = b + wm->ball->vel.normalizedVector() * wm->field->_MAX_DIST;
         Circle2D  c(roleAgent[recive]->getWaitPos(), 1); // TODO : CHECK radius
         Segment2D s(b, bv);
         drawer->draw(s, QColor(Qt::blue));
@@ -1301,8 +1301,8 @@ bool CPlayOff::isFinalShotDone() {
 
     Agent* tAgent = soccer->agents[masterPlan -> common.matchedID[tLastAgent]];
 
-    Circle2D cir(tAgent->pos() + tAgent->dir().norm() * 0.08, 0.16);
-    Circle2D cir2(tAgent->pos() + tAgent->dir().norm() * 0.20, 0.40);
+    Circle2D cir(tAgent->pos() + tAgent->dir().normalizedVector() * 0.08, 0.16);
+    Circle2D cir2(tAgent->pos() + tAgent->dir().normalizedVector() * 0.20, 0.40);
 
     drawer->draw(cir , QColor(Qt::blue));
     drawer->draw(cir2, QColor(Qt::blue));
@@ -2167,7 +2167,7 @@ bool CPlayOff::isMoveDone(const CRolePlayOff * _roleAgent) {
         }
     } else {
         // TODO : vartypes this
-        if (_roleAgent->getAgent()->pos().dist(_roleAgent->getTarget()) < max(0.3, _roleAgent->getEventDist() / 100)) {
+        if (_roleAgent->getAgent()->pos().dist(_roleAgent->getTarget()) <std::max(0.3, _roleAgent->getEventDist() / 100)) {
             return true;
         }
     }

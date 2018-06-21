@@ -270,7 +270,7 @@ Vector2D CKnowledge::getReflectPos(const CField& field, Vector2D goal, double di
     res.x = nearest.x;
     res.y = nearest.y * 2 - _ballpos.y;
 
-    dummySeg.assign(field.oppGoal(), (res - field.oppGoal()).norm() * 12);
+    dummySeg.assign(field.oppGoal(), (res - field.oppGoal()).normalizedVector() * 12);
     //    oppField.intersection(dummySeg,&sol1,&sol2);
     oppCircle.intersection(dummySeg, &sol1, &sol2);
     if (field.isInField(sol1)) {
@@ -306,7 +306,7 @@ double CKnowledge::kickTimeEstimation(CAgent *_agent, Vector2D _target, const CB
     Vector2D finalPos;
     Vector2D ballPosInFuture;
     Vector2D s1, s2;
-    Segment2D ballPath(_ball.pos, _ball.pos + _ball.vel.norm() * 10);
+    Segment2D ballPath(_ball.pos, _ball.pos + _ball.vel.normalizedVector() * 10);
     Circle2D robotAreaNear(_agent->pos(), 0.4);
 
     if (_ball.vel.length() > 0.2) {
@@ -316,7 +316,7 @@ double CKnowledge::kickTimeEstimation(CAgent *_agent, Vector2D _target, const CB
 
         for (double i = 0 ; i < 3 ; i += 0.03) {
             ballPosInFuture = _ball.getPosInFuture(i);
-            finalPos = ballPosInFuture - (_target - ballPosInFuture).norm() * 0.11;
+            finalPos = ballPosInFuture - (_target - ballPosInFuture).normalizedVector() * 0.11;
             if (timeNeeded(_agent, finalPos, _VMax, AccMaxForward, DecMax, AccMaxNormal) <= i + 0.1) {
                 //draw(finalPos,1,QColor(Qt::blue));
                 return i;
@@ -325,7 +325,7 @@ double CKnowledge::kickTimeEstimation(CAgent *_agent, Vector2D _target, const CB
 
     }
 
-    finalPos = _ball.pos - (_target - _ball.pos).norm() * 0.11;
+    finalPos = _ball.pos - (_target - _ball.pos).normalizedVector() * 0.11;
 //    draw(finalPos);
     return 100 - timeNeeded(_agent, finalPos, _VMax, AccMaxForward, DecMax, AccMaxNormal);
 
@@ -371,8 +371,8 @@ double CKnowledge::timeNeeded(CAgent *_agentT, Vector2D posT,
     }
 
     double vMaxReal = sqrt(((_agentT->pos().dist(posT) + (tAgentVel.length() * tAgentVel.length() / 2 * acc)) * 2 * acc * dec) / (acc + dec));
-    vMaxReal = min(vMaxReal, 4);
-    vMax = min(vMax, vMaxReal);
+    vMaxReal = std::min(vMaxReal, 4.0);
+    vMax = std::min(vMax, vMaxReal);
     xSat = sqrt(((vMax * vMax) - (tAgentVel.length() * tAgentVel.length())) / acc) + sqrt((vMax * vMax) / dec);
     _x3 = (-1 * tAgentVel.length() * tAgentVel.length()) / (-2 * fabs(DecMax)) ;
 

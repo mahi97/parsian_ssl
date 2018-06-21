@@ -5,7 +5,7 @@
 #include <QtCore/QList>
 
 
-#include <parsian_util/geom/geom.h>
+#include <parsian_util/geom.h>
 #include <ros/ros.h>
 
 #include <QtCore/QStringList>

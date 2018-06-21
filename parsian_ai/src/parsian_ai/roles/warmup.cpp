@@ -83,13 +83,13 @@ void CRoleWarmupInfo::findPos2() {
     dire.rotate(ang);
     for (int i = 0; i < count(); i++) {
         dire.rotate((360 / count()));
-        Segment2D seg(cent, cent + (dire.norm() * 0.5));
+        Segment2D seg(cent, cent + (dire.normalizedVector() * 0.5));
         draw(seg, "orange");
         Vector2D s1, s2;
         cir.intersection(seg, &s1, &s2);
-        if (s1.valid()) {
+        if (s1.isValid()) {
             this->Ps.append(s1);
-        } else if (s2.valid()) {
+        } else if (s2.isValid()) {
             this->Ps.append(s2);
         }
     }

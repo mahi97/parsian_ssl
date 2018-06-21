@@ -14,7 +14,7 @@ Agent::Agent(const parsian_msgs::parsian_agent &_agent) : CAgent(_agent) {
 }
 
 Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection) {
-    Vector2D oneTouchDir = Vector2D::unitVector(CKnowledge::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
+    Vector2D oneTouchDir = Vector2D::unitVector(CKnowledge::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).normalizedVector(),
                            pos() - wm->ball->pos, wm->field->oppGoal(), 0.2, 0.9));
     Vector2D q;
     q.invalidate();
@@ -23,16 +23,16 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
         oneTouchKick = true;
     }
 
-    if ((wm->ball->vel * (pos() - wm->ball->pos).norm()) > 0.1) {
-        Line2D l(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
+    if ((wm->ball->vel * (pos() - wm->ball->pos).normalizedVector()) > 0.1) {
+        Line2D l(wm->ball->pos, wm->ball->pos + wm->ball->vel.normalizedVector());
         q = l.projection(positioningPos);
         DBUG("case", D_ERROR);
-        if (q.valid() && (q - positioningPos).length() < 1.0) {
+        if (q.isValid() && (q - positioningPos).length() < 1.0) {
             DBUG("case2", D_ERROR);
             if ((wm->ball->pos - pos()).length() < 1.0) {
                 oneTouchKick = true;
             }
-            q -= (self.centerFromKicker() + CBall::radius) * oneTouchDir;
+            q -= oneTouchDir * (self.centerFromKicker() + CBall::radius);
         }
     }
     if (oneTouchKick) {

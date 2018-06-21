@@ -11,7 +11,7 @@
 #include "parsian_util/tools/drawer.h"                      //TODO must be new in node
 #include "parsian_util/tools/blackboard.h"
 #include "parsian_util/core/agent.h"
-#include "parsian_util/geom/geom.h"
+#include "parsian_util/geom.h"
 #include "parsian_util/core/worldmodel.h"
 #include "planner/obstacle.h"
 #include "ros/ros.h"

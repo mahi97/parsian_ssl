@@ -38,7 +38,7 @@ kk2Angles CDefPos::getIntersections(Vector2D _ballPos, double _radius) {
     Circle2D tempCircle(wm->field->ourGoal() - Vector2D(penaltyAreaOffset, 0), _radius);
     if (tempCircle.contains(_ballPos)) {
         Segment2D tempSegment(wm->field->ourGoal(),
-                              (_ballPos - wm->field->ourGoal()).norm() * 3 + (wm->field->ourGoal() - Vector2D(penaltyAreaOffset, 0)));
+                              (_ballPos - wm->field->ourGoal()).setLengthVector(3) + (wm->field->ourGoal() - Vector2D(penaltyAreaOffset, 0)));
         tempCircle.intersection(tempSegment, &inter3, &inter1);
         _ballPos = inter3;
     }
@@ -196,7 +196,7 @@ double CDefPos::findBestRadius(int _numOfDefs) {
     if (vatarKazeb > (_numOfDefs) * 2 * Robot::robot_radius_new) {
         mainLine = Line2D(Vector2D(BallPos.x - ((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new * ballheight / vatarKazeb), BallPos.y), Vector2D(BallPos.x - ((_numOfDefs + 0.3) * 1.5 * Robot::robot_radius_new * ballheight / vatarKazeb), BallPos.y - 0.1));
     }
-    if (biggerBarSeg.intersection(mainLine).valid()) {
+    if (biggerBarSeg.intersection(mainLine).isValid()) {
         return biggerBarSeg.intersection(mainLine).dist(wm->field->ourGoal()) + penaltyAreaOffset;
     }
     return -1;

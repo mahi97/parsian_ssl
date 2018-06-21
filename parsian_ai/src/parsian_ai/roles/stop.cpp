@@ -55,7 +55,7 @@ void CRoleStopInfo::findPositions() {
     }
 
     Vector2D baseDirVec;
-    baseDirVec = (TA - c).norm();
+    baseDirVec = (TA - c).normalizedVector();
 
 
     Ps.clear();
@@ -170,7 +170,7 @@ void CRoleStopInfo::findPositions() {
     }
 
     Vector2D baseDirVec;
-    baseDirVec = (TA - c).norm();
+    baseDirVec = (TA - c).normalizedVector();
 
 
     Ps.clear();
@@ -233,7 +233,7 @@ void CRoleStop::execute() {
 
 
     gotopoint->setSlowmode(true);
-    if (wm->ball->inSight <= 0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
+    if (wm->ball->inSight <= 0 || !wm->ball->pos.isValid() || !wm->field->isInField(wm->ball->pos)) {
         noAction->setWaithere(true);
         agent->action = noAction;
         return;

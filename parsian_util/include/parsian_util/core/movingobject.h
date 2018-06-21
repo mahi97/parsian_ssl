@@ -5,7 +5,7 @@
 #ifndef PARSIAN_UTIL_MOVINGOBJECT_H
 #define PARSIAN_UTIL_MOVINGOBJECT_H
 
-#include <parsian_util/geom/geom.h>
+#include <parsian_util/geom.h>
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_util/tools/blackboard.h>
 #include <parsian_util/tools/drawer.h>

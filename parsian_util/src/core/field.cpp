@@ -587,7 +587,7 @@ Rect2D  CField::getCircleRegion(int n, int i) const {
     Vector2D diam(0.3, 0.3);
     double rad = 1.5;
     Vector2D s;
-    s = c + Vector2D::unitVector(i * 360.0 / n + theta) * rad;
+    s = c + Vector2D::polar2vector(rad, i * 360.0 / n + theta);
 
     //TOF for technical challenge iranopen2012
 
@@ -812,7 +812,7 @@ Rect2D  CField::getRegion(QString name, double k) const {
 
 Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpoint) const {
     Line2D l(fOurGoal, AngleDeg(angle));
-    Vector2D p = fOurGoal + Vector2D::unitVector(angle) * 2.0;
+    Vector2D p = fOurGoal + Vector2D::polar2vector(2, angle);
     QList<Vector2D> results;
     QList<Vector2D> perps;
     results.clear();
@@ -830,7 +830,7 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
         double th = (vSol1 - c1.center()).th().degree();
         if ((th < 0) && (th > -90)) {
             results.append(vSol1);
-            perps.append((p - c1.center()).norm());
+            perps.append((p - c1.center()).normalizedVector());
         }
     }
     if (n == 2) {
@@ -838,12 +838,12 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
         th = (vSol1 - c1.center()).th().degree();
         if ((th < 0) && (th > -90)) {
             results.append(vSol1);
-            perps.append((p - c1.center()).norm());
+            perps.append((p - c1.center()).normalizedVector());
         }
         th = (vSol2 - c1.center()).th().degree();
         if ((th < 0) && (th > -90)) {
             results.append(vSol2);
-            perps.append((p - c1.center()).norm());
+            perps.append((p - c1.center()).normalizedVector());
         }
     }
 
@@ -852,7 +852,7 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
         double th = (vSol1 - c2.center()).th().degree();
         if ((th > 0) && (th < 90)) {
             results.append(vSol1);
-            perps.append((p - c2.center()).norm());
+            perps.append((p - c2.center()).normalizedVector());
         }
     }
     if (n == 2) {
@@ -860,17 +860,17 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
         th = (vSol1 - c2.center()).th().degree();
         if ((th > 0) && (th < 90)) {
             results.append(vSol1);
-            perps.append((p - c2.center()).norm());
+            perps.append((p - c2.center()).normalizedVector());
         }
         th = (vSol2 - c2.center()).th().degree();
         if ((th > 0) && (th < 90)) {
             results.append(vSol2);
-            perps.append((p - c2.center()).norm());
+            perps.append((p - c2.center()).normalizedVector());
         }
     }
 
     vSol1 = s.intersection(l);
-    if (vSol1.valid()) {
+    if (vSol1.isValid()) {
         results.append(vSol1);
         perps.append(Vector2D(1.0, 0.0));
     }
@@ -893,12 +893,12 @@ Vector2D CField::ourPAreaPerpendicularVector(double angle, Vector2D& intersectpo
     if (!fieldRect().contains(p)) {
         if (p.y < 0) {
             intersectpoint = Vector2D(fOurGoal + Vector2D(0, -_GOAL_WIDTH / 4));
-            intersectpoint = (p - intersectpoint).norm() * 0.5 + intersectpoint;
+            intersectpoint = (p - intersectpoint).normalizedVector() * 0.5 + intersectpoint;
             return Vector2D(0.0, -1.0);
         }
 
         intersectpoint = Vector2D(fOurGoal + Vector2D(0, _GOAL_WIDTH / 4));
-        intersectpoint = (p - intersectpoint).norm() * 0.5 + intersectpoint;
+        intersectpoint = (p - intersectpoint).normalizedVector() * 0.5 + intersectpoint;
         return Vector2D(0.0, 1.0);
 
     }

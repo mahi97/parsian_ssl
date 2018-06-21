@@ -6,7 +6,6 @@
 
 
 #include <parsian_util/action/action.h>
-#include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPoint.h>
 #include <list>
 

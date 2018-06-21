@@ -68,13 +68,13 @@ void CHalftimeLineup::fillGPA() {
         for (auto& g : gpa) {
             Vector2D dir;
             dir.setDir(conf.lineDirection + 90);
-            g->setTargetdir(dir.norm());
+            g->setTargetdir(dir.normalizedVector());
         }
     } else {
         for (auto& g : gpa) {
             Vector2D dir;
             dir.setDir(conf.lineDirection);
-            g->setTargetdir(dir.norm());
+            g->setTargetdir(dir.normalizedVector());
             g->setAvoidpenaltyarea(false);
             g->setAvoidcentercircle(false);
             g->setNoavoid(false);

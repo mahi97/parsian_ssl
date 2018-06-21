@@ -1,7 +1,7 @@
 #ifndef DEFPOS_H
 #define DEFPOS_H
 
-#include "parsian_util/geom/geom.h"
+#include "parsian_util/geom.h"
 #include "parsian_ai/util/worldmodel.h"
 #include <parsian_util/tools/drawer.h>
 

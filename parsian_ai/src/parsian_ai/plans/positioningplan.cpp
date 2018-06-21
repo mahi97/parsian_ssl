@@ -260,7 +260,7 @@ bool PositioningPlan::isValidPoint(Vector2D target , bool callFromStaticPosition
         return false;
     }
 
-    Vector2D closerTarget = target + (wm->field->ourGoal() - target).norm() * 0.2;
+    Vector2D closerTarget = target + (wm->field->ourGoal() - target).setLengthVector(0.2);
     if (wm->field->isInOurPenaltyArea(target) || wm->field->isInOurPenaltyArea(closerTarget)) {
         return false;
     }
@@ -271,7 +271,7 @@ bool PositioningPlan::isValidPoint(Vector2D target , bool callFromStaticPosition
         return false;
     }
 
-    closerTarget = target + (wm->field->oppGoal() - target).norm() * 0.3;
+    closerTarget = target + (wm->field->oppGoal() - target).setLengthVector(0.3);
     if ((gameState->ourDirectKick() ||
             gameState->ourIndirectKick()) &&
             (wm->field->isInOppPenaltyArea(target) || wm->field->isInOppPenaltyArea(closerTarget))) {

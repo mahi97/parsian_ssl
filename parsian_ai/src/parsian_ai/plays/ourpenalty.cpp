@@ -102,7 +102,7 @@ Vector2D COurPenalty::getEmptyTarget(Vector2D _position, double _radius)
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
             ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
+            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).setLengthVector(0.3))) {
                 continue;
             }
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
@@ -146,7 +146,7 @@ void COurPenalty::playmakePositioning()
     Vector2D direction, position;
     direction = wm->ball->pos - playMakeAgent->pos();
     direction.y *= 1.2;
-    position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).norm() * (0.13);
+    position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).setLengthVector(0.13);
     PMgotopoint->setTargetpos(position);
     PMgotopoint->setTargetdir(direction);
     PMgotopoint->setSlowmode(true);
@@ -178,7 +178,7 @@ void COurPenalty::playmakeKick()
                 penaltyTarget.y = wm->field->oppGoalL().y * 2;
                 shift = Vector2D(0, -0.3);
             }
-            position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + shift).norm() * (0.13);
+            position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + shift).setLengthVector(0.13);
             PMgotopoint->setTargetdir(penaltyTarget);
             PMgotopoint->setTargetpos(position);
             PMgotopoint->setLookat(wm->ball->pos);
@@ -210,8 +210,8 @@ void COurPenalty::playmakeKick()
 
 double COurPenalty::angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp)
 {
-    double theta1 = std::atan2(xp.a().y-xp.b().y,xp.a().x-xp.b().x);
-    double theta2 = std::atan2(yp.a().y-yp.b().y,yp.a().x-yp.b().x);
+    double theta1 = std::atan2(xp.origin().y-xp.terminal().y,xp.origin().x-xp.terminal().x);
+    double theta2 = std::atan2(yp.origin().y-yp.terminal().y,yp.origin().x-yp.terminal().x);
     double diff = fabs(theta1-theta2);
     return diff;
 }

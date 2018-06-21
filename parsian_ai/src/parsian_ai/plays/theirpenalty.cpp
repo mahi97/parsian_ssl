@@ -78,7 +78,7 @@ Vector2D CTheirPenalty::getEmptyTarget(Vector2D _position, double _radius)
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
             ////should check
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
+            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).normalizedVector() * 0.3)) {
                 continue;
             }
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
