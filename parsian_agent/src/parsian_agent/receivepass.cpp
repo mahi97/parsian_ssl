@@ -25,7 +25,7 @@ kkRPMode CSkillReceivePass::decideMode() {
 
     cirThresh = 1.0;
     Circle2D tempKickCircle(kkAgentPos, 0.3 + kickCirThresh);
-    Segment2D tempBallPath(ballPos, ballPos + wm->ball->vel.norm() * 10);
+    Segment2D tempBallPath(ballPos, ballPos + wm->ball->vel.normalizedVector() * 10);
     drawer->draw(tempBallPath, QColor(Qt::yellow));
     Vector2D sol1, sol2;
     if ((tempCircle2.intersection(tempBallPath, &sol1, &sol2) && wm->ball->vel.length() > 0.2)) {
@@ -49,27 +49,27 @@ void CSkillReceivePass::execute() {
     receivePassMode = decideMode();
     Segment2D ballPath;
     Vector2D sol1, sol2;
-    ballPath.assign(ballPos, ballPos + wm->ball->vel.norm() * (20));
+    ballPath.assign(ballPos, ballPos + wm->ball->vel.normalizedVector() * (20));
     drawer->draw(receiveArea, QColor(Qt::cyan));
 
 
     Vector2D agentPos = agent->pos();
     Vector2D oneTouchDir;
-    oneTouchDir = (ballPos - kkAgentPos).norm();
+    oneTouchDir = (ballPos - kkAgentPos).normalizedVector();
 
 
     //    Vector2D addVec = Vector2D(0.095*cos((target-kkAgentPos).th().radian()), 0.095*sin((target-kkAgentPos).th().radian()));
     Vector2D intersectPos;
-    Line2D agentDirLine(kkAgentPos , kkAgentPos + oneTouchDir.norm());
-    Line2D agentPerLine(kkAgentPos, kkAgentPos + oneTouchDir.norm());
+    Line2D agentDirLine(kkAgentPos , kkAgentPos + oneTouchDir.normalizedVector());
+    Line2D agentPerLine(kkAgentPos, kkAgentPos + oneTouchDir.normalizedVector());
     agentPerLine = agentDirLine.perpendicular(kkAgentPos);
-    Line2D tempBallPath(ballPos, ballPos + wm->ball->vel.norm());
+    Line2D tempBallPath(ballPos, ballPos + wm->ball->vel.normalizedVector());
     double tempDampSpeed;
 
     Vector2D tempVecDamp, tempDampTarget;
     switch (receivePassMode) {
     case RPWAITPOS:
-        if (target.valid()) {
+        if (target.isValid()) {
             gotopointavoid->init(target, oneTouchDir);
         } else {
             gotopointavoid->init(agent->pos(), oneTouchDir);
@@ -81,12 +81,12 @@ void CSkillReceivePass::execute() {
         break;
     case  RPDAMP:
     case RPRECEIVE:
-        tempVecDamp = (kkAgentPos - ballPos).norm();
+        tempVecDamp = (kkAgentPos - ballPos).normalizedVector();
         tempDampSpeed = (ballRealVel - agent->vel().length()) * 0.05;
         if (tempDampSpeed > 0.003) {
             tempDampSpeed = 0.003;
         }
-        tempDampTarget = ballPos + (kkAgentPos - ballPos).norm() * 0.10 + tempVecDamp * tempDampSpeed;
+        tempDampTarget = ballPos + (kkAgentPos - ballPos).normalizedVector() * 0.10 + tempVecDamp * tempDampSpeed;
         gotopointavoid->init(tempDampTarget, oneTouchDir);
         gotopointavoid->execute();
         DEBUG("RPdamp-Back", D_KK);
@@ -104,12 +104,12 @@ void CSkillReceivePass::execute() {
             bool posFound  = false;
             for (double i = 0 ; i < 5 ; i += 0.1) {
 
-                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
+                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).normalizedVector()*0.15;
                 QList <int> dummy;
                 agentTime = CSkillGotoPointAvoid::timeNeeded(agent, intersectPos, conf->VelMax, dummy, dummy, false, 0, true);
 
 
-                if (agentTime < (i - (0.5 /*- min(wm->ball->vel.length(),4)/8 */))) {
+                if (agentTime < (i - (0.5 /*- std::min(wm->ball->vel.length(),4)/8 */))) {
                     posFound  = true;
                     break;
                 }

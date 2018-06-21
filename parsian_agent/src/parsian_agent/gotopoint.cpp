@@ -106,7 +106,7 @@ void CSkillGotoPoint::trajectoryPlanner() {
     }
     ///////////////////////////////////////////// th pid
     thPid->kp = 0;
-    thPid->error = (agentMovementTh - agent->vel().norm().th()).radian();
+    thPid->error = (agentMovementTh - agent->vel().th()).radian();
     if ((fabs(thPid->error) > 1)
             || agentVc < 0.5
             || agentDist > 3

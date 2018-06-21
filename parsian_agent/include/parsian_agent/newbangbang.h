@@ -2,7 +2,7 @@
 #define NEWBANGBANG_H
 
 #include <parsian_util/base.h>
-#include <parsian_util/geom/geom.h>
+#include <parsian_util/geom.h>
 #include <parsian_util/tools/blackboard.h>
 #include <parsian_util/tools/drawer.h>
 
