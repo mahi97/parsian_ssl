@@ -124,7 +124,7 @@ void CPlanner::runPlanner() {
 
     nearestToGoal = nodes.findNearest(goal);
     nearestDist = nearestToGoal->pos.dist(goal);
-    while (nearestDist + EPSILON > threshold
+    while (nearestDist + Vector2D::EPSILON > threshold
             && nodes.size() < _PLANNER_EXTEND_POINT_LIMIT
             && nnn < _PLANNER_EXTEND_MAX_ATTEMPT) {
 
@@ -141,7 +141,7 @@ void CPlanner::runPlanner() {
             nearest->next = newNode;
             nodes.add(newNode);
 
-            if (nearestDist + EPSILON > newNode->pos.dist(goal)) {
+            if (nearestDist + Vector2D::EPSILON > newNode->pos.dist(goal)) {
                 nearestToGoal = newNode;
                 nearestDist = nearestToGoal->pos.dist(goal);
             }
@@ -159,10 +159,10 @@ void CPlanner::runPlanner() {
 
     obst.obsMargin = Robot::robot_radius_new + 0.03;
 
-    if (Rnodes.head && nearestDist + EPSILON > threshold) {
+    if (Rnodes.head && nearestDist + Vector2D::EPSILON > threshold) {
         RnearestToGoal = Rnodes.findNearest(Rgoal);
         RnearestDist = RnearestToGoal->pos.dist(Rgoal);
-        while (RnearestDist + EPSILON > threshold && Rnodes.size() < _PLANNER_EXTEND_POINT_LIMIT && Rnnn < _PLANNER_EXTEND_MAX_ATTEMPT) {
+        while (RnearestDist + Vector2D::EPSILON > threshold && Rnodes.size() < _PLANNER_EXTEND_POINT_LIMIT && Rnnn < _PLANNER_EXTEND_MAX_ATTEMPT) {
 
             Rtarget = chooseTarget(Rgoal);
 
@@ -177,7 +177,7 @@ void CPlanner::runPlanner() {
                 Rnearest->next = newNode;
                 Rnodes.add(newNode);
 
-                if (RnearestDist + EPSILON > newNode->pos.dist(Rgoal)) {
+                if (RnearestDist + Vector2D::EPSILON > newNode->pos.dist(Rgoal)) {
                     RnearestToGoal = newNode;
                     RnearestDist = RnearestToGoal->pos.dist(Rgoal);
                 }
@@ -198,13 +198,13 @@ void CPlanner::runPlanner() {
     vector <Vector2D> temp;
     state *lll = nullptr;
 
-    if (nearestToGoal->pos.dist(goal) + EPSILON < threshold) {
+    if (nearestToGoal->pos.dist(goal) + Vector2D::EPSILON < threshold) {
         temp.clear();
         while (nearestToGoal) {
             temp.push_back(nearestToGoal->pos);
             nearestToGoal = nearestToGoal->parent;
         }
-    } else if (RnearestToGoal && RnearestToGoal->pos.dist(Rgoal) + EPSILON < threshold) {
+    } else if (RnearestToGoal && RnearestToGoal->pos.dist(Rgoal) + Vector2D::EPSILON < threshold) {
         lll = nullptr;
         while (RnearestToGoal) {
             nearestToGoal = new state(RnearestToGoal->pos , lll , result);
@@ -243,7 +243,7 @@ void CPlanner::runPlanner() {
                 }
             }
         }
-        if (std::fabs(mn - 1000.0) > EPSILON && one != nullptr && two != nullptr) {
+        if (std::fabs(mn - 1000.0) > Vector2D::EPSILON && one != nullptr && two != nullptr) {
             auto num = static_cast<int>((one->pos.dist(two->pos)) / stepSize);
             for (int i = 1 ; i < num ; i++) {
                 two = new state(two->pos + (one->pos - two->pos).normalizedVector()*stepSize , two , result);
@@ -576,7 +576,7 @@ void CPlanner::generateObstacleSpace(CObstacles &obs, QList<int> &ourRelaxList, 
         }
     }
 
-    if (ballObstacleRadius > EPSILON) {
+    if (ballObstacleRadius > Vector2D::EPSILON) {
         obs.add_circle(wm->ball->pos.x, wm->ball->pos.y, ballObstacleRadius, wm->ball->vel.x , wm->ball->vel.y);
     }
 

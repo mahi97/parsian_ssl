@@ -56,7 +56,7 @@ bool obstacle::check(state s0, state s1 , double obsMargin) {
     double d;
 
     d = s0.pos.dist(s1.pos);
-    if (d < EPSILON) {
+    if (d < Vector2D::EPSILON) {
         return (check(s0 , obsMargin));
     }
 
