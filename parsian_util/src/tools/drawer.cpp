@@ -81,7 +81,7 @@ void Drawer::draw(const Polygon2D& _polygon, const QColor& _color, bool _filled)
 
     parsian_msgs::parsian_draw_polygon drawPolygon;
 
-    for (auto vector : _polygon.vertices()) {
+    for (auto vector : _polygon.vertex()) {
         drawPolygon.points.push_back(std::move(toParsianVec(vector)));
     }
 
@@ -93,8 +93,8 @@ void Drawer::draw(const Polygon2D& _polygon, const QColor& _color, bool _filled)
 void Drawer::draw(const Segment2D& _seg, const QColor& _color) {
     parsian_msgs::parsian_draw_segment drawSegment;
 
-    drawSegment.start = toParsianVec(_seg.origin());
-    drawSegment.end   = toParsianVec(_seg.terminal());
+    drawSegment.start = toParsianVec(_seg.a());
+    drawSegment.end   = toParsianVec(_seg.b());
     drawSegment.color = toColorRGBA(_color);
     drawSegment.line  = false;
     drawSegment.ray   = false;

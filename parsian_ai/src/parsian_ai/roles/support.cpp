@@ -34,8 +34,8 @@ void CRoleSupport::execute() {
         kick->execute();
         debug("supporting kick", int(D_SEPEHR));
     }
-    if (!info()->supportPosition.isValid() || info()->supportPosition.dist(wm->field->ourGoal()) < 1.8) {
-        info()->supportPosition = (wm->ball->pos - wm->field->ourGoal()).normalizedVector() * 1.8 + wm->field->ourGoal();
+    if (!info()->supportPosition.valid() || info()->supportPosition.dist(wm->field->ourGoal()) < 1.8) {
+        info()->supportPosition = (wm->ball->pos - wm->field->ourGoal()).norm() * 1.8 + wm->field->ourGoal();
     } else {
         if (knowledge->getSupporPlaymaker() == CKnowledge::Back) {
             gotopoint->setTargetLook(info()->supportPosition, wm->ball->pos)->execute();
@@ -70,13 +70,13 @@ void CRoleSupportInfo::findPos() {
     calculated = true;
     Vector2D playmakerPos;
     if (knowledge->getPlayMaker() == NULL) {
-        supportPosition = ((wm->field->ourGoal() - wm->ball->pos).normalizedVector() * (Robot::robot_radius_old * 3.0 + 0.3)) + wm->ball->pos;
+        supportPosition = ((wm->field->ourGoal() - wm->ball->pos).norm() * (Robot::robot_radius_old * 3.0 + 0.3)) + wm->ball->pos;
         return;
     }
     playmakerPos = knowledge->getPlayMaker()->pos();
     if (knowledge->getSupporPlaymaker() == CKnowledge::Back) {
         debug("supporting back", int(D_SEPEHR));
-        supportPosition = ((wm->field->ourGoal() - wm->ball->pos).normalizedVector() * (Robot::robot_radius_old * 4.5 + playmakerPos.dist(wm->ball->pos))) + wm->ball->pos;
+        supportPosition = ((wm->field->ourGoal() - wm->ball->pos).norm() * (Robot::robot_radius_old * 4.5 + playmakerPos.dist(wm->ball->pos))) + wm->ball->pos;
         return;
     }
     if (knowledge->getSupporPlaymaker() == CKnowledge::Left) {
@@ -91,8 +91,8 @@ void CRoleSupportInfo::findPos() {
     }
     if (knowledge->getSupporPlaymaker() == CKnowledge::Front) {
         debug("supporting front", int(D_SEPEHR));
-        supportPosition = ((wm->field->oppGoal() - wm->ball->pos).normalizedVector() * 0.45) + wm->ball->pos;
+        supportPosition = ((wm->field->oppGoal() - wm->ball->pos).norm() * 0.45) + wm->ball->pos;
         return;
     }
-    supportPosition = (wm->field->oppGoal() - playmakerPos).normalizedVector() * 0.4 + playmakerPos;
+    supportPosition = (wm->field->oppGoal() - playmakerPos).norm() * 0.4 + playmakerPos;
 }

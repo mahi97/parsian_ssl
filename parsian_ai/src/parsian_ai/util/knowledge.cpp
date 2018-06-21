@@ -53,7 +53,7 @@ bool operator == (const emptyAngleStruct& a, const emptyAngleStruct& b) {
 /////////////////////////////
 
 Vector2D Knowledge::getPointInDirection(Vector2D firstPoint, Vector2D secondPoint, double proportion) {
-    firstPoint = firstPoint + (secondPoint - firstPoint).setLengthVector(proportion) * (Segment2D(secondPoint , firstPoint).length());
+    firstPoint = firstPoint + (secondPoint - firstPoint).norm() * proportion * (Segment2D(secondPoint , firstPoint).length());
     return firstPoint;
 }
 
@@ -62,15 +62,15 @@ inline double getAngle(float x1, float y1, float x2, float y2) {
 }
 
 inline float normalang(float dir) {
-    auto _2PI = static_cast<const float>(2.0 * M_PI);
-    if (dir < -_2PI || _2PI < dir) {
+    const float _2PI = 2.0 * M_PI;
+    if (dir < -2.0 * M_PI || 2.0 * M_PI < dir) {
         dir = std::fmod(dir, _2PI);
     }
     if (dir < -M_PI) {
-        dir += _2PI;
+        dir += 2.0 * M_PI;
     }
     if (dir > M_PI) {
-        dir -= _2PI;
+        dir -= 2.0 * M_PI;
     }
     return dir;
 }
@@ -501,7 +501,7 @@ Vector2D Knowledge::getEmptyPosOnGoal(Vector2D from, double &regionWidth, bool o
         regionWidth = 1.0;
     }
     Vector2D p = Segment2D(goalL, goalR).intersection(Line2D(from, AngleDeg(angle)));
-    if (p.isValid()) {
+    if (p.valid()) {
         return p;
     }
     return (goalL + goalR) / 2.0;
@@ -844,7 +844,7 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
         time += 0.1;
         if (time > 20) {
             if (wm->ball->vel.length() > 0.2) {
-                Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.normalizedVector());
+                Line2D line(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
                 if (f.ourFastest == -1 and ourList.count() > 0) {
                     double min = 99999;
                     for (int i = 0; i < ourList.count(); i++) {
@@ -879,7 +879,7 @@ FastestToBall Knowledge::findFastestToBall(QList<int> ourList, QList<int> oppLis
             break;
         }
     }
-    f.catch_time = std::min(time, f.catch_time);
+    f.catch_time = min(time, f.catch_time);
     return f;
 }
 

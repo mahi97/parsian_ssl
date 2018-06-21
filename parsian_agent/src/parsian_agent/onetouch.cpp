@@ -82,15 +82,15 @@ Vector2D CSkillKickOneTouch::findMostPossible() {
     }
     double prob, angle, biggestAngle;
 
-    CKnowledge::getEmptyAngle(*wm->field, wm->ball->pos - (wm->field->oppGoal() - wm->ball->pos).normalizedVector() * 0.15, wm->field->oppGoalL(), wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
+    CKnowledge::getEmptyAngle(*wm->field, wm->ball->pos - (wm->field->oppGoal() - wm->ball->pos).norm() * 0.15, wm->field->oppGoalL(), wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
     DEBUG(QString("prob: %1 , angle :%2, biggest:%3").arg(prob).arg(angle).arg(biggestAngle), D_MHMMD);
 
     Segment2D goalSeg(wm->field->oppGoalL(), wm->field->oppGoalR());
     Vector2D sol1, sol2;
     DEBUG(QString("ang %1").arg(angle), D_MHMMD);
-    drawer->draw(Segment2D(wm->ball->pos , wm->ball->pos + Vector2D(cos(_PI * (angle) / 180), sin(_PI * (angle) / 180)).normalizedVector() * 12));
+    drawer->draw(Segment2D(wm->ball->pos , wm->ball->pos + Vector2D(cos(_PI * (angle) / 180), sin(_PI * (angle) / 180)).norm() * 12));
 
-    return  goalSeg.intersection(Segment2D(wm->ball->pos , wm->ball->pos + Vector2D(cos(_PI * (angle) / 180), sin(_PI * (angle) / 180)).normalizedVector() * 12));
+    return  goalSeg.intersection(Segment2D(wm->ball->pos , wm->ball->pos + Vector2D(cos(_PI * (angle) / 180), sin(_PI * (angle) / 180)).norm() * 12));
 }
 
 
@@ -102,7 +102,7 @@ void CSkillKickOneTouch::execute() {
     if (shotToEmptySpot) {
         target = findMostPossible();
     }
-    if (!target.isValid()) {
+    if (!target.valid()) {
         target = wm->field->oppGoal();
     }
 
@@ -113,17 +113,17 @@ void CSkillKickOneTouch::execute() {
 
     Segment2D ballPath;
     double stopParam = 0.085;
-    ballPath.assign(ballPos, ballPos + wm->ball->vel.normalizedVector() * 15);
+    ballPath.assign(ballPos, ballPos + wm->ball->vel.norm() * 15);
     Segment2D ballLine;
-    ballLine.assign(ballPos, ballPos + wm->ball->vel.normalizedVector() * (15));
+    ballLine.assign(ballPos, ballPos + wm->ball->vel.norm() * (15));
     drawer->draw(ballPath, "red");
-    Vector2D kickerPoint = agentPos + agent->dir().normalizedVector() * stopParam;
+    Vector2D kickerPoint = agentPos + agent->dir().norm() * stopParam;
 
 
 
     Vector2D oneTouchDir = Vector2D::unitVector(oneTouchAngle(agentPos, agent->vel(), wm->ball->vel, agentPos - ballPos, target, conf->Landa, conf->Gamma,6.5));
     drawer->draw(QString("vball :%1").arg(conf->Landa), Vector2D(0, 0));
-    //drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.normalizedVector()), QColor(Qt::red));
+    //drawer->draw(Segment2D(Vector2D(0,0), Vector2D(0,0)+oneTouchDir.norm()), QColor(Qt::red));
 
     Vector2D intersectPos;
     Vector2D sol1, sol2;
@@ -161,9 +161,9 @@ void CSkillKickOneTouch::execute() {
             bool posFound  = false;
             for (double i = 0 ; i < 5 ; i += 0.1) {
 
-                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).normalizedVector()*0.15;
+                intersectPos = wm->ball->getPosInFuture(i);// - (target-wm->ball->getPosInFuture(i)).norm()*0.15;
                 QList <int> dummy;
-                (intersectPos - target).normalizedVector() * stopParam;
+                (intersectPos - target).norm() * stopParam;
                 agentTime = CSkillGotoPointAvoid::timeNeeded(agent, intersectPos + addVec, conf->VelMax, dummy, dummy, false, 0, true);
 
 
@@ -194,7 +194,7 @@ void CSkillKickOneTouch::execute() {
             }
         }
 
-        Vector2D addVec = (intersectPos - target).normalizedVector() * stopParam;
+        Vector2D addVec = (intersectPos - target).norm() * stopParam;
 
         gotopointavoid->init(intersectPos + addVec, oneTouchDir);
         gotopointavoid->setNoavoid(true);

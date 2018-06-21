@@ -4,6 +4,7 @@
 #include <parsian_ai/plays/masterplay.h>
 #include <parsian_ai/roles/playmake.h>
 #include <parsian_ai/gamestate.h>
+#include <parsian_util/geom/geom.h>
 #include <parsian_ai/util/knowledge.h>
 #include <parsian_ai/roles/playmake.h>
 
