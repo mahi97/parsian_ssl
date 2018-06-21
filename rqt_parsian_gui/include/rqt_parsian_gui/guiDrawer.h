@@ -9,7 +9,7 @@
 #include <QQueue>
 #include <QColor>
 #include <GL/gl.h>
-#include <parsian_util/geom/geom.h>
+#include <parsian_util/geom.h>
 #include <parsian_msgs/parsian_draw_circle.h>
 #include <parsian_msgs/parsian_draw_polygon.h>
 #include <parsian_msgs/parsian_draw_rect.h>
