@@ -4,7 +4,7 @@
 #ifndef PARSIAN_UTIL_DRAWER_H_H
 #define PARSIAN_UTIL_DRAWER_H_H
 
-#include "parsian_util/geom.h"
+#include "parsian_util/geom/geom.h"
 #include "parsian_msgs/parsian_draw.h"
 
 #include <QtCore/QString>

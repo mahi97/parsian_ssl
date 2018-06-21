@@ -25,7 +25,7 @@ void CRoleFaultInfo::findPositions()
         TA = wm->field->ourGoal();
 
     Vector2D baseDirVec;
-    baseDirVec = (TA - c).normalizedVector();
+    baseDirVec = (TA - c).norm();
 
 
     Ps.clear();
@@ -103,7 +103,7 @@ void CRoleFault::execute()
     target.y = 0;
 
     gotopoint->setSlowmode(true);
-    if (wm->ball->inSight<=0 || !wm->ball->pos.isValid() || !wm->field->isInField(wm->ball->pos)) {
+    if (wm->ball->inSight<=0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
         noAction->setWaithere(true);
         agent->action = noAction;
         return;

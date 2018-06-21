@@ -70,12 +70,12 @@ void CSkillGotoPointAvoid::execute()
         bangBang->setVelMax(conf->VelMax);
     }
 
-    if (!Vector2D(targetPos).isValid()) {
+    if (!Vector2D(targetPos).valid()) {
         agent->waitHere();
         return;
     }
 
-    if (!targetVel.isValid()) {
+    if (!targetVel.valid()) {
         targetVel.assign(0, 0);
     }
 
@@ -108,8 +108,8 @@ void CSkillGotoPointAvoid::execute()
     }
 
 
-    if (lookAt.isValid()) {
-        targetDir = (lookAt - agentPos).normalizedVector();
+    if (lookAt.valid()) {
+        targetDir = (lookAt - agentPos).norm();
     }
 
     //    knowledge->plotWidgetCustom[1] = agentVel.length();
@@ -138,8 +138,8 @@ void CSkillGotoPointAvoid::execute()
     //        }
     //    }
 
-    if (lookAt.isValid()) {
-        targetDir = (lookAt - agentPos).normalizedVector();
+    if (lookAt.valid()) {
+        targetDir = (lookAt - agentPos).norm();
     }
 
     if (noAvoid) {
@@ -162,7 +162,7 @@ void CSkillGotoPointAvoid::execute()
     Vector2D dir(0, 0);
 
     if (result.size() > 1) {
-        dir = (result[1] - result[0]).normalizedVector();
+        dir = (result[1] - result[0]).norm();
     }
 
     double D = 0 , alpha = 0 , d = 0 , vf = 0;
@@ -183,7 +183,7 @@ void CSkillGotoPointAvoid::execute()
     //                else{
     //                    alpha = fabs(Vector2D::angleBetween(result[i] - result[0] , result[i+1] - result[i]).degree());
     //                    vf = -1.0259280143 * log(alpha) + 4.570475303;
-    //                    vf = std::min(vf , 0.5);
+    //                    vf = max(vf , 0.5);
     //                }
     //                D = result[i].dist(result[0]);
     //                lllll = result[i];
@@ -201,8 +201,8 @@ void CSkillGotoPointAvoid::execute()
         lllll = result[1];
 
         vf = -1.8 * log(alpha) + 11.5 - (agentVel.length()) * 1;
-        vf = std::min(vf , 0.5);
-        vf = std::min(vf, 4.0);
+        vf = max(vf , 0.5);
+        vf = min(vf, 4);
     } else {
         vf = 0;
         lllll = targetPos;
@@ -300,7 +300,7 @@ double CSkillGotoPointAvoid::timeNeeded(Agent *_agentT, Vector2D posT, double vM
     QList <Vector2D> _result;
     Vector2D _target;
 
-    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().normalizedVector()).radian());
+    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
     /*if(_noAvoid)
     {
         _result.clear();

@@ -6,6 +6,7 @@
 
 #include <parsian_util/action/autogenerate/gotopointaction.h> 
 
+#include <parsian_util/geom/geom.h>
 #include <parsian_msgs/parsian_skill_gotoPointAvoid.h>
 #include <list>
 

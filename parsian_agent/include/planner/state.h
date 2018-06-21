@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "parsian_util/geom.h"
+#include "parsian_util/geom/geom.h"
 #include <QList>
 #include <vector>
 
