@@ -1799,15 +1799,6 @@ parsian_msgs::plan_serviceResponse CCoach::getLastPlan() {
     return receivedPlan;
 }
 
-void CCoach::updateBehavior(const parsian_msgs::parsian_behaviorConstPtr _behav) {
-    m_behavior = _behav;
-    //    if (_behav->name == "mahi") {
-    //        selectedBehavior = behaviorMahi;
-    //    } else {
-    //        selectedBehavior = nullptr;
-    //    }
-}
-
 int CCoach::findGoalie() {
     if (conf.useGoalieInPlayoff
         && gameState->ourPlayOffKick()
