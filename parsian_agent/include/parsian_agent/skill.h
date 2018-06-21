@@ -9,7 +9,7 @@
 #include <parsian_msgs/parsian_robot.h>
 #include <parsian_msgs/parsian_agent.h>
 #include <parsian_util/core/worldmodel.h>
-#include <parsian_util/geom.h>
+#include <parsian_util/geom/geom.h>
 #include <QtCore/QStringList>
 #include <parsian_util/action/action.h>
 #include <parsian_agent/agent.h>

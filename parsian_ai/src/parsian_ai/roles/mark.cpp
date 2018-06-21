@@ -102,22 +102,22 @@ void CRoleMark::execute() {
         toBeMarkedID = info()->markedOpp.at(0);
 
         Vector2D nextPos;
-        if (wm->opp[toBeMarkedID]->vel.isValid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
+        if (wm->opp[toBeMarkedID]->vel.valid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
             nextPos = (wm->opp[toBeMarkedID]->vel * predit_time) + wm->opp[toBeMarkedID]->pos;
         } else {
             nextPos = wm->opp[toBeMarkedID]->pos;
         }
         //this may result in push (when it enters the above else)
-        markPos = ((wm->ball->pos - nextPos).normalizedVector() * (2 * Robot::robot_radius_new)) + nextPos;
+        markPos = ((wm->ball->pos - nextPos).norm() * (2 * Robot::robot_radius_new)) + nextPos;
     } else if (toBeMarkedID != -1 && info()->markedOpp.contains(toBeMarkedID) == true) {
         Vector2D nextPos;
-        if (wm->opp[toBeMarkedID]->vel.isValid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
+        if (wm->opp[toBeMarkedID]->vel.valid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
             nextPos = (wm->opp[toBeMarkedID]->vel * predit_time) + wm->opp[toBeMarkedID]->pos;
         } else {
             nextPos = wm->opp[toBeMarkedID]->pos;
         }
         //this may result in push (when it enters the above else)
-        markPos = ((wm->ball->pos - nextPos).normalizedVector() * (2 * Robot::robot_radius_new)) + nextPos;
+        markPos = ((wm->ball->pos - nextPos).norm() * (2 * Robot::robot_radius_new)) + nextPos;
     } else {
         bool markFailed = false;
         if (toBeMarkedID != -1 && wm->opp[toBeMarkedID]->inSight <= 0) {
@@ -132,12 +132,12 @@ void CRoleMark::execute() {
             wm->opp[toBeMarkedID]->markedByMark = true;
             draw(QString("%1").arg(agent->id()) , wm->opp[toBeMarkedID]->pos + Vector2D(0.2 , -0.2) , "yellow");
 
-            if (wm->opp[toBeMarkedID]->vel.isValid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
+            if (wm->opp[toBeMarkedID]->vel.valid() && wm->opp[toBeMarkedID]->vel.length() > 0.3) {
                 nextPos = (wm->opp[toBeMarkedID]->vel * predit_time) + wm->opp[toBeMarkedID]->pos;
             } else {
                 nextPos = wm->opp[toBeMarkedID]->pos;
             }
-            markPos = ((wm->field->ourGoal() - nextPos).normalizedVector() * (2 * Robot::robot_radius_new)) + nextPos;
+            markPos = ((wm->field->ourGoal() - nextPos).norm() * (2 * Robot::robot_radius_new)) + nextPos;
         }
     }
 
@@ -150,41 +150,41 @@ void CRoleMark::execute() {
         }
     }
 
-    maxDist =std::max(1 , maxDist);
+    maxDist = max(1 , maxDist);
 
     if (wm->field->ourGoal().dist(markPos) > maxDist) {
         for (int i = 0 ; i < 1000 && wm->field->ourGoal().dist(markPos) > maxDist ; i++) {
-            markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * 0.01) + markPos;
+            markPos = ((wm->field->ourGoal() - markPos).norm() * 0.01) + markPos;
         }
     }
 
     if (kickOffMode) {
         if (markPos.length() < 0.600 || markPos.x > -Robot::robot_radius_new) {
             for (int i = 0 ; i < 1000 && (markPos.x > -Robot::robot_radius_new || markPos.length() < 0.700) ; i++) {
-                markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * 0.01) + markPos;
+                markPos = ((wm->field->ourGoal() - markPos).norm() * 0.01) + markPos;
             }
         }
     }
 
     if (wm->ball->pos.x + 1 < markPos.x) {
         for (int i = 0 ; i < 1000 && wm->ball->pos.x + 1 < markPos.x ; i++) {
-            markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * 0.01) + markPos;
+            markPos = ((wm->field->ourGoal() - markPos).norm() * 0.01) + markPos;
         }
     }
 
-    Vector2D checkMarkPos = markPos + (wm->field->ourGoal() - markPos).normalizedVector() * 0.10;
+    Vector2D checkMarkPos = markPos + (wm->field->ourGoal() - markPos).norm() * 0.10;
     if (wm->field->isInOurPenaltyArea(checkMarkPos)) {
         for (int i = 0 ; i < 1000 && wm->field->isInOurPenaltyArea(checkMarkPos) ; i++) {
-            checkMarkPos = ((checkMarkPos - wm->field->ourGoal()).normalizedVector() * 0.01) + checkMarkPos;
+            checkMarkPos = ((checkMarkPos - wm->field->ourGoal()).norm() * 0.01) + checkMarkPos;
         }
-        markPos = checkMarkPos + (checkMarkPos - wm->field->ourGoal()).normalizedVector() * 0.10;;
+        markPos = checkMarkPos + (checkMarkPos - wm->field->ourGoal()).norm() * 0.10;;
     }
 
 
     if ((knowledge->getGameState() == CKnowledge::TheirIndirectKick || knowledge->getGameState() == CKnowledge::TheirDirectKick)
             && markPos.dist(wm->ball->pos) < 0.600) {
         for (int i = 0 ; i < 1000 && markPos.dist(wm->ball->pos) < 0.600 ; i++) {
-            markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * (0.01)) + markPos;
+            markPos = ((wm->field->ourGoal() - markPos).norm() * (0.01)) + markPos;
         }
     }
 
@@ -194,7 +194,7 @@ void CRoleMark::execute() {
         while ((blocker = info()->blocker(k)) != NULL) {
             if ((blocker->pos() - markPos).length() < Robot::robot_radius_new * 3.0) {
                 for (int i = 0 ; i < 1000 && ((blocker->pos() - markPos).length() < Robot::robot_radius_new * 3.0) ; i++) {
-                    markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * 0.01) + markPos;
+                    markPos = ((wm->field->ourGoal() - markPos).norm() * 0.01) + markPos;
                 }
             }
             k++;
@@ -203,7 +203,7 @@ void CRoleMark::execute() {
 
     if (markPos.dist(wm->field->oppGoal()) < 1) {
         for (int i = 0 ; i < 1000 && markPos.dist(wm->field->oppGoal()) < 1 ; i++) {
-            markPos = ((wm->field->ourGoal() - markPos).normalizedVector() * 0.01) + markPos;
+            markPos = ((wm->field->ourGoal() - markPos).norm() * 0.01) + markPos;
         }
     }
 
@@ -339,7 +339,7 @@ void CRoleMarkInfo::matching() {
                     mwbm.setWeight(i, j, score);
                     Segment2D seg(wm->our[ourOffenders[i]]->pos , wm->opp[oppOffenders[j]]->pos);
                     draw(seg , "blue");
-                    draw(QString("%1").arg(score) , (seg.origin() + seg.terminal()) / 2);
+                    draw(QString("%1").arg(score) , (seg.a() + seg.b()) / 2);
                 }
 
             for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {
@@ -383,7 +383,7 @@ void CRoleMarkInfo::matching() {
                 mwbm.setWeight(i, j, score);
                 Segment2D seg(wm->our[ourOffenders[i]]->pos , wm->opp[oppOffenders[j]]->pos);
                 draw(seg , "blue");
-                draw(QString("%1").arg(score) , (seg.origin() + seg.terminal()) / 2);
+                draw(QString("%1").arg(score) , (seg.a() + seg.b()) / 2);
             }
 
         for (int i = 0; i < _MAX_NUM_PLAYERS; i++) {

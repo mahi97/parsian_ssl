@@ -92,7 +92,7 @@ QList<Vector2D> WorldModel::AHZOurPAreaIntersect(Segment2D segment, QString role
     }
 
     vSol1 = s.intersection(segment);
-    if (vSol1.isValid()) {
+    if (vSol1.valid()) {
         results.append(vSol1);
     }
 

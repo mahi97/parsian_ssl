@@ -12,9 +12,9 @@ CRoleGaurd::~CRoleGaurd() {
 
 void CRoleGaurd::execute() {
     gotopoint->setAgent(agent);
-    Vector2D point = wm->ball->pos - (wm->ball->pos - wm->field->ourGoal()).normalizedVector() * 1.5;
+    Vector2D point = wm->ball->pos - (wm->ball->pos - wm->field->ourGoal()).norm() * 1.5;
     if (opposite) {
-        point = wm->ball->pos - (wm->ball->pos - wm->field->oppGoal()).normalizedVector() * 1.5;
+        point = wm->ball->pos - (wm->ball->pos - wm->field->oppGoal()).norm() * 1.5;
     }
     gotopoint->setTargetLook(point, wm->ball->pos)->execute();
 }

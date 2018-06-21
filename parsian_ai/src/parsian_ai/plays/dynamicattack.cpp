@@ -142,7 +142,7 @@ bool CDynamicAttack::evalmovefwd()
     sortobstacles(obstacles);
     //   for(int i{}; i < obstacles.size(); i++)
     //   {
-    //       ROS_INFO_STREAM("kian::: "<<obstacles[i].origin().y);
+    //       ROS_INFO_STREAM("kian::: "<<obstacles[i].a().y);
     //       //drawer->draw(obstacles[i], QColor(50, 55, 155));
     //   }
     //ROS_INFO_STREAM("debug: 3");
@@ -172,13 +172,13 @@ bool CDynamicAttack::evalmovefwd()
         tmp.first = tmp1;
         tmp.first.x += wm->ball->pos.x + wm->ball->vel.x;
         tmp.first.y += wm->ball->pos.y + wm->ball->vel.y;
-        if(obstacles[i].origin().dist(Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}) > obstacles[i+1].origin().dist(Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}))
+        if(obstacles[i].a().dist(Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}) > obstacles[i+1].a().dist(Vector2D{wm->ball->pos.x + wm->ball->vel.x, wm->ball->pos.y + wm->ball->vel.y}))
         {
-            nearestoppdist.push_back(obstacles[i+1].origin().dist(Vector2D{wm->ball->pos.x, wm->ball->pos.y}));
+            nearestoppdist.push_back(obstacles[i+1].a().dist(Vector2D{wm->ball->pos.x, wm->ball->pos.y}));
         }
         else
         {
-            nearestoppdist.push_back(obstacles[i].origin().dist(Vector2D{wm->ball->pos.x, wm->ball->pos.y}));
+            nearestoppdist.push_back(obstacles[i].a().dist(Vector2D{wm->ball->pos.x, wm->ball->pos.y}));
         }
         //ROS_INFO_STREAM("kian1: " << angles[i] * nearestoppdist);
         tmp.second =angles[i] * nearestoppdist[nearestoppdist.size()];//angleWide(prob) * nearestDist(prob) * diffrenceWithPI/2(effectivity)
@@ -254,8 +254,8 @@ void CDynamicAttack::sortobstacles(QList<Segment2D> &obstacles)
 
 double CDynamicAttack::angleOfTwoSegment(const Segment2D &xp, const Segment2D &yp)
 {
-    double theta1 = std::atan2(xp.origin().y-xp.terminal().y,xp.origin().x-xp.terminal().x);
-    double theta2 = std::atan2(yp.origin().y-yp.terminal().y,yp.origin().x-yp.terminal().x);
+    double theta1 = std::atan2(xp.a().y-xp.b().y,xp.a().x-xp.b().x);
+    double theta2 = std::atan2(yp.a().y-yp.b().y,yp.a().x-yp.b().x);
     double diff = fabs(theta1-theta2);
     return diff;
 }
@@ -812,7 +812,7 @@ void CDynamicAttack::chooseBestPositons() {
                     } else {
                         y = lastYDrib;
                     }
-                    x = std::min(wm->ball->pos.x - 0.1, 3.3);
+                    x = min(wm->ball->pos.x - 0.1, 3.3);
                 } else {
                     thrshDribble = 0.2;
                     if (lastYDrib == 10) {
@@ -889,7 +889,7 @@ void CDynamicAttack::chooseBestPositons() {
                 //            debug(QString("angle   is  : %1").arg(tempAngle    [j]), D_PARSA);
                 //            debug(QString("toofar  is  : %1").arg(tooFarToBall [j]), D_PARSA);
                 //            debug(QString("toonear is  : %1").arg(tooNearToBall[j]), D_PARSA);
-                maxAng =std::max(maxAng, tempAngle[j]);
+                maxAng = max(maxAng, tempAngle[j]);
             }
             for (int j = 0; j < guardSize; j++)
                 if (tempAngle[j] < 70 || (j == guardSize - 1 && tempAngle[j] < 80))
@@ -998,7 +998,7 @@ void CDynamicAttack::swapPlaymakeInPass()
 
 bool CDynamicAttack::isInpass()
 {
-    Line2D ballpath{wm->ball->pos, wm->ball->pos + wm->ball->vel.normalizedVector() * 10};
+    Line2D ballpath{wm->ball->pos, wm->ball->pos + wm->ball->vel.norm() * 10};
     Circle2D receiverRegion(currentPlan.passPos, 1.3);
     Vector2D sol1;
     Vector2D sol2;
@@ -1043,7 +1043,7 @@ void CDynamicAttack::chooseReceiverAndBestPosForPass() {
 
         validateSegment(recieveSegment);
         double angle = 0, biggestAngle = 0, prob = 0;
-        CKnowledge::getEmptyAngle(*wm->field, playmake->pos(), recieveSegment.origin(), recieveSegment.terminal(), obstacles, prob, angle, biggestAngle);
+        CKnowledge::getEmptyAngle(*wm->field, playmake->pos(), recieveSegment.a(), recieveSegment.b(), obstacles, prob, angle, biggestAngle);
         points.append(recieveSegment.intersection(Line2D(playmake->pos(), angle)));
         probs.append(prob);
 
@@ -1947,7 +1947,7 @@ double CDynamicAttack::calcOneTouchAngleFactor(Vector2D robotPos)
 {
     double fieldWidth = wm->field->_FIELD_WIDTH;
     double penaltyWidth = wm->field->_PENALTY_WIDTH;
-    Vector2D robotBallDir = (playmake->pos() - robotPos).normalizedVector();
+    Vector2D robotBallDir = (playmake->pos() - robotPos).norm();
     double oneTouchAngle = 60;
 
     if(robotBallDir.x <= 0 )
@@ -2097,60 +2097,60 @@ void CDynamicAttack::validateSegment(Segment2D &seg) {
     sol1.invalidate();
     sol2.invalidate();
     Vector2D mid;
-    mid = (seg.origin() + seg.terminal()) / 2;
-    if (wm->field->fieldRect().intersection(Segment2D(seg.origin(), mid), &sol1, &sol2)) {
-        seg.assign((sol1.isValid()) ? sol1 : sol2, seg.terminal());
-        mid = (seg.origin() + seg.terminal()) / 2;
+    mid = (seg.a() + seg.b()) / 2;
+    if (wm->field->fieldRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
+        seg.assign((sol1.isValid()) ? sol1 : sol2, seg.b());
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
-    if (wm->field->fieldRect().intersection(Segment2D(mid, seg.terminal()), &sol1, &sol2)) {
-        seg.assign(seg.origin(), (sol1.isValid()) ? sol1 : sol2);
-        mid = (seg.origin() + seg.terminal()) / 2;
+    if (wm->field->fieldRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
+        seg.assign(seg.a(), (sol1.isValid()) ? sol1 : sol2);
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
-    if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.origin(), mid), &sol1, &sol2)) {
+    if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
         Vector2D t = (!sol1.isValid()) ? sol2 : (!sol2.isValid()) ? Vector2D(5000,5000) : (sol1.x < sol2.x) ? sol1 : sol2;
-        seg.assign(t, seg.terminal());
-        mid = (seg.origin() + seg.terminal()) / 2;
+        seg.assign(t, seg.b());
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
-    if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.terminal()), &sol1, &sol2)) {
+    if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
         Vector2D t = (!sol1.isValid()) ? sol2 : (!sol2.isValid()) ? Vector2D(5000,5000) : (sol1.x < sol2.x) ? sol1 : sol2;
-        seg.assign(seg.origin(), t);
-        mid = (seg.origin() + seg.terminal()) / 2;
+        seg.assign(seg.a(), t);
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
-    if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.origin(), mid), &sol1, &sol2)) {
+    if (wm->field->oppPenaltyRect().intersection(Segment2D(seg.a(), mid), &sol1, &sol2)) {
         Vector2D t = (!sol1.isValid()) ? sol2 : (!sol2.isValid()) ? Vector2D(5000,5000) : (sol1.x < sol2.x) ? sol1 : sol2;
-        seg.assign(t, seg.terminal());
-        mid = (seg.origin() + seg.terminal()) / 2;
+        seg.assign(t, seg.b());
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
-    if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.terminal()), &sol1, &sol2)) {
+    if (wm->field->oppPenaltyRect().intersection(Segment2D(mid, seg.b()), &sol1, &sol2)) {
         Vector2D t = (!sol1.isValid()) ? sol2 : (!sol2.isValid()) ? Vector2D(5000, 5000) : (sol1.x < sol2.x) ? sol1 : sol2;
-        seg.assign(seg.origin(), t);
-        mid = (seg.origin() + seg.terminal()) / 2;
+        seg.assign(seg.a(), t);
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
     Vector2D t;
     if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH / 2), Vector2D(0, -wm->field->_FIELD_WIDTH / 2)).intersection(
-            Segment2D(seg.origin(), mid)), t.isValid()) {
-        seg.assign(t, seg.terminal());
-        mid = (seg.origin() + seg.terminal()) / 2;
+            Segment2D(seg.a(), mid)), t.isValid()) {
+        seg.assign(t, seg.b());
+        mid = (seg.a() + seg.b()) / 2;
     }
     sol1.invalidate();
     sol2.invalidate();
     if (t = Segment2D(Vector2D(0, wm->field->_FIELD_WIDTH / 2),
                       Vector2D(0, -wm->field->_FIELD_WIDTH / 2)).intersection(
-            Segment2D(mid, seg.terminal())), t.isValid()) {
-        seg.assign(seg.origin(), t);
-        mid = (seg.origin() + seg.terminal()) / 2;
+            Segment2D(mid, seg.b())), t.isValid()) {
+        seg.assign(seg.a(), t);
+        mid = (seg.a() + seg.b()) / 2;
     }
 }
 

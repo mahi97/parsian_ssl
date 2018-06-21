@@ -1,7 +1,7 @@
 #ifndef WORLD_MODEL_H
 #define WORLD_MODEL_H
 
-#include "parsian_util/geom.h"
+#include "parsian_util/geom/geom.h"
 #include "parsian_msgs/parsian_world_model.h"
 #include "parsian_util/core/field.h"
 #include "parsian_util/core/ball.h"

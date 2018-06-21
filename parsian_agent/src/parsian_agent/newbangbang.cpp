@@ -44,7 +44,7 @@ void CNewBangBang::trajectoryPlanner() {
     velMax = vmax;
     //    }
     ///////////////////////////////////////////// th pid
-    thPid->error = (agentMovementTh - agentVel.th()).radian();
+    thPid->error = (agentMovementTh - agentVel.norm().th()).radian();
     if (agentVel.length() < 0.3) {
         thPid->error = 0;
     }
@@ -94,8 +94,8 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     }
     if (slow) {
         posPid->kp = (conf->posKP) * (0.001 / (agentPos.dist(pos2) * agentPos.dist(pos2)));
-        posPid->kp = std::min(posPid->kp, 2.5);
-        posPid->kp = std::max(posPid->kp, 1.5);
+        posPid->kp = min(posPid->kp, 2.5);
+        posPid->kp = max(posPid->kp, 1.5);
 
         posPid->kd = conf->posKD;
         posPid->ki = conf->posKI;
@@ -106,16 +106,16 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     } else if (oneTouch) {
         posPid->kp = (conf->posKP) * (0.04 / (agentPos.dist(pos2) * agentPos.dist(pos2)));
         DEBUG(QString("kp: %1").arg(posPid->kp), D_MHMMD);
-        posPid->kp = std::min(posPid->kp, conf->posKP * 3);
-        posPid->kp = std::min(posPid->kp, conf->posKP);
+        posPid->kp = min(posPid->kp, conf->posKP * 3);
+        posPid->kp = max(posPid->kp, conf->posKP);
 
         posPid->kd = 15;
         posPid->ki = 0;
     } else {
         posPid->kp = (conf->posKP) * (0.015 / (agentPos.dist(pos2) * agentPos.dist(pos2)));
         DEBUG(QString("kp: %1").arg(posPid->kp), D_MHMMD);
-        posPid->kp = std::min(posPid->kp, conf->posKP * 2);
-        posPid->kp = std::min(posPid->kp, conf->posKP);
+        posPid->kp = min(posPid->kp, conf->posKP * 2);
+        posPid->kp = max(posPid->kp, conf->posKP);
         posPid->kd = conf->posKD;
         posPid->ki = conf->posKI;
     }
@@ -129,7 +129,7 @@ void CNewBangBang::bangBangSpeed(Vector2D _agentPos, Vector2D _agentVel, Vector2
     switch (decidePlan()) {
     case _bangBangPosPID:
         posPid->error = agentPos.dist(pos2);
-        vDes = std::min(posPid->PID_OUT(), velMax);
+        vDes = min(posPid->PID_OUT(), velMax);
         break;
     case _bangBangConst:
         vDes = velMax;

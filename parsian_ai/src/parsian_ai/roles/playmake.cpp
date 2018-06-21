@@ -54,7 +54,7 @@ void CRolePlayMake::stopBehindBall(bool penalty) {
 
             direction = wm->ball->pos - agent->pos();
             direction.y *= 1.2;
-            position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).normalizedVector() * (0.13);
+            position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).norm() * (0.13);
             gotopoint->setTargetpos(position);
             gotopoint->setTargetdir(direction);
         }
@@ -71,9 +71,9 @@ void CRolePlayMake::stopBehindBall(bool penalty) {
         gotopoint->setSlowmode(false);
 
     } else {
-        Vector2D shadowPoint = wm->ball->pos + Vector2D(wm->ball->pos - wm->field->oppGoal()).normalizedVector() * 0.3;
+        Vector2D shadowPoint = wm->ball->pos + Vector2D(wm->ball->pos - wm->field->oppGoal()).norm() * 0.3;
         if (kickoffmode || kickoffWing) {
-            shadowPoint = wm->ball->pos + Vector2D(wm->field->oppGoal() - wm->ball->pos).normalizedVector() * 0.3;
+            shadowPoint = wm->ball->pos + Vector2D(wm->field->oppGoal() - wm->ball->pos).norm() * 0.3;
         }
         gotopoint->setSlowmode(true);
         gotopoint->setNoavoid(false);
@@ -118,7 +118,7 @@ void CRolePlayMake::executeOurKickOff() {
             kick->setSlow(false);
             agent->action = kick;
         } else {
-            if (wm->ball->inSight <= 0 || !wm->ball->pos.isValid() || !wm->field->isInField(wm->ball->pos)) {
+            if (wm->ball->inSight <= 0 || !wm->ball->pos.valid() || !wm->field->isInField(wm->ball->pos)) {
                 wait->setWaithere(true);
                 agent->action = wait;
                 return;
@@ -333,7 +333,7 @@ void CRolePlayMake::executeOurPenalty() {
                     penaltyTarget.y = wm->field->oppGoalL().y * 2;
                     shift = Vector2D(0, -0.3);
                 }
-                position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + shift).normalizedVector() * (0.13);
+                position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + shift).norm() * (0.13);
                 gotopoint->setTargetdir(penaltyTarget);
                 gotopoint->setTargetpos(position);
                 gotopoint->setLookat(wm->ball->pos);
@@ -380,7 +380,7 @@ void CRolePlayMake::theirPenaltyPositioning() {
 }
 
 void CRolePlayMake::kickPass(double kickSpeed) {
-    Vector2D behindTheBall = wm->ball->pos + Vector2D(wm->ball->pos - pointToPass).normalizedVector() * 0.2;
+    Vector2D behindTheBall = wm->ball->pos + Vector2D(wm->ball->pos - pointToPass).norm() * 0.2;
     if (kickPassMode == KickPassFirst && agent->pos().dist(behindTheBall) > 0.01) {
         finalTarget = wm->ball->pos;
         gotopoint->setTargetpos(behindTheBall);
@@ -414,7 +414,7 @@ void CRolePlayMake::execute() {
     ROS_INFO_STREAM("shootout: gameState->ourPenaltyShootout(): " << gameState->ourPenaltyShootout());
     cyclesExecuted++;
     if (wm->ball->inSight <= 0
-            || !wm->ball->pos.isValid()
+            || !wm->ball->pos.valid()
             || !wm->field->marginedField().contains(wm->ball->pos)) {
         wait->setWaithere(true);
         agent->action = wait;

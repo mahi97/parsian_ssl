@@ -68,7 +68,7 @@ Vector2D COurPenaltyShootout::getEmptyTarget(Vector2D _position, double _radius)
     for (double dist = 0.0 ; dist <= 0.5 ; dist += 0.2) {
         for (double ang = -180.0 ; ang <= 180.0 ; ang += 60.0) {
             tempTarget = position + Vector2D::polar2vector(dist, ang);
-            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).normalizedVector() * 0.3)) {
+            if (wm->field->isInOppPenaltyArea(tempTarget + (wm->field->oppGoal() - tempTarget).norm() * 0.3)) {
                 continue;
             }
             for (int i = 0; i < wm->opp.activeAgentsCount(); i++) {
@@ -109,7 +109,7 @@ void COurPenaltyShootout::playmakeInitialPositioning()
     Vector2D direction, position;
     direction = wm->ball->pos - playMakeAgent->pos();
     direction.y *= 1.2;
-    position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).normalizedVector() * (0.13);
+    position = wm->ball->pos + (wm->ball->pos - wm->field->oppGoal() + Vector2D(0, 0.2)).norm() * (0.13);
     PMgotopoint->setTargetpos(position);
     PMgotopoint->setTargetdir(direction);
     PMgotopoint->setSlowmode(true);

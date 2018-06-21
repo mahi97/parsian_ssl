@@ -419,7 +419,7 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     if (!diveMode) {
         if (vforward >= 0) {
             if (vforward > (lastVf + conf->AccMaxForward * 0.0166667)) {
-                vforward = lastVf + (conf->AccMaxForward * 0.0166667) * (vforward > 0) ? 1 : -1;
+                vforward = lastVf + (conf->AccMaxForward * 0.0166667) * sign(vforward);
             }
             if (vforward < (lastVf - decCoef * conf->DecMax * 0.0166667)) {
                 vforward = lastVf - (decCoef * conf->DecMax * 0.0166667);
@@ -435,7 +435,7 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     } else {
         if (vforward >= 0) {
             if (vforward > (lastVf + conf->AccMaxForward * 0.0166667 * 2)) {
-                vforward = lastVf + (conf->AccMaxForward * 0.0166667 * 2) * (vforward > 0) ? 1 : -1;
+                vforward = lastVf + (conf->AccMaxForward * 0.0166667 * 2) * sign(vforward);
             }
             if (vforward < (lastVf - decCoef * conf->DecMax * 0.0166667 * 2)) {
                 vforward = lastVf - (decCoef * conf->DecMax * 0.0166667 * 2);
@@ -453,11 +453,11 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     if (vnormal >= 0) {
         if (diveMode) {
             if (vnormal > (lastVn + 8 * 0.0166667)) {
-                vnormal = lastVn + (8 * 0.0166667) * (vnormal > 0) ? 1 : -1;
+                vnormal = lastVn + (8 * 0.0166667) * sign(vnormal);
             }
         } else {
             if (vnormal > (lastVn + conf->AccMaxNormal * 0.0166667)) {
-                vnormal = lastVn + (conf->AccMaxNormal * 0.0166667) * (vnormal > 0) ? 1 : -1;
+                vnormal = lastVn + (conf->AccMaxNormal * 0.0166667) * sign(vnormal);
             }
         }
 
@@ -467,11 +467,11 @@ void Agent::accelerationLimiter(double vf, bool diveMode) {
     } else {
         if (diveMode) {
             if (vnormal < (lastVn - 8 * 0.0166667)) {
-                vnormal = lastVn + (8 * 0.0166667) * (vnormal > 0) ? 1 : -1;
+                vnormal = lastVn + (8 * 0.0166667) * sign(vnormal);
             }
         } else {
             if (vnormal < (lastVn - conf->AccMaxNormal * 0.0166667)) {
-                vnormal = lastVn + (conf->AccMaxNormal * 0.0166667) * (vnormal > 0) ? 1 : -1;
+                vnormal = lastVn + (conf->AccMaxNormal * 0.0166667) * sign(vnormal);
             }
         }
 
@@ -814,7 +814,7 @@ int Agent::kickValueForDistance(double dist, double finalVel) {
 
 //TODO : get speed from profiler
 Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirection) {
-    Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).normalizedVector(),
+    Vector2D oneTouchDir = Vector2D::unitVector(CSkillKickOneTouch::oneTouchAngle(pos(), Vector2D(0, 0), (pos() - wm->ball->pos).norm(),
                            pos() - wm->ball->pos, wm->field->oppGoal(),
                            conf->Landa,
                            conf->Gamma,
@@ -827,10 +827,10 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
     }
     //todo ballComingSpeed
     if (1/*self()->ballComingSpeed()*/ > 0.1) {
-        Line2D l(wm->ball->pos, wm->ball->pos + wm->ball->vel.normalizedVector());
+        Line2D l(wm->ball->pos, wm->ball->pos + wm->ball->vel.norm());
         q = l.projection(positioningPos);
         DBUG("case", D_ERROR);
-        if (q.isValid() && (q - positioningPos).length() < 1.0) {
+        if (q.valid() && (q - positioningPos).length() < 1.0) {
             DBUG("case2", D_ERROR);
             if ((wm->ball->pos - pos()).length() < 1.0) {
                 oneTouchKick = true;
@@ -853,11 +853,11 @@ Vector2D Agent::oneTouchCheck(Vector2D positioningPos, Vector2D* oneTouchDirecti
 ////CKS
 
 bool Agent::canOneTouch() {
-    drawer->draw(QString("%1 , %2").arg(1/*self()->ballComingSpeed()*/).arg(fabs(Vector2D::angleBetween(wm->ball->vel.normalizedVector(), (pos() - wm->ball->pos).normalizedVector()).degree())), Vector2D(0, 1));
-    drawer->draw(Segment2D(Vector2D(0, 0) , (pos() - wm->ball->pos).normalizedVector()), "blue");
-    drawer->draw(Segment2D(Vector2D(0, 0) , wm->ball->vel.normalizedVector()), "red");
+    drawer->draw(QString("%1 , %2").arg(1/*self()->ballComingSpeed()*/).arg(fabs(Vector2D::angleBetween(wm->ball->vel.norm(), (pos() - wm->ball->pos).norm()).degree())), Vector2D(0, 1));
+    drawer->draw(Segment2D(Vector2D(0, 0) , (pos() - wm->ball->pos).norm()), "blue");
+    drawer->draw(Segment2D(Vector2D(0, 0) , wm->ball->vel.norm()), "red");
     if (1/*self()->ballComingSpeed()*/ > 0.9) {
-        if (fabs(Vector2D::angleBetween(wm->ball->vel.normalizedVector(), (pos() - wm->ball->pos).normalizedVector()).degree()) < 21) {
+        if (fabs(Vector2D::angleBetween(wm->ball->vel.norm(), (pos() - wm->ball->pos).norm()).degree()) < 21) {
             return true;
         }
     }
@@ -901,7 +901,7 @@ void Agent::initPlanner(const Vector2D &_target, const QList<int> &_ourRelaxList
 void Agent::getPathPlannerResult(vector<Vector2D> _result , Vector2D _averageDir) {
     pathPlannerResult.clear();
     pathPlannerResult.assign(_result.begin() , _result.end());
-    plannerAverageDir = _averageDir.normalizedVector();
+    plannerAverageDir = _averageDir.norm();
     ROS_INFO_STREAM("SUBS");
 }
 

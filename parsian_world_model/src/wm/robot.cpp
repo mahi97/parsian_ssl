@@ -99,7 +99,7 @@ Robot::Robot(int _id, bool isOurTeam, bool noKalman) : MovingObject(true) {
 void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, bool cameraSwitched, bool applyCommand, kalmParam _param) {
     kalman *kalman = donKalman;
     const qint64 lastTime = (updateFuture) ? kalmanFutureLastTime : kalmanLastTime;
-    double timeDiff = (std::max(kalmanTime.elapsed() , 1)) * 0.001; //(time - lastTime);
+    double timeDiff = (max(kalmanTime.elapsed() , 1)) * 0.001; //(time - lastTime);
     //timeDiff = 0.016;
     Q_ASSERT(timeDiff >= 0);
     const float phi = kalman->baseState()(2) - (_PI / 2);
@@ -139,9 +139,9 @@ void Robot::newPredict(qint64 time, bool updateFuture, bool permanentUpdate, boo
 
 
      if(fabs(accel_f) > 5)
-        accel_f = 5 * (accel_f < 0) ? -1 : 1;
+        accel_f = 5 * sign(accel_f);
     if(fabs(accel_s )> 5)
-        accel_s = 5 * (accel_s < 0) ? -1 : 1;
+        accel_s = 5 * sign(accel_s);
 
     //debug(QString("acc : %1").arg(accel_f),D_MHMMD);
 

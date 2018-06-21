@@ -7,7 +7,7 @@
 #include "math.h"
 #include "matrix.h"
 #include "stdio.h"
-#include "parsian_util/geom.h"
+#include "parsian_util/geom/geom.h"
 
 double AvgWithoutOutliers(QList<double> data , double accuracy);
 

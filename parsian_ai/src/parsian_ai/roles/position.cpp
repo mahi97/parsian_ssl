@@ -74,12 +74,12 @@ void CRolePosition::execute() {
         p[0] = wm->field->getRegion(wm->field->OurMidFieldTopWing).center();
         p[1] = wm->field->getRegion(wm->field->OurMidFieldBottomWing).center();
 
-//    if (!lastBestPoint1.isValid())
+//    if (!lastBestPoint1.valid())
 //      lastBestPoint1 = p[0];
 //    pos[0].initialPoint = lastBestPoint1;
 
 
-//    if (!lastBestPoint2.isValid())
+//    if (!lastBestPoint2.valid())
 //      lastBestPoint2 = p[1];
 //    pos[1].initialPoint = lastBestPoint2;
 
@@ -122,7 +122,7 @@ void CRolePosition::execute() {
 //      {
 //        if ((pos[i].point - mywm->ball->pos).length() < 0.7)
 //        {
-//          pos[i].point = (pos[i].point-mywm->ball->pos).normalizedVector()*0.7 + mywm->ball->pos;
+//          pos[i].point = (pos[i].point-mywm->ball->pos).norm()*0.7 + mywm->ball->pos;
 //        }
 //        if (!mywm->field->isInField(pos[i].point))
 //        {
@@ -138,7 +138,7 @@ void CRolePosition::execute() {
 //          }
 //          if (best_i == -1 || c==0)
 //          {
-//            pos[i].point = (mywm->ball->pos - mywm->field->ourGoal()).normalizedVector() + mywm->ball->pos;
+//            pos[i].point = (mywm->ball->pos - mywm->field->ourGoal()).norm() + mywm->ball->pos;
 //          }
 //          else {
 //            pos[i].point = sol[best_i];
