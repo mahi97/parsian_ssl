@@ -319,6 +319,44 @@ Rect2D::intersection(const Circle2D & circle,
 
     }
 
+int
+Rect2D::rotateAndintersect(const Segment2D & segment, const Vector2D& center, float angle ,
+                           Vector2D * sol1,
+                           Vector2D * sol2) const {
+    Vector2D a = segment.origin() - center;
+    Vector2D b = segment.terminal() - center;
+    a.rotate(-angle);
+    b.rotate(-angle);
+    a += center;
+    b += center;
+    int res = intersection(Segment2D(a, b), sol1, sol2);
+    sol1->rotate(angle);
+    sol2->rotate(angle);
+
+    return res;
+}
+
+
+int
+Rect2D::rotateAndintersect(const Circle2D & circle, const Vector2D& center, float angle ,
+                           Vector2D * sol1,
+                           Vector2D * sol2,
+                           Vector2D * sol3,
+                           Vector2D * sol4) const {
+
+    Vector2D cirCenter = circle.center() - center;
+    cirCenter.rotate(-angle);
+    cirCenter += center;
+    int res = intersection(Circle2D(cirCenter, circle.radius()) , sol1, sol2, sol3, sol4);
+
+    sol1->rotate(angle);
+    sol2->rotate(angle);
+    sol3->rotate(angle);
+    sol4->rotate(angle);
+
+    return res;
+}
+
 
 /*-------------------------------------------------------------------*/
 /*!

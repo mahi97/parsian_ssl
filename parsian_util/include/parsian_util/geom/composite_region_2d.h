@@ -32,7 +32,7 @@
 #ifndef RCSC_GEOM_COMPOSITE_REGION2D_H
 #define RCSC_GEOM_COMPOSITE_REGION2D_H
 
-#include <rcsc/geom/region_2d.h>
+#include <parsian_util/geom/region_2d.h>
 
 #include <boost/shared_ptr.hpp>
 #include <vector>

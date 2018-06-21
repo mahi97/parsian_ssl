@@ -30,7 +30,7 @@
 #ifndef RCSC_GEOM_TRIANGULATION_USING_TRIANGLE_H
 #define RCSC_GEOM_TRIANGULATION_USING_TRIANGLE_H
 
-#include <rcsc/geom/vector_2d.h>
+#include <parsian_util/geom/vector_2d.h>
 
 #include <vector>
 #include <set>

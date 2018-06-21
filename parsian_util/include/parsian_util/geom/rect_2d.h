@@ -47,14 +47,14 @@ class Segment2D;
   \class Rect2D
   \brief 2D rectangle regin class.
 
-  The model and naming rules are depend on soccer simulator environment
-          -34.0
+  The model and naming rules are depend on soccer simulator environment (changed for SSL)
+           34.0
             |
             |
 -52.5 ------+------- 52.5
             |
             |
-          34.0
+          -34.0
 */
 class Rect2D
     : public Region2D {
@@ -123,13 +123,13 @@ public:
             const Vector2D & bottom_right )
         : M_top_left( top_left )
         , M_size( bottom_right.x - top_left.x,
-                  bottom_right.y - top_left.y )
+                  top_left.y - bottom_right.y)
       {
           if ( bottom_right.x - top_left.x < 0.0 )
           {
               M_top_left.x = bottom_right.x;
           }
-          if ( bottom_right.y - top_left.y < 0.0 )
+          if ( bottom_right.y - top_left.y > 0.0 )
           {
               M_top_left.y = bottom_right.y;
           }
@@ -146,8 +146,8 @@ public:
                         const double & length,
                         const double & width )
       {
-          return Rect2D( center.x - length*0.5,
-                         center.y - width*0.5,
+          return Rect2D( center.x - length * 0.5,
+                         center.y + width  * 0.5,
                          length,
                          width );
       }
@@ -166,7 +166,7 @@ public:
                         const double & width )
       {
           return Rect2D( center_x - length*0.5,
-                         center_y - width*0.5,
+                         center_y + width*0.5,
                          length,
                          width );
       }
@@ -600,8 +600,8 @@ public:
       {
           return ( left() <= point.x
                    && point.x <= right()
-                   && top() <= point.y
-                   && point.y <= bottom() );
+                   && top() >= point.y
+                   && point.y >= bottom() );
       }
 
     /*!
@@ -615,8 +615,8 @@ public:
       {
           return ( left() - error_thr <= point.x
                    && point.x <= right() + error_thr
-                   && top() - error_thr <= point.y
-                   && point.y <= bottom() + error_thr );
+                   && top() + error_thr >= point.y
+                   && point.y >= bottom() - error_thr );
       }
 
     /*!
@@ -654,7 +654,7 @@ public:
     */
     double bottom() const
       {
-          return top() + size().width();
+          return top() - size().width();
       }
 
     /*!
@@ -831,6 +831,37 @@ public:
     int intersection(const Circle2D & circle,
                          Vector2D * sol1, Vector2D * sol2,
                          Vector2D * sol3, Vector2D * sol4) const;
+
+    /*!
+      \brief calculate intersection point with line segment.
+      \param segment considerd line segment.
+      \param center considerd center of rotation.
+      \param angle considerd angle of rotation.
+      \param sol1 pointer to the 1st solution variable
+      \param sol2 pointer to the 2nd solution variable
+      \return number of intersection
+    */
+    int rotateAndintersect(const Segment2D & segment, const Vector2D& center, float angle ,
+                           Vector2D * sol1,
+                           Vector2D * sol2) const;
+
+    /*!
+      \brief calculate intersection point with circle.
+      \param circle considerd the circle.
+      \param center considerd center of rotation.
+      \param angle considerd angle of rotation.
+      \param sol1 pointer to the 1st solution variable
+      \param sol2 pointer to the 2nd solution variable
+      \param sol3 pointer to the 3rd solution variable
+      \param sol4 pointer to the 4th solution variable
+      \return number of intersection
+    */
+    int rotateAndintersect(const Circle2D & circle, const Vector2D& center, float angle ,
+                           Vector2D * sol1,
+                           Vector2D * sol2,
+                           Vector2D * sol3,
+                           Vector2D * sol4) const;
+
 
     /*!
       \brief convert this rectangle to the intersection rectangle with other.

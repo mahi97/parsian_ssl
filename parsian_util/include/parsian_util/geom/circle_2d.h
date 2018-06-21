@@ -193,6 +193,16 @@ public:
                       Vector2D * sol1,
                       Vector2D * sol2 ) const;
 
+
+    /*!
+      \brief calculate the tangent from a point
+      \param p considerd the point that tangent comes from
+      \param sol1 pointer to the 1st solution variable
+      \param sol2 pointer to the 2nd solution variable
+      \return the number of solution
+     */
+    int tangent(const Vector2D& p, Vector2D * sol1, Vector2D * sol2) const;
+
     // static utility
 
     /*!

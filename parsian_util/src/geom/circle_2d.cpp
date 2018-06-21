@@ -304,6 +304,19 @@ Circle2D::intersection( const Circle2D & circle,
     return this->intersection( line, sol1, sol2 );
 }
 
+int Circle2D::tangent(const Vector2D& p, Vector2D * sol1, Vector2D * sol2) const {
+    double s = p.dist2(M_center);
+    double r = M_radius * M_radius;
+    if (s < r) {
+        return 0;
+    }
+    if (s == r) {
+        sol1->assign(p.x, p.y);
+        return 1;
+    }
+    return intersection(Circle2D(p, sqrt(s - r)), sol1, sol2);
+}
+
 /*-------------------------------------------------------------------*/
 /*!
 

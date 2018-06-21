@@ -302,7 +302,7 @@ public:
       the invalidated value vector is returned.
     */
     Vector2D intersection( const Segment2D & other,
-                           const bool allow_end_point ) const;
+                           const bool allow_end_point = true) const;
 
     /*!
       \brief check & get the intersection point with other line

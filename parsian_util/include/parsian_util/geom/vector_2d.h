@@ -68,8 +68,8 @@ namespace rcsc {
           \brief default constructor.
         */
         Vector2D()
-                : x( 0.0 ),
-                  y( 0.0 )
+                : x( ERROR_VALUE ),
+                  y( ERROR_VALUE )
         { }
         /*!
         \brief create Vector with parsian message.
@@ -367,6 +367,21 @@ namespace rcsc {
         }
 
         /*!
+          \brief get a single coordinate.
+          \param i the number of coordinate that we want
+          \return the wanted coordinate
+        */
+        double &operator [](int i) {
+            i %= 2;
+            if (i == 0) {
+                return x;
+            } else {
+                return y;
+            }
+        }
+
+
+        /*!
           \brief get the squared distance from this to 'p'.
           \param p target point
           \return squared distance to 'p'
@@ -624,6 +639,44 @@ namespace rcsc {
         {
             return v1.outerProduct( v2 );
         }
+
+
+    AngleDeg angleWith(const Vector2D & v) const {
+        double d = (length() * v.length());
+        if (d == 0.0) {
+            return 0;
+        }
+        return AngleDeg(acos((this->x * v.x + this->y * v.y) / d) * 180.0 / M_PI);
+    }
+    inline
+    static AngleDeg angleOf(const Vector2D& A, const Vector2D& O, const Vector2D& B) {
+        Vector2D a1(A.x - O.x, A.y - O.y);
+        Vector2D a2(B.x - O.x, B.y - O.y);
+        return AngleDeg(fabs(AngleDeg::normalize_angle(
+                                 ((a1).th().degree() - (a2).th().degree())))
+                       );
+    }
+
+        inline
+    static
+    double dirTo_deg(const Vector2D &firstPoint ,
+                     const Vector2D &targetPoint) {
+        return AngleDeg::atan2_deg(targetPoint.y - firstPoint.y,
+                                   targetPoint.x - firstPoint.x);
+    }
+
+    inline
+    static
+    Vector2D unitVector(const AngleDeg &angle) {
+        return Vector2D(angle.cos(), angle.sin());
+    }
+
+    inline
+    static
+    AngleDeg angleBetween(const Vector2D& v1, const Vector2D& v2) {
+        return AngleDeg::normalize_angle(v2.th().degree() - v1.th().degree());
+    }
+
 
         //////////////////////////////////////////////
         // stream utility
@@ -931,6 +984,65 @@ operator/( const rcsc::Vector2D & lhs,
 }
 
 /*!
+  \brief operator mult(T, U)
+  \param lhs left hand side parameter
+  \param rhs right hand side parameter. double type
+  \return new vector object
+*/
+inline
+const
+rcsc::Vector2D
+operator*( const double & lhs,
+           const rcsc::Vector2D & rhs )
+{
+    return rcsc::Vector2D( rhs ) *= lhs;
+}
+
+/*!
+  \brief operator div(T, U)
+  \param lhs left hand side parameter
+  \param rhs right hand side parameter. double type
+  \return new vector object
+*/
+inline
+const
+rcsc::Vector2D
+operator/( const double & lhs,
+           const rcsc::Vector2D & rhs )
+{
+    return rcsc::Vector2D( rhs ) /= lhs;
+}
+
+
+/*!
+  \brief operator mult(T, U)
+  \param lhs left hand side parameter
+  \param rhs right hand side parameter.
+  \return a double
+*/
+inline
+double
+operator*(const rcsc::Vector2D & lhs,
+          const rcsc::Vector2D & rhs) {
+    return lhs.innerProduct(rhs);
+}
+
+
+/*!
+  \brief operator mult(T, U)
+  \param lhs left hand side parameter
+  \param rhs right hand side parameter
+  \return a double
+*/
+inline
+double
+operator^(const rcsc::Vector2D & lhs,
+          const rcsc::Vector2D & rhs) {
+    return lhs.outerProduct(rhs);
+}
+
+
+/*!
   \brief never used
  */
 template < typename T >
@@ -1029,6 +1141,5 @@ operator<<( std::ostream & os,
 {
     return v.print( os );
 }
-
 
 #endif

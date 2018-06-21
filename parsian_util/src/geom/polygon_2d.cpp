@@ -165,11 +165,11 @@ Polygon2D::contains( const Vector2D & p,
 
 
     Rect2D r = this -> getBoundingBox();
-
-    if ( ! r.contains( p ) )
-    {
-        return false;
-    }
+    //// COMMENTED BY MAHI @ PARSIAN
+    // if ( ! r.contains( p ) )
+    // {
+    //     return false;
+    // }
 
 
     //

@@ -41,8 +41,8 @@ namespace rcsc {
 
 const double Vector2D::EPSILON = 1.0e-6;
 
-const double Vector2D::ERROR_VALUE = std::numeric_limits< double >::max();
+const double Vector2D::ERROR_VALUE = 5000.0;
+const Vector2D Vector2D::INVALIDATED(Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE);
 
-const Vector2D Vector2D::INVALIDATED( Vector2D::ERROR_VALUE, Vector2D::ERROR_VALUE );
 
 }
