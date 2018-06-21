@@ -95,7 +95,7 @@ double CBall::getVel() {
     return fabs(modelC1 / modelSampleTime);
 }
 Vector2D CBall::getPosInFuture(double _t) {
-    return pos + (-0.5 * (getBallAcc()) * _t * _t + vel.length() * _t) * vel.norm();
+    return pos + (-0.5 * (getBallAcc()) * _t * _t + vel.length() * _t) * vel.normalizedVector();
 }
 
 double CBall::modelWhenIsObjAt(double dToObj) {
@@ -136,13 +136,13 @@ Vector2D CBall::getDir() {
 }
 
 Vector2D CBall::getStopPos() {
-    return pos + vel.norm() * vel.r2() / (2.0 * getBallAcc());
+    return pos + vel.normalizedVector() * vel.r2() / (2.0 * getBallAcc());
 //    if (modelC2<0) return modelObjStopPos;
 //    return Vector2D();
 }
 
 Vector2D CBall::getProjectionOfPointOnBallVeclocityDirection(Vector2D point, bool usepath) {
-    if (usepath && modelDir.valid()) {
+    if (usepath && modelDir.isValid()) {
         Line2D l(pos, modelDir + pos);
         Vector2D proj = l.projection(point);
         return proj;
@@ -276,14 +276,14 @@ Vector2D CBall::whereBallSpeedIs(double speed) {
     if (vel.length() < speed) {
         return pos;
     }
-    return pos + vel.norm() * (vel.r2() - speed * speed) / (2.0 * acc.length());
+    return pos + vel.normalizedVector() * (vel.r2() - speed * speed) / (2.0 * acc.length());
 }
 
 Vector2D CBall::ballSpeedAt(double dist) {
     if (dist < 0) return Vector2D{0.0, 0.0};
     double v2 = vel.r2() - 2.0 * acc.length() * dist;
     if (v2 < 0) return Vector2D{0.0, 0.0};
-    return vel.norm() * sqrt(v2);
+    return vel.normalizedVector() * sqrt(v2);
 }
 
 double CBall::getBallAcc() {

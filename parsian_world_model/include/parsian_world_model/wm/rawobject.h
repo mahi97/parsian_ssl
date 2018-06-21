@@ -5,7 +5,7 @@
 #ifndef PARSIAN_WORLD_MODEL_RAWOBJECT_H
 #define PARSIAN_WORLD_MODEL_RAWOBJECT_H
 
-#include <parsian_util/geom/geom.h>
+#include <parsian_util/geom.h>
 #include <parsian_world_model/wm/movingobject.h>
 
 class MovingObject;
