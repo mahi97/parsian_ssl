@@ -13,7 +13,7 @@
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,8 +32,10 @@
 #ifndef RCSC_GEOM_H
 #define RCSC_GEOM_H
 
+
 #include <parsian_util/geom/angle_deg.h>
 #include <parsian_util/geom/circle_2d.h>
+#include <parsian_util/geom/delaunay_triangulation.h>
 #include <parsian_util/geom/line_2d.h>
 #include <parsian_util/geom/matrix_2d.h>
 #include <parsian_util/geom/polygon_2d.h>
@@ -44,9 +46,6 @@
 #include <parsian_util/geom/size_2d.h>
 #include <parsian_util/geom/triangle_2d.h>
 #include <parsian_util/geom/vector_2d.h>
-
-#define EPSILON 0.0001
-#define _INF        1.0e13
 
 using namespace rcsc;
 

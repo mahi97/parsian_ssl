@@ -13,7 +13,7 @@
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,16 +42,19 @@ namespace rcsc {
 
  */
 Vector2D
-Ray2D::intersection(const Line2D & other) const {
+Ray2D::intersection( const Line2D & other ) const
+{
     Line2D my_line = this->line();
 
-    Vector2D tmp_sol = my_line.intersection(other);
+    Vector2D tmp_sol = my_line.intersection( other );
 
-    if (! tmp_sol.valid()) {
+    if ( ! tmp_sol.isValid() )
+    {
         return Vector2D::INVALIDATED;
     }
 
-    if (! inRightDir(tmp_sol)) {
+    if ( ! inRightDir( tmp_sol ) )
+    {
         return Vector2D::INVALIDATED;
     }
 
@@ -63,15 +66,18 @@ Ray2D::intersection(const Line2D & other) const {
 
  */
 Vector2D
-Ray2D::intersection(const Ray2D & other) const {
-    Vector2D tmp_sol = this->line().intersection(other.line());
+Ray2D::intersection( const Ray2D & other ) const
+{
+    Vector2D tmp_sol = this->line().intersection( other.line() );
 
-    if (! tmp_sol.valid()) {
+    if ( ! tmp_sol.isValid() )
+    {
         return Vector2D::INVALIDATED;
     }
 
-    if (! this->inRightDir(tmp_sol)
-            || ! other.inRightDir(tmp_sol)) {
+    if ( ! this->inRightDir( tmp_sol )
+        || ! other.inRightDir( tmp_sol ) )
+    {
         return Vector2D::INVALIDATED;
     }
 

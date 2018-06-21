@@ -8,12 +8,12 @@
 /*
  *Copyright:
 
- Copyright (C) Hiroki Shimora
+ Copyright (C) Hiroki Shimora, Hidehisa Akiyama
 
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,6 +30,8 @@
 #ifndef RCSC_GEOM_POLYGON2D_H
 #define RCSC_GEOM_POLYGON2D_H
 
+#include <parsian_util/geom/region_2d.h>
+
 #include <vector>
 
 namespace rcsc {
@@ -41,9 +43,10 @@ class Rect2D;
   \class Polygon2D
   \brief 2D polygon region class
  */
-class Polygon2D {
+class Polygon2D
+    : public Region2D {
 private:
-    std::vector< Vector2D > M_vertex;
+    std::vector< Vector2D > M_vertices;
 
 public:
     /*!
@@ -58,10 +61,9 @@ public:
     Polygon2D( const std::vector< Vector2D > & v );
 
     /*!
-      \brief set polygon to empty polygon
-      \return const reference to itself
+      \brief clear all data.
     */
-    const Polygon2D & assign();
+    void clear();
 
     /*!
       \brief set polygon with points
@@ -74,19 +76,30 @@ public:
       \brief append point to polygon
       \param p new point
     */
-    void addVertex( const Vector2D & p );
+    void addVertex( const Vector2D & p )
+      {
+          M_vertices.push_back( p );
+      }
 
     /*!
       \brief get list of point of this polygon
       \return const reference to point list
     */
-    const std::vector< Vector2D > & vertex() const;
+    const std::vector< Vector2D > & vertices() const
+      {
+          return M_vertices;
+      }
 
     /*!
-      \brief get list of point of this polygon
-      \return reference to point list
+      \brief check point is in this polygon or not. the point on segment lines is allowed.
+      \param p point for checking
+      \return true if point is in this polygon
     */
-    std::vector< Vector2D > & vertex();
+    virtual
+    bool contains( const Vector2D & p ) const
+      {
+          return contains( p, true );
+      }
 
     /*!
       \brief check point is in this polygon or not
@@ -96,7 +109,7 @@ public:
       \return true if point is in this polygon
     */
     bool contains( const Vector2D & p,
-                   bool allow_on_segment = true ) const;
+                   const bool allow_on_segment ) const;
 
     /*!
       \brief get bounding box of this polygon
@@ -123,22 +136,23 @@ public:
       \return minimum distance between this polygon and point
     */
     double dist( const Vector2D & p,
-                 bool check_as_plane = true ) const;
+                 const bool check_as_plane = true ) const;
 
     /*!
       \brief get area of this polygon
       \return value of area with sign.
     */
+    virtual
     double area() const;
 
     /*!
-      \brief get area with sign
-      \return value of area with sign.
-      If vertexes are placed counterclockwise order, returns positive number.
-      If vertexes are placed clockwise order, returns negative number.
+      \brief calculate doubled signed area value
+      \return value of doubled signed area.
+      If vertices are placed counterclockwise order, returns positive number.
+      If vertices are placed clockwise order, returns negative number.
       Otherwise, returns 0.
     */
-    double signedArea2() const;
+    double doubleSignedArea() const;
 
     /*!
       \brief check vertexes of this polygon is placed counterclockwise ot not

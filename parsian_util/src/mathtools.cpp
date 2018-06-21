@@ -789,7 +789,7 @@ void MWBM::destroy() {
 }
 
 void MWBM::changeSize(int k, int r) {
-    int pp = max(k, r);
+    int pp = std::max(k, r);
     if (pp > cap) {
         return;
     }
@@ -970,7 +970,7 @@ double MWBM::findMaxMinMatching() {
     double minWeight = 0;
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) {
-            minWeight = min(minWeight, W[i][j]);
+            minWeight = std::min(minWeight, W[i][j]);
         }
     double tempW[n][n];
     for (int i = 0; i < n; i++)

@@ -13,7 +13,7 @@
  This code is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+ version 3 of the License, or (at your option) any later version.
 
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,6 +32,7 @@
 #endif
 
 #include "parsian_util/geom/polygon_2d.h"
+
 #include <parsian_util/geom/vector_2d.h>
 #include <parsian_util/geom/segment_2d.h>
 #include <parsian_util/geom/rect_2d.h>
@@ -42,88 +43,57 @@
 #include <cstdlib>
 #include <iostream>
 
-
-
 namespace rcsc {
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 Polygon2D::Polygon2D()
-    : M_vertex()
+    : M_vertices()
 {
+
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 Polygon2D::Polygon2D( const std::vector< Vector2D > & v )
-    : M_vertex( v )
+    : M_vertices( v )
 {
+
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
-const Polygon2D &
-Polygon2D::assign()
+ */
+void
+Polygon2D::clear()
 {
-    M_vertex.clear();
-    return *this;
+    M_vertices.clear();
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 const Polygon2D &
 Polygon2D::assign( const std::vector< Vector2D > & v )
 {
-    M_vertex = v;
+    M_vertices = v;
     return *this;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
-void
-Polygon2D::addVertex( const Vector2D & p )
-{
-    M_vertex.push_back( p );
-}
-
-/*-------------------------------------------------------------------*/
-/*!
-
-*/
-const std::vector< Vector2D > &
-Polygon2D::vertex() const
-{
-    return M_vertex;
-}
-
-/*-------------------------------------------------------------------*/
-/*!
-
-*/
-std::vector< Vector2D > &
-Polygon2D::vertex()
-{
-    return M_vertex;
-}
-
-/*-------------------------------------------------------------------*/
-/*!
-
-*/
+ */
 Rect2D
 Polygon2D::getBoundingBox() const
 {
-    if ( M_vertex.empty() )
+    if ( M_vertices.empty() )
     {
         return Rect2D();
     }
@@ -133,38 +103,40 @@ Polygon2D::getBoundingBox() const
     double y_min = +DBL_MAX;
     double y_max = -DBL_MAX;
 
-    for ( size_t i = 0; i < M_vertex.size(); ++i )
+    const std::vector< Vector2D >::const_iterator end = M_vertices.end();
+    for ( std::vector< Vector2D >::const_iterator p = M_vertices.begin();
+          p != end;
+          ++p )
     {
-        const Vector2D & p = M_vertex[i];
-
-        if ( p.x > x_max )
+        if ( p->x > x_max )
         {
-            x_max = p.x;
+            x_max = p->x;
         }
 
-        if ( p.x < x_min )
+        if ( p->x < x_min )
         {
-            x_min = p.x;
+            x_min = p->x;
         }
 
-        if ( p.y > y_max )
+        if ( p->y > y_max )
         {
-            y_max = p.y;
+            y_max = p->y;
         }
 
-        if ( p.y < y_min )
+        if ( p->y < y_min )
         {
-            y_min = p.y;
+            y_min = p->y;
         }
     }
 
-    return( Rect2D( x_min, y_min, (x_max - x_min), (y_max - y_min) ) );
+    return Rect2D( Vector2D( x_min, y_min ),
+                   Size2D( x_max - x_min, y_max - y_min ) );
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 Vector2D
 Polygon2D::xyCenter() const
 {
@@ -174,27 +146,30 @@ Polygon2D::xyCenter() const
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 bool
 Polygon2D::contains( const Vector2D & p,
-                     bool allow_on_segment ) const
+                     const bool allow_on_segment ) const
 {
-    if ( M_vertex.empty() )
+    if ( M_vertices.empty() )
     {
         return false;
     }
-    else if ( M_vertex.size() == 1 )
+    else if ( M_vertices.size() == 1 )
     {
-        return allow_on_segment && (M_vertex[0] == p);
+        return allow_on_segment
+            //&& ( M_vertices[0].equals( p ) );
+            && ( M_vertices[0] == p );
+
     }
 
 
     Rect2D r = this -> getBoundingBox();
 
-    // if ( ! r.contains( p ) )
-    // {
-    //     return false;
-    // }
+    if ( ! r.contains( p ) )
+    {
+        return false;
+    }
 
 
     //
@@ -202,7 +177,7 @@ Polygon2D::contains( const Vector2D & p,
     //
     Segment2D line( p, Vector2D( p.x + ((r.maxX() - r.minX()
                                          + r.maxY() - r.minY())
-                                        + (M_vertex[0] - p).r()) * 3.0,
+                                        + (M_vertices[0] - p).r()) * 3.0,
                                  p.y ) );
 
     //
@@ -211,17 +186,17 @@ Polygon2D::contains( const Vector2D & p,
     bool inside = false;
     double min_line_x = r.maxX() + 1.0;
 
-    for ( size_t i = 0; i < M_vertex.size(); ++i )
+    for ( size_t i = 0; i < M_vertices.size(); ++i )
     {
         size_t p1_index = i + 1;
 
-        if ( p1_index >= M_vertex.size() )
+        if ( p1_index >= M_vertices.size() )
         {
             p1_index = 0;
         }
 
-        const Vector2D p0 = M_vertex[i];
-        const Vector2D p1 = M_vertex[p1_index];
+        const Vector2D p0 = M_vertices[i];
+        const Vector2D p1 = M_vertices[p1_index];
 
         if ( ! allow_on_segment )
         {
@@ -231,7 +206,10 @@ Polygon2D::contains( const Vector2D & p,
             }
         }
 
-        if ( allow_on_segment && p == p0 )
+        if ( allow_on_segment
+            //&& p.equalsStrictly( p0 ) )
+            && p == p0 )
+
         {
             return true;
         }
@@ -239,7 +217,7 @@ Polygon2D::contains( const Vector2D & p,
         if ( line.existIntersection( Segment2D( p0, p1 ) ) )
         {
             if ( p0.y == p.y
-              || p1.y == p.y )
+                 || p1.y == p.y )
             {
                 if ( p0.y == p.y )
                 {
@@ -263,7 +241,7 @@ Polygon2D::contains( const Vector2D & p,
                     continue;
                 }
                 else if ( p0.y < p.y
-                       || p1.y < p.y )
+                          || p1.y < p.y )
                 {
                     continue;
                 }
@@ -284,27 +262,29 @@ Polygon2D::contains( const Vector2D & p,
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 double
 Polygon2D::dist( const Vector2D & p,
                  bool check_as_plane ) const
 {
-    if ( this -> vertex().size() == 1 )
+    const size_t size = vertices().size();
+
+    if ( size == 1 )
     {
-        return (this -> vertex()[0] - p).r();
+        return ( M_vertices[0] - p ).r();
     }
 
-    if ( check_as_plane && this -> contains( p ) )
+    if ( check_as_plane && contains( p ) )
     {
         return 0.0;
     }
 
     double min_dist = +DBL_MAX;
 
-    for ( size_t i = 0; i + 1 < this -> vertex().size(); ++i )
+    for ( size_t i = 0; i + 1 < size; ++i )
     {
-        Segment2D seg( this -> vertex()[i],
-                       this -> vertex()[i + 1] );
+        Segment2D seg( M_vertices[i],
+                       M_vertices[i + 1] );
 
         double d = seg.dist( p );
 
@@ -314,10 +294,9 @@ Polygon2D::dist( const Vector2D & p,
         }
     }
 
-    if ( this -> vertex().size() >= 3 )
+    if ( size >= 3 )
     {
-        Segment2D seg( *(this -> vertex().rbegin()),
-                       *(this -> vertex().begin()) );
+        Segment2D seg( M_vertices.back(), M_vertices.front() );
 
         double d = seg.dist( p );
 
@@ -335,35 +314,36 @@ Polygon2D::dist( const Vector2D & p,
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 double
 Polygon2D::area() const
 {
-    return std::fabs( this -> signedArea2() / 2.0 );
+    return std::fabs( doubleSignedArea() * 0.5 );
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 double
-Polygon2D::signedArea2() const
+Polygon2D::doubleSignedArea() const
 {
-    if ( M_vertex.size() < 3 )
+    const size_t size = M_vertices.size();
+    if ( size < 3 )
     {
         return 0.0;
     }
 
     double sum = 0.0;
-    for ( size_t i = 0; i < M_vertex.size(); ++i )
+    for ( size_t i = 0; i < size; ++i )
     {
         size_t n = i + 1;
-        if ( n == M_vertex.size() )
+        if ( n == size )
         {
             n = 0;
         }
 
-        sum += (M_vertex[i].x * M_vertex[n].y - M_vertex[n].x * M_vertex[i].y);
+        sum += ( M_vertices[i].x * M_vertices[n].y - M_vertices[n].x * M_vertices[i].y );
     }
 
     return sum;
@@ -372,27 +352,27 @@ Polygon2D::signedArea2() const
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 bool
 Polygon2D::isCounterclockwise() const
 {
-    return this -> signedArea2() > 0.0;
+    return doubleSignedArea() > 0.0;
 }
 
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 bool
 Polygon2D::isClockwise() const
 {
-    return this -> signedArea2() < 0.0;
+    return doubleSignedArea() < 0.0;
 }
 
 
 /*-------------------------------------------------------------------*/
 /*!
-
+  \brief scissorring implementation
 */
 template< class Predicate >
 void
@@ -433,7 +413,7 @@ scissorWithLine( const Predicate & in_region,
             {
                 Vector2D c = line.intersection( Line2D( p0, p1 ) );
 
-                if ( ! c.valid() )
+                if ( ! c.isValid() )
                 {
                     std::cerr << "internal error:"
                               << " in rcsc::Polygon2D::scissorWithLine()"
@@ -451,7 +431,7 @@ scissorWithLine( const Predicate & in_region,
             {
                 Vector2D c = line.intersection( Line2D( p0, p1 ) );
 
-                if ( ! c.valid() )
+                if ( ! c.isValid() )
                 {
                     std::cerr << "internal error:"
                               << " in rcsc::Polygon2D::scissorWithLine()"
@@ -543,16 +523,16 @@ public:
 /*-------------------------------------------------------------------*/
 /*!
 
-*/
+ */
 Polygon2D
 Polygon2D::getScissoredConnectedPolygon( const Rect2D & r ) const
 {
-    if ( M_vertex.empty() )
+    if ( M_vertices.empty() )
     {
         return Polygon2D();
     }
 
-    std::vector< Vector2D > p = M_vertex;
+    std::vector< Vector2D > p = M_vertices;
     std::vector< Vector2D > clipped_p_1;
     std::vector< Vector2D > clipped_p_2;
     std::vector< Vector2D > clipped_p_3;
