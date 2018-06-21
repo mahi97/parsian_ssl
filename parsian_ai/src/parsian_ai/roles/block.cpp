@@ -15,7 +15,7 @@ void CRoleBlock::execute() {
 
     Vector2D dir, p;
     p = agent->oneTouchCheck(info()->blockPosition, &dir);
-    if (p.valid()) {
+    if (p.isValid()) {
         gotopoint->setTargetdir(dir);
         gotopoint->setTargetpos(p);
 
@@ -60,15 +60,15 @@ void CRoleBlockInfo::findPos(bool blockGoal) {
     }
 
     if (blockGoal) {
-        blockPosition = (wm->field->ourGoal() - wm->ball->pos).norm() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
+        blockPosition = (wm->field->ourGoal() - wm->ball->pos).normalizedVector() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
     } else {
-        Vector2D goalPos = (wm->field->ourGoal() - wm->ball->pos).norm() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
+        Vector2D goalPos = (wm->field->ourGoal() - wm->ball->pos).normalizedVector() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
         Vector2D pos;
         int kicker = know->getNearestOppToPoint(wm->ball->pos);
         if (kicker == -1) {
             blockPosition = goalPos;
         } else {
-            pos = (wm->ball->pos - wm->opp[kicker]->pos).norm() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
+            pos = (wm->ball->pos - wm->opp[kicker]->pos).normalizedVector() * (blockDist + Robot::robot_radius_old) + wm->ball->pos;
 
             Rect2D checkRect = Rect2D(wm->field->fieldRect().left() + Robot::robot_radius_old, wm->field->fieldRect().top() - Robot::robot_radius_old , wm->field->_FIELD_WIDTH - 2 * Robot::robot_radius_old, wm->field->_FIELD_HEIGHT - 2 * Robot::robot_radius_old);
             if (Vector2D::angleBetween((wm->ball->pos - wm->opp[kicker]->pos) , (wm->field->ourGoal() - wm->ball->pos)).abs() < 30 && checkRect.contains(pos)) {

@@ -906,7 +906,7 @@ void CMarkPlan::execute(){
                     markPoses.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).first());
                     markAngs.append(ShootBlockRatio(segmentpershoot, oppAgentsToMarkPos[i]).last());
                 }
-                for(int i = 0; i < min(agents.count() - oppAgentsToMarkPos.count(), oppAgentsToMarkPos.count()); i++) {
+                for(int i = 0; i <std::min(agents.count() - oppAgentsToMarkPos.count(), oppAgentsToMarkPos.count()); i++) {
                     markPoses.append(PassBlockRatio(segmentperpass, tempQlistQpair[i].first).first());
                     markAngs.append(PassBlockRatio(segmentperpass, tempQlistQpair[i].first).last());
                 }

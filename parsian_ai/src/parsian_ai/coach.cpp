@@ -352,7 +352,7 @@ double CCoach::timeNeeded(Agent *_agentT,const Vector2D& posT, double vMax) {
     double dist = 0;
     QList <Vector2D> _result;
     Vector2D _target;
-    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().norm()).radian());
+    double tAgentVelTanjent =  tAgentVel.length() * cos(Vector2D::angleBetween(posT - _agentT->pos() , _agentT->vel().normalizedVector()).radian());
 
     double vXvirtual = (posT - _agentT->pos()).x;
     double vYvirtual = (posT - _agentT->pos()).y;
@@ -382,11 +382,11 @@ double CCoach::kickTimeEstimation(Agent * _agent, const Vector2D& target) {
     Vector2D s1,s2;
     Vector2D finalPos;
     double agentTime = 0;
-    Segment2D ballPath(ballPos,ballPos + wm->ball->vel.norm()*20);
+    Segment2D ballPath(ballPos,ballPos + wm->ball->vel.setLengthVector(20));
 
     if(wm->ball->vel.length() < 0.1)
     {
-        return timeNeeded(_agent, ballPos + (ballPos - target).norm()*0.1, 4.5);
+        return timeNeeded(_agent, ballPos + (ballPos - target).setLengthVector(0.1), 4.5);
     }
 
     if (Circle2D(agentPos, 0.1).intersection(Segment2D(ballPos, wm->ball->getPosInFuture(0.5)), &s1, &s2)) {
@@ -395,7 +395,7 @@ double CCoach::kickTimeEstimation(Agent * _agent, const Vector2D& target) {
     } else {
         for (double i = 0.5; i < 5; i += 0.1) {
             finalPos = wm->ball->getPosInFuture(i);
-            agentTime = timeNeeded(_agent, finalPos - (finalPos-target).norm()*0.1, 4.5);
+            agentTime = timeNeeded(_agent, finalPos - (finalPos-target).setLengthVector(0.1), 4.5);
             if (agentTime < (i - (0.5))) {
                 return i;
             }
@@ -458,7 +458,7 @@ bool CCoach::isBallcollide(int framCount, double diffDir) {
     lastBallVels.append(std::move(wm->ball->vel));
     averageVel += wm->ball->vel.length();
     if(lastBallVels.size()>2){
-        double innerproduct = wm->ball->vel.norm().innerProduct(lastBallVels.first().norm());
+        double innerproduct = wm->ball->vel.normalizedVector().innerProduct(lastBallVels.first().normalizedVector());
         ROS_INFO_STREAM("KALI inner : "<<innerproduct<<"  vel "<<wm->ball->vel.length());
 
         if((wm->ball->vel.length() <.1 && averageVel/lastBallVels.size() > .1)||
@@ -570,7 +570,7 @@ double CCoach::findMostPossible(Vector2D agentPos) {
     }
     double prob, angle, biggestAngle;
 
-    CKnowledge::getEmptyAngle(*wm->field, agentPos - (wm->field->oppGoal() - agentPos).norm() * 0.15, wm->field->oppGoalL(),
+    CKnowledge::getEmptyAngle(*wm->field, agentPos - (wm->field->oppGoal() - agentPos).setLengthVector(0.15), wm->field->oppGoalL(),
                               wm->field->oppGoalR(), obstacles, prob, angle, biggestAngle);
 
 
@@ -1164,7 +1164,7 @@ void CCoach::execute()
     // choose playmake agent
     bool defenseFirst = wm->ball->vel.length() > 1
                         && Segment2D(wm->field->oppGoalR(), wm->field->oppGoalL()).
-            intersection(Segment2D(wm->ball->pos, wm->ball->pos + wm->ball->dir.norm() * 10)).isValid();
+            intersection(Segment2D(wm->ball->pos, wm->ball->pos + wm->ball->dir.setLengthVector(10))).isValid();
     playmakeId = -1;
     if (defenseFirst) {
         decideDefense();
@@ -1420,7 +1420,7 @@ void CCoach::checkSensorShootFault() {
         if (ourPlayers.contains(i) != nullptr) {
             Agent* tempAgent = agents[i];
             if (tempAgent->shootSensor
-                &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().norm() * 0.08) > 0.2) {
+                &&  wm->ball->pos.dist(tempAgent->pos() + tempAgent->dir().setLengthVector(0.08)) > 0.2) {
                 faultDetectionCounter[i]++;
 
             } else {
@@ -1670,7 +1670,7 @@ void CCoach::matchPlan(NGameOff::SPlan *_plan, const QList<int>& _ourplayers) {
 
     MWBM matcher;
     int passcount = 0;
-    passcount = min(_plan->execution.passCount + 1, _ourplayers.size());
+    passcount =std::min(_plan->execution.passCount + 1, _ourplayers.size());
     matcher.create(_plan->common.currentSize - passcount, _ourplayers.size() - passcount);
 
     int matchedID = -1, secMatchedID = -1, thirdMatchedID = -1;
