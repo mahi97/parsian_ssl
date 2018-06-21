@@ -191,7 +191,7 @@ void CSkillGotoPointAvoid::execute()
     //
     //
     //                flag = false;
-    //
+    //                break;
     //            }
     //        }
 
